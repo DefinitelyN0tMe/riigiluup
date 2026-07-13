@@ -55,4 +55,35 @@ public class RiigikoguClient {
             Thread.currentThread().interrupt();
         }
     }
+
+    // --- Added in Phase 2 ---
+
+    public List<UsergroupDto> fetchAllUsergroups() {
+        UsergroupDto[] arr = rest.get()
+                .uri("/api/usergroups?lang=et")
+                .retrieve()
+                .body(UsergroupDto[].class);
+        return arr == null ? List.of() : List.of(arr);
+    }
+
+    public PlenaryMemberDetailDto fetchPlenaryMemberDetail(String uuid) {
+        return rest.get()
+                .uri("/api/plenary-members/{uuid}?lang=et", uuid)
+                .retrieve()
+                .body(PlenaryMemberDetailDto.class);
+    }
+
+    public JsonNode fetchParticipationStats(String memberUuid) {
+        return rest.get()
+                .uri("/api/statistics/participations/member/{uuid}?lang=et", memberUuid)
+                .retrieve()
+                .body(JsonNode.class);
+    }
+
+    public JsonNode fetchVotingStats(String memberUuid) {
+        return rest.get()
+                .uri("/api/statistics/votings/member/{uuid}?lang=et", memberUuid)
+                .retrieve()
+                .body(JsonNode.class);
+    }
 }
