@@ -74,6 +74,7 @@ export type PoliticianProfile = {
   committees: CommitteeMembership[];
   participation: ParticipationStats;
   voting: VotingStats;
+  groupAlignment: GroupAlignmentDto;
   biographyHtml: string | null;
   sourceUrl: string;
 };
@@ -135,4 +136,57 @@ export type PoliticianVote = {
   startedAt: string | null;
   choice: VoteIndividual["choice"];
   choiceSourceCode: string | null;
+};
+
+export type ComparisonSide = {
+  id: string;
+  slug: string;
+  fullName: string;
+  factionName: string | null;
+  partyShortName: string | null;
+  photoUrl: string | null;
+  groupAlignmentRate: number | null;
+  groupAlignmentMatches: number;
+  groupAlignmentEligible: number;
+};
+
+export type PairwiseAgreement = {
+  sameCount: number;
+  diffCount: number;
+  oneNotParticipatingCount: number;
+  totalOverlap: number;
+  agreementRate: number | null;
+  methodologyNote: string;
+};
+
+export type ComparisonDisagreement = {
+  voteEventId: string;
+  voteEventDescription: string | null;
+  voteType: string | null;
+  startedAt: string | null;
+  leftChoice: string;
+  rightChoice: string;
+};
+
+export type ComparisonResponse = {
+  left: ComparisonSide;
+  right: ComparisonSide;
+  period: { from: string; to: string };
+  agreement: PairwiseAgreement;
+  recentDisagreements: ComparisonDisagreement[];
+};
+
+export type GroupAlignmentDto = {
+  rate: number | null;
+  matches: number;
+  eligible: number;
+  recentDeviations: Array<{
+    voteEventId: string;
+    voteEventDescription: string | null;
+    voteType: string | null;
+    startedAt: string | null;
+    memberChoice: string | null;
+    factionMajorityChoice: string | null;
+  }>;
+  methodologyNote: string;
 };

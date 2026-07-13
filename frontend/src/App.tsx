@@ -4,6 +4,7 @@ import PoliticiansPage from "./pages/PoliticiansPage";
 import PoliticianProfilePage from "./pages/PoliticianProfilePage";
 import VotesPage from "./pages/VotesPage";
 import VoteDetailPage from "./pages/VoteDetailPage";
+import ComparePage from "./pages/ComparePage";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <nav className="text-sm text-slate-600 flex gap-4">
           <Link to="/politicians" className="hover:text-estonia">MPs</Link>
           <Link to="/votes" className="hover:text-estonia">Votes</Link>
+          <Link to="/compare" className="hover:text-estonia">Compare</Link>
         </nav>
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
@@ -22,6 +24,7 @@ export default function App() {
           <Route path="/politicians/:slug" element={<PoliticianProfilePage />} />
           <Route path="/votes" element={<VotesPage />} />
           <Route path="/votes/:id" element={<VoteDetailPage />} />
+          <Route path="/compare" element={<ComparePage />} />
         </Routes>
       </main>
       <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500">
