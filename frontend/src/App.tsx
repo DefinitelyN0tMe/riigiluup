@@ -1,4 +1,5 @@
 import { Link, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import LocaleSwitcher from "./components/LocaleSwitcher";
 import HomePage from "./pages/HomePage";
@@ -22,9 +23,13 @@ import CorrectionsPage from "./pages/static/CorrectionsPage";
 import AdminPage from "./pages/AdminPage";
 
 export default function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  useEffect(() => {
+    document.documentElement.lang = i18n.resolvedLanguage ?? "en";
+  }, [i18n.resolvedLanguage]);
   return (
     <div className="min-h-screen flex flex-col">
+      <a href="#main" className="skip-link">Skip to content</a>
       <header className="border-b border-slate-200 px-6 py-4 flex items-center gap-6">
         <Link to="/" className="text-lg font-semibold text-ink">{t("nav.brand")}</Link>
         <nav className="text-sm text-slate-600 flex gap-4 flex-1">
@@ -35,7 +40,7 @@ export default function App() {
         </nav>
         <LocaleSwitcher />
       </header>
-      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
+      <main id="main" className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/politicians" element={<PoliticiansPage />} />

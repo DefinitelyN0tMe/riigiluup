@@ -10,8 +10,9 @@ export default function AgreementBar({ same, diff, oneNotParticipating }: Props)
     return <div className="text-sm text-slate-500">No comparable overlap.</div>;
   }
   const samePct = (same / comparable) * 100;
+  const legend = `Same ${same}, Different ${diff}, At least one did not participate ${oneNotParticipating}`;
   return (
-    <div>
+    <div role="img" aria-label={legend}>
       <div className="flex h-3 rounded overflow-hidden bg-slate-100">
         <span className="bg-emerald-500 h-3 block" style={{ width: `${samePct}%` }} title={`Same: ${same}`} />
         <span className="bg-orange-500 h-3 block" style={{ width: `${100 - samePct}%` }} title={`Different: ${diff}`} />

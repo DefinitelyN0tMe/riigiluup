@@ -57,7 +57,7 @@ export default function PoliticiansPage() {
 
       {data && (
         <>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600" aria-live="polite">
             Showing {data.items.length} of {data.totalElements} MPs.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

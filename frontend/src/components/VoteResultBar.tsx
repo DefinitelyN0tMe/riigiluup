@@ -28,8 +28,9 @@ export default function VoteResultBar({
         title={`${label}: ${n}`}
       />
     ) : null;
+  const legend = `For ${inFavor}, Against ${against}, Abstained ${abstained}, Did not vote ${didNotVote}, Absent ${absent}, total ${total}`;
   return (
-    <div className="w-full">
+    <div className="w-full" role="img" aria-label={legend}>
       <div className="flex h-3 rounded overflow-hidden bg-slate-100">
         {seg(inFavor, COLORS.inFavor, "FOR")}
         {seg(against, COLORS.against, "AGAINST")}
