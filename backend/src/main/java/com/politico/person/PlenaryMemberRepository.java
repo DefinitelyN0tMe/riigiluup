@@ -16,7 +16,7 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
     @Query("""
         select m from PlenaryMember m
         where (:activeOnly = false or m.active = true)
-          and (:q is null or lower(m.fullName) like lower(concat('%', :q, '%')))
+          and (:q is null or lower(m.fullName) like lower(concat('%', cast(:q as string), '%')))
         """)
     Page<PlenaryMember> search(
             @Param("q") String q,
