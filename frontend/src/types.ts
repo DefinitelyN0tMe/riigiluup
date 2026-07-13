@@ -246,3 +246,24 @@ export type PoliticianLegislationResponse = {
   totalSponsored: number;
   items: PageResponse<LegislationListItem>;
 };
+
+export type AdminStatus = {
+  jobs: Array<{
+    sourceName: string;
+    jobName: string;
+    lastRunStatus: string;
+    lastRunAt: string | null;
+    recordsSeen: number;
+    recordsUpserted: number;
+    errorMessage: string | null;
+  }>;
+  snapshotsByEntity: Array<{ entityType: string; count: number }>;
+  counts: {
+    plenaryMembers: number;
+    groups: number;
+    voteEvents: number;
+    individualVotes: number;
+    legislativeItems: number;
+  };
+  generatedAt: string;
+};

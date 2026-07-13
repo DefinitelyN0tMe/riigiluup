@@ -17,6 +17,7 @@ import PrivacyPage from "./pages/static/PrivacyPage";
 import TermsPage from "./pages/static/TermsPage";
 import DataStatusPage from "./pages/static/DataStatusPage";
 import CorrectionsPage from "./pages/static/CorrectionsPage";
+import AdminPage from "./pages/AdminPage";
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/data-status" element={<DataStatusPage />} />
           <Route path="/corrections" element={<CorrectionsPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </main>
       <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
