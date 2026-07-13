@@ -141,9 +141,9 @@ public class PlenaryMemberDetailImporter {
     private void reconcileCommitteeMemberships(
             PlenaryMember member, PlenaryMemberDetailDto dto, SourceSnapshot snap
     ) {
-        if (dto.committees() == null) return;
+        List<PlenaryMemberDetailDto.GroupRef> committees = mapper.currentTermCommittees(dto);
         Set<String> incomingGroupUuids = new HashSet<>();
-        for (PlenaryMemberDetailDto.Committee c : dto.committees()) {
+        for (PlenaryMemberDetailDto.GroupRef c : committees) {
             if (c.uuid() == null) continue;
             incomingGroupUuids.add(c.uuid());
             Group group = groupRepo
@@ -163,8 +163,10 @@ public class PlenaryMemberDetailImporter {
                             .importedAt(Instant.now())
                             .updatedAt(Instant.now())
                             .build());
-            incoming.setRole(MembershipRole.fromSourceLabel(c.position()));
-            incoming.setActive(Boolean.TRUE.equals(c.active()));
+            String roleLabel = c.membership() == null || c.membership().role() == null
+                    ? null : c.membership().role().value();
+            incoming.setRole(MembershipRole.fromSourceLabel(roleLabel));
+            incoming.setActive(true);
             incoming.setSourceSnapshot(snap);
             incoming.setUpdatedAt(Instant.now());
             membershipRepo.save(incoming);

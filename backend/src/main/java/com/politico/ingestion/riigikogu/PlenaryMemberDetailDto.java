@@ -4,6 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
+/**
+ * Shape of {@code /api/plenary-members/{uuid}}. Committees, factions and
+ * electoral district live INSIDE each {@link Membership} (one per parliamentary
+ * term the MP has served). Callers pick the current term via
+ * {@code membershipRoleItems[i].endDate == null}.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record PlenaryMemberDetailDto(
         String uuid,
@@ -12,13 +18,11 @@ public record PlenaryMemberDetailDto(
         String fullName,
         String email,
         String gender,
-        String dateOfBirth,           // ISO yyyy-MM-dd from source
-        String biography,             // HTML
-        Integer parliamentSeniority,  // days
+        String dateOfBirth,
+        String biography,
+        Integer parliamentSeniority,
         Photo photo,
-        List<Committee> committees,
-        List<ElectoralDistrict> electoralDistrict,
-        Faction currentFaction        // Riigikogu returns `faction` on some endpoints; verify at first fetch
+        List<Membership> memberships
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Photo(String uuid, String fileName, String fileExtension, Links _links) {
@@ -29,11 +33,45 @@ public record PlenaryMemberDetailDto(
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Committee(String uuid, String name, String position, Boolean active) {}
+    public record Membership(
+            Integer membershipNumber,
+            List<GroupRef> factions,
+            List<GroupRef> committees,
+            List<DistrictEntry> electoralDistrict,
+            List<MembershipRoleItem> membershipRoleItems
+    ) {}
+
+    /** Committee / faction reference nested under a Membership. */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GroupRef(
+            String uuid,
+            String name,
+            CodeValue type,
+            Boolean active,
+            MembershipSpan membership
+    ) {}
+
+    /** Validity window of a specific group affiliation within a term. */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record MembershipSpan(
+            String uuid,
+            Integer membershipNumber,
+            String startDate,
+            String endDate,
+            CodeValue role,
+            CodeValue jobTitle
+    ) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ElectoralDistrict(String uuid, String name) {}
+    public record DistrictEntry(Integer membership, CodeValue electoralDistrict) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Faction(String uuid, String name) {}
+    public record MembershipRoleItem(
+            String startDate,
+            String endDate,
+            CodeValue role
+    ) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record CodeValue(String code, String value) {}
 }

@@ -2,8 +2,10 @@ package com.politico.group;
 
 /**
  * Discriminator mapped from Riigikogu usergroups {@code type.code}.
- * Values observed so far: fraktsioon, alatine_komisjon, erikomisjon,
- * delegatsioon, uhendus (ühendus), parlamentaargrupp. Anything else → OTHER.
+ * Real codes observed in production API (uppercase; matcher lowercases them):
+ * FRAKTSIOON, ALALINE_KOMISJON, ERIKOMISJON, UURIMISKOMISJON, DELEGATSIOON,
+ * YHENDUS, PARLAMENDIRYHM, OSAKOND, ASUTUSE_YKSUS, RIIGIKOGU_JUHATUS,
+ * RIIGIKOGU_TAISKOGU. Anything unrecognized falls through to OTHER.
  */
 public enum GroupType {
     FRACTION,
@@ -18,11 +20,11 @@ public enum GroupType {
         if (code == null) return OTHER;
         return switch (code.toLowerCase()) {
             case "fraktsioon" -> FRACTION;
-            case "alatine_komisjon" -> STANDING_COMMITTEE;
-            case "erikomisjon" -> SPECIAL_COMMITTEE;
+            case "alaline_komisjon" -> STANDING_COMMITTEE;
+            case "erikomisjon", "uurimiskomisjon" -> SPECIAL_COMMITTEE;
             case "delegatsioon" -> DELEGATION;
-            case "uhendus", "ühendus" -> ASSOCIATION;
-            case "parlamentaargrupp" -> BILATERAL_GROUP;
+            case "yhendus", "uhendus", "ühendus" -> ASSOCIATION;
+            case "parlamendiryhm", "parlamentaargrupp" -> BILATERAL_GROUP;
             default -> OTHER;
         };
     }
