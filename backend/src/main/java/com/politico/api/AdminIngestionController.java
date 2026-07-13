@@ -2,9 +2,11 @@ package com.politico.api;
 
 import com.politico.alignment.FactionAlignmentBackfillService;
 import com.politico.ingestion.riigikogu.ImportRunLog;
+import com.politico.ingestion.riigikogu.LegislativeItemImporter;
 import com.politico.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.politico.ingestion.riigikogu.PlenaryMemberImporter;
 import com.politico.ingestion.riigikogu.UsergroupImporter;
+import com.politico.ingestion.riigikogu.VoteBillLinker;
 import com.politico.ingestion.riigikogu.VoteEventImporter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +27,8 @@ public class AdminIngestionController {
     private final PlenaryMemberDetailImporter detailImporter;
     private final VoteEventImporter voteImporter;
     private final FactionAlignmentBackfillService alignmentBackfill;
+    private final LegislativeItemImporter legislationImporter;
+    private final VoteBillLinker voteBillLinker;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -56,5 +60,21 @@ public class AdminIngestionController {
     public Map<String, Object> recomputeAlignments() {
         int processed = alignmentBackfill.recomputeAll();
         return Map.of("processedEvents", processed);
+    }
+
+    @PostMapping("/legislation")
+    public ImportRunLog runLegislationImport(
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to
+    ) {
+        LocalDate today = LocalDate.now();
+        LocalDate effectiveTo = to != null ? to : today;
+        LocalDate effectiveFrom = from != null ? from : effectiveTo.minusDays(90);
+        return legislationImporter.runWindow(effectiveFrom, effectiveTo);
+    }
+
+    @PostMapping("/link-votes-to-bills")
+    public Map<String, Object> linkVotesToBills() {
+        return Map.of("linked", voteBillLinker.linkAll());
     }
 }
