@@ -1,5 +1,6 @@
 package com.politico.api;
 
+import com.politico.alignment.FactionAlignmentBackfillService;
 import com.politico.ingestion.riigikogu.ImportRunLog;
 import com.politico.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.politico.ingestion.riigikogu.PlenaryMemberImporter;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/import")
@@ -22,6 +24,7 @@ public class AdminIngestionController {
     private final UsergroupImporter usergroupImporter;
     private final PlenaryMemberDetailImporter detailImporter;
     private final VoteEventImporter voteImporter;
+    private final FactionAlignmentBackfillService alignmentBackfill;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -47,5 +50,11 @@ public class AdminIngestionController {
         LocalDate effectiveTo = to != null ? to : today;
         LocalDate effectiveFrom = from != null ? from : effectiveTo.minusDays(90);
         return voteImporter.runWindow(effectiveFrom, effectiveTo);
+    }
+
+    @PostMapping("/recompute-alignments")
+    public Map<String, Object> recomputeAlignments() {
+        int processed = alignmentBackfill.recomputeAll();
+        return Map.of("processedEvents", processed);
     }
 }
