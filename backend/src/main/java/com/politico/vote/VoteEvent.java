@@ -68,6 +68,10 @@ public class VoteEvent {
     @JoinColumn(name = "source_snapshot_id")
     private SourceSnapshot sourceSnapshot;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "legislative_item_id")
+    private com.politico.legislation.LegislativeItem legislativeItem;
+
     @Column(name = "imported_at", nullable = false)
     private Instant importedAt;
 
