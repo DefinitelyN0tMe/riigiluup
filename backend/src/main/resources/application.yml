@@ -27,3 +27,6 @@ politico:
     base-url: https://api.riigikogu.ee
     user-agent: "politico/0.0.1 (riigiluup@gmail.com)"
     rate-limit-per-second: 1
+  schedule:
+    daily-refresh-cron: "0 5 3 * * *"
+    daily-refresh-zone: "Europe/Tallinn"

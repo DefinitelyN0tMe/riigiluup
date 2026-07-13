@@ -1,7 +1,9 @@
 package com.politico.api;
 
 import com.politico.ingestion.riigikogu.ImportRunLog;
+import com.politico.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.politico.ingestion.riigikogu.PlenaryMemberImporter;
+import com.politico.ingestion.riigikogu.UsergroupImporter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,11 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminIngestionController {
 
-    private final PlenaryMemberImporter importer;
+    private final PlenaryMemberImporter memberImporter;
+    private final UsergroupImporter usergroupImporter;
+    private final PlenaryMemberDetailImporter detailImporter;
 
-    // Phase 1: unprotected. Basic auth or IP allow-list is Phase 6.
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
-        return importer.runOnce();
+        return memberImporter.runOnce();
+    }
+
+    @PostMapping("/usergroups")
+    public ImportRunLog runUsergroupsImport() {
+        return usergroupImporter.runOnce();
+    }
+
+    @PostMapping("/plenary-member-details")
+    public ImportRunLog runDetailImport() {
+        return detailImporter.runOnce();
     }
 }
