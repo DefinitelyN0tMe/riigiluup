@@ -31,8 +31,8 @@ public class PairwiseAgreementService {
             where l.voteEvent = r.voteEvent
               and l.plenaryMember = :left
               and r.plenaryMember = :right
-              and (:from is null or l.voteEvent.startedAt >= :from)
-              and (:to is null or l.voteEvent.startedAt <= :to)
+              and (cast(:from as instant) is null or l.voteEvent.startedAt >= :from)
+              and (cast(:to as instant) is null or l.voteEvent.startedAt <= :to)
             """;
         List<Tuple> rows = em.createQuery(jpql, Tuple.class)
                 .setParameter("left", left)
