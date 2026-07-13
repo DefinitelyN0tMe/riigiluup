@@ -30,3 +30,6 @@ politico:
   schedule:
     daily-refresh-cron: "0 5 3 * * *"
     daily-refresh-zone: "Europe/Tallinn"
+  admin:
+    username: ${POLITICO_ADMIN_USERNAME:admin}
+    password: ${POLITICO_ADMIN_PASSWORD:change-me}
