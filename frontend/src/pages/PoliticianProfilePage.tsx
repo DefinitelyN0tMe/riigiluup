@@ -2,6 +2,8 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProfile } from "../api/politicians";
 import { resolveMediaUrl } from "../api/client";
+import { fetchPoliticianVotes } from "../api/votes";
+import type { PoliticianVote } from "../types";
 import MetricCard from "../components/MetricCard";
 import CommitteeChip from "../components/CommitteeChip";
 import FactionBadge from "../components/FactionBadge";
@@ -9,6 +11,46 @@ import FactionBadge from "../components/FactionBadge";
 function pct(v: number | null): string {
   if (v == null) return "—";
   return `${(v * 100).toFixed(1)}%`;
+}
+
+const CHOICE_LABEL_SHORT: Record<PoliticianVote["choice"], string> = {
+  FOR: "For",
+  AGAINST: "Against",
+  ABSTAINED: "Abstained",
+  DID_NOT_VOTE: "Did not vote",
+  ABSENT: "Absent",
+  PRESENT: "Present",
+  UNKNOWN: "Unknown",
+};
+
+function VotingHistory({ slug }: { slug: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["politician-votes", slug],
+    queryFn: () => fetchPoliticianVotes(slug, 0, 20),
+  });
+  if (isLoading) return <p className="text-sm text-slate-500">Loading voting history…</p>;
+  if (!data || data.items.length === 0)
+    return <p className="text-sm text-slate-500">No recorded votes yet.</p>;
+  return (
+    <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg">
+      {data.items.map((v) => {
+        const when = v.startedAt ? new Date(v.startedAt).toLocaleDateString() : "";
+        return (
+          <li key={v.voteEventId} className="flex justify-between items-center p-3 text-sm gap-3">
+            <span className="min-w-0">
+              <Link to={`/votes/${v.voteEventId}`} className="hover:underline text-ink">
+                {v.description ?? "(no description)"}
+              </Link>
+              <span className="text-slate-500 block text-xs">{when}</span>
+            </span>
+            <span className="shrink-0 font-medium">
+              {CHOICE_LABEL_SHORT[v.choice] ?? v.choice}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 export default function PoliticianProfilePage() {
@@ -91,6 +133,13 @@ export default function PoliticianProfilePage() {
               <CommitteeChip key={`${c.name}-${c.role}`} c={c} />
             ))}
           </ul>
+        </section>
+      )}
+
+      {data.slug && (
+        <section aria-label="Recent votes">
+          <h2 className="text-lg font-semibold text-ink mb-2">Recent votes</h2>
+          <VotingHistory slug={data.slug} />
         </section>
       )}
 
