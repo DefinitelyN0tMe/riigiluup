@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "mps": "Депутаты",
+    "votes": "Голосования",
+    "compare": "Сравнить",
+    "bills": "Законопроекты",
+    "brand": "Politico"
+  },
+  "footer": {
+    "dataCredit": "Данные © Рийгикогу, CC BY-SA 3.0.",
+    "about": "О сайте",
+    "methodology": "Методология",
+    "sources": "Источники",
+    "dataFreshness": "Свежесть данных",
+    "privacy": "Приватность",
+    "terms": "Условия использования",
+    "corrections": "Правки"
+  },
+  "common": {
+    "loading": "Загрузка…",
+    "failedToLoad": "Не удалось загрузить.",
+    "sourceLink": "Источник ↗",
+    "officialProfile": "Официальный профиль ↗",
+    "prev": "Назад",
+    "next": "Вперёд",
+    "page": "Страница",
+    "of": "из"
+  },
+  "sections": {
+    "committees": "Комиссии",
+    "recentVotes": "Недавние голосования",
+    "recentBills": "Инициированные законопроекты",
+    "groupAlignment": "Соответствие фракции",
+    "biography": "Биография"
+  }
+}

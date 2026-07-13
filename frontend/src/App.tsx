@@ -1,4 +1,6 @@
 import { Link, Route, Routes } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LocaleSwitcher from "./components/LocaleSwitcher";
 import HomePage from "./pages/HomePage";
 import PoliticiansPage from "./pages/PoliticiansPage";
 import PoliticianProfilePage from "./pages/PoliticianProfilePage";
@@ -20,16 +22,18 @@ import CorrectionsPage from "./pages/static/CorrectionsPage";
 import AdminPage from "./pages/AdminPage";
 
 export default function App() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-slate-200 px-6 py-4 flex items-center gap-6">
-        <Link to="/" className="text-lg font-semibold text-ink">Politico</Link>
-        <nav className="text-sm text-slate-600 flex gap-4">
-          <Link to="/politicians" className="hover:text-estonia">MPs</Link>
-          <Link to="/votes" className="hover:text-estonia">Votes</Link>
-          <Link to="/compare" className="hover:text-estonia">Compare</Link>
-          <Link to="/legislation" className="hover:text-estonia">Bills</Link>
+        <Link to="/" className="text-lg font-semibold text-ink">{t("nav.brand")}</Link>
+        <nav className="text-sm text-slate-600 flex gap-4 flex-1">
+          <Link to="/politicians" className="hover:text-estonia">{t("nav.mps")}</Link>
+          <Link to="/votes" className="hover:text-estonia">{t("nav.votes")}</Link>
+          <Link to="/compare" className="hover:text-estonia">{t("nav.compare")}</Link>
+          <Link to="/legislation" className="hover:text-estonia">{t("nav.bills")}</Link>
         </nav>
+        <LocaleSwitcher />
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
         <Routes>
@@ -55,14 +59,14 @@ export default function App() {
         </Routes>
       </main>
       <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
-        <span>Data © Riigikogu, CC BY-SA 3.0.</span>
-        <Link to="/about" className="hover:text-estonia">About</Link>
-        <Link to="/methodology" className="hover:text-estonia">Methodology</Link>
-        <Link to="/sources" className="hover:text-estonia">Sources</Link>
-        <Link to="/data-status" className="hover:text-estonia">Data freshness</Link>
-        <Link to="/privacy" className="hover:text-estonia">Privacy</Link>
-        <Link to="/terms" className="hover:text-estonia">Terms</Link>
-        <Link to="/corrections" className="hover:text-estonia">Corrections</Link>
+        <span>{t("footer.dataCredit")}</span>
+        <Link to="/about" className="hover:text-estonia">{t("footer.about")}</Link>
+        <Link to="/methodology" className="hover:text-estonia">{t("footer.methodology")}</Link>
+        <Link to="/sources" className="hover:text-estonia">{t("footer.sources")}</Link>
+        <Link to="/data-status" className="hover:text-estonia">{t("footer.dataFreshness")}</Link>
+        <Link to="/privacy" className="hover:text-estonia">{t("footer.privacy")}</Link>
+        <Link to="/terms" className="hover:text-estonia">{t("footer.terms")}</Link>
+        <Link to="/corrections" className="hover:text-estonia">{t("footer.corrections")}</Link>
       </footer>
     </div>
   );

@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "mps": "Saadikud",
+    "votes": "Hääletused",
+    "compare": "Võrdle",
+    "bills": "Eelnõud",
+    "brand": "Politico"
+  },
+  "footer": {
+    "dataCredit": "Andmed © Riigikogu, CC BY-SA 3.0.",
+    "about": "Meist",
+    "methodology": "Metoodika",
+    "sources": "Allikad",
+    "dataFreshness": "Andmete värskus",
+    "privacy": "Privaatsus",
+    "terms": "Tingimused",
+    "corrections": "Parandused"
+  },
+  "common": {
+    "loading": "Laen…",
+    "failedToLoad": "Laadimine ebaõnnestus.",
+    "sourceLink": "Allikas ↗",
+    "officialProfile": "Ametlik profiil ↗",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "page": "Leht",
+    "of": "kokku"
+  },
+  "sections": {
+    "committees": "Komisjonid",
+    "recentVotes": "Hiljutised hääletused",
+    "recentBills": "Algatatud eelnõud",
+    "groupAlignment": "Rühmakuuluvus",
+    "biography": "Elulugu"
+  }
+}

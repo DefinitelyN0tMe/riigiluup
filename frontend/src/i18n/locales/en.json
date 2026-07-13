@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "mps": "MPs",
+    "votes": "Votes",
+    "compare": "Compare",
+    "bills": "Bills",
+    "brand": "Politico"
+  },
+  "footer": {
+    "dataCredit": "Data © Riigikogu, CC BY-SA 3.0.",
+    "about": "About",
+    "methodology": "Methodology",
+    "sources": "Sources",
+    "dataFreshness": "Data freshness",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "corrections": "Corrections"
+  },
+  "common": {
+    "loading": "Loading…",
+    "failedToLoad": "Failed to load.",
+    "sourceLink": "Source ↗",
+    "officialProfile": "Official profile ↗",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
+  },
+  "sections": {
+    "committees": "Committees",
+    "recentVotes": "Recent votes",
+    "recentBills": "Bills sponsored",
+    "groupAlignment": "Group alignment",
+    "biography": "Biography"
+  }
+}
