@@ -11,6 +11,7 @@ frontend/node_modules/
 .idea/
 *.iml
 .vscode/
+.claude/
 
 # OS
 Thumbs.db
