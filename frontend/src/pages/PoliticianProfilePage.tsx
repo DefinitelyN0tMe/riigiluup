@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchProfile } from "../api/politicians";
 import { resolveMediaUrl } from "../api/client";
 import { fetchPoliticianVotes } from "../api/votes";
+import { fetchPoliticianLegislation } from "../api/legislation";
 import type { PoliticianVote } from "../types";
 import MetricCard from "../components/MetricCard";
 import CommitteeChip from "../components/CommitteeChip";
@@ -50,6 +51,35 @@ function VotingHistory({ slug }: { slug: string }) {
         );
       })}
     </ul>
+  );
+}
+
+function BillsSponsored({ slug }: { slug: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["politician-legislation", slug],
+    queryFn: () => fetchPoliticianLegislation(slug, 0, 10),
+  });
+  if (isLoading) return <p className="text-sm text-slate-500">Loading bills…</p>;
+  if (!data || data.totalSponsored === 0)
+    return <p className="text-sm text-slate-500">No bills sponsored.</p>;
+  return (
+    <div>
+      <p className="text-3xl font-semibold text-ink">{data.totalSponsored}</p>
+      <p className="text-xs text-slate-500 mb-2">bills sponsored / initiated</p>
+      <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
+        {data.items.items.map((i) => (
+          <li key={i.id} className="p-3 text-sm">
+            <a href={`/legislation/${i.id}`} className="hover:underline text-ink">
+              {i.mark != null && <span className="text-slate-400 mr-2">#{i.mark}</span>}
+              {i.title}
+            </a>
+            <span className="text-slate-500 block text-xs mt-0.5">
+              {i.phase} · Initiated {i.initiatedDate ?? "—"}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -161,6 +191,15 @@ export default function PoliticianProfilePage() {
                 </ul>
               </div>
             )}
+          </div>
+        </section>
+      )}
+
+      {data.slug && (
+        <section aria-label="Bills sponsored">
+          <h2 className="text-lg font-semibold text-ink mb-2">Bills sponsored</h2>
+          <div className="border border-slate-200 rounded-lg p-4">
+            <BillsSponsored slug={data.slug} />
           </div>
         </section>
       )}
