@@ -38,8 +38,8 @@ public class GroupAlignmentService {
                   com.politico.vote.VoteChoice.FOR,
                   com.politico.vote.VoteChoice.AGAINST,
                   com.politico.vote.VoteChoice.ABSTAINED)
-              and (:from is null or iv.voteEvent.startedAt >= :from)
-              and (:to is null or iv.voteEvent.startedAt <= :to)
+              and (cast(:from as instant) is null or iv.voteEvent.startedAt >= :from)
+              and (cast(:to as instant) is null or iv.voteEvent.startedAt <= :to)
             """;
         Tuple row = em.createQuery(jpql, Tuple.class)
                 .setParameter("member", member)
