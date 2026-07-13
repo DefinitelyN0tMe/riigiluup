@@ -7,6 +7,15 @@ import VoteDetailPage from "./pages/VoteDetailPage";
 import ComparePage from "./pages/ComparePage";
 import LegislationPage from "./pages/LegislationPage";
 import LegislationDetailPage from "./pages/LegislationDetailPage";
+import AboutPage from "./pages/static/AboutPage";
+import MethodologyIndexPage from "./pages/static/MethodologyIndexPage";
+import MethodologyParticipationPage from "./pages/static/MethodologyParticipationPage";
+import MethodologyAlignmentPage from "./pages/static/MethodologyAlignmentPage";
+import MethodologyAgreementPage from "./pages/static/MethodologyAgreementPage";
+import SourcesPage from "./pages/static/SourcesPage";
+import PrivacyPage from "./pages/static/PrivacyPage";
+import TermsPage from "./pages/static/TermsPage";
+import DataStatusPage from "./pages/static/DataStatusPage";
 
 export default function App() {
   return (
@@ -30,10 +39,26 @@ export default function App() {
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/legislation" element={<LegislationPage />} />
           <Route path="/legislation/:id" element={<LegislationDetailPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/methodology" element={<MethodologyIndexPage />} />
+          <Route path="/methodology/participation" element={<MethodologyParticipationPage />} />
+          <Route path="/methodology/alignment" element={<MethodologyAlignmentPage />} />
+          <Route path="/methodology/agreement" element={<MethodologyAgreementPage />} />
+          <Route path="/sources" element={<SourcesPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/data-status" element={<DataStatusPage />} />
         </Routes>
       </main>
-      <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500">
-        Data © Riigikogu, CC BY-SA 3.0.
+      <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
+        <span>Data © Riigikogu, CC BY-SA 3.0.</span>
+        <Link to="/about" className="hover:text-estonia">About</Link>
+        <Link to="/methodology" className="hover:text-estonia">Methodology</Link>
+        <Link to="/sources" className="hover:text-estonia">Sources</Link>
+        <Link to="/data-status" className="hover:text-estonia">Data freshness</Link>
+        <Link to="/privacy" className="hover:text-estonia">Privacy</Link>
+        <Link to="/terms" className="hover:text-estonia">Terms</Link>
+        <a href="mailto:corrections@politico.example" className="hover:text-estonia">Corrections</a>
       </footer>
     </div>
   );
