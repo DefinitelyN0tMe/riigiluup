@@ -1,0 +1,29 @@
+{
+  "uuid": "vot-2000",
+  "votingNumber": 5,
+  "type": {"code": "AVALIK", "value": "Avalik"},
+  "description": "Muudatusettepaneku hääletamine",
+  "startDateTime": "2026-01-16T11:00:00",
+  "endDateTime": "2026-01-16T11:01:00",
+  "present": 94,
+  "absent": 7,
+  "inFavor": 40,
+  "against": 50,
+  "neutral": 0,
+  "abstained": 4,
+  "sitting": {"uuid": "sit-200", "title": "IX istungjärgu 2. istung"},
+  "voters": [
+    {
+      "uuid": "mp-A",
+      "fullName": "Kaja Kallas",
+      "faction": {"uuid": "F-Reform", "name": "Reformierakonna fraktsioon"},
+      "decision": {"code": "VASTU", "value": "Vastu"}
+    },
+    {
+      "uuid": "mp-C",
+      "fullName": "Mart Helme",
+      "faction": {"uuid": "F-EKRE", "name": "EKRE fraktsioon"},
+      "decision": {"code": "POOLT", "value": "Poolt"}
+    }
+  ]
+}

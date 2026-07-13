@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchAdminStatus, triggerAdminImport } from "../api/admin";
+import { AdminUnauthorizedError, fetchAdminStatus, triggerAdminImport } from "../api/admin";
 import type { AdminStatus } from "../types";
 
 const IMPORT_JOBS = [
@@ -13,10 +13,14 @@ const IMPORT_JOBS = [
   { path: "/api/v1/admin/import/link-votes-to-bills", labelKey: "admin.jobs.linkVotesToBills" },
 ] as const;
 
+const BASE = import.meta.env.VITE_API_BASE_URL ?? "";
+const OIDC_LOGIN_URL = `${BASE}/oauth2/authorization/google`;
+
+type AuthState = "loading" | "unauthorized" | "authorized";
+
 export default function AdminPage() {
   const { t } = useTranslation();
-  const [u, setU] = useState("");
-  const [p, setP] = useState("");
+  const [authState, setAuthState] = useState<AuthState>("loading");
   const [status, setStatus] = useState<AdminStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -24,50 +28,65 @@ export default function AdminPage() {
   async function refresh() {
     setError(null);
     try {
-      const s = await fetchAdminStatus(u, p);
+      const s = await fetchAdminStatus();
       setStatus(s);
+      setAuthState("authorized");
     } catch (e) {
-      setError((e as Error).message);
-      setStatus(null);
+      if (e instanceof AdminUnauthorizedError) {
+        setAuthState("unauthorized");
+        setStatus(null);
+      } else {
+        setError((e as Error).message);
+      }
     }
   }
+
+  useEffect(() => {
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function trigger(path: string, label: string) {
     if (!confirm(t("admin.confirmRun", { label }))) return;
     setBusy(label);
     setError(null);
     try {
-      await triggerAdminImport(u, p, path);
+      await triggerAdminImport(path);
       await refresh();
     } catch (e) {
-      setError((e as Error).message);
+      if (e instanceof AdminUnauthorizedError) {
+        setAuthState("unauthorized");
+        setStatus(null);
+      } else {
+        setError((e as Error).message);
+      }
     } finally {
       setBusy(null);
     }
   }
 
-  if (!status) {
+  if (authState === "loading") {
     return (
-      <form
-        className="max-w-sm space-y-3"
-        onSubmit={(e) => { e.preventDefault(); refresh(); }}
-      >
+      <div className="max-w-sm space-y-3">
         <h1 className="text-2xl font-semibold text-ink">{t("admin.title")}</h1>
-        <label className="block text-sm">
-          {t("admin.username")}
-          <input value={u} onChange={(e) => setU(e.target.value)} autoComplete="username"
-                 className="w-full border border-slate-300 rounded-md px-3 py-2 mt-1"/>
-        </label>
-        <label className="block text-sm">
-          {t("admin.password")}
-          <input type="password" value={p} onChange={(e) => setP(e.target.value)} autoComplete="current-password"
-                 className="w-full border border-slate-300 rounded-md px-3 py-2 mt-1"/>
-        </label>
-        <button type="submit" className="px-4 py-2 rounded-md bg-estonia text-white hover:bg-blue-700">
-          {t("admin.signIn")}
-        </button>
+        <p className="text-slate-500 text-sm">{t("admin.running")}</p>
+      </div>
+    );
+  }
+
+  if (authState === "unauthorized" || !status) {
+    return (
+      <div className="max-w-sm space-y-4">
+        <h1 className="text-2xl font-semibold text-ink">{t("admin.title")}</h1>
+        <p className="text-sm text-slate-600">{t("admin.signInWithGoogleHelp", { defaultValue: "Sign in with your authorised Google account." })}</p>
+        <a
+          href={OIDC_LOGIN_URL}
+          className="inline-block px-4 py-2 rounded-md bg-estonia text-white hover:bg-blue-700"
+        >
+          {t("admin.signInWithGoogle", { defaultValue: "Sign in with Google" })}
+        </a>
         {error && <p className="text-red-600 text-sm" role="alert">{error}</p>}
-      </form>
+      </div>
     );
   }
 

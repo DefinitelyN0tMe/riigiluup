@@ -1,0 +1,44 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  # Neuter the OAuth2 client autoconfig — the integration tests only exercise
+  # the basic-auth admin chain. Registering no providers keeps the context
+  # bootable without needing real Google credentials.
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.client.reactive.ReactiveOAuth2ClientAutoConfiguration
+  security:
+    oauth2:
+      client:
+        registration: {}
+
+server:
+  # SpringBootTest with RANDOM_PORT overrides this anyway.
+  port: 0
+
+politico:
+  riigikogu:
+    base-url: http://localhost:0
+    user-agent: "politico-test/0.0.1"
+    rate-limit-per-second: 1000
+  schedule:
+    daily-refresh-cron: "-"
+    daily-refresh-zone: "UTC"
+  admin:
+    username: ${POLITICO_ADMIN_USERNAME:testadmin}
+    password: ${POLITICO_ADMIN_PASSWORD:testpass}
+
+logging:
+  level:
+    root: WARN
+    com.politico: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN

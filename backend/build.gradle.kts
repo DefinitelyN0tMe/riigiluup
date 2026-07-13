@@ -21,6 +21,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
@@ -33,14 +34,19 @@ dependencies {
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.wiremock:wiremock-standalone:3.9.1")
     testImplementation("org.assertj:assertj-core")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test {
     useJUnitPlatform {
-        // Slow tests (Testcontainers, full context) are opt-in.
-        excludeTags("slow")
+        // Fast task excludes legacy slow tests and the new "integration" tag.
+        excludeTags("slow", "integration")
     }
 }
 
@@ -49,4 +55,34 @@ tasks.register<Test>("slowTest") {
         includeTags("slow")
     }
     shouldRunAfter(tasks.test)
+}
+
+tasks.register<Test>("integrationTest") {
+    description = "Runs @Tag(\"integration\") tests against a real Postgres 16."
+    group = "verification"
+    useJUnitPlatform {
+        includeTags("integration")
+    }
+    shouldRunAfter(tasks.test)
+    // Keep a single fork so the shared Testcontainer/external DB is reused.
+    maxParallelForks = 1
+    // The DB backend is picked by com.politico.support.IntegrationDbSelector:
+    //   - Default: boots a shared postgres:16-alpine via Testcontainers
+    //     (works on Linux CI / any host with a working Docker socket).
+    //   - Windows dev escape hatch: set POLITICO_IT_JDBC_URL to point at a
+    //     pre-started Postgres. Needed on Docker Desktop 4.73 / Engine 29.4
+    //     where docker-java's probe fails with HTTP 400 against the TCP
+    //     proxy. Example:
+    //       docker run -d --rm --name politico-test-pg -p 25432:5432 \
+    //         -e POSTGRES_DB=politico_it -e POSTGRES_USER=politico \
+    //         -e POSTGRES_PASSWORD=politico postgres:16-alpine
+    //       set POLITICO_IT_JDBC_URL=jdbc:postgresql://localhost:25432/politico_it
+    listOf("POLITICO_IT_JDBC_URL", "POLITICO_IT_JDBC_USER",
+            "POLITICO_IT_JDBC_PASSWORD", "DOCKER_HOST").forEach { key ->
+        System.getenv(key)?.let { environment(key, it) }
+    }
+    testLogging {
+        events("passed", "failed", "skipped")
+        showStandardStreams = false
+    }
 }

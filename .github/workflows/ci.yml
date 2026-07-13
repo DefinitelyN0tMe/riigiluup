@@ -28,16 +28,23 @@ jobs:
         working-directory: backend
         run: ./gradlew --no-daemon compileJava compileTestJava
 
-      - name: Unit tests (fast group only — skip @Tag("slow"))
+      - name: Unit tests (fast group only — skip @Tag("slow") + @Tag("integration"))
         working-directory: backend
         run: ./gradlew --no-daemon test
+
+      - name: Integration tests (Testcontainers — @Tag("integration"))
+        working-directory: backend
+        # ubuntu-24.04 runners ship with Docker; Testcontainers picks it up.
+        run: ./gradlew --no-daemon integrationTest
 
       - name: Upload test report on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-report
-          path: backend/build/reports/tests/test/
+          path: |
+            backend/build/reports/tests/test/
+            backend/build/reports/tests/integrationTest/
 
   frontend:
     name: Frontend (typecheck + build)

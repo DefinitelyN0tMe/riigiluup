@@ -14,6 +14,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  # OAuth2 client (Google OIDC) is registered programmatically in AdminSecurityConfig
+  # only when GOOGLE_OAUTH_CLIENT_ID is set, so an unset value doesn't break startup.
 
 server:
   port: ${SERVER_PORT:8081}
@@ -33,3 +35,4 @@ politico:
   admin:
     username: ${POLITICO_ADMIN_USERNAME:admin}
     password: ${POLITICO_ADMIN_PASSWORD:change-me}
+    allowed-emails: ${POLITICO_ADMIN_ALLOWED_EMAILS:riigiluup@gmail.com}

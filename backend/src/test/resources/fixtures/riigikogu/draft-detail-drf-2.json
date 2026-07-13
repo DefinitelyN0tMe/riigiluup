@@ -1,0 +1,35 @@
+{
+  "uuid": "drf-2",
+  "title": "Perekonnaseaduse muutmise seadus",
+  "initialTitle": "Perekonnaseaduse ja sellega seonduvalt teiste seaduste muutmise seadus",
+  "mark": 20,
+  "membership": 14,
+  "draftTypeCode": "SE",
+  "activeDraftStage": "VASTU_VOETUD",
+  "activeDraftStatus": "VASTU_VOETUD",
+  "introduction": "Sissejuhatus…",
+  "initiated": "2026-01-10",
+  "accepted": "2026-03-01",
+  "amendmentsDeadline": null,
+  "leadingCommittee": {"uuid": "cmt-2", "name": "Sotsiaalkomisjon", "type": "STANDING", "active": true},
+  "initiators": [
+    {"uuid": "gov-1", "name": "Vabariigi Valitsus", "type": "classifier", "active": true}
+  ],
+  "descriptors": [
+    {"edid": 9999, "text": "perekonnaõigus"}
+  ],
+  "readings": [
+    {
+      "readingCode": "ESIMENE_LUGEMINE",
+      "proceedingEvents": [
+        {"date": "2026-01-20T10:00:00", "status": "LOPETATUD"}
+      ]
+    },
+    {
+      "readingCode": "KOLMAS_LUGEMINE",
+      "proceedingEvents": [
+        {"date": "2026-03-01T14:00:00", "status": "VASTU_VOETUD"}
+      ]
+    }
+  ]
+}

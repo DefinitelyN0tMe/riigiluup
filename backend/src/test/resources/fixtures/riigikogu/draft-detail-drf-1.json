@@ -1,0 +1,31 @@
+{
+  "uuid": "drf-1",
+  "title": "Karistusseadustiku muutmise seadus",
+  "initialTitle": "Karistusseadustiku ja sellega seonduvalt teiste seaduste muutmise seadus",
+  "mark": 12,
+  "membership": 14,
+  "draftTypeCode": "SE",
+  "activeDraftStage": "ESIMENE_LUGEMINE",
+  "activeDraftStatus": "MENETLUSES",
+  "introduction": "Sissejuhatus…",
+  "initiated": "2026-01-02",
+  "accepted": null,
+  "amendmentsDeadline": "2026-02-01T09:00:00",
+  "leadingCommittee": {"uuid": "cmt-1", "name": "Õiguskomisjon", "type": "STANDING", "active": true},
+  "initiators": [
+    {"uuid": "mp-A", "name": "Kaja Kallas", "type": "plenaryMember", "active": true},
+    {"uuid": "ug-1", "name": "Reformierakonna fraktsioon", "type": "usergroup", "active": true}
+  ],
+  "descriptors": [
+    {"edid": 1234, "text": "kriminaalõigus"},
+    {"edid": 5678, "text": "karistusseadustik"}
+  ],
+  "readings": [
+    {
+      "readingCode": "ESIMENE_LUGEMINE",
+      "proceedingEvents": [
+        {"date": "2026-01-15T10:00:00", "status": "ALGATATUD"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "uuid": "sit-100",
+    "title": "IX istungjärgu 1. istung",
+    "sittingDateTime": "2026-01-15T10:00:00",
+    "votings": [
+      {
+        "uuid": "vot-1000",
+        "votingNumber": 1,
+        "type": {"code": "AVALIK", "value": "Avalik"},
+        "description": "Ettepanek võtta seaduseelnõu vastu",
+        "startDateTime": "2026-01-15T10:15:00",
+        "endDateTime": "2026-01-15T10:16:00",
+        "present": 96,
+        "absent": 5,
+        "inFavor": 60,
+        "against": 30,
+        "neutral": 2,
+        "abstained": 4
+      }
+    ]
+  },
+  {
+    "uuid": "sit-200",
+    "title": "IX istungjärgu 2. istung",
+    "sittingDateTime": "2026-01-16T10:00:00",
+    "votings": [
+      {
+        "uuid": "vot-2000",
+        "votingNumber": 5,
+        "type": {"code": "AVALIK", "value": "Avalik"},
+        "description": "Muudatusettepaneku hääletamine",
+        "startDateTime": "2026-01-16T11:00:00",
+        "endDateTime": "2026-01-16T11:01:00",
+        "present": 94,
+        "absent": 7,
+        "inFavor": 40,
+        "against": 50,
+        "neutral": 0,
+        "abstained": 4
+      }
+    ]
+  }
+]

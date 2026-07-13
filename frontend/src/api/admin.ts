@@ -2,24 +2,31 @@ import type { AdminStatus } from "../types";
 
 const BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
-export async function fetchAdminStatus(username: string, password: string): Promise<AdminStatus> {
-  const auth = btoa(`${username}:${password}`);
+/** Thrown when the admin API returns 401 — SPA renders the sign-in button. */
+export class AdminUnauthorizedError extends Error {
+  constructor(msg = "Unauthorized") {
+    super(msg);
+    this.name = "AdminUnauthorizedError";
+  }
+}
+
+export async function fetchAdminStatus(): Promise<AdminStatus> {
   const res = await fetch(`${BASE}/api/v1/admin/status`, {
-    headers: { Authorization: `Basic ${auth}`, Accept: "application/json" },
+    credentials: "include",
+    headers: { Accept: "application/json" },
   });
-  if (res.status === 401) throw new Error("Invalid admin credentials.");
+  if (res.status === 401) throw new AdminUnauthorizedError();
   if (!res.ok) throw new Error(`Admin API ${res.status}`);
   return res.json();
 }
 
-export async function triggerAdminImport(
-    username: string, password: string, path: string
-): Promise<unknown> {
-  const auth = btoa(`${username}:${password}`);
+export async function triggerAdminImport(path: string): Promise<unknown> {
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
-    headers: { Authorization: `Basic ${auth}`, Accept: "application/json" },
+    credentials: "include",
+    headers: { Accept: "application/json" },
   });
+  if (res.status === 401) throw new AdminUnauthorizedError();
   if (!res.ok) throw new Error(`Admin API ${res.status}`);
   return res.json();
 }

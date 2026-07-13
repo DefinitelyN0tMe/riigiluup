@@ -1,0 +1,35 @@
+{
+  "_embedded": {
+    "content": [
+      {
+        "uuid": "drf-1",
+        "title": "Karistusseadustiku muutmise seadus",
+        "mark": 12,
+        "membership": 14,
+        "draftTypeCode": "SE",
+        "activeDraftStage": "ESIMENE_LUGEMINE",
+        "activeDraftStatus": "MENETLUSES",
+        "proceedingStatus": "IN_PROGRESS",
+        "activeDraftStatusDate": "2026-01-05",
+        "leadingCommittee": {"uuid": "cmt-1", "name": "Õiguskomisjon", "type": "STANDING", "active": true},
+        "initiated": "2026-01-02",
+        "amendmentsDeadline": "2026-02-01T09:00:00"
+      },
+      {
+        "uuid": "drf-2",
+        "title": "Perekonnaseaduse muutmise seadus",
+        "mark": 20,
+        "membership": 14,
+        "draftTypeCode": "SE",
+        "activeDraftStage": "VASTU_VOETUD",
+        "activeDraftStatus": "VASTU_VOETUD",
+        "proceedingStatus": "DONE",
+        "activeDraftStatusDate": "2026-03-01",
+        "leadingCommittee": {"uuid": "cmt-2", "name": "Sotsiaalkomisjon", "type": "STANDING", "active": true},
+        "initiated": "2026-01-10",
+        "amendmentsDeadline": null
+      }
+    ]
+  },
+  "page": {"size": 20, "totalElements": 2, "totalPages": 1, "number": 0}
+}
