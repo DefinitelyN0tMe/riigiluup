@@ -190,3 +190,52 @@ export type GroupAlignmentDto = {
   }>;
   methodologyNote: string;
 };
+
+export type LegislationListItem = {
+  id: string;
+  externalId: string;
+  mark: number | null;
+  draftTypeCode: string | null;
+  title: string;
+  phase: "SUBMITTED" | "IN_COMMITTEE" | "IN_READINGS" | "ADOPTED" | "REJECTED" | "WITHDRAWN" | "OTHER";
+  activeStageSourceCode: string | null;
+  initiatedDate: string | null;
+  acceptedDate: string | null;
+  leadingCommitteeName: string | null;
+  sourceUrl: string;
+};
+
+export type LegislationStage = {
+  readingCode: string | null;
+  statusCode: string | null;
+  occurredAt: string | null;
+  sequence: number;
+};
+
+export type LegislationSponsor = {
+  kind: "PLENARY_MEMBER" | "FACTION" | "COMMITTEE" | "ORGAN" | "OTHER";
+  displayName: string | null;
+  memberSlug: string | null;
+  memberFullName: string | null;
+  externalId: string | null;
+};
+
+export type LegislationTopic = { edid: number; text: string };
+
+export type LegislationDetail = LegislationListItem & {
+  membership: number | null;
+  initialTitle: string | null;
+  activeStatusSourceCode: string | null;
+  proceedingStatus: string | null;
+  activeStatusDate: string | null;
+  amendmentsDeadline: string | null;
+  introduction: string | null;
+  stages: LegislationStage[];
+  sponsors: LegislationSponsor[];
+  topics: LegislationTopic[];
+};
+
+export type PoliticianLegislationResponse = {
+  totalSponsored: number;
+  items: PageResponse<LegislationListItem>;
+};

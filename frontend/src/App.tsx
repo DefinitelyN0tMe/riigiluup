@@ -5,6 +5,8 @@ import PoliticianProfilePage from "./pages/PoliticianProfilePage";
 import VotesPage from "./pages/VotesPage";
 import VoteDetailPage from "./pages/VoteDetailPage";
 import ComparePage from "./pages/ComparePage";
+import LegislationPage from "./pages/LegislationPage";
+import LegislationDetailPage from "./pages/LegislationDetailPage";
 
 export default function App() {
   return (
@@ -15,6 +17,7 @@ export default function App() {
           <Link to="/politicians" className="hover:text-estonia">MPs</Link>
           <Link to="/votes" className="hover:text-estonia">Votes</Link>
           <Link to="/compare" className="hover:text-estonia">Compare</Link>
+          <Link to="/legislation" className="hover:text-estonia">Bills</Link>
         </nav>
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
@@ -25,6 +28,8 @@ export default function App() {
           <Route path="/votes" element={<VotesPage />} />
           <Route path="/votes/:id" element={<VoteDetailPage />} />
           <Route path="/compare" element={<ComparePage />} />
+          <Route path="/legislation" element={<LegislationPage />} />
+          <Route path="/legislation/:id" element={<LegislationDetailPage />} />
         </Routes>
       </main>
       <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500">
