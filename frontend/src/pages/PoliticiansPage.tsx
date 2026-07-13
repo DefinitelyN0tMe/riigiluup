@@ -1,17 +1,27 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchPoliticians } from "../api/politicians";
+import { fetchFactions, fetchPoliticians } from "../api/politicians";
 import PoliticianCard from "../components/PoliticianCard";
 import SearchInput from "../components/SearchInput";
 import DataFreshnessBadge from "../components/DataFreshnessBadge";
 
 export default function PoliticiansPage() {
   const [q, setQ] = useState("");
+  const [faction, setFaction] = useState<string | "">("");
   const [page, setPage] = useState(0);
 
+  const factions = useQuery({ queryKey: ["factions"], queryFn: fetchFactions });
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ["politicians", q, page],
-    queryFn: () => fetchPoliticians({ q: q || undefined, page, size: 50, activeOnly: true }),
+    queryKey: ["politicians", q, faction, page],
+    queryFn: () =>
+      fetchPoliticians({
+        q: q || undefined,
+        faction: faction || undefined,
+        page,
+        size: 50,
+        activeOnly: true,
+      }),
     placeholderData: (previous) => previous,
   });
 
@@ -22,7 +32,25 @@ export default function PoliticiansPage() {
         <DataFreshnessBadge />
       </div>
 
-      <SearchInput value={q} onChange={(v) => { setPage(0); setQ(v); }} placeholder="Search by name…" />
+      <div className="flex flex-wrap gap-3 items-center">
+        <SearchInput
+          value={q}
+          onChange={(v) => { setPage(0); setQ(v); }}
+          placeholder="Search by name…"
+        />
+        <select
+          value={faction}
+          onChange={(e) => { setPage(0); setFaction(e.target.value); }}
+          className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-estonia"
+        >
+          <option value="">All factions</option>
+          {factions.data?.map((f) => (
+            <option key={f.externalId} value={f.externalId}>
+              {f.name} ({f.memberCount})
+            </option>
+          ))}
+        </select>
+      </div>
 
       {isLoading && <p className="text-slate-500">Loading…</p>}
       {error && <p className="text-red-600">Failed to load. {(error as Error).message}</p>}
