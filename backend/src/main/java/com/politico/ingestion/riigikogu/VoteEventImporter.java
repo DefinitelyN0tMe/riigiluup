@@ -1,6 +1,9 @@
 package com.politico.ingestion.riigikogu;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.politico.alignment.FactionAlignmentComputer;
+import com.politico.alignment.VoteFactionAlignment;
+import com.politico.alignment.VoteFactionAlignmentRepository;
 import com.politico.person.PlenaryMember;
 import com.politico.person.PlenaryMemberRepository;
 import com.politico.source.ProcessingStatus;
@@ -42,6 +45,8 @@ public class VoteEventImporter {
     private final SourceSnapshotRepository snapshotRepo;
     private final ImportRunLogRepository runLogRepo;
     private final TransactionTemplate tx;
+    private final FactionAlignmentComputer alignmentComputer;
+    private final VoteFactionAlignmentRepository alignmentRepo;
 
     public VoteEventImporter(
             RiigikoguClient client,
@@ -53,7 +58,9 @@ public class VoteEventImporter {
             PlenaryMemberRepository memberRepo,
             SourceSnapshotRepository snapshotRepo,
             ImportRunLogRepository runLogRepo,
-            PlatformTransactionManager txManager
+            PlatformTransactionManager txManager,
+            FactionAlignmentComputer alignmentComputer,
+            VoteFactionAlignmentRepository alignmentRepo
     ) {
         this.client = client;
         this.eventMapper = eventMapper;
@@ -65,6 +72,8 @@ public class VoteEventImporter {
         this.snapshotRepo = snapshotRepo;
         this.runLogRepo = runLogRepo;
         this.tx = new TransactionTemplate(txManager);
+        this.alignmentComputer = alignmentComputer;
+        this.alignmentRepo = alignmentRepo;
     }
 
     public ImportRunLog runWindow(LocalDate from, LocalDate to) {
@@ -144,6 +153,7 @@ public class VoteEventImporter {
         existing.setSourceSnapshot(detailSnap);
 
         reconcileVoters(existing, detail);
+        recomputeAlignmentsForEvent(existing);
         detailSnap.setProcessingStatus(ProcessingStatus.PROCESSED);
     }
 
@@ -213,6 +223,31 @@ public class VoteEventImporter {
                         .fetchedAt(Instant.now())
                         .processingStatus(ProcessingStatus.PENDING)
                         .build()));
+    }
+
+    private void recomputeAlignmentsForEvent(VoteEvent event) {
+        List<IndividualVote> all = individualVoteRepo
+                .findByVoteEventOrderByFactionNameAscPlenaryMember_LastNameAsc(event);
+        Map<String, List<IndividualVote>> byFaction = new java.util.LinkedHashMap<>();
+        for (IndividualVote iv : all) {
+            String key = iv.getFactionExternalId();
+            if (key == null) continue;
+            byFaction.computeIfAbsent(key, k -> new java.util.ArrayList<>()).add(iv);
+        }
+        // Clear existing rows for this event to keep the aggregate authoritative on rerun.
+        alignmentRepo.deleteByVoteEvent(event);
+        for (Map.Entry<String, List<IndividualVote>> e : byFaction.entrySet()) {
+            FactionAlignmentComputer.Result r = alignmentComputer.compute(e.getValue());
+            alignmentRepo.save(VoteFactionAlignment.builder()
+                    .voteEvent(event)
+                    .factionExternalId(e.getKey())
+                    .majorityChoice(r.majorityChoice())
+                    .majorityCount(r.majorityCount())
+                    .comparableCount(r.comparableCount())
+                    .hasClearMajority(r.hasClearMajority())
+                    .computedAt(Instant.now())
+                    .build());
+        }
     }
 
     private static String sha256(String s) {
