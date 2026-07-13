@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Proxies Riigikogu file downloads through this backend so we can serve them
@@ -51,10 +52,18 @@ public class FileProxyController {
     @RequiredArgsConstructor
     static class Loader {
         private final RiigikoguClient client;
+        /** Serialize cross-key file fetches so we don't burst Riigikogu's per-IP limit. */
+        private final ReentrantLock fetchLock = new ReentrantLock(true);
 
-        @Cacheable(value = CacheConfig.CACHE_FILES, key = "#uuid")
+        @Cacheable(value = CacheConfig.CACHE_FILES, key = "#uuid", sync = true)
         public byte[] load(String uuid) {
-            return client.fetchFileBytes(uuid);
+            fetchLock.lock();
+            try {
+                client.throttle();
+                return client.fetchFileBytes(uuid);
+            } finally {
+                fetchLock.unlock();
+            }
         }
     }
 }
