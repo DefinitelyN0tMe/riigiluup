@@ -124,6 +124,13 @@ export type VoteIndividual = {
 export type VoteDetail = VoteListItem & {
   sittingExternalId: string | null;
   endedAt: string | null;
+  linkedBill: {
+    id: string;
+    externalId: string;
+    mark: number | null;
+    title: string;
+    phase: string;
+  } | null;
   factionBreakdowns: VoteFactionBreakdown[];
   individualVotes: VoteIndividual[];
 };

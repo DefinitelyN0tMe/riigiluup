@@ -55,6 +55,14 @@ export default function VoteDetailPage() {
           href={data.sourceUrl} target="_blank" rel="noreferrer noopener"
           className="text-xs text-estonia hover:underline inline-block mt-1"
         >Riigikogu source ↗</a>
+        {data.linkedBill && (
+          <div className="mt-2 text-sm">
+            Bill: <Link to={`/legislation/${data.linkedBill.id}`} className="text-estonia hover:underline">
+              {data.linkedBill.mark != null && <span className="text-slate-400 mr-1">#{data.linkedBill.mark}</span>}
+              {data.linkedBill.title}
+            </Link>
+          </div>
+        )}
       </header>
 
       <section aria-label="Result">

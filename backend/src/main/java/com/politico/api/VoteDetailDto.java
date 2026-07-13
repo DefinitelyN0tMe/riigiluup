@@ -21,10 +21,13 @@ public record VoteDetailDto(
         int resultNeutral,
         int resultPresent,
         int resultAbsent,
+        LinkedBill linkedBill,
         List<FactionBreakdown> factionBreakdowns,
         List<IndividualVoteDto> individualVotes,
         String sourceUrl
 ) {
+    public record LinkedBill(UUID id, String externalId, Integer mark, String title, String phase) {}
+
     public record FactionBreakdown(
             String factionExternalId,
             String factionName,

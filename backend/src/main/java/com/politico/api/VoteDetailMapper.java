@@ -62,6 +62,14 @@ public class VoteDetailMapper {
                 .map(FactionAcc::toDto)
                 .toList();
 
+        VoteDetailDto.LinkedBill linkedBill = null;
+        if (v.getLegislativeItem() != null) {
+            var b = v.getLegislativeItem();
+            linkedBill = new VoteDetailDto.LinkedBill(
+                    b.getId(), b.getExternalId(), b.getMark(), b.getTitle(),
+                    b.getPhase() == null ? "OTHER" : b.getPhase().name());
+        }
+
         return new VoteDetailDto(
                 v.getId(), v.getExternalId(), v.getVotingNumber(),
                 v.getType() == null ? "OTHER" : v.getType().name(),
@@ -71,6 +79,7 @@ public class VoteDetailMapper {
                 v.getStartedAt(), v.getEndedAt(),
                 v.getResultInFavor(), v.getResultAgainst(), v.getResultAbstained(),
                 v.getResultNeutral(), v.getResultPresent(), v.getResultAbsent(),
+                linkedBill,
                 breakdowns, individuals,
                 sourceUrl(v.getExternalId())
         );
