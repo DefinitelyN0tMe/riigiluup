@@ -19,10 +19,23 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
         select m from PlenaryMember m
         where (:activeOnly = false or m.active = true)
           and (:q is null or lower(m.fullName) like lower(concat('%', cast(:q as string), '%')))
+          and (:faction is null or m.factionExternalId = cast(:faction as string))
         """)
-    Page<PlenaryMember> search(
+    Page<PlenaryMember> searchByFaction(
             @Param("q") String q,
+            @Param("faction") String faction,
             @Param("activeOnly") boolean activeOnly,
             Pageable pageable
     );
+
+    @Query("""
+        select new com.politico.api.PoliticianController$FactionOption(
+            m.factionExternalId, m.factionName, count(m))
+        from PlenaryMember m
+        where m.active = true and m.factionExternalId is not null
+        group by m.factionExternalId, m.factionName
+        order by m.factionName
+        """)
+    java.util.List<com.politico.api.PoliticianController.FactionOption>
+        findDistinctFactionsForActiveMembers();
 }
