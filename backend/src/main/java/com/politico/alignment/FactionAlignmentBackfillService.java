@@ -6,6 +6,8 @@ import com.politico.vote.VoteEvent;
 import com.politico.vote.VoteEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -42,17 +44,22 @@ public class FactionAlignmentBackfillService {
 
     /** Iterate every VoteEvent and recompute faction alignment. Returns event count processed. */
     public int recomputeAll() {
-        List<VoteEvent> events = voteEventRepo.findAll();
         int processed = 0;
-        for (VoteEvent ev : events) {
-            try {
-                tx.executeWithoutResult(status -> recomputeOne(ev));
-                processed++;
-            } catch (Exception e) {
-                log.warn("alignment recompute failed for {} ({}): {}",
-                        ev.getId(), ev.getDescription(), e.toString());
+        int page = 0;
+        Slice<VoteEvent> slice;
+        do {
+            slice = voteEventRepo.findAllByStartedAtAsc(PageRequest.of(page, 500));
+            for (VoteEvent ev : slice.getContent()) {
+                try {
+                    tx.executeWithoutResult(status -> recomputeOne(ev));
+                    processed++;
+                } catch (Exception e) {
+                    log.warn("alignment recompute failed for {} ({}): {}",
+                            ev.getId(), ev.getDescription(), e.toString());
+                }
             }
-        }
+            page++;
+        } while (slice.hasNext());
         return processed;
     }
 

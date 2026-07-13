@@ -12,6 +12,8 @@ import com.politico.source.ProcessingStatus;
 import com.politico.source.SourceSnapshot;
 import com.politico.source.SourceSnapshotRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -76,20 +78,23 @@ public class PlenaryMemberDetailImporter {
         int seen = 0;
         int upserted = 0;
         try {
-            List<PlenaryMember> members = memberRepo.findAll().stream()
-                    .filter(PlenaryMember::isActive)
-                    .toList();
-            for (PlenaryMember m : members) {
-                seen++;
-                try {
-                    tx.executeWithoutResult(status -> upsertOne(m.getExternalId()));
-                    upserted++;
-                } catch (Exception e) {
-                    log.warn("detail refresh failed for {} {}: {}",
-                            m.getFullName(), m.getExternalId(), e.getMessage());
+            int page = 0;
+            Slice<PlenaryMember> slice;
+            do {
+                slice = memberRepo.findActiveOrderByLastName(PageRequest.of(page, 200));
+                for (PlenaryMember m : slice.getContent()) {
+                    seen++;
+                    try {
+                        tx.executeWithoutResult(status -> upsertOne(m.getExternalId()));
+                        upserted++;
+                    } catch (Exception e) {
+                        log.warn("detail refresh failed for {} {}: {}",
+                                m.getFullName(), m.getExternalId(), e.getMessage());
+                    }
+                    client.throttle();
                 }
-                client.throttle();
-            }
+                page++;
+            } while (slice.hasNext());
             run.setStatus("SUCCESS");
         } catch (Exception e) {
             log.error("detail refresh outer loop failed", e);

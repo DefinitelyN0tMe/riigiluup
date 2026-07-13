@@ -22,9 +22,46 @@ server:
   forward-headers-strategy: framework
 
 management:
-  endpoints.web.exposure.include: health,info
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    prometheus:
+      access: unrestricted
+  metrics:
+    tags:
+      application: politico
+
+resilience4j:
+  retry:
+    instances:
+      riigikogu:
+        maxAttempts: 3
+        waitDuration: 1s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+        retryExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.ResourceAccessException
+          - java.io.IOException
+          - org.springframework.web.client.HttpClientErrorException$TooManyRequests
+        # 429 responses surface as HttpClientErrorException.TooManyRequests;
+        # the predicate also catches ResponseEntity-style 429s if a future
+        # refactor stops throwing on 4xx.
+        retryOnResultPredicate: com.politico.ingestion.riigikogu.Retry429Predicate
+  circuitbreaker:
+    instances:
+      riigikogu:
+        slidingWindowSize: 20
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
 
 politico:
+  rate-limit:
+    enabled: true
+    per-minute: 60
+    path-regex: "/api/v1/(?!admin/).*"
   riigikogu:
     base-url: https://api.riigikogu.ee
     user-agent: "politico/0.0.1 (riigiluup@gmail.com)"

@@ -2,6 +2,8 @@ package com.politico.ingestion.riigikogu;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -11,6 +13,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Component
+@Retry(name = "riigikogu")
+@CircuitBreaker(name = "riigikogu")
 public class RiigikoguClient {
 
     private static final String SOURCE_NAME = "riigikogu";

@@ -4,6 +4,11 @@ backend/.gradle/
 frontend/dist/
 frontend/node_modules/
 
+# Playwright artifacts
+frontend/test-results/
+frontend/playwright-report/
+frontend/playwright/.cache/
+
 # Logs
 *.log
 

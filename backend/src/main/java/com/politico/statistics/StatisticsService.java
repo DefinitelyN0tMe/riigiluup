@@ -37,8 +37,8 @@ public class StatisticsService {
                     "Attendance-check presence reported by Riigikogu API (" + from + " → " + to + ")",
                     url);
         } catch (Exception e) {
-            log.warn("participation stats fetch failed for {} [{} → {}]: {}",
-                    memberUuid, from, to, e.toString());
+            log.warn("participation stats fetch failed for {} [{} -> {}]",
+                    memberUuid, from, to, e);
             return new ParticipationStats(0, 0, null,
                     "Data currently unavailable from Riigikogu API", url);
         }
@@ -68,8 +68,8 @@ public class StatisticsService {
                             + from + " → " + to + ")",
                     url);
         } catch (Exception e) {
-            log.warn("voting stats fetch failed for {} [{} → {}]: {}",
-                    memberUuid, from, to, e.toString());
+            log.warn("voting stats fetch failed for {} [{} -> {}]",
+                    memberUuid, from, to, e);
             return new VotingStats(0, 0, null,
                     "Data currently unavailable from Riigikogu API", url);
         }

@@ -8,6 +8,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -107,17 +108,30 @@ public class HistoricalBackfillOrchestrator {
 
     /**
      * Flip the run to CANCELLED. The background loop notices at the next window boundary
-     * and stops cleanly.
+     * and stops cleanly. Retries once on optimistic-lock collision with the loop's own
+     * progress save; if it still loses the race we log and move on — the loop will pick
+     * up the CANCELLED status on its next iteration anyway.
      */
     public Optional<BackfillRun> cancel(UUID runId) {
-        return runRepo.findById(runId).map(run -> {
-            if (STATUS_RUNNING.equals(run.getStatus())) {
-                run.setStatus(STATUS_CANCELLED);
-                run.setEndedAt(Instant.now());
-                return runRepo.save(run);
+        for (int attempt = 0; attempt < 2; attempt++) {
+            Optional<BackfillRun> found = runRepo.findById(runId);
+            if (found.isEmpty()) return Optional.empty();
+            BackfillRun run = found.get();
+            if (!STATUS_RUNNING.equals(run.getStatus())) {
+                return Optional.of(run);
             }
-            return run;
-        });
+            run.setStatus(STATUS_CANCELLED);
+            run.setEndedAt(Instant.now());
+            try {
+                return Optional.of(runRepo.save(run));
+            } catch (ObjectOptimisticLockingFailureException e) {
+                log.debug("cancel({}) lost optimistic lock, retrying (attempt {})",
+                        runId, attempt);
+            }
+        }
+        log.warn("cancel({}) still losing optimistic lock — loop will observe status "
+                + "flip on next progress save", runId);
+        return runRepo.findById(runId);
     }
 
     /**
@@ -214,7 +228,14 @@ public class HistoricalBackfillOrchestrator {
             cursor = windowEnd.plusDays(1);
             run.setCurrentWindowStart(cursor);
             run.setWindowsCompleted(run.getWindowsCompleted() + 1);
-            runRepo.save(run);
+            try {
+                runRepo.save(run);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                // A concurrent cancel() bumped the version out from under us.
+                // Next loop iteration will re-read and see CANCELLED, so just log.
+                log.info("progress save for run {} lost optimistic lock — likely a "
+                        + "concurrent cancel; will observe status on next iteration", runId);
+            }
 
             sleepQuietly(INTER_WINDOW_SLEEP_MS);
         }

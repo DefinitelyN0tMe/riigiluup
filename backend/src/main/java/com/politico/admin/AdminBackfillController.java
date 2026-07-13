@@ -6,6 +6,7 @@ import com.politico.ingestion.riigikogu.VoteBillLinker;
 import com.politico.ingestion.riigikogu.VoteEventImporter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,15 +23,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Ops-only historical backfill.
+ * Ops-only historical backfill — single window, synchronous.
  *
- * <p>Runs the existing {@link VoteEventImporter#runWindow} and
- * {@link LegislativeItemImporter#runWindow} inline over an arbitrary date range so
- * ops can seed the DB with a multi-year window (e.g. 2022..today) without a code change
- * or waiting for the daily scheduled job. The response holds the connection open until
- * the whole window completes — this is intentional. For very large ranges the caller
- * is expected to send several smaller requests.
+ * <p>Runs {@link VoteEventImporter#runWindow} and {@link LegislativeItemImporter#runWindow}
+ * inline over an arbitrary date range. The response holds the connection open until
+ * the whole window completes.
+ *
+ * @deprecated Prefer {@link HistoricalBackfillController} at
+ * {@code /api/v1/admin/backfill/full} for multi-window background runs with progress
+ * polling and cancellation. The legacy {@code POST /api/v1/admin/backfill} mapping will
+ * be removed one release from now; use {@code POST /api/v1/admin/backfill/single}
+ * instead for the synchronous single-window mode.
  */
+@Deprecated
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/admin/backfill")
@@ -46,11 +51,44 @@ public class AdminBackfillController {
     private final VoteEventImporter voteImporter;
     private final VoteBillLinker voteBillLinker;
 
+    /**
+     * @deprecated call {@link #backfillSingle(String, String, String)} at
+     * {@code /api/v1/admin/backfill/single} instead. This mapping keeps working for one
+     * release and stamps a {@code Deprecation} HTTP header on responses.
+     */
+    @Deprecated
     @PostMapping
     public ResponseEntity<BackfillResult> backfill(
             @RequestParam("from") String fromRaw,
             @RequestParam(value = "to", required = false) String toRaw,
             @RequestParam(value = "kinds", required = false) String kindsRaw
+    ) {
+        ResponseEntity<BackfillResult> response = runSingleWindow(fromRaw, toRaw, kindsRaw);
+        // RFC 8594 Deprecation header — the value is a HTTP-date literal placeholder
+        // ("true" is also accepted by tooling like sunset-headers).
+        HttpHeaders headers = new HttpHeaders();
+        headers.addAll(response.getHeaders());
+        headers.set("Deprecation", "true");
+        headers.set("Link",
+                "</api/v1/admin/backfill/single>; rel=\"successor-version\", "
+                        + "</api/v1/admin/backfill/full>; rel=\"alternate\"");
+        return ResponseEntity.status(response.getStatusCode())
+                .headers(headers)
+                .body(response.getBody());
+    }
+
+    /** Successor mapping for the synchronous single-window backfill. */
+    @PostMapping("/single")
+    public ResponseEntity<BackfillResult> backfillSingle(
+            @RequestParam("from") String fromRaw,
+            @RequestParam(value = "to", required = false) String toRaw,
+            @RequestParam(value = "kinds", required = false) String kindsRaw
+    ) {
+        return runSingleWindow(fromRaw, toRaw, kindsRaw);
+    }
+
+    private ResponseEntity<BackfillResult> runSingleWindow(
+            String fromRaw, String toRaw, String kindsRaw
     ) {
         LocalDate from;
         LocalDate to;

@@ -2,6 +2,7 @@ package com.politico.person;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,10 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
     Optional<PlenaryMember> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     Optional<PlenaryMember> findBySlug(String slug);
+
+    /** Paginated iteration over active members ordered by lastName for stable slices. */
+    @Query("select m from PlenaryMember m where m.active = true order by m.lastName asc, m.id asc")
+    Slice<PlenaryMember> findActiveOrderByLastName(Pageable pageable);
 
     @Query("""
         select m from PlenaryMember m

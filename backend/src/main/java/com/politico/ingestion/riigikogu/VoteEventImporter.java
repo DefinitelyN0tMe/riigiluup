@@ -87,6 +87,14 @@ public class VoteEventImporter {
         int seenVotings = 0;
         int upsertedVotings = 0;
         try {
+            // Snapshot the plenary_member table once per run: it has ~100 rows and
+            // rarely changes mid-window, so reloading it for every vote (was: findAll()
+            // inside reconcileVoters) turned each vote into an N+1 hot path. A member
+            // that appears between the snapshot and reconcileVoters just gets skipped
+            // this run and reconciled on the next scheduled window.
+            Map<String, PlenaryMember> memberCache = memberRepo.findAll().stream()
+                    .collect(Collectors.toMap(PlenaryMember::getExternalId, Function.identity(),
+                            (a, b) -> a));
             LocalDate cursor = from;
             while (!cursor.isAfter(to)) {
                 LocalDate windowEnd = cursor.plusDays(6);
@@ -100,7 +108,7 @@ public class VoteEventImporter {
                     for (VotingListDto.VotingSummary s : sitting.votings()) {
                         seenVotings++;
                         try {
-                            tx.executeWithoutResult(status -> upsertVote(sitting, s));
+                            tx.executeWithoutResult(status -> upsertVote(sitting, s, memberCache));
                             upsertedVotings++;
                         } catch (Exception e) {
                             log.warn("failed vote {} ({}): {}",
@@ -125,7 +133,8 @@ public class VoteEventImporter {
         return run;
     }
 
-    private void upsertVote(VotingListDto sitting, VotingListDto.VotingSummary summary) {
+    private void upsertVote(VotingListDto sitting, VotingListDto.VotingSummary summary,
+                            Map<String, PlenaryMember> memberCache) {
         VoteEvent existing = voteEventRepo
                 .findBySourceNameAndExternalId(client.sourceName(), summary.uuid())
                 .orElse(null);
@@ -152,7 +161,7 @@ public class VoteEventImporter {
         eventMapper.applyDetail(existing, detail);
         existing.setSourceSnapshot(detailSnap);
 
-        reconcileVoters(existing, detail);
+        reconcileVoters(existing, detail, memberCache);
         recomputeAlignmentsForEvent(existing);
         detailSnap.setProcessingStatus(ProcessingStatus.PROCESSED);
     }
@@ -169,11 +178,9 @@ public class VoteEventImporter {
         );
     }
 
-    private void reconcileVoters(VoteEvent event, VotingDetailDto detail) {
+    private void reconcileVoters(VoteEvent event, VotingDetailDto detail,
+                                 Map<String, PlenaryMember> byExternalId) {
         if (detail.voters() == null || detail.voters().isEmpty()) return;
-        Map<String, PlenaryMember> byExternalId = memberRepo.findAll().stream()
-                .collect(Collectors.toMap(PlenaryMember::getExternalId, Function.identity(),
-                        (a, b) -> a));
         for (VotingDetailDto.Voter voter : detail.voters()) {
             PlenaryMember m = byExternalId.get(voter.uuid());
             if (m == null) {

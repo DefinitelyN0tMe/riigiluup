@@ -38,7 +38,7 @@ public class FileProxyController {
         try {
             bytes = loader.load(uuid);
         } catch (Exception e) {
-            log.warn("file proxy failed for {}: {}", uuid, e.toString());
+            log.warn("file proxy failed for {}", uuid, e);
             return ResponseEntity.status(502).build();
         }
         if (bytes == null || bytes.length == 0) return ResponseEntity.notFound().build();

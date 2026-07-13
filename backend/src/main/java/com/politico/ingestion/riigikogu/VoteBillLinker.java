@@ -8,11 +8,11 @@ import com.politico.source.SourceSnapshotRepository;
 import com.politico.vote.VoteEvent;
 import com.politico.vote.VoteEventRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -39,14 +39,35 @@ public class VoteBillLinker {
     }
 
     public int linkAll() {
-        List<VoteEvent> events = voteEventRepo.findAll();
+        // Note: we always fetch page=0 because linkOne() either sets legislativeItem
+        // (removing the row from the unlinked slice) or leaves it null. In the "still
+        // null after we tried" case the next page=0 fetch would loop forever, so we
+        // step page forward for skipped rows and re-fetch page=0 whenever we linked
+        // at least one row this pass (which shifts the offset back to zero anyway).
         int linked = 0;
-        for (VoteEvent ev : events) {
-            if (ev.getLegislativeItem() != null) continue;
-            try {
-                if (Boolean.TRUE.equals(tx.execute(status -> linkOne(ev)))) linked++;
-            } catch (Exception e) {
-                log.warn("link failed for vote_event {}: {}", ev.getId(), e.toString());
+        int page = 0;
+        while (true) {
+            Slice<VoteEvent> slice = voteEventRepo.findUnlinkedByStartedAtAsc(
+                    PageRequest.of(page, 500));
+            if (slice.getContent().isEmpty()) break;
+            int linkedThisPage = 0;
+            for (VoteEvent ev : slice.getContent()) {
+                try {
+                    if (Boolean.TRUE.equals(tx.execute(status -> linkOne(ev)))) {
+                        linked++;
+                        linkedThisPage++;
+                    }
+                } catch (Exception e) {
+                    log.warn("link failed for vote_event {}: {}", ev.getId(), e.toString());
+                }
+            }
+            if (!slice.hasNext()) break;
+            if (linkedThisPage == 0) {
+                // No progress on this page; advance so we don't re-scan the same rows.
+                page++;
+            } else {
+                // We shrunk the unlinked set; page=0 now points to the next unseen rows.
+                page = 0;
             }
         }
         return linked;

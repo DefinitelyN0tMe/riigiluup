@@ -1,16 +1,19 @@
+## Dev compose. Shared env-var names with deploy/docker-compose.prod.yml so a single
+## .env file (see deploy/.env.example) drives both stacks. Sensible dev defaults are
+## baked in via `${VAR:-default}` so `docker compose up` works with no .env.
 services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: politico
-      POSTGRES_USER: politico
-      POSTGRES_PASSWORD: politico
+      POSTGRES_DB: ${POSTGRES_DB:-politico}
+      POSTGRES_USER: ${POSTGRES_USER:-politico}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-politico}
     ports:
       - "15432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U politico -d politico"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-politico} -d ${POSTGRES_DB:-politico}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -18,9 +21,9 @@ services:
   api:
     build: ./backend
     environment:
-      DB_URL: jdbc:postgresql://db:5432/politico
-      DB_USER: politico
-      DB_PASSWORD: politico
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-politico}
+      DB_USER: ${POSTGRES_USER:-politico}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-politico}
       SERVER_PORT: "8080"
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
       POLITICO_ADMIN_ALLOWED_EMAILS: ${POLITICO_ADMIN_ALLOWED_EMAILS:-riigiluup@gmail.com}

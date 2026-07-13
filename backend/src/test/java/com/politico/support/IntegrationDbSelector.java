@@ -15,7 +15,7 @@ import java.util.Map;
  *   <li>If {@code POLITICO_IT_JDBC_URL} is set → connect to that URL directly.
  *       Intended for Windows dev boxes where docker-java's TCP probe fails
  *       against Docker Desktop 4.73.</li>
- *   <li>Otherwise → boot a shared {@code postgres:16-alpine} Testcontainer.
+ *   <li>Otherwise → boot a shared {@code postgres:16.4-alpine3.20} Testcontainer.
  *       Used on Linux CI runners with a working Docker socket.</li>
  * </ol>
  *
@@ -61,7 +61,7 @@ public class IntegrationDbSelector
             synchronized (IntegrationDbSelector.class) {
                 local = sharedContainer;
                 if (local == null) {
-                    local = new PostgreSQLContainer<>("postgres:16-alpine")
+                    local = new PostgreSQLContainer<>("postgres:16.4-alpine3.20")
                             .withDatabaseName("politico_it")
                             .withUsername("politico")
                             .withPassword("politico")

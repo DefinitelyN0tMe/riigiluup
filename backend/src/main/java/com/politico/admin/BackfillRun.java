@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,4 +58,9 @@ public class BackfillRun {
 
     @Column(name = "error_message", columnDefinition = "text")
     private String errorMessage;
+
+    /** JPA optimistic-lock guard; see HistoricalBackfillOrchestrator race handling. */
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 }

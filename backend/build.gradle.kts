@@ -1,8 +1,11 @@
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
 }
+
+jacoco { toolVersion = "0.8.12" }
 
 group = "com.politico"
 version = "0.0.1"
@@ -22,6 +25,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
+    // bucket4j starter removed 2026-07-13 — 0.12.x SPI required a specific cache-backend module
+    // that never resolved cleanly with our Caffeine setup. Replaced by com.politico.api.RateLimitFilter
+    // (60 lines, Caffeine window, per-IP).
+    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
@@ -47,6 +59,15 @@ tasks.test {
     useJUnitPlatform {
         // Fast task excludes legacy slow tests and the new "integration" tag.
         excludeTags("slow", "integration")
+    }
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
     }
 }
 
