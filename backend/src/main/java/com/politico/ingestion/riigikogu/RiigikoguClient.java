@@ -124,4 +124,23 @@ public class RiigikoguClient {
                 .retrieve()
                 .body(VotingDetailDto.class);
     }
+
+    public DraftListDto fetchDraftsInWindow(java.time.LocalDate from, java.time.LocalDate to) {
+        return rest.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/volumes/drafts")
+                        .queryParam("startDate", from.toString())
+                        .queryParam("endDate", to.toString())
+                        .queryParam("lang", "et")
+                        .build())
+                .retrieve()
+                .body(DraftListDto.class);
+    }
+
+    public DraftDetailDto fetchDraftDetail(String uuid) {
+        return rest.get()
+                .uri("/api/volumes/drafts/{uuid}?lang=et", uuid)
+                .retrieve()
+                .body(DraftDetailDto.class);
+    }
 }
