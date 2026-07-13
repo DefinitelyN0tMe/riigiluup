@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import PoliticiansPage from "./pages/PoliticiansPage";
+import PoliticianProfilePage from "./pages/PoliticianProfilePage";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/politicians" element={<PoliticiansPage />} />
+          <Route path="/politicians/:slug" element={<PoliticianProfilePage />} />
         </Routes>
       </main>
       <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500">
