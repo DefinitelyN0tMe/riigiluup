@@ -1,17 +1,19 @@
 import { Link } from "react-router-dom";
 import type { Politician } from "../types";
+import { resolveMediaUrl } from "../api/client";
 
 export default function PoliticianCard({ p }: { p: Politician }) {
   const initials = `${p.firstName?.[0] ?? ""}${p.lastName?.[0] ?? ""}`.toUpperCase();
+  const photoSrc = resolveMediaUrl(p.photoUrl);
   return (
     <Link
       to={`/politicians/${encodeURIComponent(p.slug)}`}
       className="block border border-slate-200 rounded-lg p-4 hover:shadow-sm hover:border-estonia transition"
     >
       <div className="flex items-start gap-3">
-        {p.photoUrl ? (
+        {photoSrc ? (
           <img
-            src={p.photoUrl}
+            src={photoSrc}
             alt=""
             loading="lazy"
             className="w-14 h-14 rounded-full object-cover bg-slate-100"

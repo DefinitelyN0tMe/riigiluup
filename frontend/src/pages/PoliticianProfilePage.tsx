@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProfile } from "../api/politicians";
+import { resolveMediaUrl } from "../api/client";
 import MetricCard from "../components/MetricCard";
 import CommitteeChip from "../components/CommitteeChip";
 import FactionBadge from "../components/FactionBadge";
@@ -31,9 +32,9 @@ export default function PoliticianProfilePage() {
       </div>
 
       <header className="flex items-start gap-4">
-        {data.photoUrl ? (
+        {resolveMediaUrl(data.photoUrl) ? (
           <img
-            src={data.photoUrl}
+            src={resolveMediaUrl(data.photoUrl)}
             alt=""
             className="w-24 h-24 rounded-full object-cover bg-slate-100"
           />
