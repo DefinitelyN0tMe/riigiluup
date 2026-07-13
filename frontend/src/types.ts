@@ -78,3 +78,61 @@ export type PoliticianProfile = {
   sourceUrl: string;
 };
 export type FactionOption = { externalId: string; name: string; memberCount: number };
+
+export type VoteListItem = {
+  id: string;
+  externalId: string;
+  votingNumber: number | null;
+  type: "OPEN" | "ATTENDANCE_CHECK" | "SECRET" | "OTHER";
+  typeSourceCode: string | null;
+  description: string | null;
+  sittingTitle: string | null;
+  startedAt: string | null;
+  resultInFavor: number;
+  resultAgainst: number;
+  resultAbstained: number;
+  resultNeutral: number;
+  resultPresent: number;
+  resultAbsent: number;
+  sourceUrl: string;
+};
+
+export type VoteFactionBreakdown = {
+  factionExternalId: string | null;
+  factionName: string;
+  inFavor: number;
+  against: number;
+  abstained: number;
+  didNotVote: number;
+  absent: number;
+  present: number;
+  unknown: number;
+  total: number;
+};
+
+export type VoteIndividual = {
+  memberExternalId: string | null;
+  memberSlug: string | null;
+  memberFullName: string | null;
+  factionExternalId: string | null;
+  factionName: string | null;
+  choice: "FOR" | "AGAINST" | "ABSTAINED" | "DID_NOT_VOTE" | "ABSENT" | "PRESENT" | "UNKNOWN";
+  choiceSourceCode: string | null;
+};
+
+export type VoteDetail = VoteListItem & {
+  sittingExternalId: string | null;
+  endedAt: string | null;
+  factionBreakdowns: VoteFactionBreakdown[];
+  individualVotes: VoteIndividual[];
+};
+
+export type PoliticianVote = {
+  voteEventId: string;
+  voteEventExternalId: string;
+  description: string | null;
+  type: "OPEN" | "ATTENDANCE_CHECK" | "SECRET" | "OTHER" | null;
+  startedAt: string | null;
+  choice: VoteIndividual["choice"];
+  choiceSourceCode: string | null;
+};

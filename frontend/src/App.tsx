@@ -2,6 +2,8 @@ import { Link, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import PoliticiansPage from "./pages/PoliticiansPage";
 import PoliticianProfilePage from "./pages/PoliticianProfilePage";
+import VotesPage from "./pages/VotesPage";
+import VoteDetailPage from "./pages/VoteDetailPage";
 
 export default function App() {
   return (
@@ -10,6 +12,7 @@ export default function App() {
         <Link to="/" className="text-lg font-semibold text-ink">Politico</Link>
         <nav className="text-sm text-slate-600 flex gap-4">
           <Link to="/politicians" className="hover:text-estonia">MPs</Link>
+          <Link to="/votes" className="hover:text-estonia">Votes</Link>
         </nav>
       </header>
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
@@ -17,6 +20,8 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/politicians" element={<PoliticiansPage />} />
           <Route path="/politicians/:slug" element={<PoliticianProfilePage />} />
+          <Route path="/votes" element={<VotesPage />} />
+          <Route path="/votes/:id" element={<VoteDetailPage />} />
         </Routes>
       </main>
       <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500">
