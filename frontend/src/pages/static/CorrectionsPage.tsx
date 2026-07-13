@@ -1,56 +1,46 @@
+import { useTranslation } from "react-i18next";
 import { CORRECTIONS_EMAIL } from "../../config";
 
 export default function CorrectionsPage() {
-  const subject = encodeURIComponent("Politico correction");
-  const body = encodeURIComponent(
-      "Which record is wrong? (URL or ID)\n\n" +
-      "What is the correction?\n\n" +
-      "Where can we verify (Riigikogu link or other official source)?\n\n" +
-      "Your name (optional):\n"
-  );
+  const { t } = useTranslation();
+  const subject = encodeURIComponent(t("corrections.mailSubject"));
+  const body = encodeURIComponent(t("corrections.mailTemplate"));
   const mailto = `mailto:${CORRECTIONS_EMAIL}?subject=${subject}&body=${body}`;
   return (
     <article className="prose max-w-none text-slate-700">
-      <h1 className="text-3xl font-semibold text-ink">Corrections</h1>
+      <h1 className="text-3xl font-semibold text-ink">{t("corrections.title")}</h1>
+      <p>{t("corrections.intro")}</p>
+      <h2>{t("corrections.sendHeading")}</h2>
       <p>
-        Politico mirrors Riigikogu's open data — most factual errors originate
-        upstream and flow into Politico on the next daily refresh once fixed at
-        the source. If you spot an issue that Politico introduces (a broken
-        chart, a wrong slug, a mislabeled metric), please tell us directly.
-      </p>
-      <h2>Send a correction</h2>
-      <p>
-        Email <a href={mailto} className="text-estonia hover:underline">{CORRECTIONS_EMAIL}</a> with:
+        {t("corrections.emailPrefix")}
+        <a href={mailto} className="text-estonia hover:underline">{CORRECTIONS_EMAIL}</a>
+        {t("corrections.emailSuffix")}
       </p>
       <ol>
-        <li>The URL or ID of the record you are reporting.</li>
-        <li>What is currently shown and what should be shown instead.</li>
-        <li>A source link for verification.</li>
+        <li>{t("corrections.step1")}</li>
+        <li>{t("corrections.step2")}</li>
+        <li>{t("corrections.step3")}</li>
       </ol>
       <p>
-        The <em>Send a correction</em> button below opens your mail client with
-        that template pre-filled.
+        {t("corrections.buttonExplainerA")}
+        <em>{t("corrections.buttonExplainerB")}</em>
+        {t("corrections.buttonExplainerC")}
       </p>
       <p>
         <a
           href={mailto}
           className="inline-flex items-center px-4 py-2 rounded-md bg-estonia text-white hover:bg-blue-700 no-underline"
         >
-          Send a correction
+          {t("corrections.sendButton")}
         </a>
       </p>
-      <h2>What we do</h2>
-      <p>
-        Every credible report is reviewed by a maintainer within 7 days. If the
-        issue is with Politico's own presentation, it is patched and released.
-        If the issue is with the upstream Riigikogu data, we forward it to
-        Riigikogu's data team and note the report on this page.
-      </p>
-      <h2>What we do not do</h2>
+      <h2>{t("corrections.whatWeDoHeading")}</h2>
+      <p>{t("corrections.whatWeDo")}</p>
+      <h2>{t("corrections.whatWeDontHeading")}</h2>
       <ul>
-        <li>Retract public voting records — a vote is a public fact.</li>
-        <li>Re-label MPs or parties on request.</li>
-        <li>Assign or remove "activity scores" — the site does not compute them.</li>
+        <li>{t("corrections.wnd1")}</li>
+        <li>{t("corrections.wnd2")}</li>
+        <li>{t("corrections.wnd3")}</li>
       </ul>
     </article>
   );

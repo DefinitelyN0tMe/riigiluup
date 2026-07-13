@@ -1,27 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { fetchDataStatus } from "../../api/politicians";
 
 export default function DataStatusPage() {
+  const { t } = useTranslation();
   const { data } = useQuery({ queryKey: ["data-status"], queryFn: fetchDataStatus });
   return (
     <article className="prose max-w-none text-slate-700">
-      <h1 className="text-3xl font-semibold text-ink">Data freshness</h1>
-      <p>
-        Politico refreshes upstream Riigikogu data daily at 03:05 Europe/Tallinn.
-        The table below lists the most recent successful runs of each ingestion
-        job.
-      </p>
+      <h1 className="text-3xl font-semibold text-ink">{t("dataStatus.title")}</h1>
+      <p>{t("dataStatus.intro")}</p>
       {(!data || data.length === 0) ? (
-        <p className="text-slate-500">No successful runs recorded yet.</p>
+        <p className="text-slate-500">{t("dataStatus.empty")}</p>
       ) : (
         <table className="table-auto border border-slate-200">
+          <caption className="sr-only">Latest ingestion job runs</caption>
           <thead>
             <tr className="bg-slate-50 text-left text-sm">
-              <th className="px-3 py-2">Source</th>
-              <th className="px-3 py-2">Job</th>
-              <th className="px-3 py-2">Last run</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2 text-right">Records</th>
+              <th scope="col" className="px-3 py-2">{t("dataStatus.col.source")}</th>
+              <th scope="col" className="px-3 py-2">{t("dataStatus.col.job")}</th>
+              <th scope="col" className="px-3 py-2">{t("dataStatus.col.lastRun")}</th>
+              <th scope="col" className="px-3 py-2">{t("dataStatus.col.status")}</th>
+              <th scope="col" className="px-3 py-2 text-right">{t("dataStatus.col.records")}</th>
             </tr>
           </thead>
           <tbody>
@@ -37,11 +36,11 @@ export default function DataStatusPage() {
           </tbody>
         </table>
       )}
-      <h2>Known limitations</h2>
+      <h2>{t("dataStatus.limitationsHeading")}</h2>
       <ul>
-        <li>Riigikogu itself sometimes publishes vote or bill records with a delay of a few hours.</li>
-        <li>Riigikogu's statistics endpoints require a date window; the site queries them lazily and caches results per MP × date range.</li>
-        <li>Secret votes have no per-MP records upstream and appear only as aggregate counts.</li>
+        <li>{t("dataStatus.lim1")}</li>
+        <li>{t("dataStatus.lim2")}</li>
+        <li>{t("dataStatus.lim3")}</li>
       </ul>
     </article>
   );

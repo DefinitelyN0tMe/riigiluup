@@ -1,14 +1,8 @@
+import { useTranslation } from "react-i18next";
 import type { CommitteeMembership } from "../types";
 
-const ROLE_LABEL: Record<CommitteeMembership["role"], string> = {
-  CHAIR: "Chair",
-  VICE_CHAIR: "Vice-chair",
-  MEMBER: "Member",
-  REPRESENTATIVE: "Representative",
-  OTHER: "Other",
-};
-
 export default function CommitteeChip({ c }: { c: CommitteeMembership }) {
+  const { t } = useTranslation();
   const border = c.colorHex ?? "#94a3b8";
   return (
     <li
@@ -17,7 +11,7 @@ export default function CommitteeChip({ c }: { c: CommitteeMembership }) {
     >
       <span className="font-medium">{c.name}</span>
       {c.role !== "MEMBER" && (
-        <span className="text-slate-500"> — {ROLE_LABEL[c.role]}</span>
+        <span className="text-slate-500"> — {t(`committeeRole.${c.role}` as const, { defaultValue: c.role })}</span>
       )}
     </li>
   );

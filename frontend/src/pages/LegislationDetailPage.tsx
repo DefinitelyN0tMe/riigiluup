@@ -1,28 +1,12 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { fetchLegislationDetail } from "../api/legislation";
 import StageTimeline from "../components/StageTimeline";
 import TopicChip from "../components/TopicChip";
 
-const PHASE_LABEL: Record<string, string> = {
-  SUBMITTED: "Submitted",
-  IN_COMMITTEE: "In committee",
-  IN_READINGS: "In readings",
-  ADOPTED: "Adopted",
-  REJECTED: "Rejected",
-  WITHDRAWN: "Withdrawn",
-  OTHER: "Other",
-};
-
-const SPONSOR_KIND_LABEL: Record<string, string> = {
-  PLENARY_MEMBER: "MP",
-  FACTION: "Faction",
-  COMMITTEE: "Committee",
-  ORGAN: "Organ",
-  OTHER: "Other",
-};
-
 export default function LegislationDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useQuery({
     queryKey: ["legislation", id],
@@ -30,14 +14,22 @@ export default function LegislationDetailPage() {
     enabled: !!id,
   });
 
-  if (isLoading) return <p className="text-slate-500">Loading…</p>;
-  if (error) return <p className="text-red-600">Failed to load. {(error as Error).message}</p>;
-  if (!data) return <p className="text-slate-500">Not found.</p>;
+  if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
+  if (error) return <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>;
+  if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
+
+  const phaseLabel = t(`phase.${data.phase}` as const, { defaultValue: data.phase });
+  const initiatedStr = data.initiatedDate
+    ? ` · ${t("legislation.initiatedInline", { date: new Date(data.initiatedDate).toLocaleDateString() })}`
+    : "";
+  const acceptedStr = data.acceptedDate
+    ? ` · ${t("legislation.acceptedInline", { date: new Date(data.acceptedDate).toLocaleDateString() })}`
+    : "";
 
   return (
     <div className="space-y-6">
       <div>
-        <Link to="/legislation" className="text-sm text-estonia hover:underline">← All bills</Link>
+        <Link to="/legislation" className="text-sm text-estonia hover:underline">{t("legislation.backAll")}</Link>
       </div>
 
       <header className="space-y-1">
@@ -47,36 +39,37 @@ export default function LegislationDetailPage() {
         </h1>
         <p className="text-sm text-slate-600">
           {data.draftTypeCode ? `${data.draftTypeCode} · ` : ""}
-          {PHASE_LABEL[data.phase] ?? data.phase}
-          {data.initiatedDate ? ` · Initiated ${new Date(data.initiatedDate).toLocaleDateString()}` : ""}
-          {data.acceptedDate ? ` · Accepted ${new Date(data.acceptedDate).toLocaleDateString()}` : ""}
+          {phaseLabel}
+          {initiatedStr}
+          {acceptedStr}
         </p>
         {data.leadingCommitteeName && (
-          <p className="text-sm text-slate-500">Leading committee: {data.leadingCommitteeName}</p>
+          <p className="text-sm text-slate-500">{t("legislation.leadingCommittee", { name: data.leadingCommitteeName })}</p>
         )}
-        <a href={data.sourceUrl} target="_blank" rel="noreferrer noopener"
+        <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer"
+           aria-label="Riigikogu source (opens in new tab)"
            className="text-xs text-estonia hover:underline inline-block mt-1">
-          Riigikogu source ↗
+          {t("common.riigikoguSource")}
         </a>
       </header>
 
       {data.topics.length > 0 && (
         <section aria-label="Topics">
           <div className="flex flex-wrap">
-            {data.topics.map((t) => <TopicChip key={t.edid} t={t} />)}
+            {data.topics.map((topic) => <TopicChip key={topic.edid} t={topic} />)}
           </div>
         </section>
       )}
 
       {data.introduction && (
         <section aria-label="Introduction">
-          <h2 className="text-lg font-semibold text-ink mb-2">Introduction</h2>
+          <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.introduction")}</h2>
           <p className="text-sm text-slate-700 whitespace-pre-line">{data.introduction}</p>
         </section>
       )}
 
       <section aria-label="Sponsors">
-        <h2 className="text-lg font-semibold text-ink mb-2">Sponsors ({data.sponsors.length})</h2>
+        <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.sponsors", { count: data.sponsors.length })}</h2>
         <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
           {data.sponsors.map((s, idx) => (
             <li key={s.externalId ?? `${idx}`} className="p-3 text-sm flex justify-between gap-3">
@@ -85,10 +78,10 @@ export default function LegislationDetailPage() {
                   <Link to={`/politicians/${s.memberSlug}`} className="hover:underline text-ink">
                     {s.memberFullName ?? s.displayName}
                   </Link>
-                ) : (s.displayName ?? "(no name)")}
+                ) : (s.displayName ?? t("legislation.noName"))}
               </span>
               <span className="shrink-0 text-xs text-slate-500">
-                {SPONSOR_KIND_LABEL[s.kind] ?? s.kind}
+                {t(`sponsorKind.${s.kind}` as const, { defaultValue: s.kind })}
               </span>
             </li>
           ))}
@@ -96,7 +89,7 @@ export default function LegislationDetailPage() {
       </section>
 
       <section aria-label="Timeline">
-        <h2 className="text-lg font-semibold text-ink mb-2">Legislative timeline</h2>
+        <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.timeline")}</h2>
         <StageTimeline stages={data.stages} />
       </section>
     </div>

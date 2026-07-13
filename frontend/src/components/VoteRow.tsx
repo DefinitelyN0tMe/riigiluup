@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { VoteListItem } from "../types";
 import VoteResultBar from "./VoteResultBar";
 
-const TYPE_LABEL: Record<VoteListItem["type"], string> = {
-  OPEN: "Roll-call",
-  ATTENDANCE_CHECK: "Attendance",
-  SECRET: "Secret",
-  OTHER: "Other",
+const SHORT_TYPE_KEY: Record<VoteListItem["type"], string> = {
+  OPEN: "voteType.OPEN",
+  ATTENDANCE_CHECK: "voteType.ATTENDANCE_SHORT",
+  SECRET: "voteType.SECRET",
+  OTHER: "voteType.OTHER",
 };
 
 export default function VoteRow({ v }: { v: VoteListItem }) {
+  const { t } = useTranslation();
   const when = v.startedAt ? new Date(v.startedAt).toLocaleString() : "";
   return (
     <Link
@@ -18,9 +20,9 @@ export default function VoteRow({ v }: { v: VoteListItem }) {
     >
       <div className="flex justify-between items-start gap-3 mb-2">
         <div className="min-w-0">
-          <h3 className="font-semibold text-ink truncate">{v.description ?? "(no description)"}</h3>
+          <h2 className="text-base font-semibold text-ink truncate">{v.description ?? t("common.noDescription")}</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            {TYPE_LABEL[v.type]} · {when}
+            {t(SHORT_TYPE_KEY[v.type], { defaultValue: v.type })} · {when}
           </p>
         </div>
         <span className="text-xs text-slate-500 shrink-0">#{v.votingNumber ?? "—"}</span>

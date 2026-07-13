@@ -1,15 +1,6 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { LegislationListItem } from "../types";
-
-const PHASE_LABEL: Record<LegislationListItem["phase"], string> = {
-  SUBMITTED: "Submitted",
-  IN_COMMITTEE: "In committee",
-  IN_READINGS: "In readings",
-  ADOPTED: "Adopted",
-  REJECTED: "Rejected",
-  WITHDRAWN: "Withdrawn",
-  OTHER: "Other",
-};
 
 const PHASE_CLASS: Record<LegislationListItem["phase"], string> = {
   SUBMITTED: "bg-slate-100 text-slate-700",
@@ -22,6 +13,7 @@ const PHASE_CLASS: Record<LegislationListItem["phase"], string> = {
 };
 
 export default function LegislationRow({ i }: { i: LegislationListItem }) {
+  const { t } = useTranslation();
   const initiated = i.initiatedDate ? new Date(i.initiatedDate).toLocaleDateString() : "—";
   return (
     <Link
@@ -30,18 +22,18 @@ export default function LegislationRow({ i }: { i: LegislationListItem }) {
     >
       <div className="flex justify-between items-start gap-3">
         <div className="min-w-0">
-          <h3 className="font-semibold text-ink truncate">
+          <h2 className="text-base font-semibold text-ink truncate">
             {i.mark != null && <span className="text-slate-400 mr-2">#{i.mark}</span>}
             {i.title}
-          </h3>
+          </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             {i.draftTypeCode ? `${i.draftTypeCode} · ` : ""}
-            Initiated {initiated}
+            {t("legislation.initiatedInline", { date: initiated })}
             {i.leadingCommitteeName ? ` · ${i.leadingCommitteeName}` : ""}
           </p>
         </div>
         <span className={`shrink-0 px-2 py-0.5 rounded text-xs ${PHASE_CLASS[i.phase]}`}>
-          {PHASE_LABEL[i.phase]}
+          {t(`phase.${i.phase}` as const, { defaultValue: i.phase })}
         </span>
       </div>
     </Link>

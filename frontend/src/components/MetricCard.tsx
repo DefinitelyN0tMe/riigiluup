@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 type Props = {
   label: string;
   value: string;
@@ -6,6 +8,7 @@ type Props = {
 };
 
 export default function MetricCard({ label, value, hint, sourceUrl }: Props) {
+  const { t } = useTranslation();
   return (
     <div className="border border-slate-200 rounded-lg p-4">
       <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
@@ -14,10 +17,11 @@ export default function MetricCard({ label, value, hint, sourceUrl }: Props) {
       <a
         href={sourceUrl}
         target="_blank"
-        rel="noreferrer noopener"
+        rel="noopener noreferrer"
+        aria-label={`Source for ${label} (opens in new tab)`}
         className="text-xs text-estonia hover:underline mt-1 inline-block"
       >
-        Source ↗
+        {t("common.sourceLink")}
       </a>
     </div>
   );

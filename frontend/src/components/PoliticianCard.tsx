@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Politician } from "../types";
 import { resolveMediaUrl } from "../api/client";
 
 export default function PoliticianCard({ p }: { p: Politician }) {
+  const { t } = useTranslation();
   const initials = `${p.firstName?.[0] ?? ""}${p.lastName?.[0] ?? ""}`.toUpperCase();
   const photoSrc = resolveMediaUrl(p.photoUrl);
   return (
@@ -24,9 +26,9 @@ export default function PoliticianCard({ p }: { p: Politician }) {
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-ink truncate">{p.fullName}</h3>
+          <h2 className="text-base font-semibold text-ink truncate">{p.fullName}</h2>
           <p className="text-sm text-slate-600 truncate">
-            {p.factionName ?? "No faction"}
+            {p.factionName ?? t("common.noFaction")}
           </p>
         </div>
       </div>

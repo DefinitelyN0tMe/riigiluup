@@ -1,17 +1,8 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { fetchVoteDetail } from "../api/votes";
 import VoteResultBar from "../components/VoteResultBar";
-
-const CHOICE_LABEL: Record<string, string> = {
-  FOR: "For",
-  AGAINST: "Against",
-  ABSTAINED: "Abstained",
-  DID_NOT_VOTE: "Did not vote",
-  ABSENT: "Absent",
-  PRESENT: "Present",
-  UNKNOWN: "Unknown",
-};
 
 const CHOICE_CLASS: Record<string, string> = {
   FOR: "text-estonia",
@@ -24,6 +15,7 @@ const CHOICE_CLASS: Record<string, string> = {
 };
 
 export default function VoteDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useQuery({
     queryKey: ["vote", id],
@@ -31,33 +23,35 @@ export default function VoteDetailPage() {
     enabled: !!id,
   });
 
-  if (isLoading) return <p className="text-slate-500">Loading…</p>;
-  if (error) return <p className="text-red-600">Failed to load. {(error as Error).message}</p>;
-  if (!data) return <p className="text-slate-500">Not found.</p>;
+  if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
+  if (error) return <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>;
+  if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
 
   const when = data.startedAt ? new Date(data.startedAt).toLocaleString() : "—";
+  const typeLabel = t(`voteType.${data.type}` as const, { defaultValue: data.type });
 
   return (
     <div className="space-y-6">
       <div>
-        <Link to="/votes" className="text-sm text-estonia hover:underline">← All votes</Link>
+        <Link to="/votes" className="text-sm text-estonia hover:underline">{t("votes.backAll")}</Link>
       </div>
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold text-ink">{data.description ?? "(no description)"}</h1>
+        <h1 className="text-2xl font-semibold text-ink">{data.description ?? t("common.noDescription")}</h1>
         <p className="text-sm text-slate-600">
-          {data.type} · #{data.votingNumber ?? "—"} · {when}
+          {t("votes.meta", { type: typeLabel, number: data.votingNumber ?? "—", when })}
         </p>
         {data.sittingTitle && (
-          <p className="text-sm text-slate-500">Sitting: {data.sittingTitle}</p>
+          <p className="text-sm text-slate-500">{t("votes.sitting", { title: data.sittingTitle })}</p>
         )}
         <a
-          href={data.sourceUrl} target="_blank" rel="noreferrer noopener"
+          href={data.sourceUrl} target="_blank" rel="noopener noreferrer"
+          aria-label="Riigikogu source (opens in new tab)"
           className="text-xs text-estonia hover:underline inline-block mt-1"
-        >Riigikogu source ↗</a>
+        >{t("common.riigikoguSource")}</a>
         {data.linkedBill && (
           <div className="mt-2 text-sm">
-            Bill: <Link to={`/legislation/${data.linkedBill.id}`} className="text-estonia hover:underline">
+            {t("votes.bill")} <Link to={`/legislation/${data.linkedBill.id}`} className="text-estonia hover:underline">
               {data.linkedBill.mark != null && <span className="text-slate-400 mr-1">#{data.linkedBill.mark}</span>}
               {data.linkedBill.title}
             </Link>
@@ -76,14 +70,14 @@ export default function VoteDetailPage() {
       </section>
 
       <section aria-label="Faction breakdown">
-        <h2 className="text-lg font-semibold text-ink mb-2">Breakdown by faction</h2>
+        <h2 className="text-lg font-semibold text-ink mb-2">{t("votes.breakdown")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {data.factionBreakdowns.map((f) => (
             <div key={f.factionExternalId ?? f.factionName}
                  className="border border-slate-200 rounded-lg p-3">
               <div className="flex justify-between items-baseline mb-2">
                 <span className="font-medium truncate">{f.factionName}</span>
-                <span className="text-xs text-slate-500 shrink-0">{f.total} MPs</span>
+                <span className="text-xs text-slate-500 shrink-0">{t("votes.membersShort", { count: f.total })}</span>
               </div>
               <VoteResultBar
                 inFavor={f.inFavor}
@@ -99,7 +93,7 @@ export default function VoteDetailPage() {
 
       <section aria-label="Individual votes">
         <h2 className="text-lg font-semibold text-ink mb-2">
-          Individual votes ({data.individualVotes.length})
+          {t("votes.individual", { count: data.individualVotes.length })}
         </h2>
         <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg">
           {data.individualVotes.map((iv) => (
@@ -111,10 +105,10 @@ export default function VoteDetailPage() {
                     {iv.memberFullName}
                   </Link>
                 ) : iv.memberFullName}
-                <span className="text-slate-500"> — {iv.factionName ?? "Unaffiliated"}</span>
+                <span className="text-slate-500"> — {iv.factionName ?? t("common.unaffiliated")}</span>
               </span>
               <span className={`shrink-0 font-medium ${CHOICE_CLASS[iv.choice] ?? ""}`}>
-                {CHOICE_LABEL[iv.choice] ?? iv.choice}
+                {t(`choice.${iv.choice}` as const, { defaultValue: iv.choice })}
               </span>
             </li>
           ))}
