@@ -1,5 +1,6 @@
 package com.politico.api;
 
+import com.politico.common.PhotoUrlRewriter;
 import com.politico.group.GroupMembership;
 import com.politico.group.GroupType;
 import com.politico.party.FactionPartyLinkRepository;
@@ -10,6 +11,7 @@ import com.politico.statistics.VotingStats;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -18,6 +20,7 @@ public class PoliticianProfileMapper {
 
     private final FactionPartyLinkRepository factionLinks;
     private final StatisticsService stats;
+    private final PhotoUrlRewriter photoUrlRewriter;
 
     public PoliticianProfileDto toDto(PlenaryMember m, List<GroupMembership> memberships) {
         PoliticianProfileDto.Party party = factionLinks
@@ -41,13 +44,16 @@ public class PoliticianProfileMapper {
                         gm.isActive()))
                 .toList();
 
-        ParticipationStats participation = stats.participation(m.getExternalId());
-        VotingStats voting = stats.voting(m.getExternalId());
+        LocalDate today = LocalDate.now();
+        ParticipationStats participation = stats.participation(
+                m.getExternalId(), StatisticsService.TERM_START, today);
+        VotingStats voting = stats.voting(
+                m.getExternalId(), StatisticsService.TERM_START, today);
 
         return new PoliticianProfileDto(
                 m.getId(), m.getSlug(),
                 m.getFullName(), m.getFirstName(), m.getLastName(),
-                m.getPhotoUrl(), m.getOfficialProfileUrl(),
+                photoUrlRewriter.toProxyPath(m.getPhotoUrl()), m.getOfficialProfileUrl(),
                 m.getEmail(), m.getGender(), m.getDateOfBirth(),
                 m.getElectoralDistrict(),
                 m.getParliamentSeniorityDays(),

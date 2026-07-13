@@ -15,34 +15,41 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class StatisticsServiceCacheTest {
 
+    private static final LocalDate FROM = LocalDate.of(2023, 4, 10);
+    private static final LocalDate TO = LocalDate.of(2026, 7, 13);
+
     @Test
-    void participation_result_is_cached_per_uuid() throws Exception {
+    void participation_result_is_cached_per_uuid_and_date_range() throws Exception {
         RiigikoguClient client = mock(RiigikoguClient.class);
         ObjectMapper json = new ObjectMapper();
         AtomicInteger calls = new AtomicInteger();
-        when(client.fetchParticipationStats("m-1")).thenAnswer(inv -> {
+        when(client.fetchParticipationStats(eq("m-1"), any(), any())).thenAnswer(inv -> {
             calls.incrementAndGet();
-            return json.readTree("{\"totalSittings\":100,\"attended\":80}");
+            return json.readTree("{\"sittings\":400,\"participated\":383,\"absent\":17}");
         });
 
         StatisticsService raw = new StatisticsService(client);
         StatisticsService svc = wrapWithCache(raw);
 
-        ParticipationStats a = svc.participation("m-1");
-        ParticipationStats b = svc.participation("m-1");
-        ParticipationStats c = svc.participation("m-1");
+        ParticipationStats a = svc.participation("m-1", FROM, TO);
+        ParticipationStats b = svc.participation("m-1", FROM, TO);
+        ParticipationStats c = svc.participation("m-1", FROM, TO);
 
-        assertThat(a.totalSittings()).isEqualTo(100);
-        assertThat(a.attended()).isEqualTo(80);
-        assertThat(a.participationRate()).isEqualTo(0.8);
+        assertThat(a.totalSittings()).isEqualTo(400);
+        assertThat(a.attended()).isEqualTo(383);
+        assertThat(a.participationRate()).isEqualTo(383.0 / 400.0);
         assertThat(b).isSameAs(a);
         assertThat(c).isSameAs(a);
         assertThat(calls.get()).isEqualTo(1);
@@ -85,9 +92,10 @@ class StatisticsServiceCacheTest {
                 return invocation.proceed();
             }
 
-            Object key = invocation.getArguments().length > 0
-                    ? invocation.getArguments()[0]
-                    : null;
+            String key = Arrays.stream(invocation.getArguments())
+                    .map(String::valueOf)
+                    .reduce((a, b) -> a + ":" + b)
+                    .orElse("");
 
             Cache.ValueWrapper cached = cache.get(key);
             if (cached != null) {

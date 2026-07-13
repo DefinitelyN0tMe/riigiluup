@@ -12,9 +12,10 @@ public class CacheConfig {
 
     public static final String CACHE_PARTICIPATION = "participation-stats";
     public static final String CACHE_VOTING = "voting-stats";
+    public static final String CACHE_FILES = "riigikogu-files";
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager(CACHE_PARTICIPATION, CACHE_VOTING);
+        return new ConcurrentMapCacheManager(CACHE_PARTICIPATION, CACHE_VOTING, CACHE_FILES);
     }
 }

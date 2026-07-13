@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -73,17 +74,34 @@ public class RiigikoguClient {
                 .body(PlenaryMemberDetailDto.class);
     }
 
-    public JsonNode fetchParticipationStats(String memberUuid) {
+    public JsonNode fetchParticipationStats(String memberUuid, LocalDate startDate, LocalDate endDate) {
         return rest.get()
-                .uri("/api/statistics/participations/member/{uuid}?lang=et", memberUuid)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/statistics/participations/member/{uuid}")
+                        .queryParam("startDate", startDate.toString())
+                        .queryParam("endDate", endDate.toString())
+                        .queryParam("lang", "et")
+                        .build(memberUuid))
                 .retrieve()
                 .body(JsonNode.class);
     }
 
-    public JsonNode fetchVotingStats(String memberUuid) {
+    public JsonNode fetchVotingStats(String memberUuid, LocalDate startDate, LocalDate endDate) {
         return rest.get()
-                .uri("/api/statistics/votings/member/{uuid}?lang=et", memberUuid)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/statistics/votings/member/{uuid}")
+                        .queryParam("startDate", startDate.toString())
+                        .queryParam("endDate", endDate.toString())
+                        .queryParam("lang", "et")
+                        .build(memberUuid))
                 .retrieve()
                 .body(JsonNode.class);
+    }
+
+    public byte[] fetchFileBytes(String fileUuid) {
+        return rest.get()
+                .uri("/api/files/{uuid}/download", fileUuid)
+                .retrieve()
+                .body(byte[].class);
     }
 }

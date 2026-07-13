@@ -1,10 +1,16 @@
 package com.politico.api;
 
+import com.politico.common.PhotoUrlRewriter;
 import com.politico.person.PlenaryMember;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class PoliticianMapper {
+
+    private final PhotoUrlRewriter photoUrlRewriter;
+
     public PoliticianDto toDto(PlenaryMember m) {
         return new PoliticianDto(
                 m.getId(),
@@ -12,7 +18,7 @@ public class PoliticianMapper {
                 m.getFullName(),
                 m.getFirstName(),
                 m.getLastName(),
-                m.getPhotoUrl(),
+                photoUrlRewriter.toProxyPath(m.getPhotoUrl()),
                 m.getOfficialProfileUrl(),
                 m.isActive(),
                 m.getFactionName(),
