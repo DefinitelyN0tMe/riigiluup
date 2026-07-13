@@ -125,6 +125,46 @@ export default function PoliticianProfilePage() {
         />
       </section>
 
+      {data.groupAlignment && (
+        <section aria-label="Group alignment">
+          <h2 className="text-lg font-semibold text-ink mb-2">Group alignment</h2>
+          <div className="border border-slate-200 rounded-lg p-4">
+            <p className="text-3xl font-semibold text-ink">
+              {data.groupAlignment.rate == null ? "—" : `${(data.groupAlignment.rate * 100).toFixed(1)}%`}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">
+              {data.groupAlignment.matches} of {data.groupAlignment.eligible} eligible votes matched the faction majority.
+            </p>
+            <p className="text-xs text-slate-500 mt-2">{data.groupAlignment.methodologyNote}</p>
+            {data.groupAlignment.recentDeviations.length > 0 && (
+              <div className="mt-3">
+                <h3 className="text-sm font-medium text-ink mb-1">Recent deviations</h3>
+                <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
+                  {data.groupAlignment.recentDeviations.map((d) => {
+                    const when = d.startedAt ? new Date(d.startedAt).toLocaleDateString() : "";
+                    return (
+                      <li key={d.voteEventId} className="p-3 text-sm flex justify-between items-start gap-3">
+                        <span className="min-w-0">
+                          <a href={`/votes/${d.voteEventId}`} className="hover:underline text-ink">
+                            {d.voteEventDescription ?? "(no description)"}
+                          </a>
+                          <span className="text-slate-500 block text-xs">{when}</span>
+                        </span>
+                        <span className="shrink-0 text-xs text-slate-500 text-right">
+                          MP: <span className="font-medium text-ink">{d.memberChoice ?? "—"}</span>
+                          <br />
+                          Faction: <span className="font-medium text-ink">{d.factionMajorityChoice ?? "—"}</span>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {data.committees.length > 0 && (
         <section aria-label="Committees">
           <h2 className="text-lg font-semibold text-ink mb-2">Committees</h2>
