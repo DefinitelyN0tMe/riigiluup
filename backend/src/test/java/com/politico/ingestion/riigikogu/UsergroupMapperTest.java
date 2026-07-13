@@ -34,7 +34,7 @@ class UsergroupMapperTest {
     void maps_standing_committee_with_null_optional_fields() {
         UsergroupDto dto = new UsergroupDto(
                 "c-1", "Rahanduskomisjon", null, true, null, null,
-                new UsergroupDto.Type("alatine_komisjon", "Alatine komisjon")
+                new UsergroupDto.Type("alaline_komisjon", "Alaline komisjon")
         );
 
         Group g = mapper.toEntity(dto);

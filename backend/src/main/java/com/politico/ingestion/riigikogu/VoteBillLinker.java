@@ -7,7 +7,6 @@ import com.politico.source.SourceSnapshot;
 import com.politico.source.SourceSnapshotRepository;
 import com.politico.vote.VoteEvent;
 import com.politico.vote.VoteEventRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -54,15 +53,12 @@ public class VoteBillLinker {
     }
 
     private Boolean linkOne(VoteEvent event) {
-        // For MVP simplicity we scan snapshots directly; a dedicated
-        // findBySourceNameAndEntityTypeAndExternalId finder is a Phase-6 tweak.
-        List<SourceSnapshot> candidates = snapshotRepo.findAll().stream()
-                .filter(s -> SOURCE.equals(s.getSourceName())
-                        && DETAIL_ENTITY.equals(s.getEntityType())
-                        && event.getExternalId().equals(s.getExternalId()))
-                .toList();
-        if (candidates.isEmpty()) return false;
-        JsonNode payload = candidates.get(candidates.size() - 1).getPayload();
+        SourceSnapshot snapshot = snapshotRepo
+                .findFirstBySourceNameAndEntityTypeAndExternalIdOrderByFetchedAtDesc(
+                        SOURCE, DETAIL_ENTITY, event.getExternalId())
+                .orElse(null);
+        if (snapshot == null) return false;
+        JsonNode payload = snapshot.getPayload();
         JsonNode sitting = payload.get("sitting");
         if (sitting == null) return false;
         JsonNode draft = sitting.get("draft");

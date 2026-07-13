@@ -5,8 +5,23 @@ const READING_LABEL: Record<string, string> = {
   ESIMENE_LUGEMINE: "First reading",
   TEINE_LUGEMINE: "Second reading",
   KOLMAS_LUGEMINE: "Third reading",
+  FIRST_READING: "First reading",
+  SECOND_READING: "Second reading",
+  THIRD_READING: "Third reading",
+  EFFECTUATION: "Effectuation",
   VASTU_VOETUD: "Adopted",
   LOPETATUD: "Ended",
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  ALGATATUD: "Introduced",
+  MENETLUSSE_VOETUD: "Accepted for procedure",
+  LOPETATUD: "Concluded",
+  SAADETUD_VABARIIGI_PRESIDENDILE: "Sent to the President",
+  VALJAKUULUTATUD: "Promulgated",
+  AVALDATUD_RIIGITEATAJAS: "Published in Riigi Teataja",
+  TAGASI_LUKATUD: "Rejected",
+  TAGASI_VOETUD: "Withdrawn",
 };
 
 export default function StageTimeline({ stages }: { stages: LegislationStage[] }) {
@@ -22,7 +37,7 @@ export default function StageTimeline({ stages }: { stages: LegislationStage[] }
               {READING_LABEL[s.readingCode ?? ""] ?? s.readingCode ?? "Stage"}
             </div>
             <div className="text-xs text-slate-500">
-              {s.statusCode ?? ""} · {when}
+              {(s.statusCode && (STATUS_LABEL[s.statusCode] ?? s.statusCode)) || ""} · {when}
             </div>
           </li>
         );

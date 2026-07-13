@@ -10,4 +10,8 @@ public interface SourceSnapshotRepository extends JpaRepository<SourceSnapshot, 
     Optional<SourceSnapshot> findFirstBySourceNameAndEntityTypeAndExternalIdAndPayloadHash(
             String sourceName, String entityType, String externalId, String payloadHash
     );
+
+    Optional<SourceSnapshot> findFirstBySourceNameAndEntityTypeAndExternalIdOrderByFetchedAtDesc(
+            String sourceName, String entityType, String externalId
+    );
 }
