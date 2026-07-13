@@ -104,4 +104,24 @@ public class RiigikoguClient {
                 .retrieve()
                 .body(byte[].class);
     }
+
+    public List<VotingListDto> fetchVotingsInWindow(java.time.LocalDate from, java.time.LocalDate to) {
+        VotingListDto[] arr = rest.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/votings")
+                        .queryParam("startDate", from.toString())
+                        .queryParam("endDate", to.toString())
+                        .queryParam("lang", "et")
+                        .build())
+                .retrieve()
+                .body(VotingListDto[].class);
+        return arr == null ? List.of() : List.of(arr);
+    }
+
+    public VotingDetailDto fetchVotingDetail(String votingUuid) {
+        return rest.get()
+                .uri("/api/votings/{uuid}?lang=et", votingUuid)
+                .retrieve()
+                .body(VotingDetailDto.class);
+    }
 }
