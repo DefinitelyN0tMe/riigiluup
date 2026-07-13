@@ -4,6 +4,9 @@ backend/.gradle/
 frontend/dist/
 frontend/node_modules/
 
+# Logs
+*.log
+
 # IDE
 .idea/
 *.iml
