@@ -1,0 +1,24 @@
+# Build outputs
+backend/build/
+backend/.gradle/
+frontend/dist/
+frontend/node_modules/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Env
+.env
+.env.local
+frontend/.env.local
+backend/.env
+
+# Local docs (per global rule: no .md in git except README)
+docs/
+estonian_political_transparency_mvp.md
