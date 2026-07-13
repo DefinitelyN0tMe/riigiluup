@@ -5,6 +5,7 @@ import com.politico.person.PlenaryMember;
 import com.politico.person.PlenaryMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ public class PoliticianProfileController {
     private final PoliticianProfileMapper mapper;
 
     @GetMapping("/{slug}")
+    @Transactional(readOnly = true)
     public ResponseEntity<PoliticianProfileDto> get(@PathVariable String slug) {
         PlenaryMember m = memberRepo.findBySlug(slug).orElse(null);
         if (m == null) return ResponseEntity.notFound().build();
