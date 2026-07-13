@@ -16,6 +16,7 @@ import SourcesPage from "./pages/static/SourcesPage";
 import PrivacyPage from "./pages/static/PrivacyPage";
 import TermsPage from "./pages/static/TermsPage";
 import DataStatusPage from "./pages/static/DataStatusPage";
+import CorrectionsPage from "./pages/static/CorrectionsPage";
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/data-status" element={<DataStatusPage />} />
+          <Route path="/corrections" element={<CorrectionsPage />} />
         </Routes>
       </main>
       <footer className="border-t border-slate-200 px-6 py-4 text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1">
@@ -58,7 +60,7 @@ export default function App() {
         <Link to="/data-status" className="hover:text-estonia">Data freshness</Link>
         <Link to="/privacy" className="hover:text-estonia">Privacy</Link>
         <Link to="/terms" className="hover:text-estonia">Terms</Link>
-        <a href="mailto:corrections@politico.example" className="hover:text-estonia">Corrections</a>
+        <Link to="/corrections" className="hover:text-estonia">Corrections</Link>
       </footer>
     </div>
   );
