@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -47,6 +48,24 @@ public class PlenaryMember {
 
     @Column(name = "faction_name", length = 256)
     private String factionName;
+
+    @Column(name = "electoral_district", length = 256)
+    private String electoralDistrict;
+
+    @Column(length = 16)
+    private String gender;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(length = 256)
+    private String email;
+
+    @Column(name = "biography_html", columnDefinition = "text")
+    private String biographyHtml;
+
+    @Column(name = "parliament_seniority_days")
+    private Integer parliamentSeniorityDays;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_snapshot_id")

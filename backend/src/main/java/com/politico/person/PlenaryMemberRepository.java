@@ -13,6 +13,8 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
 
     Optional<PlenaryMember> findBySourceNameAndExternalId(String sourceName, String externalId);
 
+    Optional<PlenaryMember> findBySlug(String slug);
+
     @Query("""
         select m from PlenaryMember m
         where (:activeOnly = false or m.active = true)
