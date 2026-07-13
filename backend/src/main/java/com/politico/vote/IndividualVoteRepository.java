@@ -21,6 +21,15 @@ public interface IndividualVoteRepository extends JpaRepository<IndividualVote, 
 
     @Query("""
         select iv from IndividualVote iv
+        join fetch iv.plenaryMember
+        where iv.voteEvent = :event
+        order by iv.factionName asc, iv.plenaryMember.lastName asc
+        """)
+    List<IndividualVote> findByVoteEventWithMemberOrderByFactionNameAscPlenaryMember_LastNameAsc(
+            @Param("event") VoteEvent event);
+
+    @Query("""
+        select iv from IndividualVote iv
         where iv.plenaryMember = :member
         order by iv.voteEvent.startedAt desc
         """)

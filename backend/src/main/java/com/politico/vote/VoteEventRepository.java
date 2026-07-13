@@ -16,9 +16,9 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
 
     @Query("""
         select v from VoteEvent v
-        where (:from is null or v.startedAt >= :from)
-          and (:to is null or v.startedAt <= :to)
-          and (:type is null or v.type = :type)
+        where (cast(:from as instant) is null or v.startedAt >= :from)
+          and (cast(:to as instant) is null or v.startedAt <= :to)
+          and (cast(:type as string) is null or v.type = :type)
         order by v.startedAt desc
         """)
     Page<VoteEvent> search(
