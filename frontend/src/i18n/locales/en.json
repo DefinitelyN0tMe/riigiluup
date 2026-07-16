@@ -33,8 +33,11 @@
     "footerBlurb": "A civic-tech mirror of Riigikogu data — free software, public source, open API. Every fact links back to its official source.",
     "foot": {
       "browse": "Browse",
+      "browseDesc": "MP profiles, roll-call votes, bills and analytics — straight from Riigikogu open data, every record linking back to its source.",
       "transparency": "Transparency",
+      "transparencyDesc": "How every metric is computed, the full list of sources and endpoints, the data-freshness log, and a way to report corrections.",
       "citizen": "For citizens",
+      "citizenDesc": "What this project is and why it exists, the privacy policy, terms of use, and direct access to the Riigikogu API.",
       "riigikoguApi": "Riigikogu API ↗"
     }
   },
@@ -45,7 +48,7 @@
       "line1": "Every vote",
       "line2": "every bill",
       "line3": "every MP",
-      "lede": "A civic-tech platform mirroring Riigikogu open data in real time. Every fact links back to its official source — no opinion, no ranking.",
+      "lede": "A civic-tech platform mirroring Riigikogu open data. Every fact links back to its official source — no opinion, no ranking.",
       "ctaBrowse": "Browse MPs",
       "ctaMethodology": "Methodology",
       "footIntroduction": "Introduction",
@@ -101,7 +104,7 @@
       "quote": "«If you cannot verify the source, you cannot trust the system.»",
       "quoteAttr": "— Methodology · v. 1.3 · 2026-07",
       "step1H": "Source",
-      "step1P": "Riigikogu OpenData API — named votes, bills, members. Sync every 6 hours.",
+      "step1P": "Riigikogu OpenData API — roll-call votes, bills, members. Votes every 6 hours, the rest once a day.",
       "step1L": "RIIGIKOGU.EE",
       "step2H": "Sync",
       "step2P": "Idempotent pipeline into PostgreSQL. Every record carries source_hash and fetched_at fields.",
@@ -768,9 +771,9 @@
   },
   "about": {
     "title": "About Riigiluup",
-    "intro": "Riigiluup is a public civic-tech tool that makes the work of the Estonian Riigikogu easier to understand. It aggregates the parliament's own open data — MPs, votes, bills — and presents it as neutral profiles, timelines, and comparisons. Every fact links back to the official source.",
+    "intro": "Riigiluup is a public, open-source tool that makes the work of the Estonian Riigikogu easier to follow. It aggregates the parliament's own open data — MPs, roll-call votes, and bills — and presents it as neutral profiles, timelines, comparisons, and analytics. It covers the current Riigikogu (2023–2027), with roll-call voting records reaching back to 2019, and every figure links back to the official Riigikogu source.",
     "editorial": "Editorial stance",
-    "editorialBody": "The service does not assign ideological labels, moral scores, or rankings. It reports factual counts and rates. Where a metric could be misinterpreted, we document the formula, what is included, what is excluded, and the known limitations.",
+    "editorialBody": "The service does not assign ideological labels, moral scores, or rankings — it is a mirror, not an interpreter. It reports factual counts and rates and lets you draw your own conclusions. Where a metric could be misread, we document the formula, what is included, what is excluded, and the known limitations; a figure is never framed as good or bad, only described and linked back so you can check it against the original Riigikogu form.",
     "whatPublic": "What is public here",
     "list": {
       "members": "Member profiles, faction, committees, electoral district.",
@@ -827,7 +830,7 @@
     "participation": {
       "title": "Participation methodology",
       "votingHeading": "Voting participation",
-      "votingFormula": "rate = participated / (participated + present + absent + neutral)",
+      "votingFormula": "rate = (FOR + AGAINST + ABSTAINED) / every roll-call vote in which the MP held a mandate",
       "participatedBody": "Participated counts every roll-call vote where the MP cast FOR, AGAINST, or ABSTAINED.",
       "excludedNumerator": "Excluded from the numerator:",
       "excludedN1": "Did-not-vote (present but did not press a button).",
@@ -837,7 +840,7 @@
       "excludedB1": "Attendance-check \"votes\" (they are not roll-call votes).",
       "excludedB2": "Secret votes (no per-MP records are published).",
       "excludedB3": "Votes where the MP did not have an active mandate.",
-      "votingSourceLine": "Source: Riigikogu API endpoint ",
+      "votingSourceLine": "Computed from the roll-call votes ingested from Riigikogu — the same ones listed under Votes. The primary source of each vote is the endpoint ",
       "attendanceHeading": "Attendance-check presence",
       "attendanceFormula": "rate = attended / total sittings with an attendance check",
       "attendanceBody1a": "Attendance checks are a specific procedure in the Riigikogu where members register presence at a sitting. ",
@@ -949,7 +952,7 @@
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
     "licenseBody1c": ". This site's own aggregated content and code are released under the same license so downstream reuse is straightforward.",
     "updateFrequency": "Update frequency",
-    "updateBody": "Sync runs every 6 hours (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) and refreshes members, groups, per-MP details, the last 7 days of votes, and the last 7 days of bills. The \"Last sync\" badge in the header shows the timestamp of the last successful members refresh."
+    "updateBody": "Votes sync every 6 hours (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), so new roll-calls appear the same day. Members, factions, profile details and bills refresh once a day (04:30 Europe/Tallinn): they change slowly, and past records are immutable and never re-fetched. The \"Last sync\" badge in the header shows the timestamp of the last successful refresh."
   },
   "dataStatus": {
     "kicker": "Transparency · Sync",

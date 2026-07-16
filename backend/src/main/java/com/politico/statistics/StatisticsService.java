@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class StatisticsService {
 
-    /** Start of the 14th Riigikogu term — default period for aggregate metrics. */
+    /** Start of the current (XV) Riigikogu term — default period for aggregate metrics. */
     public static final LocalDate TERM_START = LocalDate.of(2023, 4, 10);
 
     private final RiigikoguClient client;

@@ -25,7 +25,7 @@ export default function MethodologyParticipationPage() {
       </ul>
       <p>
         {t("methodology.participation.votingSourceLine")}
-        <code>/api/statistics/votings/member/{`{uuid}`}?startDate=…&endDate=…</code>.
+        <code>/api/votings/{`{uuid}`}</code>.
       </p>
 
       <h2>{t("methodology.participation.attendanceHeading")}</h2>

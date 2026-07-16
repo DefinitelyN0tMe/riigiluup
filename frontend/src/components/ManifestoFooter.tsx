@@ -28,7 +28,8 @@ export default function ManifestoFooter() {
           </p>
         </div>
         <div>
-          <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue-glow font-bold mb-4">{t("chrome.foot.browse")}</h5>
+          <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue-glow font-bold mb-2">{t("chrome.foot.browse")}</h5>
+          <p className="text-xs opacity-45 leading-snug mb-4 max-w-[28ch]">{t("chrome.foot.browseDesc")}</p>
           <ul className="space-y-2 text-sm">
             <li><Link to="/politicians" className="opacity-80 hover:opacity-100">{t("nav.mps")}</Link></li>
             <li><Link to="/votes" className="opacity-80 hover:opacity-100">{t("nav.votes")}</Link></li>
@@ -38,7 +39,8 @@ export default function ManifestoFooter() {
           </ul>
         </div>
         <div>
-          <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue-glow font-bold mb-4">{t("chrome.foot.transparency")}</h5>
+          <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue-glow font-bold mb-2">{t("chrome.foot.transparency")}</h5>
+          <p className="text-xs opacity-45 leading-snug mb-4 max-w-[28ch]">{t("chrome.foot.transparencyDesc")}</p>
           <ul className="space-y-2 text-sm">
             <li><Link to="/methodology" className="opacity-80 hover:opacity-100">{t("footer.methodology")}</Link></li>
             <li><Link to="/sources" className="opacity-80 hover:opacity-100">{t("footer.sources")}</Link></li>
@@ -47,7 +49,8 @@ export default function ManifestoFooter() {
           </ul>
         </div>
         <div>
-          <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue-glow font-bold mb-4">{t("chrome.foot.citizen")}</h5>
+          <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue-glow font-bold mb-2">{t("chrome.foot.citizen")}</h5>
+          <p className="text-xs opacity-45 leading-snug mb-4 max-w-[28ch]">{t("chrome.foot.citizenDesc")}</p>
           <ul className="space-y-2 text-sm">
             <li><Link to="/about" className="opacity-80 hover:opacity-100">{t("footer.about")}</Link></li>
             <li><Link to="/privacy" className="opacity-80 hover:opacity-100">{t("footer.privacy")}</Link></li>

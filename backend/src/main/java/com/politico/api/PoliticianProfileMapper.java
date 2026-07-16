@@ -74,7 +74,7 @@ public class PoliticianProfileMapper {
         VotingStats voting = new VotingStats(
                 vTotal, vParticipated, vRate,
                 "Voting participation = (FOR + AGAINST + ABSTAINED) / eligible roll-call votes, "
-                        + "computed from ingested Riigikogu roll-call records (14th term).",
+                        + "computed from ingested Riigikogu roll-call records (current term, since 2023-04-10).",
                 m.getOfficialProfileUrl());
 
         GroupAlignmentService.Result gaResult = groupAlignmentService.forMember(

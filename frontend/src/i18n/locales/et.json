@@ -33,8 +33,11 @@
     "footerBlurb": "Kodanikualgatuslik Riigikogu andmete peegel — vaba tarkvara, avalik lähtekood, avatud API. Iga fakt viib tagasi originaalallikale.",
     "foot": {
       "browse": "Sirvi",
+      "browseDesc": "Saadikute profiilid, nimelised hääletused, eelnõud ja analüütika — otse Riigikogu avaandmetest, iga kirje viitab allikale.",
       "transparency": "Läbipaistvus",
+      "transparencyDesc": "Kuidas iga näitaja arvutatakse, allikate ja otspunktide loend, andmete värskuse logi ning paranduste teatamise vorm.",
       "citizen": "Kodanikule",
+      "citizenDesc": "Mis projekt see on ja miks, privaatsuspoliitika, kasutustingimused ning otsejuurdepääs Riigikogu API-le.",
       "riigikoguApi": "Riigikogu API ↗"
     }
   },
@@ -45,7 +48,7 @@
       "line1": "Iga hääl",
       "line2": "iga eelnõu",
       "line3": "iga saadik",
-      "lede": "Kodanikualgatuslik platvorm, mis peegeldab Riigikogu avaandmed reaalajas. Iga fakt viib tagasi ametlikule allikale — ei arvamust, ei pingerida.",
+      "lede": "Kodanikualgatuslik platvorm, mis peegeldab Riigikogu avaandmeid. Iga fakt viib tagasi ametlikule allikale — ei arvamust, ei pingerida.",
       "ctaBrowse": "Sirvi saadikuid",
       "ctaMethodology": "Metoodika",
       "footIntroduction": "Sissejuhatus",
@@ -101,7 +104,7 @@
       "quote": "«Kui te ei saa allikat kontrollida, ei saa te süsteemi usaldada.»",
       "quoteAttr": "— Metoodika · v. 1.3 · 2026-07",
       "step1H": "Allikas",
-      "step1P": "Riigikogu OpenData API — nimelised hääletused, eelnõud, koosseis. Sünk iga 6 tunni tagant.",
+      "step1P": "Riigikogu OpenData API — nimelised hääletused, eelnõud, koosseis. Hääletused iga 6 tunni tagant, ülejäänu kord ööpäevas.",
       "step1L": "RIIGIKOGU.EE",
       "step2H": "Sünk",
       "step2P": "Idempotentne pipeline PostgreSQL-i. Iga kirje kannab source_hash ja fetched_at välja.",
@@ -768,9 +771,9 @@
   },
   "about": {
     "title": "Riigiluup'st",
-    "intro": "Riigiluup on avalik kodanikutehnoloogia tööriist, mis muudab Eesti Riigikogu töö arusaadavamaks. See koondab parlamendi enda avaandmed — saadikud, hääletused, eelnõud — ning esitab need neutraalsete profiilide, ajajoonte ja võrdlustena. Iga fakt viitab ametlikule allikale.",
+    "intro": "Riigiluup on avalik, avatud lähtekoodiga tööriist, mis muudab Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi enda avaandmed — saadikud, nimelised hääletused ja eelnõud — ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Kaetud on praegune Riigikogu koosseis (2023–2027) ning nimeliste hääletuste ajalugu ulatub 2019. aastani; iga näitaja viitab ametlikule Riigikogu allikale.",
     "editorial": "Toimetuse hoiak",
-    "editorialBody": "Teenus ei omista ideoloogilisi silte, moraalseid hindeid ega edetabeliid. See esitab faktilisi arve ja suhtarvusid. Kui näitajat võib valesti tõlgendada, dokumenteerime valemi, mis on arvestatud, mis välja jäetud, ning teadaolevad piirangud.",
+    "editorialBody": "Teenus ei omista ideoloogilisi silte, moraalseid hindeid ega edetabeleid — see on peegel, mitte tõlgendaja. See esitab faktilisi arve ja suhtarve ning jätab järeldused teile. Kui näitajat võib valesti mõista, kirjeldame valemit, mis on arvestatud, mis välja jäetud ja teadaolevad piirangud; arvu ei esitata kunagi hea ega halvana — üksnes kirjeldatakse ja lingitakse, et saaksite selle Riigikogu algvormiga võrrelda.",
     "whatPublic": "Mis on siin avalik",
     "list": {
       "members": "Saadikute profiilid, fraktsioon, komisjonid, valimisringkond.",
@@ -827,7 +830,7 @@
     "participation": {
       "title": "Osaluse metoodika",
       "votingHeading": "Hääletustel osalemine",
-      "votingFormula": "määr = osales / (osales + kohal + puudus + neutraalne)",
+      "votingFormula": "määr = (POOLT + VASTU + ERAPOOLETU) / kõik nimelised hääletused, kus saadikul oli mandaat",
       "participatedBody": "Osales loeb iga nimelist hääletust, kus saadik andis hääle POOLT, VASTU või ERAPOOLETU.",
       "excludedNumerator": "Lugejast välja jäetud:",
       "excludedN1": "Ei hääletanud (oli kohal, kuid ei vajutanud nuppu).",
@@ -837,7 +840,7 @@
       "excludedB1": "Kohaloleku kontrolli \"hääled\" (need pole nimelised hääletused).",
       "excludedB2": "Salajased hääletused (individuaalseid kirjeid ei avaldata).",
       "excludedB3": "Hääletused, kus saadikul polnud aktiivset mandaati.",
-      "votingSourceLine": "Allikas: Riigikogu API otspunkt ",
+      "votingSourceLine": "Arvutatakse Riigikogust laaditud nimelistest hääletustest — samad, mis on loetletud jaotises Hääletused. Iga hääle esmane allikas on otspunkt ",
       "attendanceHeading": "Kohaloleku kontrolli osalus",
       "attendanceFormula": "määr = kohal / istungid kokku, kus toimus kohaloleku kontroll",
       "attendanceBody1a": "Kohaloleku kontroll on Riigikogus konkreetne protseduur, kus liikmed registreerivad end istungil kohalolijaks. ",
@@ -949,7 +952,7 @@
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
     "licenseBody1c": " alusel. Selle saidi enda koondsisu ja kood on avaldatud sama litsentsi alusel, et taaskasutus oleks lihtne.",
     "updateFrequency": "Uuendussagedus",
-    "updateBody": "Sünkroonimine käivitub iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) ja värskendab saadikud, rühmad, saadikupõhised detailid, viimase 7 päeva hääletused ja viimase 7 päeva eelnõud. Päise \"Viimane sünkroonimine\" märgis näitab viimase eduka saadikute värskenduse ajatemplit."
+    "updateBody": "Hääletused sünkroonitakse iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), nii et uued nimelised hääletused ilmuvad samal päeval. Saadikud, fraktsioonid, profiilide detailid ja eelnõud värskenduvad kord ööpäevas (04:30 Europe/Tallinn): need muutuvad aeglaselt ning varasemad andmed on muutumatud ega laadita uuesti. Päise \"Viimane sünkroonimine\" märgis näitab viimase eduka värskenduse ajatemplit."
   },
   "dataStatus": {
     "kicker": "Läbipaistvus · Sünkroonimine",
