@@ -143,7 +143,8 @@
       "toc8": "Poliitiline maastik",
       "toc9": "Reaalne koostöö",
       "toc10": "Öised hääled",
-      "toc11": "Kõige aktiivsemad saadikud"
+      "toc11": "Kõige aktiivsemad saadikud",
+      "toc12": "Kes sai enim hääli"
     },
     "sec": {
       "agreement": {
@@ -222,6 +223,13 @@
         "titleEm": "aktiivsemad",
         "titlePost": " saadikud",
         "note": "Sõnavõtud ja küsimused täiskogu stenogrammidest, pluss iga saadiku esitatud arupärimised ja kirjalikud küsimused jooksval koosseisul. Vaheta mõõdikut, et ümber järjestada. Arvud kajastavad aktiivsuse mahtu, mitte selle sisu."
+      },
+      "elections": {
+        "kicker": "Isiklik mandaat",
+        "titlePre": "Kellel on enim ",
+        "titleEm": "isiklikke hääli",
+        "titlePost": "",
+        "note": "Iga istuv saadik 2023. aasta valimistel saadud isiklike häälte järgi, koos mandaaditüüpide jaotusega. Isikumandaadi saab piisava häältearvuga üle ringkonna kvoodi; ringkonna- ja kompensatsioonimandaat jagatakse nimekirjast. Asendajaid, keda ise ei valitud, ei näidata."
       }
     }
   },

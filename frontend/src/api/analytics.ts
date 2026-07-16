@@ -44,6 +44,18 @@ export type MemberActivityItem = {
 export type MemberActivityBoard = { items: MemberActivityItem[]; computedAt: string };
 export type ActivityMetric = "speeches" | "questions" | "interpellations" | "writtenQuestions";
 
+export type ElectionMemberItem = {
+  memberSlug: string;
+  memberName: string;
+  factionShortName: string | null;
+  factionColorHex: string | null;
+  personalVotes: number;
+  mandateType: string;
+  partyName: string | null;
+};
+export type MandateCount = { mandateType: string; count: number };
+export type ElectionBoard = { members: ElectionMemberItem[]; mandates: MandateCount[]; computedAt: string };
+
 export type BillFlowNode = { id: string; label: string; count: number };
 export type BillFlowLink = { source: string; target: string; count: number };
 export type BillFlow = { nodes: BillFlowNode[]; links: BillFlowLink[]; totalBills: number; computedAt: string };
@@ -160,6 +172,7 @@ export const fetchFactionAgreement = () => apiGet<FactionAgreementMatrix>(`${B}/
 export const fetchDisciplineBreakers = (limit = 24) =>
   apiGet<DisciplineBreakers>(`${B}/discipline-breakers?limit=${limit}`);
 export const fetchMemberActivity = () => apiGet<MemberActivityBoard>(`${B}/member-activity`);
+export const fetchElections = () => apiGet<ElectionBoard>(`${B}/elections`);
 export const fetchBillFlow = () => apiGet<BillFlow>(`${B}/bill-flow`);
 export const fetchAttendanceMatrix = (sittings = 40) =>
   apiGet<AttendanceMatrix>(`${B}/attendance-matrix?sittings=${sittings}`);

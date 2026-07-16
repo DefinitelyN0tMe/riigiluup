@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   fetchAttendanceMatrix, fetchBillFlow, fetchBillVelocity, fetchCoSponsorship,
-  fetchDisciplineBreakers, fetchFactionAgreement, fetchHighlights, fetchMemberActivity, fetchMpSimilarity,
-  fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
+  fetchDisciplineBreakers, fetchElections, fetchFactionAgreement, fetchHighlights, fetchMemberActivity,
+  fetchMpSimilarity, fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
 } from "../api/analytics";
 import SectionHead from "../components/SectionHead";
 import FactionHeatmap from "../components/analytics/FactionHeatmap";
@@ -18,6 +18,7 @@ import CoSponsorshipGraph from "../components/analytics/CoSponsorshipGraph";
 import HighlightsStrip from "../components/analytics/HighlightsStrip";
 import NightVotesLog from "../components/analytics/NightVotesLog";
 import ActiveMembers from "../components/analytics/ActiveMembers";
+import ElectionLeaders from "../components/analytics/ElectionLeaders";
 import type { ReactNode } from "react";
 
 function Loading() {
@@ -54,6 +55,7 @@ export default function AnalyticsPage() {
   const high = useQuery({ queryKey: ["ana:highlights"], queryFn: fetchHighlights });
   const night = useQuery({ queryKey: ["ana:night"], queryFn: () => fetchNightVotes(20) });
   const activity = useQuery({ queryKey: ["ana:activity"], queryFn: fetchMemberActivity });
+  const elections = useQuery({ queryKey: ["ana:elections"], queryFn: fetchElections });
 
   const tocItems: [string, string][] = [
     ["I.", t("analytics.hero.toc1")],
@@ -67,6 +69,7 @@ export default function AnalyticsPage() {
     ["IX.", t("analytics.hero.toc9")],
     ["X.", t("analytics.hero.toc10")],
     ["XI.", t("analytics.hero.toc11")],
+    ["XII.", t("analytics.hero.toc12")],
   ];
 
   return (
@@ -194,6 +197,15 @@ export default function AnalyticsPage() {
       >
         {activity.isLoading ? <Loading /> : activity.error ? <Failed err={activity.error} /> :
           activity.data && <ActiveMembers data={activity.data} />}
+      </Section>
+
+      <Section
+        index="XII." kicker={t("analytics.sec.elections.kicker")}
+        title={<>{t("analytics.sec.elections.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.elections.titleEm")}</span>{t("analytics.sec.elections.titlePost")}</>}
+        note={t("analytics.sec.elections.note")}
+      >
+        {elections.isLoading ? <Loading /> : elections.error ? <Failed err={elections.error} /> :
+          elections.data && <ElectionLeaders data={elections.data} />}
       </Section>
     </>
   );

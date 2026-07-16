@@ -38,6 +38,11 @@ public class AnalyticsController {
         return service.memberActivity();
     }
 
+    @GetMapping("/elections")
+    public AnalyticsDto.ElectionBoard elections() {
+        return service.elections();
+    }
+
     @GetMapping("/discipline-breakers")
     public AnalyticsDto.DisciplineBreakers disciplineBreakers(
             @RequestParam(defaultValue = "24") int limit,

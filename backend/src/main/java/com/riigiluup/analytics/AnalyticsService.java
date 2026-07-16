@@ -2,6 +2,8 @@ package com.riigiluup.analytics;
 
 import com.riigiluup.activity.MemberActivity;
 import com.riigiluup.activity.MemberActivityRepository;
+import com.riigiluup.election.ElectionResult;
+import com.riigiluup.election.ElectionResultRepository;
 import com.riigiluup.group.Group;
 import com.riigiluup.group.GroupRepository;
 import com.riigiluup.group.GroupType;
@@ -54,6 +56,7 @@ public class AnalyticsService {
     private final GroupRepository groupRepo;
     private final PlenaryMemberRepository memberRepo;
     private final MemberActivityRepository memberActivityRepo;
+    private final ElectionResultRepository electionResultRepo;
 
     /**
      * Faction name substrings currently in the governing coalition. Drives the
@@ -231,6 +234,39 @@ public class AnalyticsService {
                     a.getSpeeches(), a.getQuestions(), a.getInterpellations(), a.getWrittenQuestions()));
         }
         return new AnalyticsDto.MemberActivityBoard(items, Instant.now());
+    }
+
+    /* ============================================================
+     *  Elections — personal votes and mandate type of sitting MPs (RK_2023)
+     * ============================================================ */
+    @Cacheable("analytics-elections")
+    public AnalyticsDto.ElectionBoard elections() {
+        Map<String, ElectionResult> byExt = electionResultRepo.findAll().stream()
+                .collect(Collectors.toMap(ElectionResult::getMemberExternalId, e -> e, (a, b) -> a));
+        Map<String, Group> factionByExt = activeFactions().stream()
+                .collect(Collectors.toMap(Group::getExternalId, g -> g, (a, b) -> a));
+
+        List<AnalyticsDto.ElectionMemberItem> items = new ArrayList<>();
+        Map<String, Integer> mandateCounts = new LinkedHashMap<>();
+        for (PlenaryMember m : memberRepo.findAll()) {
+            if (!m.isActive()) continue;
+            ElectionResult e = byExt.get(m.getExternalId());
+            if (e == null) continue;
+            Group faction = m.getFactionExternalId() != null ? factionByExt.get(m.getFactionExternalId()) : null;
+            String factionShort = faction != null ? shortenFactionName(faction.getName())
+                    : shortenFactionName(m.getFactionName());
+            String colorHex = faction != null ? faction.getColorHex() : null;
+            items.add(new AnalyticsDto.ElectionMemberItem(
+                    m.getSlug(), m.getFullName(), factionShort, colorHex,
+                    e.getPersonalVotes(), e.getMandateType(), e.getPartyName()));
+            mandateCounts.merge(e.getMandateType(), 1, Integer::sum);
+        }
+        items.sort(Comparator.comparingInt(AnalyticsDto.ElectionMemberItem::personalVotes).reversed());
+
+        List<AnalyticsDto.MandateCount> mandates = mandateCounts.entrySet().stream()
+                .map(en -> new AnalyticsDto.MandateCount(en.getKey(), en.getValue()))
+                .toList();
+        return new AnalyticsDto.ElectionBoard(items, mandates, Instant.now());
     }
 
     private IndividualVote fetchOneRecentDeviation(PlenaryMember m) {

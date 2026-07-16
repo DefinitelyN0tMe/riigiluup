@@ -143,7 +143,8 @@
       "toc8": "Political landscape",
       "toc9": "Real collaboration",
       "toc10": "Night votes",
-      "toc11": "Most active MPs"
+      "toc11": "Most active MPs",
+      "toc12": "Who got the most votes"
     },
     "sec": {
       "agreement": {
@@ -222,6 +223,13 @@
         "titleEm": "active",
         "titlePost": " MPs",
         "note": "Speeches and questions from the plenary stenograms, plus the interpellations and written questions each MP submitted, over the current term. Switch the metric to re-rank. Counts reflect the volume of activity, not its substance."
+      },
+      "elections": {
+        "kicker": "The personal mandate",
+        "titlePre": "Who got the most ",
+        "titleEm": "personal votes",
+        "titlePost": "",
+        "note": "Every sitting MP by the personal votes they won at the 2023 election, with the split of mandate types. A personal mandate takes enough votes to clear the district quota outright; district and compensation mandates are allocated from the party list. Substitutes who were not themselves elected are not shown."
       }
     }
   },

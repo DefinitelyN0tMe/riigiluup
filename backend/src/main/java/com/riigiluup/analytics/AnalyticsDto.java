@@ -128,6 +128,19 @@ public final class AnalyticsDto {
             int writtenQuestions
     ) {}
 
+    /* ================ ELECTIONS (personal votes, mandate types) ================ */
+    public record ElectionBoard(List<ElectionMemberItem> members, List<MandateCount> mandates, Instant computedAt) {}
+    public record ElectionMemberItem(
+            String memberSlug,
+            String memberName,
+            String factionShortName,
+            String factionColorHex,
+            int personalVotes,
+            String mandateType,
+            String partyName
+    ) {}
+    public record MandateCount(String mandateType, int count) {}
+
     /* ================ MP TOPIC RADAR ================ */
     public record MpTopicRadar(String slug, List<TopicSlice> topics, int totalBills) {}
 
