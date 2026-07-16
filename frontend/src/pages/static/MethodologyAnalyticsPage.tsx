@@ -6,12 +6,14 @@ import type React from "react";
  * language: what it measures, what is left out, and what it does NOT tell you.
  * All prose is translated via the "methodology.analytics.*" i18n block.
  */
-export default function MethodologyAnalyticsPage() {
+export default function MethodologyAnalyticsPage({ embedded = false }: { embedded?: boolean } = {}) {
   const { t } = useTranslation();
   const K = "methodology.analytics";
   return (
     <article className="prose max-w-none text-slate-700">
-      <h1 className="text-3xl font-semibold text-ink">{t(`${K}.title`)}</h1>
+      {embedded
+        ? <h2 className="text-2xl font-semibold text-ink mt-0">{t(`${K}.title`)}</h2>
+        : <h1 className="text-3xl font-semibold text-ink">{t(`${K}.title`)}</h1>}
       <p>{t(`${K}.intro`)}</p>
 
       <hr />

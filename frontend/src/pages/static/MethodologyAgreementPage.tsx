@@ -1,10 +1,12 @@
 import { useTranslation } from "react-i18next";
 
-export default function MethodologyAgreementPage() {
+export default function MethodologyAgreementPage({ embedded = false }: { embedded?: boolean } = {}) {
   const { t } = useTranslation();
   return (
     <article className="prose max-w-none text-slate-700">
-      <h1 className="text-3xl font-semibold text-ink">{t("methodology.agreement.title")}</h1>
+      {embedded
+        ? <h2 className="text-2xl font-semibold text-ink mt-0">{t("methodology.agreement.title")}</h2>
+        : <h1 className="text-3xl font-semibold text-ink">{t("methodology.agreement.title")}</h1>}
 
       <p>{t("methodology.agreement.intro")}</p>
 
