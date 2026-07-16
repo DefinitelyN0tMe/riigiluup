@@ -44,14 +44,7 @@ public class ElectionResultsImporter {
     public int importRk2023() {
         List<ElectionCandidateDto> candidates = client.fetchRk2023Results();
 
-        // Active members win name collisions, so a returning name attaches to the sitting MP
-        // rather than an inactive same-name record from an earlier term.
-        List<PlenaryMember> members = new ArrayList<>(memberRepo.findAll());
-        members.sort(Comparator.comparing(PlenaryMember::isActive)); // active (true) sorts last → overwrites
-        Map<String, PlenaryMember> byName = new HashMap<>();
-        for (PlenaryMember m : members) {
-            byName.put(nameKey(m.getFirstName(), m.getLastName()), m);
-        }
+        Map<String, PlenaryMember> byName = activeWinsNameIndex(memberRepo.findAll());
 
         repo.deleteByElectionCode(ELECTION_CODE); // full refresh — immutable source, keeps this idempotent
         Instant now = Instant.now();
@@ -78,7 +71,21 @@ public class ElectionResultsImporter {
         return matched;
     }
 
-    private static String nameKey(String forename, String surname) {
+    /**
+     * Index members by name, letting ACTIVE members win collisions — a returning name then
+     * attaches to the sitting MP rather than an inactive same-name record from an earlier term.
+     */
+    static Map<String, PlenaryMember> activeWinsNameIndex(List<PlenaryMember> members) {
+        List<PlenaryMember> sorted = new ArrayList<>(members);
+        sorted.sort(Comparator.comparing(PlenaryMember::isActive)); // active (true) sorts last → overwrites
+        Map<String, PlenaryMember> byName = new HashMap<>();
+        for (PlenaryMember m : sorted) {
+            byName.put(nameKey(m.getFirstName(), m.getLastName()), m);
+        }
+        return byName;
+    }
+
+    static String nameKey(String forename, String surname) {
         String f = forename == null ? "" : forename.trim().toLowerCase(Locale.ROOT);
         String s = surname == null ? "" : surname.trim().toLowerCase(Locale.ROOT);
         return f + "|" + s;

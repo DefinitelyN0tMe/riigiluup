@@ -244,7 +244,7 @@ public class RiigikoguClient {
         return pageTotal(n);
     }
 
-    private static int pageTotal(JsonNode n) {
+    static int pageTotal(JsonNode n) {
         if (n == null) return 0;
         JsonNode p = n.path("page").path("totalElements");
         return p.isNumber() ? p.asInt() : n.path("totalElements").asInt(0);
