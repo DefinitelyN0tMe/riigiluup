@@ -619,6 +619,18 @@
       "seniorityYears": "{{years}} лет",
       "seniorityHint": "Дни парламентской службы по данным Рийгикогу"
     },
+    "election": {
+      "title": "Как получен мандат",
+      "personalVotes": "Личных голосов (2023)",
+      "mandateType": "Мандат",
+      "ranAs": "Баллотировался от",
+      "source": "Официальный результат выборов",
+      "mandate": {
+        "PERSONAL": "Личный мандат",
+        "DISTRICT": "Окружной мандат",
+        "COMPENSATION": "Компенсационный мандат"
+      }
+    },
     "groupAlignmentDetail": "{{matches}} из {{eligible}} учитываемых голосований совпали с большинством фракции.",
     "recentDeviations": "Недавние отклонения",
     "mpChoice": "Депутат",

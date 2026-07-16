@@ -605,6 +605,18 @@
       "seniorityYears": "{{years}} years",
       "seniorityHint": "Days of parliamentary service reported by Riigikogu"
     },
+    "election": {
+      "title": "How this seat was won",
+      "personalVotes": "Personal votes (2023)",
+      "mandateType": "Mandate",
+      "ranAs": "Ran with",
+      "source": "Official election result",
+      "mandate": {
+        "PERSONAL": "Personal mandate",
+        "DISTRICT": "District mandate",
+        "COMPENSATION": "Compensation mandate"
+      }
+    },
     "groupAlignmentDetail": "{{matches}} of {{eligible}} eligible votes matched the faction majority.",
     "recentDeviations": "Recent deviations",
     "mpChoice": "MP",

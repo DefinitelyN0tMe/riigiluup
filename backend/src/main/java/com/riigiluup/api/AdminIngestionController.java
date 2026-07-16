@@ -1,6 +1,7 @@
 package com.riigiluup.api;
 
 import com.riigiluup.alignment.FactionAlignmentBackfillService;
+import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.ingestion.riigikogu.ImportRunLog;
 import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
@@ -33,6 +34,7 @@ public class AdminIngestionController {
     private final VoteBillLinker voteBillLinker;
     private final WikidataImporter wikidataImporter;
     private final SponsorRelinker sponsorRelinker;
+    private final ElectionResultsImporter electionResultsImporter;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -99,5 +101,14 @@ public class AdminIngestionController {
     @PostMapping("/relink-sponsors")
     public Map<String, Object> relinkSponsors() {
         return Map.of("relinked", sponsorRelinker.relinkOrphanSponsors());
+    }
+
+    /**
+     * One-shot import of RK_2023 election results from opendata.valimised.ee,
+     * matched to seated MPs by name. Immutable data — idempotent upsert.
+     */
+    @PostMapping("/elections")
+    public Map<String, Object> runElectionResultsImport() {
+        return Map.of("matched", electionResultsImporter.importRk2023());
     }
 }

@@ -96,6 +96,16 @@ export type PoliticianProfile = {
   biographyHtml: string | null;
   sourceUrl: string;
   externalAffiliations: ExternalAffiliation[];
+  election?: ElectionInfo | null;
+};
+export type ElectionInfo = {
+  electionCode: string;
+  personalVotes: number;
+  mandateType: "PERSONAL" | "DISTRICT" | "COMPENSATION" | string;
+  districtNumber: number | null;
+  partyName: string | null;
+  ballotNumber: number | null;
+  sourceUrl: string;
 };
 export type FactionOption = { externalId: string; name: string; memberCount: number };
 

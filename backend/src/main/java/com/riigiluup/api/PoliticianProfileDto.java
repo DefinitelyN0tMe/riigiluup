@@ -34,8 +34,19 @@ public record PoliticianProfileDto(
         GroupAlignment groupAlignment,
         String biographyHtml,
         String sourceUrl,
-        List<ExternalAffiliationDto> externalAffiliations
+        List<ExternalAffiliationDto> externalAffiliations,
+        ElectionInfo election
 ) {
+    /** How the MP won their seat (from opendata.valimised.ee); null if not matched. */
+    public record ElectionInfo(
+            String electionCode,
+            int personalVotes,
+            String mandateType,
+            Integer districtNumber,
+            String partyName,
+            Integer ballotNumber,
+            String sourceUrl
+    ) {}
     public record Faction(String externalId, String name) {}
     public record Party(String shortName, String fullName, String colorHex, String officialUrl) {}
     public record GroupMembershipDto(String name, String shortName, String colorHex,

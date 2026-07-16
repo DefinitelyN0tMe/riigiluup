@@ -235,6 +235,44 @@ export default function PoliticianProfilePage() {
         />
       </section>
 
+      {data.election && (
+        <section aria-label={t("profile.election.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-4">
+            {t("profile.election.title")}
+          </h2>
+          <div className="flex flex-wrap gap-x-10 gap-y-4">
+            <div>
+              <div className="font-display font-bold text-[32px] leading-none tracking-[-0.03em] text-ink">
+                {data.election.personalVotes.toLocaleString()}
+              </div>
+              <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">
+                {t("profile.election.personalVotes")}
+              </div>
+            </div>
+            <div>
+              <div className="font-display font-bold text-[20px] leading-tight text-ink">
+                {t(`profile.election.mandate.${data.election.mandateType}`, data.election.mandateType)}
+              </div>
+              <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">
+                {t("profile.election.mandateType")}
+              </div>
+            </div>
+            {data.election.partyName && (
+              <div>
+                <div className="text-[15px] text-ink leading-tight">{data.election.partyName}</div>
+                <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">
+                  {t("profile.election.ranAs")}
+                </div>
+              </div>
+            )}
+          </div>
+          <a href={data.election.sourceUrl} target="_blank" rel="noreferrer noopener"
+             className="inline-block mt-4 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
+            {t("profile.election.source")} ↗
+          </a>
+        </section>
+      )}
+
       {data.slug && (
         <section aria-label={t("pages.profileEnh.deviationsTitle")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
           <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-3">

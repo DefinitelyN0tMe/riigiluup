@@ -605,6 +605,18 @@
       "seniorityYears": "{{years}} aastat",
       "seniorityHint": "Riigikogu andmetel parlamenditeenistuse päevad"
     },
+    "election": {
+      "title": "Kuidas mandaat saadi",
+      "personalVotes": "Isiklikke hääli (2023)",
+      "mandateType": "Mandaat",
+      "ranAs": "Kandideeris nimekirjas",
+      "source": "Ametlik valimistulemus",
+      "mandate": {
+        "PERSONAL": "Isikumandaat",
+        "DISTRICT": "Ringkonnamandaat",
+        "COMPENSATION": "Kompensatsioonimandaat"
+      }
+    },
     "groupAlignmentDetail": "{{matches}} / {{eligible}} kvalifitseeruvat hääletust vastasid fraktsiooni enamuse valikule.",
     "recentDeviations": "Hiljutised kõrvalekalded",
     "mpChoice": "Saadik",
