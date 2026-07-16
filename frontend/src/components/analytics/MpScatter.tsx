@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 import type { MpSimilarity } from "../../api/analytics";
 
 /**
- * 2D scatter: X = coalition (+1) ↔ opposition (-1); Y = party loyalty (+1) ↔ dissenter (-1).
- * Colored by faction. Hover reveals label.
+ * 2D scatter: X = opposition (-1) ↔ coalition (+1); Y = faction loyalty (+1) ↔ dissenter (-1).
+ * Points coloured by faction; hover reveals a label. Axis pole labels read inward so they
+ * never clip against the SVG viewport.
  */
 export default function MpScatter({ data }: { data: MpSimilarity }) {
   const { t } = useTranslation();
@@ -15,12 +16,14 @@ export default function MpScatter({ data }: { data: MpSimilarity }) {
   if (!points.length) return <div className="text-muted font-mono text-sm">{t("viz.noData")}</div>;
 
   const size = 640;
-  const pad = 44;
+  const pad = 56;
+  const mid = size / 2;
   const project = (v: number, axis: "x" | "y") => {
     // v in [-1, 1] → [pad, size - pad]
     const scale = (v + 1) / 2;
     return axis === "x" ? pad + scale * (size - 2 * pad) : size - pad - scale * (size - 2 * pad);
   };
+  const gridlines = [-0.5, 0.5];
 
   const factionSummary = useMemo(() => {
     const map = new Map<string, { count: number; color: string }>();
@@ -34,26 +37,46 @@ export default function MpScatter({ data }: { data: MpSimilarity }) {
   }, [points]);
 
   const highlighted = points.find((p) => p.slug === hover);
+  const LABEL = "'JetBrains Mono', monospace";
 
   return (
     <div className="relative">
-      <svg role="group" aria-label={t("viz.a11y.mpScatter", { count: data.points.length, defaultValue: "MP similarity scatterplot with {{count}} MPs, x = coalition-vs-opposition, y = faction loyalty." })}
+      <svg role="group"
+           aria-label={t("viz.a11y.mpScatter", { count: data.points.length, defaultValue: "MP similarity scatterplot with {{count}} MPs, x = coalition-vs-opposition, y = faction loyalty." })}
            viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[720px] mx-auto block">
-        {/* Quadrants background */}
-        <rect x={pad} y={pad} width={(size - 2 * pad) / 2} height={(size - 2 * pad) / 2} fill="#F4F4F1" />
-        <rect x={size / 2} y={size / 2} width={(size - 2 * pad) / 2} height={(size - 2 * pad) / 2} fill="#F4F4F1" />
-        {/* Axes */}
-        <line x1={pad} y1={size / 2} x2={size - pad} y2={size / 2} stroke="#0A0A0A" strokeWidth={1.2} />
-        <line x1={size / 2} y1={pad} x2={size / 2} y2={size - pad} stroke="#0A0A0A" strokeWidth={1.2} />
-        {/* Axis labels */}
-        <text x={size - pad + 4} y={size / 2 + 4} fontFamily="'JetBrains Mono', monospace" fontSize={11} fontWeight={700} fill="#0072CE">{t("viz.scatter.xRight")}</text>
-        <text x={pad - 4} y={size / 2 + 4} textAnchor="end" fontFamily="'JetBrains Mono', monospace" fontSize={11} fontWeight={700} fill="#FF4B3E">{t("viz.scatter.xLeft")}</text>
-        <text x={size / 2 + 6} y={pad - 6} fontFamily="'JetBrains Mono', monospace" fontSize={11} fontWeight={700} fill="#0A0A0A">{t("viz.scatter.yUp")}</text>
-        <text x={size / 2 + 6} y={size - pad + 14} fontFamily="'JetBrains Mono', monospace" fontSize={11} fontWeight={700} fill="#0A0A0A">{t("viz.scatter.yDown")}</text>
-        <text x={pad + 12} y={pad + 18} fontFamily="'Fraunces', serif" fontStyle="italic" fontWeight={300} fontSize={14} fill="#0A0A0A" opacity={0.35}>{t("viz.scatter.qOpLoy")}</text>
-        <text x={size - pad - 12} y={pad + 18} textAnchor="end" fontFamily="'Fraunces', serif" fontStyle="italic" fontWeight={300} fontSize={14} fill="#0A0A0A" opacity={0.35}>{t("viz.scatter.qCoLoy")}</text>
-        <text x={pad + 12} y={size - pad - 8} fontFamily="'Fraunces', serif" fontStyle="italic" fontWeight={300} fontSize={14} fill="#0A0A0A" opacity={0.35}>{t("viz.scatter.qOpInd")}</text>
-        <text x={size - pad - 12} y={size - pad - 8} textAnchor="end" fontFamily="'Fraunces', serif" fontStyle="italic" fontWeight={300} fontSize={14} fill="#0A0A0A" opacity={0.35}>{t("viz.scatter.qCoInd")}</text>
+        {/* Plot surface + frame */}
+        <rect x={pad} y={pad} width={size - 2 * pad} height={size - 2 * pad} rx={12}
+              fill="#FCFCFA" stroke="#E7E7E1" strokeWidth={1} />
+
+        {/* Faint reference gridlines at ±0.5 */}
+        {gridlines.map((g) => (
+          <g key={g} stroke="#EDEDE7" strokeWidth={1}>
+            <line x1={project(g, "x")} y1={pad} x2={project(g, "x")} y2={size - pad} />
+            <line x1={pad} y1={project(g, "y")} x2={size - pad} y2={project(g, "y")} />
+          </g>
+        ))}
+
+        {/* Center crosshair — the neutral origin */}
+        <line x1={pad} y1={mid} x2={size - pad} y2={mid} stroke="#CDCDC6" strokeWidth={1.25} />
+        <line x1={mid} y1={pad} x2={mid} y2={size - pad} stroke="#CDCDC6" strokeWidth={1.25} />
+
+        {/* Axis pole labels — placed inside the plot, reading toward each pole (never clip) */}
+        <text x={pad + 12} y={mid - 12} textAnchor="start"
+              fontFamily={LABEL} fontSize={11} fontWeight={600} letterSpacing="0.09em" fill="#5B5B54">
+          {t("viz.scatter.xLeft")}
+        </text>
+        <text x={size - pad - 12} y={mid - 12} textAnchor="end"
+              fontFamily={LABEL} fontSize={11} fontWeight={600} letterSpacing="0.09em" fill="#5B5B54">
+          {t("viz.scatter.xRight")}
+        </text>
+        <text x={mid} y={pad - 13} textAnchor="middle"
+              fontFamily={LABEL} fontSize={11} fontWeight={600} letterSpacing="0.09em" fill="#5B5B54">
+          {t("viz.scatter.yUp")}
+        </text>
+        <text x={mid} y={size - pad + 22} textAnchor="middle"
+              fontFamily={LABEL} fontSize={11} fontWeight={600} letterSpacing="0.09em" fill="#5B5B54">
+          {t("viz.scatter.yDown")}
+        </text>
 
         {/* Points */}
         {points.map((p) => {
@@ -71,8 +94,8 @@ export default function MpScatter({ data }: { data: MpSimilarity }) {
                style={{ cursor: "pointer" }}>
               <circle cx={cx} cy={cy} r={active ? 8 : 5}
                       fill={p.factionColorHex ?? "#0072CE"}
-                      stroke={active ? "#0A0A0A" : "#FFFFFF"} strokeWidth={active ? 2 : 1}
-                      opacity={hover && !active ? 0.35 : 0.9}
+                      stroke={active ? "#0A0A0A" : "#FCFCFA"} strokeWidth={active ? 2 : 1.5}
+                      opacity={hover && !active ? 0.3 : 0.92}
                       style={{ transition: "r 0.15s, opacity 0.15s" }} />
             </g>
           );
@@ -84,17 +107,17 @@ export default function MpScatter({ data }: { data: MpSimilarity }) {
           // Flip the tooltip to the left for right-edge points so it doesn't clip off-canvas.
           const flip = cx > size - 240;
           const boxX = flip ? cx - 232 : cx + 12;
-          const textX = boxX + 10;
+          const textX = boxX + 12;
           return (
             <g pointerEvents="none">
-              <rect x={boxX} y={cy - 32} width={220} height={54} rx={6} fill="#0A0A0A" opacity={0.92} />
-              <text x={textX} y={cy - 15} fontFamily="'Bricolage Grotesque', sans-serif" fontWeight={700} fontSize={13} fill="#FFFFFF">
+              <rect x={boxX} y={cy - 34} width={220} height={58} rx={8} fill="#0A0A0A" opacity={0.94} />
+              <text x={textX} y={cy - 16} fontFamily="'Bricolage Grotesque', sans-serif" fontWeight={700} fontSize={13} fill="#FFFFFF">
                 {highlighted.name}
               </text>
-              <text x={textX} y={cy + 3} fontFamily="'JetBrains Mono', monospace" fontSize={10} fill="#6BB4F0" letterSpacing="0.06em">
+              <text x={textX} y={cy + 2} fontFamily={LABEL} fontSize={10} fill="#6BB4F0" letterSpacing="0.06em">
                 {highlighted.factionShortName ?? "—"} · {highlighted.totalComparableVotes} {t("viz.scatter.tooltipVotes")}
               </text>
-              <text x={textX} y={cy + 17} fontFamily="'JetBrains Mono', monospace" fontSize={10} fill="#FFFFFF" opacity={0.7} letterSpacing="0.06em">
+              <text x={textX} y={cy + 18} fontFamily={LABEL} fontSize={10} fill="#FFFFFF" opacity={0.7} letterSpacing="0.06em">
                 {highlighted.deviations} {t("viz.scatter.tooltipDev")}
               </text>
             </g>

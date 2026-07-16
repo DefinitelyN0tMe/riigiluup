@@ -305,8 +305,8 @@
       "clickHint": "Kliki tulbal, et näha konkreetseid eelnõusid"
     },
     "scatter": {
-      "xRight": "→ KOALITSIOON",
-      "xLeft": "OPOSITSIOON ←",
+      "xRight": "KOALITSIOON →",
+      "xLeft": "← OPOSITSIOON",
       "yUp": "↑ PARTEILOJAALSUS",
       "yDown": "↓ DISSIDENT",
       "qOpLoy": "opositsiooni lojalist",

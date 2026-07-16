@@ -305,8 +305,8 @@
       "clickHint": "Click a bar to see the specific bills"
     },
     "scatter": {
-      "xRight": "→ COALITION",
-      "xLeft": "OPPOSITION ←",
+      "xRight": "COALITION →",
+      "xLeft": "← OPPOSITION",
       "yUp": "↑ PARTY LOYALTY",
       "yDown": "↓ DISSIDENT",
       "qOpLoy": "opposition loyalist",
