@@ -32,11 +32,40 @@ public class DailyRefreshJob {
     /** Guards against a slow run still executing when the next 6-hourly trigger fires. */
     private final AtomicBoolean running = new AtomicBoolean(false);
 
+    /**
+     * Votes every 6 hours so new roll-calls appear the same day. Cheap: the votings list is
+     * date-filtered and historical votes are immutable, so only the recent window is fetched.
+     */
+    @Scheduled(cron = "${politico.schedule.votes-refresh-cron}",
+               zone = "${politico.schedule.daily-refresh-zone}")
+    public void refreshVotes() {
+        if (!running.compareAndSet(false, true)) {
+            log.info("Votes refresh skipped — another refresh is in progress");
+            return;
+        }
+        log.info("Votes refresh starting");
+        try {
+            LocalDate today = LocalDate.now(TALLINN);
+            voteImporter.runWindow(today.minusDays(7), today);
+            voteBillLinker.linkAll();
+            log.info("Votes refresh finished");
+        } catch (Exception e) {
+            log.error("Votes refresh failed", e);
+        } finally {
+            running.set(false);
+        }
+    }
+
+    /**
+     * Members, committees and legislation once a day — these change slowly. With legislation
+     * detail change-detection and member-detail freshness gating, this no longer re-downloads the
+     * whole bill catalogue or all 101 member details on every run.
+     */
     @Scheduled(cron = "${politico.schedule.daily-refresh-cron}",
                zone = "${politico.schedule.daily-refresh-zone}")
-    public void runDaily() {
+    public void refreshDaily() {
         if (!running.compareAndSet(false, true)) {
-            log.info("Daily refresh skipped — previous run still in progress");
+            log.info("Daily refresh skipped — another refresh is in progress");
             return;
         }
         log.info("Daily refresh starting");

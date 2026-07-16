@@ -12,6 +12,7 @@ import com.politico.source.ProcessingStatus;
 import com.politico.source.SourceSnapshot;
 import com.politico.source.SourceSnapshotRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.List;
@@ -40,6 +42,10 @@ public class PlenaryMemberDetailImporter {
     private final SourceSnapshotRepository snapshotRepo;
     private final ImportRunLogRepository runLogRepo;
     private final TransactionTemplate tx;
+
+    /** Re-fetch a member's detail at most this often — committees/bio/faction change slowly. */
+    @Value("${politico.schedule.member-detail-max-age-days:7}")
+    private int detailMaxAgeDays;
 
     public PlenaryMemberDetailImporter(
             RiigikoguClient client,
@@ -77,6 +83,8 @@ public class PlenaryMemberDetailImporter {
                 .build());
         int seen = 0;
         int upserted = 0;
+        int skipped = 0;
+        Instant freshCutoff = Instant.now().minus(detailMaxAgeDays, ChronoUnit.DAYS);
         try {
             int page = 0;
             Slice<PlenaryMember> slice;
@@ -84,6 +92,14 @@ public class PlenaryMemberDetailImporter {
                 slice = memberRepo.findActiveOrderByLastName(PageRequest.of(page, 200));
                 for (PlenaryMember m : slice.getContent()) {
                     seen++;
+                    // Skip members whose detail we already refreshed within the window — re-fetching
+                    // all 101 every run just re-downloads unchanged bio/committees/faction. New
+                    // members (no snapshot) and stale ones are still fetched, so none stay incomplete.
+                    if (snapshotRepo.existsBySourceNameAndEntityTypeAndExternalIdAndFetchedAtAfter(
+                            client.sourceName(), ENTITY, m.getExternalId(), freshCutoff)) {
+                        skipped++;
+                        continue;
+                    }
                     try {
                         tx.executeWithoutResult(status -> upsertOne(m.getExternalId()));
                         upserted++;
@@ -94,6 +110,8 @@ public class PlenaryMemberDetailImporter {
                 }
                 page++;
             } while (slice.hasNext());
+            log.info("detail refresh: {} fetched, {} skipped as fresh (< {} days)",
+                    upserted, skipped, detailMaxAgeDays);
             run.setStatus("SUCCESS");
         } catch (Exception e) {
             log.error("detail refresh outer loop failed", e);

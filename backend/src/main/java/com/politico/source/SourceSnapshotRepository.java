@@ -20,6 +20,16 @@ public interface SourceSnapshotRepository extends JpaRepository<SourceSnapshot, 
             String sourceName, String entityType, String externalId
     );
 
+    /** True if we already stored a detail snapshot for this entity — used to skip re-fetching it. */
+    boolean existsBySourceNameAndEntityTypeAndExternalId(
+            String sourceName, String entityType, String externalId
+    );
+
+    /** True if we have a snapshot fetched more recently than {@code after} — a freshness gate. */
+    boolean existsBySourceNameAndEntityTypeAndExternalIdAndFetchedAtAfter(
+            String sourceName, String entityType, String externalId, java.time.Instant after
+    );
+
     /**
      * Bulk delete used by {@link SnapshotRetentionJob}. Returns the number of rows removed.
      * Dependent tables (plenary_member, group, group_membership, vote_event, legislative_item)

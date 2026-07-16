@@ -93,9 +93,15 @@ politico:
     user-agent: "politico/0.0.1 (riigiluup@gmail.com)"
     rate-limit-per-second: 1
   schedule:
-    # Every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn).
-    daily-refresh-cron: "0 5 3/6 * * *"
+    # Votes every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) — new roll-calls
+    # appear the same day; the votings list is date-filtered so this stays cheap.
+    votes-refresh-cron: "0 5 3/6 * * *"
+    # Members + committees + legislation once a day at 04:30. These change slowly, and legislation
+    # now skips unchanged bills instead of re-downloading the whole catalogue every run.
+    daily-refresh-cron: "0 30 4 * * *"
     daily-refresh-zone: "Europe/Tallinn"
+    # Re-fetch a member's detail (bio / committees / faction) at most this often.
+    member-detail-max-age-days: 7
   admin:
     username: ${POLITICO_ADMIN_USERNAME:admin}
     password: ${POLITICO_ADMIN_PASSWORD:change-me}

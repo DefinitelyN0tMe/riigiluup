@@ -205,6 +205,25 @@ public class LegislativeItemImporter {
                 .orElse(null);
 
         SourceSnapshot listSnap = snapshotFor(ENTITY_LIST, entry.uuid(), entry);
+
+        // /api/volumes/drafts ignores its date params, so the refresh sees the whole catalogue every
+        // run. Re-fetching every bill's detail (one throttled call each) re-downloads thousands of
+        // long-finished bills that never change. If we already have this bill, its current stage
+        // and status are unchanged, and we already stored its detail, then nothing we'd fetch
+        // differs from what's local — skip the detail call entirely. (Stage + status are the fields
+        // applyDetail keeps current on every fetch, so a bill that advances is always re-fetched and
+        // then compares equal again next run — no perpetual re-fetching.)
+        boolean listUnchanged = existing != null
+                && java.util.Objects.equals(existing.getActiveStageSourceCode(), entry.activeDraftStage())
+                && java.util.Objects.equals(existing.getActiveStatusSourceCode(), entry.activeDraftStatus());
+        if (listUnchanged
+                && snapshotRepo.existsBySourceNameAndEntityTypeAndExternalId(
+                        client.sourceName(), ENTITY_DETAIL, entry.uuid())) {
+            existing.setSourceSnapshot(listSnap);
+            listSnap.setProcessingStatus(ProcessingStatus.PROCESSED);
+            return;
+        }
+
         if (existing == null) {
             existing = mapper.fromListEntry(entry);
             existing.setSourceSnapshot(listSnap);
