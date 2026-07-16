@@ -4,6 +4,10 @@ import com.riigiluup.activity.MemberActivity;
 import com.riigiluup.activity.MemberActivityRepository;
 import com.riigiluup.election.ElectionResult;
 import com.riigiluup.election.ElectionResultRepository;
+import com.riigiluup.finance.PartyReceipt;
+import com.riigiluup.finance.PartyReceiptRepository;
+import com.riigiluup.party.Party;
+import com.riigiluup.party.PartyRepository;
 import com.riigiluup.group.Group;
 import com.riigiluup.group.GroupRepository;
 import com.riigiluup.group.GroupType;
@@ -57,6 +61,8 @@ public class AnalyticsService {
     private final PlenaryMemberRepository memberRepo;
     private final MemberActivityRepository memberActivityRepo;
     private final ElectionResultRepository electionResultRepo;
+    private final PartyReceiptRepository partyReceiptRepo;
+    private final PartyRepository partyRepo;
 
     /**
      * Faction name substrings currently in the governing coalition. Drives the
@@ -267,6 +273,54 @@ public class AnalyticsService {
                 .map(en -> new AnalyticsDto.MandateCount(en.getKey(), en.getValue()))
                 .toList();
         return new AnalyticsDto.ElectionBoard(items, mandates, Instant.now());
+    }
+
+    /* ============================================================
+     *  Party finance — income mix of the parliamentary parties (ERJK)
+     * ============================================================ */
+    private static final int FINANCE_SINCE_YEAR = 2023; // current term
+
+    @Cacheable("analytics-party-finance")
+    public AnalyticsDto.PartyFinanceBoard partyFinance() {
+        List<PartyReceipt> receipts = partyReceiptRepo.findAll().stream()
+                .filter(r -> r.getPeriodYear() >= FINANCE_SINCE_YEAR)
+                .toList();
+
+        List<AnalyticsDto.PartyFinanceItem> items = new ArrayList<>();
+        for (Party p : partyRepo.findAll()) {
+            String pname = p.getFullName() == null ? "" : p.getFullName().toLowerCase(java.util.Locale.ROOT).trim();
+            if (pname.isEmpty()) continue;
+
+            // ERJK party names carry the same core party name (sometimes with a prefix), so a
+            // contains-match on the lowercased name maps each of our parties to its ERJK rows.
+            Map<String, Long> byBucket = new LinkedHashMap<>();
+            for (PartyReceipt r : receipts) {
+                if (r.getPartyName() == null) continue;
+                if (!r.getPartyName().toLowerCase(java.util.Locale.ROOT).contains(pname)) continue;
+                byBucket.merge(bucketOf(r.getCategoryId()), r.getAmount().longValue(), Long::sum);
+            }
+            long total = byBucket.values().stream().mapToLong(Long::longValue).sum();
+            if (total <= 0) continue;
+
+            List<AnalyticsDto.FinanceBucket> buckets = byBucket.entrySet().stream()
+                    .map(e -> new AnalyticsDto.FinanceBucket(e.getKey(), e.getValue()))
+                    .sorted(Comparator.comparingLong(AnalyticsDto.FinanceBucket::amount).reversed())
+                    .toList();
+            items.add(new AnalyticsDto.PartyFinanceItem(p.getFullName(), p.getColorHex(), total, buckets));
+        }
+        items.sort(Comparator.comparingLong(AnalyticsDto.PartyFinanceItem::total).reversed());
+        return new AnalyticsDto.PartyFinanceBoard(items, FINANCE_SINCE_YEAR, Instant.now());
+    }
+
+    /** Collapse the seven ERJK income types into a few readable buckets. */
+    private static String bucketOf(String categoryId) {
+        return switch (categoryId == null ? "" : categoryId) {
+            case "113" -> "state";              // Riigitoetus (state support)
+            case "111", "112" -> "donations";   // Rahaline + Mitterahaline annetus
+            case "110" -> "membership";         // Liikmemaks (membership fees)
+            case "115" -> "loans";              // Pangalaen (bank loan)
+            default -> "other";                 // 116 Isiklikud vahendid, 114 Tulu erakonna varalt
+        };
     }
 
     private IndividualVote fetchOneRecentDeviation(PlenaryMember m) {

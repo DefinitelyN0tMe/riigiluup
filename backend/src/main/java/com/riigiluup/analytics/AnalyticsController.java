@@ -43,6 +43,11 @@ public class AnalyticsController {
         return service.elections();
     }
 
+    @GetMapping("/party-finance")
+    public AnalyticsDto.PartyFinanceBoard partyFinance() {
+        return service.partyFinance();
+    }
+
     @GetMapping("/discipline-breakers")
     public AnalyticsDto.DisciplineBreakers disciplineBreakers(
             @RequestParam(defaultValue = "24") int limit,

@@ -2,6 +2,7 @@ package com.riigiluup.api;
 
 import com.riigiluup.activity.MemberActivityImporter;
 import com.riigiluup.alignment.FactionAlignmentBackfillService;
+import com.riigiluup.finance.PartyFinanceImporter;
 import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.ingestion.riigikogu.ImportRunLog;
 import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
@@ -37,6 +38,7 @@ public class AdminIngestionController {
     private final SponsorRelinker sponsorRelinker;
     private final ElectionResultsImporter electionResultsImporter;
     private final MemberActivityImporter memberActivityImporter;
+    private final PartyFinanceImporter partyFinanceImporter;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -121,5 +123,11 @@ public class AdminIngestionController {
     @PostMapping("/activity")
     public Map<String, Object> runActivityCompute() {
         return Map.of("computed", memberActivityImporter.computeAll());
+    }
+
+    /** Full-replace import of ERJK party income data (money in politics). */
+    @PostMapping("/party-finance")
+    public Map<String, Object> runPartyFinanceImport() {
+        return Map.of("rows", partyFinanceImporter.importAll());
     }
 }

@@ -141,6 +141,11 @@ public final class AnalyticsDto {
     ) {}
     public record MandateCount(String mandateType, int count) {}
 
+    /* ================ PARTY FINANCE (money in politics) ================ */
+    public record PartyFinanceBoard(List<PartyFinanceItem> parties, int sinceYear, Instant computedAt) {}
+    public record PartyFinanceItem(String partyName, String colorHex, long total, List<FinanceBucket> buckets) {}
+    public record FinanceBucket(String key, long amount) {}
+
     /* ================ MP TOPIC RADAR ================ */
     public record MpTopicRadar(String slug, List<TopicSlice> topics, int totalBills) {}
 

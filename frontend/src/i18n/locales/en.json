@@ -144,7 +144,8 @@
       "toc9": "Real collaboration",
       "toc10": "Night votes",
       "toc11": "Most active MPs",
-      "toc12": "Who got the most votes"
+      "toc12": "Who got the most votes",
+      "toc13": "Party funding"
     },
     "sec": {
       "agreement": {
@@ -230,6 +231,13 @@
         "titleEm": "personal votes",
         "titlePost": "",
         "note": "Every sitting MP by the personal votes they won at the 2023 election, with the split of mandate types. A personal mandate takes enough votes to clear the district quota outright; district and compensation mandates are allocated from the party list. Substitutes who were not themselves elected are not shown."
+      },
+      "finance": {
+        "kicker": "Money in politics",
+        "titlePre": "How parties are ",
+        "titleEm": "funded",
+        "titlePost": "",
+        "note": "Declared income of the parliamentary parties since 2023, split by source, from the ERJK financing register. State support is the biggest slice for most, but some parties lean heavily on donations. Figures are reported totals in euros."
       }
     }
   },
@@ -243,6 +251,16 @@
         "questions": "Questions",
         "interpellations": "Questions to ministers",
         "writtenQuestions": "Written questions"
+      }
+    },
+    "finance": {
+      "footnote": "Income since {{year}}",
+      "source": {
+        "state": "State support",
+        "donations": "Donations",
+        "membership": "Membership fees",
+        "loans": "Loans",
+        "other": "Other"
       }
     },
     "loading": "Loading…",

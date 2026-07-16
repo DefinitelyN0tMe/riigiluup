@@ -144,7 +144,8 @@
       "toc9": "Reaalne koostöö",
       "toc10": "Öised hääled",
       "toc11": "Kõige aktiivsemad saadikud",
-      "toc12": "Kes sai enim hääli"
+      "toc12": "Kes sai enim hääli",
+      "toc13": "Parteide rahastamine"
     },
     "sec": {
       "agreement": {
@@ -230,6 +231,13 @@
         "titleEm": "isiklikke hääli",
         "titlePost": "",
         "note": "Iga istuv saadik 2023. aasta valimistel saadud isiklike häälte järgi, koos mandaaditüüpide jaotusega. Isikumandaadi saab piisava häältearvuga üle ringkonna kvoodi; ringkonna- ja kompensatsioonimandaat jagatakse nimekirjast. Asendajaid, keda ise ei valitud, ei näidata."
+      },
+      "finance": {
+        "kicker": "Raha poliitikas",
+        "titlePre": "Kuidas parteid on ",
+        "titleEm": "rahastatud",
+        "titlePost": "",
+        "note": "Parlamendiparteide deklareeritud tulud alates 2023. aastast allikate kaupa, ERJK rahastamisregistrist. Enamikul on suurim osa riigitoetus, kuid mõned toetuvad tugevalt annetustele. Summad on aruandelised, eurodes."
       }
     }
   },
@@ -243,6 +251,16 @@
         "questions": "Küsimused",
         "interpellations": "Arupärimised",
         "writtenQuestions": "Kirjalikud küsimused"
+      }
+    },
+    "finance": {
+      "footnote": "Tulud alates {{year}}",
+      "source": {
+        "state": "Riigitoetus",
+        "donations": "Annetused",
+        "membership": "Liikmemaksud",
+        "loans": "Laenud",
+        "other": "Muu"
       }
     },
     "loading": "Laen…",

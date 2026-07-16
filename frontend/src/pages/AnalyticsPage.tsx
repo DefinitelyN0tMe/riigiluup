@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   fetchAttendanceMatrix, fetchBillFlow, fetchBillVelocity, fetchCoSponsorship,
   fetchDisciplineBreakers, fetchElections, fetchFactionAgreement, fetchHighlights, fetchMemberActivity,
-  fetchMpSimilarity, fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
+  fetchMpSimilarity, fetchPartyFinance, fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
 } from "../api/analytics";
 import SectionHead from "../components/SectionHead";
 import FactionHeatmap from "../components/analytics/FactionHeatmap";
@@ -19,6 +19,7 @@ import HighlightsStrip from "../components/analytics/HighlightsStrip";
 import NightVotesLog from "../components/analytics/NightVotesLog";
 import ActiveMembers from "../components/analytics/ActiveMembers";
 import ElectionLeaders from "../components/analytics/ElectionLeaders";
+import PartyFinance from "../components/analytics/PartyFinance";
 import type { ReactNode } from "react";
 
 function Loading() {
@@ -56,6 +57,7 @@ export default function AnalyticsPage() {
   const night = useQuery({ queryKey: ["ana:night"], queryFn: () => fetchNightVotes(20) });
   const activity = useQuery({ queryKey: ["ana:activity"], queryFn: fetchMemberActivity });
   const elections = useQuery({ queryKey: ["ana:elections"], queryFn: fetchElections });
+  const finance = useQuery({ queryKey: ["ana:finance"], queryFn: fetchPartyFinance });
 
   const tocItems: [string, string][] = [
     ["I.", t("analytics.hero.toc1")],
@@ -70,6 +72,7 @@ export default function AnalyticsPage() {
     ["X.", t("analytics.hero.toc10")],
     ["XI.", t("analytics.hero.toc11")],
     ["XII.", t("analytics.hero.toc12")],
+    ["XIII.", t("analytics.hero.toc13")],
   ];
 
   return (
@@ -206,6 +209,15 @@ export default function AnalyticsPage() {
       >
         {elections.isLoading ? <Loading /> : elections.error ? <Failed err={elections.error} /> :
           elections.data && <ElectionLeaders data={elections.data} />}
+      </Section>
+
+      <Section
+        index="XIII." kicker={t("analytics.sec.finance.kicker")}
+        title={<>{t("analytics.sec.finance.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.finance.titleEm")}</span>{t("analytics.sec.finance.titlePost")}</>}
+        note={t("analytics.sec.finance.note")}
+      >
+        {finance.isLoading ? <Loading /> : finance.error ? <Failed err={finance.error} /> :
+          finance.data && <PartyFinance data={finance.data} />}
       </Section>
     </>
   );
