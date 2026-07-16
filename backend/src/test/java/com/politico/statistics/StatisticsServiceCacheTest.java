@@ -40,7 +40,8 @@ class StatisticsServiceCacheTest {
             return json.readTree("{\"sittings\":400,\"participated\":383,\"absent\":17}");
         });
 
-        StatisticsService raw = new StatisticsService(client);
+        ParticipationCacheStore cacheStore = mock(ParticipationCacheStore.class);
+        StatisticsService raw = new StatisticsService(client, cacheStore);
         StatisticsService svc = wrapWithCache(raw);
 
         ParticipationStats a = svc.participation("m-1", FROM, TO);

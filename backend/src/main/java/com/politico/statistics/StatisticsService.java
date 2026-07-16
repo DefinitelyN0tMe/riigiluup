@@ -19,6 +19,7 @@ public class StatisticsService {
     public static final LocalDate TERM_START = LocalDate.of(2023, 4, 10);
 
     private final RiigikoguClient client;
+    private final ParticipationCacheStore cacheStore;
 
     @Cacheable(
             value = CacheConfig.CACHE_PARTICIPATION,
@@ -27,21 +28,33 @@ public class StatisticsService {
     public ParticipationStats participation(String memberUuid, LocalDate from, LocalDate to) {
         String url = "https://api.riigikogu.ee/api/statistics/participations/member/"
                 + memberUuid + "?startDate=" + from + "&endDate=" + to;
+        ParticipationStats fresh = null;
         try {
             JsonNode json = client.fetchParticipationStats(memberUuid, from, to);
             int total = asInt(json, "sittings");
             int attended = asInt(json, "participated");
             Double rate = ratio(attended, total);
-            return new ParticipationStats(
+            fresh = new ParticipationStats(
                     total, attended, rate,
                     "Attendance-check presence reported by Riigikogu API (" + from + " → " + to + ")",
                     url);
         } catch (Exception e) {
             log.warn("participation stats fetch failed for {} [{} -> {}]",
                     memberUuid, from, to, e);
-            return new ParticipationStats(0, 0, null,
-                    "Data currently unavailable from Riigikogu API", url);
         }
+        // A good live figure is persisted as the new last-good and returned.
+        if (fresh != null && fresh.participationRate() != null) {
+            cacheStore.save(memberUuid, fresh.totalSittings(), fresh.attended(),
+                    fresh.participationRate(), from, to);
+            return fresh;
+        }
+        // Live fetch failed or the source returned an empty 0/0 — serve the last value we
+        // persisted so an active MP never flips to "0 of 0" during a source outage. Only fall
+        // through to the "unavailable" sentinel if we have never captured a good figure yet.
+        return cacheStore.lastGood(memberUuid, url)
+                .orElse(fresh != null ? fresh
+                        : new ParticipationStats(0, 0, null,
+                                "Data currently unavailable from Riigikogu API", url));
     }
 
     @Cacheable(
