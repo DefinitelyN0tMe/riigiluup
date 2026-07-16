@@ -318,6 +318,46 @@ export default function PoliticianProfilePage() {
         </section>
       )}
 
+      {(data.education || data.positions) && (
+        <section aria-label={t("profile.bio.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
+            {t("profile.bio.title")}
+          </h2>
+          <p className="font-serif italic text-[14px] text-ink-2 mb-4 max-w-[64ch]">
+            {t("profile.bio.lede")}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {data.education && (
+              <div>
+                <h3 className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted mb-2">
+                  {t("profile.bio.education")}
+                </h3>
+                <ul className="flex flex-wrap gap-2">
+                  {data.education.split("; ").map((e) => (
+                    <li key={e} className="text-[13px] text-ink bg-paper border border-rule rounded-full px-3 py-1">{e}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {data.positions && (
+              <div>
+                <h3 className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted mb-2">
+                  {t("profile.bio.positions")}
+                </h3>
+                <ul className="flex flex-wrap gap-2">
+                  {data.positions.split("; ").map((p) => (
+                    <li key={p} className="text-[13px] text-ink bg-paper border border-rule rounded-full px-3 py-1">{p}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <p className="mt-4 font-mono text-[11px] text-muted tracking-[0.04em]">
+            {t("profile.bio.source")}
+          </p>
+        </section>
+      )}
+
       {data.slug && (
         <section aria-label={t("pages.profileEnh.deviationsTitle")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
           <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-3">

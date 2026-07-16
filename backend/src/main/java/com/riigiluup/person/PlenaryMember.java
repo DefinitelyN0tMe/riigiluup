@@ -64,6 +64,14 @@ public class PlenaryMember {
     @Column(name = "biography_html", columnDefinition = "text")
     private String biographyHtml;
 
+    /** Education institutions (Wikidata P69), "; "-joined Estonian labels; nullable. */
+    @Column(columnDefinition = "text")
+    private String education;
+
+    /** Other public offices held (Wikidata P39, "; "-joined Estonian labels); nullable. */
+    @Column(columnDefinition = "text")
+    private String positions;
+
     @Column(name = "parliament_seniority_days")
     private Integer parliamentSeniorityDays;
 

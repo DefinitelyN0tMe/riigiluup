@@ -672,6 +672,13 @@
       "writtenQuestions": "Written questions",
       "source": "On the Riigikogu site"
     },
+    "bio": {
+      "title": "Education & career",
+      "lede": "Where this MP studied and the public offices they have held.",
+      "education": "Education",
+      "positions": "Offices held",
+      "source": "Source: Wikidata (CC0). Labels shown in Estonian."
+    },
     "groupAlignmentDetail": "{{matches}} of {{eligible}} eligible votes matched the faction majority.",
     "recentDeviations": "Recent deviations",
     "mpChoice": "MP",

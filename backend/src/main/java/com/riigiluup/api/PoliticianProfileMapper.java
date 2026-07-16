@@ -150,7 +150,9 @@ public class PoliticianProfileMapper {
                 "https://api.riigikogu.ee/api/plenary-members/" + m.getExternalId(),
                 external,
                 election,
-                activity
+                activity,
+                m.getEducation(),
+                m.getPositions()
         );
     }
 

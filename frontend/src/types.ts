@@ -98,6 +98,8 @@ export type PoliticianProfile = {
   externalAffiliations: ExternalAffiliation[];
   election?: ElectionInfo | null;
   activity?: ActivityInfo | null;
+  education?: string | null;
+  positions?: string | null;
 };
 export type ElectionInfo = {
   electionCode: string;

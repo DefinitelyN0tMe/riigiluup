@@ -66,6 +66,21 @@ public class WikidataImporter {
             }
             """;
 
+    // Follow-up query for the matched MPs only (VALUES list), so it stays bounded: education
+    // institutions (P69) and other offices held (P39, excluding the MP position itself),
+    // as "; "-joined Estonian labels. No label service (would clash with GROUP BY).
+    private static final String BIO_SPARQL_TEMPLATE = """
+            SELECT ?person
+              (GROUP_CONCAT(DISTINCT ?eduL; separator="; ") AS ?education)
+              (GROUP_CONCAT(DISTINCT ?posL; separator="; ") AS ?positions)
+            WHERE {
+              VALUES ?person { %s }
+              OPTIONAL { ?person wdt:P69 ?edu. ?edu rdfs:label ?eduL. FILTER(lang(?eduL) = "et") }
+              OPTIONAL { ?person wdt:P39 ?pos. FILTER(?pos != wd:Q21100241) ?pos rdfs:label ?posL. FILTER(lang(?posL) = "et") }
+            }
+            GROUP BY ?person
+            """;
+
     private final PlenaryMemberRepository memberRepo;
     private final ImportRunLogRepository runLogRepo;
     private final RestClient rest = RestClient.builder()
@@ -112,6 +127,7 @@ public class WikidataImporter {
             }
 
             Set<UUID> assignedByDob = new HashSet<>(); // matched by the strong name+DOB key — never override
+            Map<String, PlenaryMember> matchedByQid = new HashMap<>(); // for the follow-up bio enrichment
             for (JsonNode row : bindings) {
                 seen++;
                 String qUri = row.path("person").path("value").asText(null);
@@ -159,10 +175,13 @@ public class WikidataImporter {
                 setIfPresent(row, "ruwiki", mp::setWikipediaUrlRu);
                 mp.setUpdatedAt(Instant.now());
                 if (viaDob) assignedByDob.add(mp.getId());
+                matchedByQid.put(qid, mp);
                 matched++;
             }
             log.info("wikidata cross-ref: {}/{} MPs matched from {} Wikidata rows",
                     matched, mps.size(), seen);
+
+            enrichBio(matchedByQid);
             run.setStatus("SUCCESS");
         } catch (Exception e) {
             log.error("wikidata cross-ref failed", e);
@@ -175,6 +194,39 @@ public class WikidataImporter {
             runLogRepo.save(run);
         }
         return run;
+    }
+
+    /** Second pass over just the matched QIDs: attach education + prior offices from Wikidata. */
+    private void enrichBio(Map<String, PlenaryMember> matchedByQid) {
+        if (matchedByQid.isEmpty()) return;
+        String values = matchedByQid.keySet().stream()
+                .map(q -> "wd:" + q)
+                .collect(java.util.stream.Collectors.joining(" "));
+        String query = String.format(BIO_SPARQL_TEMPLATE, values);
+        try {
+            JsonNode result = rest.get()
+                    .uri(SPARQL_ENDPOINT + "?query={q}&format=json", query)
+                    .retrieve()
+                    .body(JsonNode.class);
+            if (result == null) return;
+            int enriched = 0;
+            for (JsonNode row : result.path("results").path("bindings")) {
+                String qUri = row.path("person").path("value").asText(null);
+                if (qUri == null) continue;
+                String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
+                PlenaryMember mp = matchedByQid.get(qid);
+                if (mp == null) continue;
+                String edu = row.path("education").path("value").asText(null);
+                String pos = row.path("positions").path("value").asText(null);
+                if (edu != null && !edu.isBlank()) mp.setEducation(edu);
+                if (pos != null && !pos.isBlank()) mp.setPositions(pos);
+                enriched++;
+            }
+            log.info("wikidata bio: enriched {} MPs with education/positions", enriched);
+        } catch (Exception e) {
+            // Bio is a nice-to-have; never let it fail the whole cross-reference.
+            log.warn("wikidata bio enrichment failed (education/positions skipped): {}", e.getMessage());
+        }
     }
 
     private static void setIfPresent(JsonNode row, String key, Consumer<String> setter) {

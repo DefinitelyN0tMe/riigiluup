@@ -36,7 +36,9 @@ public record PoliticianProfileDto(
         String sourceUrl,
         List<ExternalAffiliationDto> externalAffiliations,
         ElectionInfo election,
-        ActivityInfo activity
+        ActivityInfo activity,
+        String education,
+        String positions
 ) {
     /** How the MP won their seat (from opendata.valimised.ee); null if not matched. */
     public record ElectionInfo(

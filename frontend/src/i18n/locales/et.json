@@ -672,6 +672,13 @@
       "writtenQuestions": "Kirjalikud küsimused",
       "source": "Riigikogu lehel"
     },
+    "bio": {
+      "title": "Haridus ja karjäär",
+      "lede": "Kus saadik on õppinud ja millistel avalikel ametikohtadel ta on olnud.",
+      "education": "Haridus",
+      "positions": "Peetud ametid",
+      "source": "Allikas: Wikidata (CC0). Nimetused eesti keeles."
+    },
     "groupAlignmentDetail": "{{matches}} / {{eligible}} kvalifitseeruvat hääletust vastasid fraktsiooni enamuse valikule.",
     "recentDeviations": "Hiljutised kõrvalekalded",
     "mpChoice": "Saadik",
