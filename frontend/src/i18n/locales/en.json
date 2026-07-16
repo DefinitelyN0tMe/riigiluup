@@ -232,7 +232,7 @@
       "metric": {
         "speeches": "Speeches",
         "questions": "Questions",
-        "interpellations": "Interpellations",
+        "interpellations": "Questions to ministers",
         "writtenQuestions": "Written questions"
       }
     },
@@ -638,7 +638,7 @@
       "title": "Activity in parliament",
       "speeches": "Speeches",
       "questions": "Questions asked",
-      "interpellations": "Interpellations",
+      "interpellations": "Questions to ministers",
       "writtenQuestions": "Written questions",
       "source": "On the Riigikogu site"
     },
