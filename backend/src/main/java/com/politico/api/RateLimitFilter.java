@@ -66,11 +66,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private static String clientIp(HttpServletRequest req) {
-        String xff = req.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) {
-            int comma = xff.indexOf(',');
-            return (comma > 0 ? xff.substring(0, comma) : xff).trim();
-        }
+        // Use X-Real-IP, which the single trusted edge nginx sets to the real client address and
+        // OVERWRITES on every request (deploy/nginx/politico.conf proxies /api/ straight to the api
+        // in one hop). The leftmost X-Forwarded-For entry must NOT be used: nginx appends to it, so
+        // its head is whatever the client sent — an attacker could rotate it to dodge the limit.
+        String realIp = req.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) return realIp.trim();
         return req.getRemoteAddr();
     }
 }

@@ -67,6 +67,19 @@ public class PlenaryMember {
     @Column(name = "parliament_seniority_days")
     private Integer parliamentSeniorityDays;
 
+    /** Wikidata Q-ID (e.g. "Q123456"). Populated by WikidataImporter; nullable. */
+    @Column(name = "wikidata_qid", length = 32)
+    private String wikidataQid;
+
+    @Column(name = "wikipedia_url_en", columnDefinition = "text")
+    private String wikipediaUrlEn;
+
+    @Column(name = "wikipedia_url_et", columnDefinition = "text")
+    private String wikipediaUrlEt;
+
+    @Column(name = "wikipedia_url_ru", columnDefinition = "text")
+    private String wikipediaUrlRu;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_snapshot_id")
     private SourceSnapshot sourceSnapshot;

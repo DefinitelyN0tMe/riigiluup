@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { ComparisonDisagreement } from "../types";
+import { formatDate } from "../lib/formatDate";
 
 const CHOICE_CLASS: Record<string, string> = {
   FOR: "text-estonia",
@@ -14,7 +15,7 @@ const CHOICE_CLASS: Record<string, string> = {
 
 export default function DisagreementRow({ d }: { d: ComparisonDisagreement }) {
   const { t } = useTranslation();
-  const when = d.startedAt ? new Date(d.startedAt).toLocaleDateString() : "";
+  const when = d.startedAt ? formatDate(d.startedAt) : "";
   const leftLabel = t(`choice.${d.leftChoice}` as const, { defaultValue: d.leftChoice });
   const rightLabel = t(`choice.${d.rightChoice}` as const, { defaultValue: d.rightChoice });
   return (

@@ -1,69 +1,136 @@
-import { useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { fetchLegislation } from "../api/legislation";
 import LegislationRow from "../components/LegislationRow";
 import DataFreshnessBadge from "../components/DataFreshnessBadge";
+import SearchInput from "../components/SearchInput";
 
 const PHASE_CODES = ["", "SUBMITTED", "IN_COMMITTEE", "IN_READINGS", "ADOPTED", "REJECTED", "WITHDRAWN", "OTHER"] as const;
 
 export default function LegislationPage() {
   const { t } = useTranslation();
-  const [phase, setPhase] = useState<string>("");
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(0);
+  const [sp, setSp] = useSearchParams();
+
+  const q = sp.get("q") ?? "";
+  const phase = sp.get("phase") ?? "";
+  const topicEdid = sp.get("topicEdid") ? Number(sp.get("topicEdid")) : undefined;
+  const topicLabel = sp.get("topicLabel") ?? undefined;   // frontend-only hint from drill-down
+  const minDays = sp.get("minDays") ? Number(sp.get("minDays")) : undefined;
+  const maxDays = sp.get("maxDays") ? Number(sp.get("maxDays")) : undefined;
+  const velocityLabel = sp.get("velocityLabel") ?? undefined;
+  const page = sp.get("page") ? Number(sp.get("page")) : 0;
+
+  function updateParams(next: Record<string, string | number | undefined | null>) {
+    const nextSp = new URLSearchParams(sp);
+    for (const [k, v] of Object.entries(next)) {
+      if (v === undefined || v === null || v === "" ) nextSp.delete(k);
+      else nextSp.set(k, String(v));
+    }
+    setSp(nextSp, { replace: false });
+  }
+  const removeFilter = (keys: string[]) => {
+    const nextSp = new URLSearchParams(sp);
+    keys.forEach((k) => nextSp.delete(k));
+    nextSp.delete("page");
+    setSp(nextSp);
+  };
+
   const phaseLabel = (code: string) =>
     code === "" ? t("legislation.allPhases") : t(`phase.${code}` as const, { defaultValue: code });
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["legislation", q, phase, page],
+    queryKey: ["legislation", q, phase, topicEdid, minDays, maxDays, page],
     queryFn: () => fetchLegislation({
       q: q || undefined,
       phase: phase || undefined,
+      topicEdid,
+      minDays,
+      maxDays,
       page,
       size: 50,
     }),
     placeholderData: (prev) => prev,
   });
 
+  const chips = useMemo(() => {
+    const out: { key: string; label: string; removeKeys: string[] }[] = [];
+    if (topicEdid !== undefined) out.push({
+      key: "topic",
+      label: `${t("legislation.chip.topic")}: ${topicLabel ?? `#${topicEdid}`}`,
+      removeKeys: ["topicEdid", "topicLabel"],
+    });
+    if (minDays !== undefined || maxDays !== undefined) out.push({
+      key: "velocity",
+      label: `${t("legislation.chip.velocity")}: ${velocityLabel ?? `${minDays ?? 0}–${maxDays ?? "∞"}d`}`,
+      removeKeys: ["minDays", "maxDays", "velocityLabel"],
+    });
+    return out;
+  }, [topicEdid, topicLabel, minDays, maxDays, velocityLabel, t]);
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-semibold text-ink">{t("legislation.title")}</h1>
-        <DataFreshnessBadge />
+    <div className="px-5 sm:px-8 md:px-10 py-10 sm:py-14 md:py-16 max-w-[1440px] mx-auto w-full">
+      <div className="mb-8 md:mb-12">
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-blue font-bold flex items-center gap-2.5 mb-4">
+          <span className="bg-blue text-white px-2 py-0.5 rounded font-bold tracking-[0.14em]">III.</span>
+          {t("legislation.title")}
+        </div>
+        <div className="flex items-end justify-between flex-wrap gap-4">
+          <h1 className="font-display font-bold h-display-lg">
+            {t("legislation.title")}
+          </h1>
+          <DataFreshnessBadge />
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 items-center">
-        <label htmlFor="legislation-search" className="sr-only">Search bills by title</label>
-        <input
-          id="legislation-search"
-          type="search"
+      <div className="flex flex-wrap gap-3 items-center mb-4 sm:mb-5">
+        <SearchInput
           value={q}
-          onChange={(e) => { setPage(0); setQ(e.target.value); }}
+          onChange={(v) => {
+            const nextSp = new URLSearchParams(sp);
+            if (v) nextSp.set("q", v); else nextSp.delete("q");
+            nextSp.delete("page");
+            setSp(nextSp, { replace: true });
+          }}
           placeholder={t("legislation.searchPlaceholder")}
-          aria-label="Search bills by title"
-          className="flex-1 min-w-[240px] border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-estonia"
+          ariaLabel={t("a11y.searchBills")}
         />
-        <label htmlFor="legislation-phase-filter" className="sr-only">Filter by phase</label>
+        <label htmlFor="legislation-phase-filter" className="sr-only">{t("a11y.filterByPhase")}</label>
         <select
           id="legislation-phase-filter"
           value={phase}
-          onChange={(e) => { setPage(0); setPhase(e.target.value); }}
-          className="border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-estonia"
+          onChange={(e) => updateParams({ phase: e.target.value || undefined, page: undefined })}
+          className="bg-white border border-rule rounded-full px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue min-w-[220px]"
         >
           {PHASE_CODES.map((code) => <option key={code} value={code}>{phaseLabel(code)}</option>)}
         </select>
       </div>
 
-      {isLoading && <p className="text-slate-500" role="status">{t("common.loading")}</p>}
-      {error && <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
+      {chips.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4 sm:mb-5">
+          <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted self-center">
+            {t("legislation.chip.filters")}:
+          </span>
+          {chips.map((c) => (
+            <button key={c.key} type="button" onClick={() => removeFilter(c.removeKeys)}
+                    className="inline-flex items-center gap-2 bg-blue text-white text-[12px] font-medium rounded-full pl-3 pr-2 py-1.5 hover:bg-blue-deep transition-colors">
+              {c.label}
+              <span className="w-4 h-4 rounded-full bg-white/25 grid place-items-center text-[10px] font-bold">×</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {isLoading && <p className="text-muted font-mono text-sm tracking-[0.06em]" role="status">{t("common.loading")}</p>}
+      {error && <p className="text-hot font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
 
       {data && (
         <>
-          <p className="text-sm text-slate-600" aria-live="polite" aria-atomic="true">
+          <p className="font-mono text-[11px] tracking-[0.1em] uppercase text-muted mb-4 sm:mb-5" aria-live="polite" aria-atomic="true">
             {t("legislation.showing", { shown: data.items.length, total: data.totalElements })}
           </p>
-          <ul className="grid grid-cols-1 gap-3 list-none p-0">
+          <ul className="grid grid-cols-1 gap-3 sm:gap-4 list-none p-0">
             {data.items.map((i) => (
               <li key={i.id}>
                 <LegislationRow i={i} />
@@ -71,21 +138,21 @@ export default function LegislationPage() {
             ))}
           </ul>
           {data.totalPages > 1 && (
-            <nav className="flex gap-2 items-center pt-4" aria-label="Pagination">
+            <nav className="flex gap-3 items-center pt-8 justify-center" aria-label={t("a11y.pagination")}>
               <button
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                onClick={() => updateParams({ page: Math.max(0, page - 1) })}
                 disabled={page === 0}
-                aria-label="Previous page"
-                className="border border-slate-300 rounded px-3 py-1 disabled:opacity-50"
+                aria-label={t("a11y.prevPage")}
+                className="border-[1.5px] border-ink rounded-full px-4 py-2 text-sm font-bold disabled:opacity-40 hover:bg-ink hover:text-white transition-colors"
               >{t("common.prev")}</button>
-              <span className="text-sm text-slate-600" aria-live="polite">
+              <span className="font-mono text-[11px] tracking-[0.1em] text-muted" aria-live="polite">
                 {t("common.pageOf", { page: data.page + 1, total: data.totalPages })}
               </span>
               <button
-                onClick={() => setPage((p) => (p + 1 < data.totalPages ? p + 1 : p))}
+                onClick={() => updateParams({ page: page + 1 < data.totalPages ? page + 1 : page })}
                 disabled={page + 1 >= data.totalPages}
-                aria-label="Next page"
-                className="border border-slate-300 rounded px-3 py-1 disabled:opacity-50"
+                aria-label={t("a11y.nextPage")}
+                className="border-[1.5px] border-ink rounded-full px-4 py-2 text-sm font-bold disabled:opacity-40 hover:bg-ink hover:text-white transition-colors"
               >{t("common.next")}</button>
             </nav>
           )}

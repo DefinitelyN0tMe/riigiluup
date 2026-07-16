@@ -11,6 +11,7 @@ export default function MethodologyIndexPage() {
         <li><Link to="/methodology/participation" className="text-estonia hover:underline">{t("methodology.index.participation")}</Link></li>
         <li><Link to="/methodology/alignment" className="text-estonia hover:underline">{t("methodology.index.alignment")}</Link></li>
         <li><Link to="/methodology/agreement" className="text-estonia hover:underline">{t("methodology.index.agreement")}</Link></li>
+        <li><Link to="/methodology/analytics" className="text-estonia hover:underline">{t("methodology.index.analytics", "Analytics dashboard — every chart's formula")}</Link></li>
       </ul>
     </article>
   );

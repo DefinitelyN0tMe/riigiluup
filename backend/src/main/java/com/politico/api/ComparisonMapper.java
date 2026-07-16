@@ -27,8 +27,8 @@ public class ComparisonMapper {
             PairwiseAgreementService.Result agreement,
             List<IndividualVote[]> recentDisagreements
     ) {
-        Instant fromTs = fromDate.atStartOfDay().toInstant(java.time.ZoneOffset.UTC);
-        Instant toTs = toDate.plusDays(1).atStartOfDay().toInstant(java.time.ZoneOffset.UTC);
+        Instant fromTs = fromDate.atStartOfDay(java.time.ZoneId.of("Europe/Tallinn")).toInstant();
+        Instant toTs = toDate.plusDays(1).atStartOfDay(java.time.ZoneId.of("Europe/Tallinn")).toInstant();
 
         return new ComparisonDto(
                 toSide(left, fromTs, toTs),

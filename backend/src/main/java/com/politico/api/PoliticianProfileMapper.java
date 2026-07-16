@@ -6,6 +6,8 @@ import com.politico.alignment.VoteFactionAlignmentRepository;
 import com.politico.common.PhotoUrlRewriter;
 import com.politico.group.GroupMembership;
 import com.politico.group.GroupType;
+import com.politico.party.ExternalAffiliation;
+import com.politico.party.ExternalAffiliationRepository;
 import com.politico.party.FactionPartyLinkRepository;
 import com.politico.person.PlenaryMember;
 import com.politico.statistics.ParticipationStats;
@@ -28,6 +30,7 @@ public class PoliticianProfileMapper {
     private final PhotoUrlRewriter photoUrlRewriter;
     private final GroupAlignmentService groupAlignmentService;
     private final VoteFactionAlignmentRepository alignmentRepo;
+    private final ExternalAffiliationRepository externalAffiliations;
 
     public PoliticianProfileDto toDto(PlenaryMember m, List<GroupMembership> memberships) {
         PoliticianProfileDto.Party party = factionLinks
@@ -70,6 +73,11 @@ public class PoliticianProfileMapper {
                 "Group alignment = (MP matched faction majority) / (eligible votes where faction had a clear majority)."
         );
 
+        List<PoliticianProfileDto.ExternalAffiliationDto> external = externalAffiliations
+                .findByMemberSlugOrderByValidFromAsc(m.getSlug()).stream()
+                .map(this::toExternalDto)
+                .toList();
+
         return new PoliticianProfileDto(
                 m.getId(), m.getSlug(),
                 m.getFullName(), m.getFirstName(), m.getLastName(),
@@ -77,6 +85,11 @@ public class PoliticianProfileMapper {
                 m.getEmail(), m.getGender(), m.getDateOfBirth(),
                 m.getElectoralDistrict(),
                 m.getParliamentSeniorityDays(),
+                m.isActive(),
+                m.getWikidataQid(),
+                m.getWikipediaUrlEn(),
+                m.getWikipediaUrlEt(),
+                m.getWikipediaUrlRu(),
                 m.getFactionExternalId() == null ? null
                         : new PoliticianProfileDto.Faction(
                                 m.getFactionExternalId(), m.getFactionName()),
@@ -85,7 +98,18 @@ public class PoliticianProfileMapper {
                 participation, voting,
                 ga,
                 m.getBiographyHtml(),
-                "https://api.riigikogu.ee/api/plenary-members/" + m.getExternalId()
+                "https://api.riigikogu.ee/api/plenary-members/" + m.getExternalId(),
+                external
+        );
+    }
+
+    private PoliticianProfileDto.ExternalAffiliationDto toExternalDto(ExternalAffiliation e) {
+        return new PoliticianProfileDto.ExternalAffiliationDto(
+                e.getOrganization(), e.getOrgKind(), e.getRole(),
+                e.getValidFrom(), e.getValidTo(),
+                e.getSourceUrl(), e.getSourceLabel(),
+                e.getVerifiedBy(), e.getVerifiedAt(),
+                e.getNote()
         );
     }
 

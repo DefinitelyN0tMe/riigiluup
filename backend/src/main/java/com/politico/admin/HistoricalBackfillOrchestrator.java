@@ -174,6 +174,41 @@ public class HistoricalBackfillOrchestrator {
         boolean doBills = kinds.contains("BILLS");
         boolean doVotes = kinds.contains("VOTES");
 
+        // Bills: a single all-drafts pass at the top. Riigikogu's /api/volumes/drafts
+        // ignores startDate/endDate for filtering, so calling it per-window is a
+        // pointless multiplication (see LegislativeItemImporter#runAllDrafts).
+        if (doBills) {
+            try {
+                log.info("backfill {} running one-shot all-drafts import", runId);
+                ImportRunLog r = legislationImporter.runAllDrafts();
+                BackfillRun snap = runRepo.findById(runId).orElse(null);
+                if (snap == null) return;
+                if (STATUS_CANCELLED.equals(snap.getStatus())) {
+                    log.info("backfill {} cancelled after all-drafts pass", runId);
+                    snap.setEndedAt(Instant.now());
+                    runRepo.save(snap);
+                    return;
+                }
+                snap.setBillsImported(snap.getBillsImported() + safeUpserted(r));
+                runRepo.save(snap);
+            } catch (Exception e) {
+                log.error("backfill {} all-drafts pass failed: {}", runId, e.toString());
+                // Non-fatal: proceed with votes anyway; ops can re-run bills alone.
+            }
+        }
+
+        // If only BILLS was requested, we're done — no window loop for votes.
+        if (!doVotes) {
+            BackfillRun finished = runRepo.findById(runId).orElse(null);
+            if (finished == null) return;
+            if (STATUS_CANCELLED.equals(finished.getStatus())) return;
+            finished.setStatus(STATUS_COMPLETED);
+            finished.setEndedAt(Instant.now());
+            runRepo.save(finished);
+            log.info("backfill {} completed (BILLS-only)", runId);
+            return;
+        }
+
         while (!cursor.isAfter(to)) {
             // Re-fetch each iteration so a CANCELLED status flip is observed promptly.
             BackfillRun run = runRepo.findById(runId).orElse(null);
@@ -195,13 +230,18 @@ public class HistoricalBackfillOrchestrator {
 
             boolean windowOk = true;
             try {
-                if (doBills) {
-                    ImportRunLog r = legislationImporter.runWindow(cursor, windowEnd);
-                    run.setBillsImported(run.getBillsImported() + safeUpserted(r));
-                }
+                // Bills are handled in one shot before the loop — see runAllDrafts above.
                 if (doVotes) {
                     ImportRunLog r = voteImporter.runWindow(cursor, windowEnd);
                     run.setVotesImported(run.getVotesImported() + safeUpserted(r));
+                    // runWindow swallows its own exceptions and reports via status, so inspect it
+                    // rather than trusting the (rarely-thrown) try/catch — otherwise a fully broken
+                    // upstream marches through every window as "ok" and the run finishes COMPLETED
+                    // with empty windows that are never revisited.
+                    if ("FAILED".equals(r.getStatus())) {
+                        windowOk = false;
+                        run.setErrorMessage(cursor + ".." + windowEnd + ": vote window import returned FAILED");
+                    }
                 }
             } catch (Exception e) {
                 log.warn("backfill {} window {}..{} failed: {}", runId, cursor, windowEnd, e.toString());

@@ -13,18 +13,55 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
 
     Optional<LegislativeItem> findBySourceNameAndExternalId(String sourceName, String externalId);
 
-    @Query("""
-        select i from LegislativeItem i
-        where (:q is null
-                or lower(i.title) like lower(concat('%', cast(:q as string), '%')))
-          and (:phase is null or i.phase = :phase)
-          and (:membership is null or i.membership = :membership)
-        order by i.initiatedDate desc nulls last, i.mark desc nulls last
-        """)
+    /**
+     * Rich search — every filter is null-safe. topicEdid drills into Eurovoc tags;
+     * minDays/maxDays filter by (accepted_date − initiated_date) inclusive of both bounds,
+     * and imply "must be ADOPTED with both dates known" — matches how the velocity chart
+     * is computed. Native SQL because JPQL date arithmetic is awkward.
+     */
+    @Query(value = """
+        SELECT i.* FROM legislative_item i
+        WHERE (cast(:q AS text) IS NULL
+                OR LOWER(i.title) LIKE LOWER(CONCAT('%', cast(:q AS text), '%')))
+          AND (cast(:phase AS text) IS NULL OR i.phase = cast(:phase AS text))
+          AND (cast(:membership AS integer) IS NULL OR i.membership = cast(:membership AS integer))
+          AND (cast(:topicEdid AS integer) IS NULL OR EXISTS (
+                SELECT 1 FROM legislative_item_topic lit
+                JOIN topic t ON t.id = lit.topic_id
+                WHERE lit.legislative_item_id = i.id AND t.edid = cast(:topicEdid AS integer)))
+          AND (cast(:minDays AS integer) IS NULL OR (
+                i.accepted_date IS NOT NULL AND i.initiated_date IS NOT NULL
+                AND (i.accepted_date - i.initiated_date) >= cast(:minDays AS integer)))
+          AND (cast(:maxDays AS integer) IS NULL OR (
+                i.accepted_date IS NOT NULL AND i.initiated_date IS NOT NULL
+                AND (i.accepted_date - i.initiated_date) <= cast(:maxDays AS integer)))
+        ORDER BY i.initiated_date DESC NULLS LAST, i.mark DESC NULLS LAST
+        """,
+        countQuery = """
+        SELECT COUNT(*) FROM legislative_item i
+        WHERE (cast(:q AS text) IS NULL
+                OR LOWER(i.title) LIKE LOWER(CONCAT('%', cast(:q AS text), '%')))
+          AND (cast(:phase AS text) IS NULL OR i.phase = cast(:phase AS text))
+          AND (cast(:membership AS integer) IS NULL OR i.membership = cast(:membership AS integer))
+          AND (cast(:topicEdid AS integer) IS NULL OR EXISTS (
+                SELECT 1 FROM legislative_item_topic lit
+                JOIN topic t ON t.id = lit.topic_id
+                WHERE lit.legislative_item_id = i.id AND t.edid = cast(:topicEdid AS integer)))
+          AND (cast(:minDays AS integer) IS NULL OR (
+                i.accepted_date IS NOT NULL AND i.initiated_date IS NOT NULL
+                AND (i.accepted_date - i.initiated_date) >= cast(:minDays AS integer)))
+          AND (cast(:maxDays AS integer) IS NULL OR (
+                i.accepted_date IS NOT NULL AND i.initiated_date IS NOT NULL
+                AND (i.accepted_date - i.initiated_date) <= cast(:maxDays AS integer)))
+        """,
+        nativeQuery = true)
     Page<LegislativeItem> search(
             @Param("q") String q,
-            @Param("phase") LegislationPhase phase,
+            @Param("phase") String phase,
             @Param("membership") Integer membership,
+            @Param("topicEdid") Integer topicEdid,
+            @Param("minDays") Integer minDays,
+            @Param("maxDays") Integer maxDays,
             Pageable pageable
     );
 }

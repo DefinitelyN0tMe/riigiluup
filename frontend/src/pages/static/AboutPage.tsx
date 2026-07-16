@@ -19,7 +19,7 @@ export default function AboutPage() {
       <p>
         {t("about.dataSourceBody")}
         <a href="https://api.riigikogu.ee" target="_blank" rel="noopener noreferrer"
-           aria-label="api.riigikogu.ee (opens in new tab)"
+           aria-label={`api.riigikogu.ee (${t("a11y.opensNewTab")})`}
            className="text-estonia hover:underline">
           api.riigikogu.ee
         </a>
@@ -28,8 +28,8 @@ export default function AboutPage() {
       <h2>{t("about.contact")}</h2>
       <p>
         {t("about.contactBody")}
-        <a href="mailto:corrections@politico.example" className="text-estonia hover:underline">
-          corrections@politico.example
+        <a href="mailto:corrections@riigiluup.ee" className="text-estonia hover:underline">
+          corrections@riigiluup.ee
         </a>
         .
       </p>

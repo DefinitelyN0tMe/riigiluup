@@ -56,6 +56,18 @@ export type VotingStats = {
   methodologyNote: string;
   sourceUrl: string;
 };
+export type ExternalAffiliation = {
+  organization: string;
+  orgKind: "PARTY" | "MOVEMENT" | "FRACTION_ORIGINAL" | "INDEPENDENT" | string;
+  role: string | null;
+  validFrom: string;             // ISO date
+  validTo: string | null;         // ISO date or null (= current)
+  sourceUrl: string;
+  sourceLabel: string;
+  verifiedBy: string;
+  verifiedAt: string;
+  note: string | null;
+};
 export type PoliticianProfile = {
   id: string;
   slug: string;
@@ -69,6 +81,11 @@ export type PoliticianProfile = {
   dateOfBirth: string | null;
   electoralDistrict: string | null;
   parliamentSeniorityDays: number | null;
+  active: boolean;
+  wikidataQid: string | null;
+  wikipediaUrlEn: string | null;
+  wikipediaUrlEt: string | null;
+  wikipediaUrlRu: string | null;
   faction: Faction | null;
   party: Party | null;
   committees: CommitteeMembership[];
@@ -77,6 +94,7 @@ export type PoliticianProfile = {
   groupAlignment: GroupAlignmentDto;
   biographyHtml: string | null;
   sourceUrl: string;
+  externalAffiliations: ExternalAffiliation[];
 };
 export type FactionOption = { externalId: string; name: string; memberCount: number };
 

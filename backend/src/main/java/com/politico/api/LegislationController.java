@@ -38,13 +38,18 @@ public class LegislationController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String phase,
             @RequestParam(required = false) Integer membership,
+            @RequestParam(required = false) Integer topicEdid,
+            @RequestParam(required = false) Integer minDays,
+            @RequestParam(required = false) Integer maxDays,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size
     ) {
-        LegislationPhase phaseEnum = (phase == null || phase.isBlank())
-                ? null : LegislationPhase.valueOf(phase);
+        String phaseParam = (phase == null || phase.isBlank()) ? null : phase.toUpperCase();
+        // Validate enum name so we fail fast on typos rather than passing garbage to SQL
+        if (phaseParam != null) LegislationPhase.valueOf(phaseParam);
         Page<LegislativeItem> p = itemRepo.search(
-                q, phaseEnum, membership,
+                (q == null || q.isBlank()) ? null : q,
+                phaseParam, membership, topicEdid, minDays, maxDays,
                 PageRequest.of(page, Math.min(size, 100)));
         return PageResponse.of(p.map(mapper::toListItem));
     }

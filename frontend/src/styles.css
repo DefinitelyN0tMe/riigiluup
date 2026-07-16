@@ -2,9 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root { height: 100%; }
-body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'Bricolage Grotesque', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background: #F4F4F1;
+    color: #0A0A0A;
+  }
+  ::selection { background: #0072CE; color: #fff; }
+}
 
+/* Focus ring */
 :focus-visible {
   outline: 2px solid #0072ce;
   outline-offset: 2px;
@@ -17,18 +27,76 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   top: 0;
   z-index: 100;
   padding: 8px 12px;
-  background: #0b1f3a;
+  background: #0A0A0A;
   color: white;
   border-radius: 0 0 4px 0;
 }
-
-.skip-link:focus {
-  left: 0;
-}
+.skip-link:focus { left: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
+
+/* Custom cursor — magnifying glass, desktop only (hover-capable pointer) */
+.cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 34px; height: 34px;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  transform: translate3d(-100px, -100px, 0);
+  will-change: transform;
+  color: #ffffff; /* stroke color; blend-mode inverts against bg */
+}
+.cursor-dot svg { display: block; width: 100%; height: 100%; }
+@media (hover: hover) and (pointer: fine) {
+  html, body, *, *::before, *::after { cursor: none !important; }
+}
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot { display: none; }
+}
+
+/* Grain overlay — SVG turbulence */
+.grain {
+  position: absolute; inset: 0;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+@media (max-width: 640px) { .grain { opacity: 0.15; } }
+
+/* Marquee gradient fade edges */
+.mask-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+/* Utility */
+.text-stroke-white { -webkit-text-stroke: 1.5px white; color: transparent; }
+.text-stroke-ink   { -webkit-text-stroke: 1.5px #0A0A0A; color: transparent; }
+
+/* Ticker/marquee helpers — flex row with animation, doubled content for seamless loop */
+.marquee-row { display: flex; gap: 44px; white-space: nowrap; padding-left: 44px; will-change: transform; }
+.ticker-row  { display: flex; gap: 48px; white-space: nowrap; padding-left: 48px; height: 100%; align-items: center; will-change: transform; }
+
+/* Pause auto-scroll on hover/focus so readers can stop it (WCAG 2.2.2). */
+.ticker-row:hover, .ticker-row:focus-within, .marquee-row:hover, .marquee-row:focus-within {
+  animation-play-state: paused;
+}
+
+/* Hide scrollbars but keep scroll (used in overflow bento) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Fluid display type — used in hero + manifesto */
+.h-display-mega { font-size: clamp(2.75rem, 12vw, 11rem); line-height: 0.88; letter-spacing: -0.055em; }
+.h-display-xl   { font-size: clamp(2.25rem, 8vw, 6.5rem);  line-height: 0.9;  letter-spacing: -0.045em; }
+.h-display-lg   { font-size: clamp(2rem,    6vw, 4.75rem); line-height: 0.92; letter-spacing: -0.04em;  }
+.h-display-md   { font-size: clamp(1.75rem, 4vw, 3.25rem); line-height: 0.95; letter-spacing: -0.025em; }

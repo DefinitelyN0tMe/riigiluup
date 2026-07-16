@@ -1,7 +1,12 @@
-# Politico
+# Riigiluup (riigiluup.ee)
 
 Civic-tech platform aggregating Estonian Riigikogu open data into
 public MP profiles, voting histories, and legislation views.
+
+> Internal Java packages (`com.politico.*`) and infra names
+> (`politico-db`, `POLITICO_ADMIN_*` env vars, `spring.application.name`)
+> still use the original `politico` identifier — renaming those is a
+> larger DB/env/deploy migration and is deferred.
 
 ## Running locally
 
@@ -9,9 +14,11 @@ public MP profiles, voting histories, and legislation views.
 docker compose up --build
 ```
 
-Backend: http://localhost:8080
+Backend (docker): http://localhost:18080
 Frontend: http://localhost:5173
-Postgres: localhost:5432 (user: politico / pass: politico)
+Postgres (docker): localhost:15432 (user: politico / pass: politico)
+
+Running the backend directly with `./gradlew bootRun` instead serves on port 8081.
 
 ## Stack
 
@@ -27,7 +34,7 @@ React 18, Vite, TypeScript, Tailwind CSS.
 Minimum host: Ubuntu 24.04 LTS, 2 GB RAM, 2 vCPU, EU region, one public IPv4, one domain pointed at the IP.
 
 1. Copy this repo to `/opt/politico` on the VPS (SCP, rsync, or `git clone`).
-2. Run `bash /opt/politico/deploy/scripts/init-server.sh <domain>` as root once. Installs Docker, opens firewall, substitutes the domain into the Nginx config.
+2. Run `bash /opt/politico/deploy/scripts/init-server.sh <domain>` as root once. Installs Docker, opens firewall, substitutes the domain into the Nginx config, and installs cron jobs for nightly backups and weekly cert renewal.
 3. Copy `deploy/.env.production.example` to `deploy/.env` and fill in strong passwords.
 4. `cd /opt/politico/deploy && docker compose -f docker-compose.prod.yml up -d`.
 5. `bash scripts/issue-cert.sh <domain> <email>` — obtains the first Let's Encrypt cert. The certbot container handles automatic renewal from then on.

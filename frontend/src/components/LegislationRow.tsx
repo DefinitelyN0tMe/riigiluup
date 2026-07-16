@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { LegislationListItem } from "../types";
+import { formatDate } from "../lib/formatDate";
 
 const PHASE_CLASS: Record<LegislationListItem["phase"], string> = {
   SUBMITTED: "bg-slate-100 text-slate-700",
@@ -14,7 +15,7 @@ const PHASE_CLASS: Record<LegislationListItem["phase"], string> = {
 
 export default function LegislationRow({ i }: { i: LegislationListItem }) {
   const { t } = useTranslation();
-  const initiated = i.initiatedDate ? new Date(i.initiatedDate).toLocaleDateString() : "—";
+  const initiated = i.initiatedDate ? formatDate(i.initiatedDate) : "—";
   return (
     <Link
       to={`/legislation/${encodeURIComponent(i.id)}`}

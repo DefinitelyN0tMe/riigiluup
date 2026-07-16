@@ -39,10 +39,17 @@ systemctl enable --now fail2ban
 # 5. Prepare deploy dir
 mkdir -p /opt/politico/backups
 
-# 6. Substitute the domain into nginx conf (in-place if the file was copied to /opt/politico/nginx/)
-if [ -f /opt/politico/nginx/politico.conf ]; then
-  sed -i "s/POLITICO_DOMAIN/${DOMAIN}/g" /opt/politico/nginx/politico.conf
+# 6. Substitute the domain into nginx conf. The repo layout keeps it under deploy/nginx/.
+NGINX_CONF="$(dirname "$0")/../nginx/politico.conf"
+if [ -f "$NGINX_CONF" ]; then
+  sed -i "s/POLITICO_DOMAIN/${DOMAIN}/g" "$NGINX_CONF"
 fi
+
+# 7. Scheduled backups + weekly cert renewal (idempotent — drop any prior line, then re-add).
+CRON_BACKUP="5 4 * * * cd /opt/politico/deploy && ./scripts/backup.sh >> /var/log/politico-backup.log 2>&1"
+CRON_RENEW="0 3 * * 1 cd /opt/politico/deploy && ./scripts/renew-cert.sh >> /var/log/politico-cert.log 2>&1"
+( crontab -l 2>/dev/null | grep -Fv 'scripts/backup.sh' | grep -Fv 'scripts/renew-cert.sh'; \
+  echo "$CRON_BACKUP"; echo "$CRON_RENEW" ) | crontab -
 
 echo "Server ready. Next steps:"
 echo "  1. Fill /opt/politico/.env with production secrets."

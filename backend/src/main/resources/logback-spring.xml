@@ -25,7 +25,13 @@
     </root>
   </springProfile>
 
-  <logger name="com.politico" level="DEBUG"/>
+  <!-- DEBUG only locally; prod stays at INFO so a multi-day backfill can't flood the disk. -->
+  <springProfile name="local">
+    <logger name="com.politico" level="DEBUG"/>
+  </springProfile>
+  <springProfile name="!local">
+    <logger name="com.politico" level="INFO"/>
+  </springProfile>
   <logger name="org.springframework" level="WARN"/>
   <logger name="org.hibernate" level="WARN"/>
 </configuration>

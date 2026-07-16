@@ -10,6 +10,9 @@ export function fetchLegislation(params: {
   q?: string;
   phase?: string;
   membership?: number;
+  topicEdid?: number;
+  minDays?: number;
+  maxDays?: number;
   page?: number;
   size?: number;
 }) {
@@ -17,6 +20,9 @@ export function fetchLegislation(params: {
   if (params.q) q.set("q", params.q);
   if (params.phase) q.set("phase", params.phase);
   if (params.membership !== undefined) q.set("membership", String(params.membership));
+  if (params.topicEdid !== undefined) q.set("topicEdid", String(params.topicEdid));
+  if (params.minDays !== undefined) q.set("minDays", String(params.minDays));
+  if (params.maxDays !== undefined) q.set("maxDays", String(params.maxDays));
   if (params.page !== undefined) q.set("page", String(params.page));
   if (params.size !== undefined) q.set("size", String(params.size));
   const suffix = q.toString() ? `?${q.toString()}` : "";

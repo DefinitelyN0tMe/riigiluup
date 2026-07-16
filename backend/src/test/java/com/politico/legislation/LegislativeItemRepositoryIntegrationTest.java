@@ -35,7 +35,7 @@ class LegislativeItemRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void search_returns_newest_first() {
-        Page<LegislativeItem> page = repo.search(null, null, null, PageRequest.of(0, 10));
+        Page<LegislativeItem> page = repo.search(null, null, null, null, null, null, PageRequest.of(0, 10));
 
         assertThat(page.getTotalElements()).isEqualTo(3);
         assertThat(page.getContent())
@@ -45,7 +45,7 @@ class LegislativeItemRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void search_by_q_case_insensitive_like() {
-        Page<LegislativeItem> page = repo.search("karistus", null, null, PageRequest.of(0, 10));
+        Page<LegislativeItem> page = repo.search("karistus", null, null, null, null, null, PageRequest.of(0, 10));
         assertThat(page.getContent())
                 .singleElement()
                 .satisfies(i -> assertThat(i.getExternalId()).isEqualTo("d-101"));
@@ -54,7 +54,7 @@ class LegislativeItemRepositoryIntegrationTest extends AbstractIntegrationTest {
     @Test
     void search_by_phase() {
         Page<LegislativeItem> page = repo.search(
-                null, LegislationPhase.ADOPTED, null, PageRequest.of(0, 10));
+                null, LegislationPhase.ADOPTED.name(), null, null, null, null, PageRequest.of(0, 10));
         assertThat(page.getContent())
                 .singleElement()
                 .satisfies(i -> assertThat(i.getExternalId()).isEqualTo("d-102"));
@@ -62,7 +62,7 @@ class LegislativeItemRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void search_paginates() {
-        Page<LegislativeItem> firstPage = repo.search(null, null, null, PageRequest.of(0, 2));
+        Page<LegislativeItem> firstPage = repo.search(null, null, null, null, null, null, PageRequest.of(0, 2));
         assertThat(firstPage.getNumberOfElements()).isEqualTo(2);
         assertThat(firstPage.getTotalPages()).isEqualTo(2);
     }

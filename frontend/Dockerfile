@@ -1,8 +1,8 @@
 # --- build ---
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm ci || npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 COPY . .
 ENV VITE_API_BASE_URL=/api-proxy
 RUN npm run build

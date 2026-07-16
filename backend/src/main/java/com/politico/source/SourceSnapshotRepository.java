@@ -35,4 +35,22 @@ public interface SourceSnapshotRepository extends JpaRepository<SourceSnapshot, 
                     Collection<String> entityTypes,
             @org.springframework.data.repository.query.Param("cutoff") Instant cutoff
     );
+
+    /**
+     * Batched delete (one bounded transaction per call) so a large ageing cohort can't blow the
+     * 30 s statement_timeout in a single statement — which would roll back and never succeed,
+     * letting the table grow unbounded. The retention job loops this until it returns 0.
+     */
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM source_snapshot WHERE id IN ("
+            + "SELECT id FROM source_snapshot "
+            + "WHERE entity_type IN (:entityTypes) AND fetched_at < :cutoff LIMIT :batch)",
+            nativeQuery = true)
+    int deleteBatchByEntityTypeInAndFetchedAtBefore(
+            @org.springframework.data.repository.query.Param("entityTypes")
+                    Collection<String> entityTypes,
+            @org.springframework.data.repository.query.Param("cutoff") Instant cutoff,
+            @org.springframework.data.repository.query.Param("batch") int batch
+    );
 }

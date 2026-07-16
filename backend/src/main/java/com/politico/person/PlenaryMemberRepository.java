@@ -20,6 +20,8 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
     @Query("select m from PlenaryMember m where m.active = true order by m.lastName asc, m.id asc")
     Slice<PlenaryMember> findActiveOrderByLastName(Pageable pageable);
 
+    java.util.List<PlenaryMember> findByActiveTrueOrderByLastNameAscFirstNameAsc();
+
     @Query("""
         select m from PlenaryMember m
         where (:activeOnly = false or m.active = true)

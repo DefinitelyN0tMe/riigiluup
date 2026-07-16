@@ -20,6 +20,11 @@ public record PoliticianProfileDto(
         LocalDate dateOfBirth,
         String electoralDistrict,
         Integer parliamentSeniorityDays,
+        boolean active,
+        String wikidataQid,
+        String wikipediaUrlEn,
+        String wikipediaUrlEt,
+        String wikipediaUrlRu,
         Faction faction,
         Party party,
         List<GroupMembershipDto> committees,
@@ -27,7 +32,8 @@ public record PoliticianProfileDto(
         VotingStats voting,
         GroupAlignment groupAlignment,
         String biographyHtml,
-        String sourceUrl
+        String sourceUrl,
+        List<ExternalAffiliationDto> externalAffiliations
 ) {
     public record Faction(String externalId, String name) {}
     public record Party(String shortName, String fullName, String colorHex, String officialUrl) {}
@@ -47,5 +53,17 @@ public record PoliticianProfileDto(
             String startedAt,
             String memberChoice,
             String factionMajorityChoice
+    ) {}
+    public record ExternalAffiliationDto(
+            String organization,
+            String orgKind,
+            String role,
+            LocalDate validFrom,
+            LocalDate validTo,
+            String sourceUrl,
+            String sourceLabel,
+            String verifiedBy,
+            LocalDate verifiedAt,
+            String note
     ) {}
 }

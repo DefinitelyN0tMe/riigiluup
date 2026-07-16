@@ -28,7 +28,8 @@ class LegislativeStageFlattenerTest {
         assertThat(out).hasSize(3);
         assertThat(out.get(0).readingCode()).isEqualTo("INITIATION");
         assertThat(out.get(0).statusCode()).isEqualTo("ALGATATUD");
-        assertThat(out.get(0).occurredAt()).isEqualTo(Instant.parse("2025-01-13T15:43:59.288Z"));
+        // Source sends local Tallinn wall-clock; 2025-01-13 is EET (UTC+2), so 15:43 → 13:43Z.
+        assertThat(out.get(0).occurredAt()).isEqualTo(Instant.parse("2025-01-13T13:43:59.288Z"));
         assertThat(out.get(0).sequence()).isZero();
         assertThat(out.get(1).sequence()).isEqualTo(1);
         assertThat(out.get(2).readingCode()).isEqualTo("ESIMENE_LUGEMINE");

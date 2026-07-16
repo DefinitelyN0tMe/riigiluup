@@ -5,6 +5,12 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:15432/politico}
     username: ${DB_USER:politico}
     password: ${DB_PASSWORD:politico}
+    hikari:
+      # Cap any single statement at 30 s to prevent pathological richSearch combos
+      # (all filters, cold cache) from starving the connection pool. Backfill and
+      # analytics queries are still comfortably within budget; upsert paths finish
+      # in <100 ms typically, and analytics aggregates are indexed to be sub-second.
+      connection-init-sql: "SET statement_timeout = '30s'"
   jpa:
     hibernate:
       ddl-auto: validate
@@ -14,12 +20,25 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  lifecycle:
+    # Let in-flight requests / scheduled imports finish on `docker stop` instead of being killed
+    # mid-transaction (which would strand an ImportRunLog row in RUNNING).
+    timeout-per-shutdown-phase: 20s
   # OAuth2 client (Google OIDC) is registered programmatically in AdminSecurityConfig
   # only when GOOGLE_OAUTH_CLIENT_ID is set, so an unset value doesn't break startup.
 
 server:
   port: ${SERVER_PORT:8081}
   forward-headers-strategy: framework
+  shutdown: graceful
+  servlet:
+    session:
+      cookie:
+        # Lax (NOT Strict) — Strict would drop the session on the OIDC redirect back from Google
+        # and break admin login. Lax still withholds the session cookie on cross-site POSTs,
+        # which mitigates CSRF on the state-changing admin endpoints.
+        same-site: lax
+        http-only: true
 
 management:
   endpoints:
@@ -45,10 +64,10 @@ resilience4j:
           - org.springframework.web.client.HttpServerErrorException
           - org.springframework.web.client.ResourceAccessException
           - java.io.IOException
-          - org.springframework.web.client.HttpClientErrorException$TooManyRequests
-        # 429 responses surface as HttpClientErrorException.TooManyRequests;
-        # the predicate also catches ResponseEntity-style 429s if a future
-        # refactor stops throwing on 4xx.
+        # NOTE: HttpClientErrorException$TooManyRequests intentionally NOT retried.
+        # Retrying on 429 during a batch backfill turns one failure into 3 API hits
+        # in 7 seconds, which typically extends nginx's rolling window and keeps us
+        # rate-limited longer. Better to skip the item (log WARN) and continue.
         retryOnResultPredicate: com.politico.ingestion.riigikogu.Retry429Predicate
   circuitbreaker:
     instances:
@@ -61,13 +80,21 @@ politico:
   rate-limit:
     enabled: true
     per-minute: 60
-    path-regex: "/api/v1/(?!admin/).*"
+    # Exclude /files/ (photo proxy): a single MP grid loads 50 portraits, so normal browsing
+    # would otherwise burn the 60/min budget and show broken images. The proxy has its own
+    # 1 rps upstream serialization + Cache-Control.
+    path-regex: "/api/v1/(?!admin/|files/).*"
+  analytics:
+    # Faction name substrings currently in the governing coalition — drives the coalition/
+    # opposition axis of the MP scatter. Update on any change of government (SDE left in 2025).
+    coalition-factions: reform,eesti 200
   riigikogu:
     base-url: https://api.riigikogu.ee
     user-agent: "politico/0.0.1 (riigiluup@gmail.com)"
     rate-limit-per-second: 1
   schedule:
-    daily-refresh-cron: "0 5 3 * * *"
+    # Every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn).
+    daily-refresh-cron: "0 5 3/6 * * *"
     daily-refresh-zone: "Europe/Tallinn"
   admin:
     username: ${POLITICO_ADMIN_USERNAME:admin}

@@ -29,12 +29,21 @@ public class SnapshotRetentionJob {
 
     private final SourceSnapshotRepository repo;
 
+    static final int BATCH_SIZE = 5_000;
+
     /** Detail snapshots older than 180 days go away nightly at 04:00 Europe/Tallinn. */
     @Scheduled(cron = "0 0 4 * * *", zone = "Europe/Tallinn")
     public void purgeOldDetailSnapshots() {
         Instant threshold = Instant.now().minus(RETENTION_DAYS, ChronoUnit.DAYS);
-        long deleted = repo.deleteByEntityTypeInAndFetchedAtBefore(
-                DETAIL_ENTITY_TYPES, threshold);
+        // Delete in bounded batches (one tx each) so a big post-backfill cohort can't exceed the
+        // 30 s statement_timeout in a single statement.
+        long deleted = 0;
+        int batch;
+        do {
+            batch = repo.deleteBatchByEntityTypeInAndFetchedAtBefore(
+                    DETAIL_ENTITY_TYPES, threshold, BATCH_SIZE);
+            deleted += batch;
+        } while (batch > 0);
         log.info("snapshot retention purged {} old detail rows (cutoff={})",
                 deleted, threshold);
     }

@@ -15,13 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 @RestController
 @RequestMapping("/api/v1/comparisons")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ComparisonController {
+
+    private static final ZoneId DISPLAY_ZONE = ZoneId.of("Europe/Tallinn");
 
     private final PlenaryMemberRepository memberRepo;
     private final PairwiseAgreementService pairwiseService;
@@ -39,11 +41,11 @@ public class ComparisonController {
         PlenaryMember right = memberRepo.findBySlug(rightSlug).orElse(null);
         if (left == null || right == null) return ResponseEntity.notFound().build();
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(DISPLAY_ZONE);
         LocalDate fromDate = from != null ? from : StatisticsService.TERM_START;
         LocalDate toDate = to != null ? to : today;
-        Instant fromTs = fromDate.atStartOfDay().toInstant(ZoneOffset.UTC);
-        Instant toTs = toDate.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC);
+        Instant fromTs = fromDate.atStartOfDay(DISPLAY_ZONE).toInstant();
+        Instant toTs = toDate.plusDays(1).atStartOfDay(DISPLAY_ZONE).toInstant();
 
         PairwiseAgreementService.Result agreement =
                 pairwiseService.forPair(left, right, fromTs, toTs);

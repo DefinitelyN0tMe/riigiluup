@@ -5,7 +5,10 @@ import { visualizer } from "rollup-plugin-visualizer";
 export default defineConfig({
   plugins: [
     react(),
-    visualizer({ filename: "dist/bundle-report.html", gzipSize: true, brotliSize: true })
+    // Bundle report only when explicitly requested — don't ship dist/bundle-report.html publicly.
+    ...(process.env.ANALYZE
+      ? [visualizer({ filename: "dist/bundle-report.html", gzipSize: true, brotliSize: true })]
+      : [])
   ],
   build: {
     rollupOptions: {

@@ -6,8 +6,10 @@ import com.politico.ingestion.riigikogu.LegislativeItemImporter;
 import com.politico.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.politico.ingestion.riigikogu.PlenaryMemberImporter;
 import com.politico.ingestion.riigikogu.UsergroupImporter;
+import com.politico.ingestion.riigikogu.SponsorRelinker;
 import com.politico.ingestion.riigikogu.VoteBillLinker;
 import com.politico.ingestion.riigikogu.VoteEventImporter;
+import com.politico.ingestion.wikidata.WikidataImporter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,8 @@ public class AdminIngestionController {
     private final FactionAlignmentBackfillService alignmentBackfill;
     private final LegislativeItemImporter legislationImporter;
     private final VoteBillLinker voteBillLinker;
+    private final WikidataImporter wikidataImporter;
+    private final SponsorRelinker sponsorRelinker;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -76,5 +80,24 @@ public class AdminIngestionController {
     @PostMapping("/link-votes-to-bills")
     public Map<String, Object> linkVotesToBills() {
         return Map.of("linked", voteBillLinker.linkAll());
+    }
+
+    /**
+     * One-shot Wikidata cross-reference — populates wikidata_qid + wikipedia_url_*
+     * on plenary_member by matching (fullName, dateOfBirth). Safe to re-run.
+     */
+    @PostMapping("/wikidata")
+    public ImportRunLog runWikidataCrossref() {
+        return wikidataImporter.runOnce();
+    }
+
+    /**
+     * Back-fill plenary_member_id on legislative_sponsorship rows that were stored
+     * with a NULL FK because the sponsor UUID wasn't yet in plenary_member at bill
+     * ingest time. Idempotent: only touches NULL rows.
+     */
+    @PostMapping("/relink-sponsors")
+    public Map<String, Object> relinkSponsors() {
+        return Map.of("relinked", sponsorRelinker.relinkOrphanSponsors());
     }
 }

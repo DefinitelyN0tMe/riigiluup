@@ -10,11 +10,11 @@ export default function SourcesPage() {
       <p>
         {t("sources.primaryPre")}
         <a href="https://api.riigikogu.ee" target="_blank" rel="noopener noreferrer"
-           aria-label="api.riigikogu.ee (opens in new tab)"
+           aria-label={`api.riigikogu.ee (${t("a11y.opensNewTab")})`}
            className="text-estonia hover:underline">api.riigikogu.ee</a>
         {t("sources.primaryMid")}
         <a href="https://api.riigikogu.ee/v3/api-docs" target="_blank" rel="noopener noreferrer"
-           aria-label="Riigikogu OpenAPI spec (opens in new tab)"
+           aria-label={`Riigikogu OpenAPI (${t("a11y.opensNewTab")})`}
            className="text-estonia hover:underline">/v3/api-docs</a>
         {t("sources.primarySuffix")}
       </p>

@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchVoteDetail } from "../api/votes";
 import VoteResultBar from "../components/VoteResultBar";
+import VoteDefectorsPanel from "../components/analytics/VoteDefectorsPanel";
+import { formatDateTime } from "../lib/formatDate";
 
 const CHOICE_CLASS: Record<string, string> = {
   FOR: "text-estonia",
@@ -27,13 +29,19 @@ export default function VoteDetailPage() {
   if (error) return <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>;
   if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
 
-  const when = data.startedAt ? new Date(data.startedAt).toLocaleString() : "—";
+  const when = formatDateTime(data.startedAt);
   const typeLabel = t(`voteType.${data.type}` as const, { defaultValue: data.type });
 
+  const total = data.resultInFavor + data.resultAgainst + data.resultAbstained + data.resultPresent + data.resultAbsent;
+  const quorum = 51;
+  const margin = data.resultInFavor - data.resultAgainst;
+  const marginPct = total ? (margin / total) * 100 : 0;
+  const tight = Math.abs(margin) < 10 && data.resultInFavor > 0 && data.resultAgainst > 0;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1200px] mx-auto w-full px-5 sm:px-8 md:px-10 py-8 sm:py-12">
       <div>
-        <Link to="/votes" className="text-sm text-estonia hover:underline">{t("votes.backAll")}</Link>
+        <Link to="/votes" className="text-sm text-blue hover:underline font-mono tracking-[0.06em]">{t("votes.backAll")}</Link>
       </div>
 
       <header className="space-y-1">
@@ -46,7 +54,7 @@ export default function VoteDetailPage() {
         )}
         <a
           href={data.sourceUrl} target="_blank" rel="noopener noreferrer"
-          aria-label="Riigikogu source (opens in new tab)"
+          aria-label={`${t("common.riigikoguSource").replace(" ↗", "")} (${t("a11y.opensNewTab")})`}
           className="text-xs text-estonia hover:underline inline-block mt-1"
         >{t("common.riigikoguSource")}</a>
         {data.linkedBill && (
@@ -59,17 +67,52 @@ export default function VoteDetailPage() {
         )}
       </header>
 
-      <section aria-label="Result">
-        <VoteResultBar
-          inFavor={data.resultInFavor}
-          against={data.resultAgainst}
-          abstained={data.resultAbstained}
-          didNotVote={data.resultPresent}
-          absent={data.resultAbsent}
-        />
+      <section aria-label={t("a11y.result")} className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 items-start">
+        <div>
+          <VoteResultBar
+            inFavor={data.resultInFavor}
+            against={data.resultAgainst}
+            abstained={data.resultAbstained}
+            didNotVote={data.resultPresent}
+            absent={data.resultAbsent}
+          />
+        </div>
+        {data.type === "OPEN" && total > 0 && (
+          <div className={`p-5 rounded-[20px] border ${tight ? "border-hot bg-hot/5" : "border-rule bg-white"}`}>
+            <div className="font-mono text-[10px] tracking-[0.18em] uppercase text-muted flex items-center gap-2">
+              {tight && <span className="w-1.5 h-1.5 rounded-full bg-hot animate-pulse-dot" />}
+              {t("pages.voteDetail.margin")}
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className={`font-display font-bold text-[42px] leading-none tracking-[-0.03em] ${margin >= 0 ? "text-blue" : "text-hot"}`}>
+                {margin >= 0 ? "+" : ""}{margin}
+              </span>
+              <span className="font-serif italic text-[16px] text-muted">
+                {t("pages.voteDetail.voteWord")} ({marginPct >= 0 ? "+" : ""}{marginPct.toFixed(1)}%)
+              </span>
+            </div>
+            <div className="mt-3 relative h-2 rounded-full bg-off overflow-hidden">
+              <div className="absolute inset-y-0 left-0 bg-blue" style={{ width: `${(data.resultInFavor / total) * 100}%` }} />
+              <div className="absolute inset-y-0 right-0 bg-hot" style={{ width: `${(data.resultAgainst / total) * 100}%` }} />
+              <div className="absolute inset-y-[-4px] w-[2px] bg-ink" style={{ left: `${(quorum / total) * 100}%` }} title={t("pages.voteDetail.quorum")} />
+            </div>
+            <div className="font-mono text-[10px] tracking-[0.06em] uppercase text-muted mt-2 flex justify-between">
+              <span>{t("pages.voteDetail.forShort")} <b className="text-blue">{data.resultInFavor}</b></span>
+              <span>{t("pages.voteDetail.quorum")}</span>
+              <span>{t("pages.voteDetail.againstShort")} <b className="text-hot">{data.resultAgainst}</b></span>
+            </div>
+            {tight && (
+              <div className="mt-3 font-serif italic text-[13px] text-hot leading-snug">
+                {t("pages.voteDetail.tightNote")}
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
-      <section aria-label="Faction breakdown">
+      <VoteDefectorsPanel v={data} />
+
+      <section aria-label={t("votes.breakdown")}>
         <h2 className="text-lg font-semibold text-ink mb-2">{t("votes.breakdown")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {data.factionBreakdowns.map((f) => (
@@ -91,7 +134,7 @@ export default function VoteDetailPage() {
         </div>
       </section>
 
-      <section aria-label="Individual votes">
+      <section aria-label={t("a11y.individualVotes")}>
         <h2 className="text-lg font-semibold text-ink mb-2">
           {t("votes.individual", { count: data.individualVotes.length })}
         </h2>

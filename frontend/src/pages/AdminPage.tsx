@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AdminUnauthorizedError, fetchAdminStatus, triggerAdminImport } from "../api/admin";
+import AdminAffiliationsSection from "../components/admin/AdminAffiliationsSection";
 import type { AdminStatus } from "../types";
+import { formatDateTime } from "../lib/formatDate";
 
 const IMPORT_JOBS = [
   { path: "/api/v1/admin/import/plenary-members", labelKey: "admin.jobs.plenaryMembers" },
@@ -67,31 +69,31 @@ export default function AdminPage() {
 
   if (authState === "loading") {
     return (
-      <div className="max-w-sm space-y-3">
+      <div className="max-w-sm space-y-3 px-5 sm:px-8 md:px-10 py-10">
         <h1 className="text-2xl font-semibold text-ink">{t("admin.title")}</h1>
-        <p className="text-slate-500 text-sm">{t("admin.running")}</p>
+        <p className="text-muted text-sm">{t("admin.running")}</p>
       </div>
     );
   }
 
   if (authState === "unauthorized" || !status) {
     return (
-      <div className="max-w-sm space-y-4">
+      <div className="max-w-sm space-y-4 px-5 sm:px-8 md:px-10 py-10">
         <h1 className="text-2xl font-semibold text-ink">{t("admin.title")}</h1>
-        <p className="text-sm text-slate-600">{t("admin.signInWithGoogleHelp", { defaultValue: "Sign in with your authorised Google account." })}</p>
+        <p className="text-sm text-muted">{t("admin.signInWithGoogleHelp", { defaultValue: "Sign in with your authorised Google account." })}</p>
         <a
           href={OIDC_LOGIN_URL}
-          className="inline-block px-4 py-2 rounded-md bg-estonia text-white hover:bg-blue-700"
+          className="inline-block px-4 py-2 rounded-md bg-blue text-white hover:bg-blue-deep"
         >
           {t("admin.signInWithGoogle", { defaultValue: "Sign in with Google" })}
         </a>
-        {error && <p className="text-red-600 text-sm" role="alert">{error}</p>}
+        {error && <p className="text-hot text-sm" role="alert">{error}</p>}
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1200px] mx-auto w-full px-5 sm:px-8 md:px-10 py-8 sm:py-12">
       <div className="flex justify-between items-center flex-wrap gap-3">
         <h1 className="text-2xl font-semibold text-ink">{t("admin.title")}</h1>
         <button onClick={refresh} className="text-sm text-estonia hover:underline">{t("admin.refresh")}</button>
@@ -143,6 +145,8 @@ export default function AdminPage() {
         </ul>
       </section>
 
+      <AdminAffiliationsSection onUnauthorized={() => setAuthState("unauthorized")} />
+
       <section aria-label="Recent runs">
         <h2 className="text-lg font-semibold text-ink mb-2">{t("admin.recentRuns")}</h2>
         <ul className="divide-y divide-slate-200 border border-slate-200 rounded-lg">
@@ -159,7 +163,7 @@ export default function AdminPage() {
               </div>
               <div className="text-xs text-slate-500 mt-0.5">
                 {t("admin.seenUpserted", {
-                  when: j.lastRunAt ? new Date(j.lastRunAt).toLocaleString() : "—",
+                  when: formatDateTime(j.lastRunAt),
                   seen: j.recordsSeen,
                   upserted: j.recordsUpserted,
                 })}
@@ -170,7 +174,7 @@ export default function AdminPage() {
         </ul>
       </section>
 
-      <p className="text-xs text-slate-400">{t("admin.generatedAt", { when: new Date(status.generatedAt).toLocaleString() })}</p>
+      <p className="text-xs text-slate-400">{t("admin.generatedAt", { when: formatDateTime(status.generatedAt) })}</p>
     </div>
   );
 }

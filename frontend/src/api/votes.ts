@@ -5,6 +5,13 @@ export function fetchVotes(params: {
   from?: string;
   to?: string;
   type?: string;
+  hour?: number;
+  dow?: number;              // 0=Mon..6=Sun
+  onlyWeekend?: boolean;
+  nightOnly?: boolean;
+  lateOnly?: boolean;
+  factionA?: string;
+  factionB?: string;
   page?: number;
   size?: number;
 }) {
@@ -12,6 +19,13 @@ export function fetchVotes(params: {
   if (params.from) q.set("from", params.from);
   if (params.to) q.set("to", params.to);
   if (params.type) q.set("type", params.type);
+  if (params.hour !== undefined) q.set("hour", String(params.hour));
+  if (params.dow !== undefined) q.set("dow", String(params.dow));
+  if (params.onlyWeekend) q.set("onlyWeekend", "true");
+  if (params.nightOnly) q.set("nightOnly", "true");
+  if (params.lateOnly) q.set("lateOnly", "true");
+  if (params.factionA) q.set("factionA", params.factionA);
+  if (params.factionB) q.set("factionB", params.factionB);
   if (params.page !== undefined) q.set("page", String(params.page));
   if (params.size !== undefined) q.set("size", String(params.size));
   const suffix = q.toString() ? `?${q.toString()}` : "";

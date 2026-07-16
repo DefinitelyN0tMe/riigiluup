@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 
 @Component
 public class VoteEventMapper {
@@ -61,9 +61,14 @@ public class VoteEventMapper {
 
     private static int nz(Integer v) { return v == null ? 0 : v; }
 
+    // Riigikogu emits offset-less local Estonian wall-clock (e.g. "2026-06-01T15:00:00" = 15:00
+    // Tallinn). Interpret it in the source zone so the stored absolute instant is correct; the
+    // analytics layer then converts back with AT TIME ZONE 'Europe/Tallinn' for display buckets.
+    private static final ZoneId SOURCE_ZONE = ZoneId.of("Europe/Tallinn");
+
     private static Instant parseTs(String s) {
         if (s == null || s.isBlank()) return null;
-        try { return LocalDateTime.parse(s).toInstant(ZoneOffset.UTC); }
+        try { return LocalDateTime.parse(s).atZone(SOURCE_ZONE).toInstant(); }
         catch (Exception e) { return null; }
     }
 }

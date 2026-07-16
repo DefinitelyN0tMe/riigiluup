@@ -9,5 +9,8 @@ RUN gradle --no-daemon bootJar
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
+# Run as an unprivileged user so a container-escape/RCE bug isn't root.
+RUN addgroup -S app && adduser -S app -G app && chown -R app:app /app
+USER app
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/app.jar"]

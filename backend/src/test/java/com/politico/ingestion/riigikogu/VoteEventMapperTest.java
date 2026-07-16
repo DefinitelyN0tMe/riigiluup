@@ -35,8 +35,9 @@ class VoteEventMapperTest {
         assertThat(v.getDescription()).isEqualTo("Päevakorra kinnitamine");
         assertThat(v.getSittingExternalId()).isEqualTo("s-1");
         assertThat(v.getSittingTitle()).isEqualTo("Täiskogu korraline istung 1.06.2026");
-        assertThat(v.getStartedAt()).isEqualTo(Instant.parse("2026-06-01T15:05:57.183Z"));
-        assertThat(v.getEndedAt()).isEqualTo(Instant.parse("2026-06-01T15:06:17.177Z"));
+        // Source sends local Tallinn wall-clock; 2026-06-01 is EEST (UTC+3), so 15:05 → 12:05Z.
+        assertThat(v.getStartedAt()).isEqualTo(Instant.parse("2026-06-01T12:05:57.183Z"));
+        assertThat(v.getEndedAt()).isEqualTo(Instant.parse("2026-06-01T12:06:17.177Z"));
         assertThat(v.getResultInFavor()).isEqualTo(68);
         assertThat(v.getResultAgainst()).isEqualTo(5);
         assertThat(v.getResultAbstained()).isEqualTo(27);

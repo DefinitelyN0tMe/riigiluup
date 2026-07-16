@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { fetchLegislationDetail } from "../api/legislation";
 import StageTimeline from "../components/StageTimeline";
 import TopicChip from "../components/TopicChip";
+import { formatDate } from "../lib/formatDate";
 
 export default function LegislationDetailPage() {
   const { t } = useTranslation();
@@ -20,10 +21,10 @@ export default function LegislationDetailPage() {
 
   const phaseLabel = t(`phase.${data.phase}` as const, { defaultValue: data.phase });
   const initiatedStr = data.initiatedDate
-    ? ` · ${t("legislation.initiatedInline", { date: new Date(data.initiatedDate).toLocaleDateString() })}`
+    ? ` · ${t("legislation.initiatedInline", { date: formatDate(data.initiatedDate) })}`
     : "";
   const acceptedStr = data.acceptedDate
-    ? ` · ${t("legislation.acceptedInline", { date: new Date(data.acceptedDate).toLocaleDateString() })}`
+    ? ` · ${t("legislation.acceptedInline", { date: formatDate(data.acceptedDate) })}`
     : "";
 
   return (
@@ -47,7 +48,7 @@ export default function LegislationDetailPage() {
           <p className="text-sm text-slate-500">{t("legislation.leadingCommittee", { name: data.leadingCommitteeName })}</p>
         )}
         <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer"
-           aria-label="Riigikogu source (opens in new tab)"
+           aria-label={`${t("common.riigikoguSource").replace(" ↗", "")} (${t("a11y.opensNewTab")})`}
            className="text-xs text-estonia hover:underline inline-block mt-1">
           {t("common.riigikoguSource")}
         </a>

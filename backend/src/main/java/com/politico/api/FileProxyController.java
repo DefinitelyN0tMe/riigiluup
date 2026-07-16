@@ -59,7 +59,6 @@ public class FileProxyController {
         public byte[] load(String uuid) {
             fetchLock.lock();
             try {
-                client.throttle();
                 return client.fetchFileBytes(uuid);
             } finally {
                 fetchLock.unlock();

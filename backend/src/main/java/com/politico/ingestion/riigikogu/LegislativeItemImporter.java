@@ -16,6 +16,7 @@ import com.politico.person.PlenaryMemberRepository;
 import com.politico.source.ProcessingStatus;
 import com.politico.source.SourceSnapshot;
 import com.politico.source.SourceSnapshotRepository;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -40,6 +41,7 @@ public class LegislativeItemImporter {
     private final LegislativeItemMapper mapper;
     private final LegislativeStageFlattener stageFlattener;
     private final SponsorClassifier sponsorClassifier;
+    private final PlenaryMemberMapper memberMapper;
     private final ObjectMapper json;
     private final LegislativeItemRepository itemRepo;
     private final LegislativeStageRepository stageRepo;
@@ -56,6 +58,7 @@ public class LegislativeItemImporter {
             LegislativeItemMapper mapper,
             LegislativeStageFlattener stageFlattener,
             SponsorClassifier sponsorClassifier,
+            PlenaryMemberMapper memberMapper,
             ObjectMapper json,
             LegislativeItemRepository itemRepo,
             LegislativeStageRepository stageRepo,
@@ -71,6 +74,7 @@ public class LegislativeItemImporter {
         this.mapper = mapper;
         this.stageFlattener = stageFlattener;
         this.sponsorClassifier = sponsorClassifier;
+        this.memberMapper = memberMapper;
         this.json = json;
         this.itemRepo = itemRepo;
         this.stageRepo = stageRepo;
@@ -83,6 +87,44 @@ public class LegislativeItemImporter {
         this.tx = new TransactionTemplate(txManager);
     }
 
+    /**
+     * One-shot full refresh — paginates through /api/volumes/drafts with a very
+     * wide date range in a SINGLE outer window, importing every draft the API
+     * exposes. Meant for the historical backfill.
+     *
+     * <p>Empirical finding: Riigikogu's {@code startDate/endDate} on
+     * {@code /api/volumes/drafts} do NOT actually filter the returned draft
+     * catalogue — the endpoint returns every draft regardless. Iterating 92
+     * separate 30-day sub-windows via {@link #runWindow} therefore re-scans the
+     * same catalogue 92 times. This method does it once.
+     */
+    public ImportRunLog runAllDrafts() {
+        ImportRunLog run = runLogRepo.save(ImportRunLog.builder()
+                .sourceName(client.sourceName()).jobName(JOB_NAME + ".all")
+                .startedAt(Instant.now()).status("RUNNING").build());
+        int seen = 0, upserted = 0;
+        try {
+            // Wide window so the "date" params are effectively no-ops; the API
+            // ignores them for draft-listing anyway.
+            LocalDate wideFrom = LocalDate.of(1990, 1, 1);
+            LocalDate wideTo = LocalDate.of(2100, 12, 31);
+            int[] cnt = paginateAndUpsert(wideFrom, wideTo);
+            seen = cnt[0];
+            upserted = cnt[1];
+            run.setStatus("SUCCESS");
+        } catch (Exception e) {
+            log.error("legislation full import failed", e);
+            run.setStatus("FAILED");
+            run.setErrorMessage(e.getMessage());
+        } finally {
+            run.setRecordsSeen(seen);
+            run.setRecordsUpserted(upserted);
+            run.setFinishedAt(Instant.now());
+            runLogRepo.save(run);
+        }
+        return run;
+    }
+
     public ImportRunLog runWindow(LocalDate from, LocalDate to) {
         ImportRunLog run = runLogRepo.save(ImportRunLog.builder()
                 .sourceName(client.sourceName()).jobName(JOB_NAME)
@@ -93,23 +135,9 @@ public class LegislativeItemImporter {
             while (!cursor.isAfter(to)) {
                 LocalDate windowEnd = cursor.plusDays(6);
                 if (windowEnd.isAfter(to)) windowEnd = to;
-                log.info("fetching drafts window {}..{}", cursor, windowEnd);
-                DraftListDto page = client.fetchDraftsInWindow(cursor, windowEnd);
-                client.throttle();
-                if (page != null && page._embedded() != null
-                        && page._embedded().content() != null) {
-                    for (DraftListDto.DraftListEntry entry : page._embedded().content()) {
-                        seen++;
-                        try {
-                            tx.executeWithoutResult(status -> upsertOne(entry));
-                            upserted++;
-                        } catch (Exception e) {
-                            log.warn("failed draft {} ({}): {}",
-                                    entry.uuid(), entry.title(), e.toString());
-                        }
-                        client.throttle();
-                    }
-                }
+                int[] cnt = paginateAndUpsert(cursor, windowEnd);
+                seen += cnt[0];
+                upserted += cnt[1];
                 cursor = windowEnd.plusDays(1);
             }
             run.setStatus("SUCCESS");
@@ -124,6 +152,51 @@ public class LegislativeItemImporter {
             runLogRepo.save(run);
         }
         return run;
+    }
+
+    /**
+     * Pull every draft in the given date band, paginating through the
+     * {@code /api/volumes/drafts} response, and upsert each. Returns {seen, upserted}.
+     * Shared between {@link #runWindow} (per 7-day sub-window) and
+     * {@link #runAllDrafts} (wide range).
+     */
+    private int[] paginateAndUpsert(LocalDate from, LocalDate to) {
+        int seen = 0, upserted = 0;
+        int pageNum = 0;
+        int fetchSize = 100;
+        int safety = 500;
+        while (true) {
+            log.info("fetching drafts window {}..{} page={}", from, to, pageNum);
+            DraftListDto page = client.fetchDraftsInWindow(from, to, pageNum, fetchSize);
+            if (page == null || page._embedded() == null
+                    || page._embedded().content() == null
+                    || page._embedded().content().isEmpty()) break;
+            for (DraftListDto.DraftListEntry entry : page._embedded().content()) {
+                seen++;
+                try {
+                    tx.executeWithoutResult(status -> upsertOne(entry));
+                    upserted++;
+                } catch (CallNotPermittedException e) {
+                    throw e; // circuit breaker open → let the run fail instead of persisting stage-less bills
+                } catch (Exception e) {
+                    log.warn("failed draft {} ({}): {}",
+                            entry.uuid(), entry.title(), e.toString());
+                }
+            }
+            DraftListDto.Page meta = page.page();
+            boolean lastPage = meta == null
+                    || meta.totalPages() == null
+                    || meta.number() == null
+                    || meta.number() >= meta.totalPages() - 1;
+            if (lastPage) break;
+            pageNum++;
+            if (pageNum >= safety) {
+                log.warn("draft-window {}..{} exceeded safety page cap {}, stopping",
+                        from, to, safety);
+                break;
+            }
+        }
+        return new int[]{seen, upserted};
     }
 
     private void upsertOne(DraftListDto.DraftListEntry entry) {
@@ -144,6 +217,8 @@ public class LegislativeItemImporter {
         DraftDetailDto detail;
         try {
             detail = client.fetchDraftDetail(entry.uuid());
+        } catch (CallNotPermittedException e) {
+            throw e; // circuit-broken upstream → fail the run instead of persisting stage-less bills
         } catch (Exception e) {
             log.warn("detail fetch failed for {}: {}", entry.uuid(), e.toString());
             listSnap.setProcessingStatus(ProcessingStatus.PROCESSED);
@@ -152,11 +227,13 @@ public class LegislativeItemImporter {
         SourceSnapshot detailSnap = snapshotFor(ENTITY_DETAIL, detail.uuid(), detail);
         mapper.applyDetail(existing, detail);
         existing.setSourceSnapshot(detailSnap);
+        // Set status before the reconcile* calls: their @Modifying(clearAutomatically=true) deletes
+        // detach the persistence context, so a status change made afterwards would be lost.
+        detailSnap.setProcessingStatus(ProcessingStatus.PROCESSED);
 
         reconcileStages(existing, detail);
         reconcileSponsorships(existing, detail);
         reconcileTopics(existing, detail);
-        detailSnap.setProcessingStatus(ProcessingStatus.PROCESSED);
     }
 
     private void reconcileStages(LegislativeItem item, DraftDetailDto d) {
@@ -181,7 +258,7 @@ public class LegislativeItemImporter {
             if (kind == com.politico.legislation.SponsorKind.PLENARY_MEMBER && ini.uuid() != null) {
                 linkedMp = memberRepo
                         .findBySourceNameAndExternalId(client.sourceName(), ini.uuid())
-                        .orElse(null);
+                        .orElseGet(() -> materialiseHistoricalSponsor(ini));
             }
             sponsorshipRepo.save(LegislativeSponsorship.builder()
                     .legislativeItem(item)
@@ -190,6 +267,31 @@ public class LegislativeItemImporter {
                     .externalId(ini.uuid())
                     .displayName(ini.name())
                     .build());
+        }
+    }
+
+    /**
+     * Create a stub {@link PlenaryMember} for a bill sponsor that isn't in the current
+     * mandate roster. Bills reach back further than Riigikogu's active-members list, so
+     * without this, historical sponsorships lose their MP link and drop out of the
+     * co-sponsorship graph and the per-MP "bills sponsored" list.
+     *
+     * <p>Initiator payload doesn't carry faction info, so the stub has no faction —
+     * that gets filled in later if the same UUID appears as a voter (which does carry it)
+     * or on the next full members refresh.
+     */
+    private PlenaryMember materialiseHistoricalSponsor(DraftDetailDto.Initiator ini) {
+        if (ini.uuid() == null) return null;
+        PlenaryMember stub = memberMapper.stubFromVoter(ini.uuid(), ini.name(), null, null);
+        if (memberRepo.findBySlug(stub.getSlug()).isPresent()) {
+            stub.setSlug(stub.getSlug() + "-" + ini.uuid().substring(0, 8));
+        }
+        try {
+            return memberRepo.save(stub);
+        } catch (Exception e) {
+            log.warn("failed to materialise historical sponsor {} ({}): {}",
+                    ini.uuid(), ini.name(), e.toString());
+            return null;
         }
     }
 

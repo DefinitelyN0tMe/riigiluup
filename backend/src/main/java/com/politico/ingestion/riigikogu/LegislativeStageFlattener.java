@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,9 +31,12 @@ public class LegislativeStageFlattener {
         return withSequence;
     }
 
+    // Riigikogu emits offset-less local Estonian wall-clock; interpret in the source zone.
+    private static final ZoneId SOURCE_ZONE = ZoneId.of("Europe/Tallinn");
+
     private static Instant parseTs(String s) {
         if (s == null || s.isBlank()) return null;
-        try { return LocalDateTime.parse(s).toInstant(ZoneOffset.UTC); }
+        try { return LocalDateTime.parse(s).atZone(SOURCE_ZONE).toInstant(); }
         catch (Exception e) { return null; }
     }
 

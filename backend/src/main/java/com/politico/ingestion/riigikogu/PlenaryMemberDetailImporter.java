@@ -91,7 +91,6 @@ public class PlenaryMemberDetailImporter {
                         log.warn("detail refresh failed for {} {}: {}",
                                 m.getFullName(), m.getExternalId(), e.getMessage());
                     }
-                    client.throttle();
                 }
                 page++;
             } while (slice.hasNext());

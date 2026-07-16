@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { LegislationStage } from "../types";
+import { formatDate } from "../lib/formatDate";
 
 export default function StageTimeline({ stages }: { stages: LegislationStage[] }) {
   const { t } = useTranslation();
@@ -7,7 +8,7 @@ export default function StageTimeline({ stages }: { stages: LegislationStage[] }
   return (
     <ol className="relative border-l border-slate-200 pl-4 space-y-3">
       {stages.map((s, idx) => {
-        const when = s.occurredAt ? new Date(s.occurredAt).toLocaleDateString() : "—";
+        const when = s.occurredAt ? formatDate(s.occurredAt) : "—";
         const readingLabel = s.readingCode
           ? t(`reading.${s.readingCode}` as const, { defaultValue: s.readingCode })
           : t("reading.fallback");

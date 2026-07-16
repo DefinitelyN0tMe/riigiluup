@@ -4,6 +4,11 @@
 services:
   db:
     image: postgres:16-alpine
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-politico}
       POSTGRES_USER: ${POSTGRES_USER:-politico}
@@ -20,6 +25,11 @@ services:
 
   api:
     build: ./backend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-politico}
       DB_USER: ${POSTGRES_USER:-politico}
@@ -37,6 +47,11 @@ services:
 
   web:
     build: ./frontend
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "5173:80"
     depends_on:
