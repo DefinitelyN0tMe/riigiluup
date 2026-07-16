@@ -217,12 +217,14 @@ export default function PoliticianProfilePage() {
           hint={t("profile.metrics.attendanceHint", { attended: data.participation.attended, total: data.participation.totalSittings })}
           sourceUrl={data.participation.sourceUrl}
         />
-        <MetricCard
-          label={t("profile.metrics.checkPresence")}
-          value={pct(data.attendanceChecks.participationRate)}
-          hint={t("profile.metrics.checkHint", { present: data.attendanceChecks.attended, total: data.attendanceChecks.totalSittings })}
-          sourceUrl={data.attendanceChecks.sourceUrl}
-        />
+        {data.attendanceChecks && (
+          <MetricCard
+            label={t("profile.metrics.checkPresence")}
+            value={pct(data.attendanceChecks.participationRate)}
+            hint={t("profile.metrics.checkHint", { present: data.attendanceChecks.attended, total: data.attendanceChecks.totalSittings })}
+            sourceUrl={data.attendanceChecks.sourceUrl}
+          />
+        )}
         <MetricCard
           label={t("profile.metrics.seniority")}
           value={data.parliamentSeniorityDays == null
