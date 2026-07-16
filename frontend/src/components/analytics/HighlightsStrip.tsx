@@ -5,28 +5,7 @@ import type { HighlightsBundle } from "../../api/analytics";
 export default function HighlightsStrip({ data }: { data: HighlightsBundle }) {
   const { t } = useTranslation();
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.4fr)] gap-4 sm:gap-5">
-      <div className="bg-ink text-white rounded-[22px] p-6 sm:p-7 relative overflow-hidden">
-        <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue-glow font-bold flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-live shadow-[0_0_8px_theme(colors.live)] animate-pulse-dot" /> {t("viz.highlights.partyOfWeek")}
-        </div>
-        {data.partyOfWeek ? (
-          <>
-            <div className="font-display font-bold h-display-md mt-4">
-              {data.partyOfWeek.factionShortName ?? data.partyOfWeek.factionName}
-            </div>
-            <div className="font-serif italic text-blue-glow text-[22px] sm:text-[26px] mt-1">
-              {(data.partyOfWeek.unity * 100).toFixed(1)}{t("viz.highlights.unitySuffix")}
-            </div>
-            <div className="font-mono text-[10px] tracking-[0.14em] uppercase opacity-70 mt-3">
-              {t("viz.highlights.over", { count: data.partyOfWeek.votesConsidered })}
-            </div>
-          </>
-        ) : (
-          <div className="mt-4 text-white/60">{t("viz.highlights.noData")}</div>
-        )}
-      </div>
-
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-4 sm:gap-5">
       <div className="bg-white border border-rule rounded-[22px] p-6 sm:p-7">
         <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-blue font-bold">
           {t("viz.highlights.streaks")}

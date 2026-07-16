@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Home",
     "mps": "MPs",
     "votes": "Votes",
     "compare": "Compare",
@@ -212,7 +213,7 @@
         "titlePre": "What gets decided ",
         "titleEm": "after hours",
         "titlePost": "",
-        "note": "Riigikogu's usual sitting hours are weekdays 08:00–20:00. Every named vote outside that window or on weekends is listed here — with time, margin, and linked bill. Doesn't automatically mean something's wrong, but it deserves scrutiny."
+        "note": "Riigikogu's regular sittings run during the day. Named votes cast before 08:00 or after 22:00 — or on weekends — are listed here, with time, margin, and linked bill. It doesn't automatically mean something is wrong, but it's worth a look."
       }
     }
   },
@@ -624,7 +625,7 @@
       "hour": "Hour",
       "dow": "Weekday",
       "weekend": "Weekends only",
-      "night": "Night (before 08:00 or after 20:00)",
+      "night": "Night (before 08:00 or after 22:00)",
       "late": "Late-night (22:00–06:00)",
       "disagreement": "Faction disagreement"
     }
@@ -895,7 +896,7 @@
       },
       "night": {
         "heading": "Votes outside working hours",
-        "body": "The share of recorded votes that happened outside normal working hours — before 8:00 in the morning or after 8:00 in the evening (Tallinn time). Presence checks are not counted, only actual votes."
+        "body": "The share of recorded votes that happened outside normal working hours — before 8:00 in the morning or after 22:00 at night (Tallinn time). Presence checks are not counted, only actual votes."
       },
       "topics": {
         "heading": "What bills are about",

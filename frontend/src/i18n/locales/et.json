@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Avaleht",
     "mps": "Saadikud",
     "votes": "Hääletused",
     "compare": "Võrdle",
@@ -212,7 +213,7 @@
         "titlePre": "Mida ",
         "titleEm": "öösel",
         "titlePost": " otsustatakse",
-        "note": "Riigikogu tavaline istungiaeg on tööpäevadel 08:00–20:00. Kõik nimelised hääletused väljaspool seda akent või nädalavahetusel on siin loetletud — koos kellaaja, marginaali ja seotud eelnõuga. Ei tähenda automaatselt et miski on halb, aga väärib küsimist."
+        "note": "Riigikogu tavalised istungid toimuvad päeval. Nimelised hääletused enne 08:00 või pärast 22:00 — või nädalavahetusel — on siin loetletud, koos kellaaja, marginaali ja seotud eelnõuga. See ei tähenda automaatselt, et midagi on valesti, aga tasub vaadata."
       }
     }
   },
@@ -624,7 +625,7 @@
       "hour": "Tund",
       "dow": "Nädalapäev",
       "weekend": "Ainult nädalavahetus",
-      "night": "Öö (enne 08:00 või pärast 20:00)",
+      "night": "Öö (enne 08:00 või pärast 22:00)",
       "late": "Süvaöine (22:00–06:00)",
       "disagreement": "Fraktsioonide erimeelsus"
     }
@@ -895,7 +896,7 @@
       },
       "night": {
         "heading": "Hääletused väljaspool tööaega",
-        "body": "Nende arvestatud hääletuste osakaal, mis toimusid väljaspool tavalist tööaega — enne kella 8:00 hommikul või pärast 20:00 õhtul (Tallinna aeg). Kohaloleku kontrolle ei loeta, ainult tegelikke hääletusi."
+        "body": "Nende arvestatud hääletuste osakaal, mis toimusid väljaspool tavalist tööaega — enne kella 8:00 hommikul või pärast 22:00 (Tallinna aeg). Kohaloleku kontrolle ei loeta, ainult tegelikke hääletusi."
       },
       "topics": {
         "heading": "Millest eelnõud räägivad",

@@ -57,7 +57,7 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
           AND (cast(:nightOnly AS boolean) IS NULL OR NOT cast(:nightOnly AS boolean)
                 OR (v.started_at IS NOT NULL
                     AND (EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int < 8
-                         OR EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int >= 20)))
+                         OR EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int >= 22)))
           AND (cast(:lateOnly AS boolean) IS NULL OR NOT cast(:lateOnly AS boolean)
                 OR (v.started_at IS NOT NULL
                     AND (EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int >= 22
@@ -93,7 +93,7 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
           AND (cast(:nightOnly AS boolean) IS NULL OR NOT cast(:nightOnly AS boolean)
                 OR (v.started_at IS NOT NULL
                     AND (EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int < 8
-                         OR EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int >= 20)))
+                         OR EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int >= 22)))
           AND (cast(:lateOnly AS boolean) IS NULL OR NOT cast(:lateOnly AS boolean)
                 OR (v.started_at IS NOT NULL
                     AND (EXTRACT(hour FROM (v.started_at AT TIME ZONE 'Europe/Tallinn'))::int >= 22

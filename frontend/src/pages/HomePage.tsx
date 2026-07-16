@@ -200,10 +200,7 @@ function MpFeatureCard({ p }: { p: Politician | null }) {
       <div aria-hidden className="hidden md:block absolute right-[-20px] top-[30%] origin-top-right rotate-[-90deg] font-display font-extrabold text-[160px] xl:text-[200px] tracking-[-0.055em] leading-none text-white/[0.06] pointer-events-none select-none">
         {factionUpper}
       </div>
-      <div className="flex justify-between items-start relative">
-        <div className="inline-flex items-center gap-2 bg-white/14 px-3 py-1.5 rounded-full font-mono text-[10px] sm:text-[11px] tracking-[0.14em] uppercase font-semibold">
-          <span className="w-1.5 h-1.5 rounded-full bg-live shadow-[0_0_8px_theme(colors.live)] animate-pulse-dot" /> {t("homePage.bento.featureTag")}
-        </div>
+      <div className="flex justify-end items-start relative">
         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white text-blue grid place-items-center font-serif font-semibold text-[26px] sm:text-[28px] tracking-[-0.02em]">
           {initials(p ?? undefined) || "KK"}
         </div>

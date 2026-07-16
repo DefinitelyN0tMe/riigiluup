@@ -802,7 +802,7 @@ public class AnalyticsService {
     }
 
     /* ============================================================
-     *  Night votes — votes cast outside 08:00–20:00 Europe/Tallinn
+     *  Night votes — votes cast outside 08:00–22:00 Europe/Tallinn (default window)
      * ============================================================ */
     @Cacheable("analytics-night-votes")
     public AnalyticsDto.NightVotes nightVotes(int windowStartHour, int windowEndHour, int limit) {

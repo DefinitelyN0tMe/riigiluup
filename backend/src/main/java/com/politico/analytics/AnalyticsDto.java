@@ -124,7 +124,7 @@ public final class AnalyticsDto {
     /* ================ NIGHT VOTES ================ */
     /**
      * "Night" votes are ones started outside conventional working hours
-     * (before 08:00 or after 20:00 Europe/Tallinn by default).
+     * (before 08:00 or after 22:00 Europe/Tallinn by default).
      * Also flags weekend votes (Sat, Sun).
      */
     public record NightVotes(

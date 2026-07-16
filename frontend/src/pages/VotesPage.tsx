@@ -79,7 +79,7 @@ export default function VotesPage() {
     });
     if (nightOnly) out.push({
       key: "night",
-      label: t("votes.chip.night", "Night (before 08:00 or after 20:00)"),
+      label: t("votes.chip.night", "Night (before 08:00 or after 22:00)"),
       removeKeys: ["nightOnly"],
     });
     if (lateOnly) out.push({

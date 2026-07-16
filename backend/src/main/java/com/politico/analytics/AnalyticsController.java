@@ -90,7 +90,7 @@ public class AnalyticsController {
     @GetMapping("/night-votes")
     public AnalyticsDto.NightVotes nightVotes(
             @RequestParam(defaultValue = "8") int startHour,
-            @RequestParam(defaultValue = "20") int endHour,
+            @RequestParam(defaultValue = "22") int endHour,
             @RequestParam(defaultValue = "20") int limit
     ) {
         return service.nightVotes(startHour, endHour, Math.min(limit, 100));

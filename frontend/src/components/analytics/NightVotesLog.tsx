@@ -4,7 +4,7 @@ import type { NightVotes } from "../../api/analytics";
 
 /**
  * "Night votes" investigative log — votes started outside conventional working hours
- * (08:00–20:00 Europe/Tallinn) or on weekends. Shows overall metric + editorial list.
+ * (08:00–22:00 Europe/Tallinn) or on weekends. Shows overall metric + editorial list.
  */
 export default function NightVotesLog({ data }: { data: NightVotes }) {
   const { t, i18n } = useTranslation();

@@ -18,8 +18,11 @@ export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const cursorRef = useRef<HTMLDivElement>(null);
 
-  // Close mobile menu on route change
-  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+  // Close mobile menu + jump to top of page on route change
+  useEffect(() => {
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname]);
 
   // Custom cursor (desktop, hover-capable only — CSS hides it on touch)
   useEffect(() => {
@@ -40,11 +43,12 @@ export default function Layout() {
   }, []);
 
   const navItems = [
-    { to: "/politicians", label: t("nav.mps") },
-    { to: "/votes", label: t("nav.votes") },
-    { to: "/legislation", label: t("nav.bills") },
-    { to: "/analytics", label: t("nav.analytics") },
-    { to: "/methodology", label: t("footer.methodology") },
+    { to: "/", label: t("nav.home"), end: true },
+    { to: "/politicians", label: t("nav.mps"), end: false },
+    { to: "/votes", label: t("nav.votes"), end: false },
+    { to: "/legislation", label: t("nav.bills"), end: false },
+    { to: "/analytics", label: t("nav.analytics"), end: false },
+    { to: "/methodology", label: t("footer.methodology"), end: false },
   ];
 
   const navTheme = isHome
@@ -78,7 +82,7 @@ export default function Layout() {
           {/* Desktop nav */}
           <div className="hidden md:flex justify-center gap-1">
             {navItems.map((item) => (
-              <NavLink key={item.to} to={item.to}
+              <NavLink key={item.to} to={item.to} end={item.end}
                 className={({ isActive }) => `${linkBase} ${isActive ? linkOn : linkOff}`}>
                 {item.label}
               </NavLink>
@@ -114,7 +118,7 @@ export default function Layout() {
             <ul className="flex flex-col gap-1 pt-2">
               {navItems.map((item) => (
                 <li key={item.to}>
-                  <NavLink to={item.to}
+                  <NavLink to={item.to} end={item.end}
                     className={({ isActive }) =>
                       `block px-4 py-3 rounded-2xl text-[15px] font-semibold ${
                         isActive
