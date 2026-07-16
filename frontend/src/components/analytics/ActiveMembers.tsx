@@ -28,6 +28,7 @@ export default function ActiveMembers({ data }: { data: MemberActivityBoard }) {
             role="tab"
             aria-selected={metric === m}
             onClick={() => setMetric(m)}
+            title={m === "interpellations" ? t("viz.activity.interpellationsHint") : undefined}
             className={`font-mono text-[11px] tracking-[0.08em] uppercase px-3 py-1.5 rounded-full border transition-colors ${
               metric === m ? "bg-ink text-white border-ink" : "bg-white text-ink border-rule hover:border-blue"
             }`}

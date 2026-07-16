@@ -229,6 +229,7 @@
     "noData": "No data available.",
     "activity": {
       "metricLabel": "Activity metric",
+      "interpellationsHint": "A formal demand that a minister answer in the chamber, followed by debate.",
       "metric": {
         "speeches": "Speeches",
         "questions": "Questions",
@@ -639,6 +640,7 @@
       "speeches": "Speeches",
       "questions": "Questions asked",
       "interpellations": "Questions to ministers",
+      "interpellationsHint": "A formal demand that a minister answer in the chamber, followed by debate.",
       "writtenQuestions": "Written questions",
       "source": "On the Riigikogu site"
     },

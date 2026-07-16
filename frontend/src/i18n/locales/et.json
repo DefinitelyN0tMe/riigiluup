@@ -229,6 +229,7 @@
     "noData": "Puuduvad andmed.",
     "activity": {
       "metricLabel": "Aktiivsuse mõõt",
+      "interpellationsHint": "Ametlik nõue, millele minister peab istungil vastama, ja sellele järgnev arutelu.",
       "metric": {
         "speeches": "Sõnavõtud",
         "questions": "Küsimused",
@@ -639,6 +640,7 @@
       "speeches": "Sõnavõtud",
       "questions": "Esitatud küsimused",
       "interpellations": "Arupärimised",
+      "interpellationsHint": "Ametlik nõue, millele minister peab istungil vastama, ja sellele järgnev arutelu.",
       "writtenQuestions": "Kirjalikud küsimused",
       "source": "Riigikogu lehel"
     },

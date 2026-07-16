@@ -20,13 +20,20 @@ function pct(v: number | null): string {
   return `${(v * 100).toFixed(1)}%`;
 }
 
-function ActivityStat({ value, label }: { value: number; label: string }) {
+function ActivityStat({ value, label, hint }: { value: number; label: string; hint?: string }) {
   return (
     <div>
       <div className="font-display font-bold text-[28px] leading-none tracking-[-0.03em] text-ink">
         {value.toLocaleString()}
       </div>
-      <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">{label}</div>
+      <div
+        className={`font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5${
+          hint ? " border-b border-dotted border-muted/60 cursor-help inline-block" : ""
+        }`}
+        title={hint}
+      >
+        {label}
+      </div>
     </div>
   );
 }
@@ -292,7 +299,7 @@ export default function PoliticianProfilePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <ActivityStat value={data.activity.speeches} label={t("profile.activity.speeches")} />
             <ActivityStat value={data.activity.questions} label={t("profile.activity.questions")} />
-            <ActivityStat value={data.activity.interpellations} label={t("profile.activity.interpellations")} />
+            <ActivityStat value={data.activity.interpellations} label={t("profile.activity.interpellations")} hint={t("profile.activity.interpellationsHint")} />
             <ActivityStat value={data.activity.writtenQuestions} label={t("profile.activity.writtenQuestions")} />
           </div>
           <a href={data.activity.sourceUrl} target="_blank" rel="noreferrer noopener"
