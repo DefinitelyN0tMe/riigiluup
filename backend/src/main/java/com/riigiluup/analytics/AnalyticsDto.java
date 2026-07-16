@@ -118,6 +118,19 @@ public final class AnalyticsDto {
     public record VoteMargin(UUID voteId, Integer voteNumber, String description, String startedAt,
                              int forCount, int againstCount, int margin) {}
 
+    /* ================ MEMBER ACTIVITY (most active MPs) ================ */
+    public record MemberActivityBoard(List<MemberActivityItem> items, Instant computedAt) {}
+    public record MemberActivityItem(
+            String memberSlug,
+            String memberName,
+            String factionShortName,
+            String factionColorHex,
+            int speeches,
+            int questions,
+            int interpellations,
+            int writtenQuestions
+    ) {}
+
     /* ================ MP TOPIC RADAR ================ */
     public record MpTopicRadar(String slug, List<TopicSlice> topics, int totalBills) {}
 

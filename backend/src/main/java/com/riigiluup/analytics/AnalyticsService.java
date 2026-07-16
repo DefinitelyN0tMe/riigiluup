@@ -1,5 +1,7 @@
 package com.riigiluup.analytics;
 
+import com.riigiluup.activity.MemberActivity;
+import com.riigiluup.activity.MemberActivityRepository;
 import com.riigiluup.group.Group;
 import com.riigiluup.group.GroupRepository;
 import com.riigiluup.group.GroupType;
@@ -51,6 +53,7 @@ public class AnalyticsService {
     private final EntityManager em;
     private final GroupRepository groupRepo;
     private final PlenaryMemberRepository memberRepo;
+    private final MemberActivityRepository memberActivityRepo;
 
     /**
      * Faction name substrings currently in the governing coalition. Drives the
@@ -202,6 +205,32 @@ public class AnalyticsService {
             ));
         }
         return new AnalyticsDto.DisciplineBreakers(items, Instant.now());
+    }
+
+    /* ============================================================
+     *  Most active MPs — speeches, questions, interpellations, written questions
+     * ============================================================ */
+    @Cacheable("analytics-member-activity")
+    public AnalyticsDto.MemberActivityBoard memberActivity() {
+        Map<String, MemberActivity> byExt = memberActivityRepo.findAll().stream()
+                .collect(Collectors.toMap(MemberActivity::getMemberExternalId, a -> a, (a, b) -> a));
+        Map<String, Group> factionByExt = activeFactions().stream()
+                .collect(Collectors.toMap(Group::getExternalId, g -> g, (a, b) -> a));
+
+        List<AnalyticsDto.MemberActivityItem> items = new ArrayList<>();
+        for (PlenaryMember m : memberRepo.findAll()) {
+            if (!m.isActive()) continue;
+            MemberActivity a = byExt.get(m.getExternalId());
+            if (a == null) continue;
+            Group faction = m.getFactionExternalId() != null ? factionByExt.get(m.getFactionExternalId()) : null;
+            String factionShort = faction != null ? shortenFactionName(faction.getName())
+                    : shortenFactionName(m.getFactionName());
+            String colorHex = faction != null ? faction.getColorHex() : null;
+            items.add(new AnalyticsDto.MemberActivityItem(
+                    m.getSlug(), m.getFullName(), factionShort, colorHex,
+                    a.getSpeeches(), a.getQuestions(), a.getInterpellations(), a.getWrittenQuestions()));
+        }
+        return new AnalyticsDto.MemberActivityBoard(items, Instant.now());
     }
 
     private IndividualVote fetchOneRecentDeviation(PlenaryMember m) {

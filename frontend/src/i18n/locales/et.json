@@ -142,7 +142,8 @@
       "toc7": "Kiirus & mustri",
       "toc8": "Poliitiline maastik",
       "toc9": "Reaalne koostöö",
-      "toc10": "Öised hääled"
+      "toc10": "Öised hääled",
+      "toc11": "Kõige aktiivsemad saadikud"
     },
     "sec": {
       "agreement": {
@@ -214,11 +215,27 @@
         "titleEm": "öösel",
         "titlePost": " otsustatakse",
         "note": "Riigikogu tavalised istungid toimuvad päeval. Nimelised hääletused enne 08:00 või pärast 22:00 — või nädalavahetusel — on siin loetletud, koos kellaaja, marginaali ja seotud eelnõuga. See ei tähenda automaatselt, et midagi on valesti, aga tasub vaadata."
+      },
+      "activity": {
+        "kicker": "Kes teeb tööd",
+        "titlePre": "Kõige ",
+        "titleEm": "aktiivsemad",
+        "titlePost": " saadikud",
+        "note": "Sõnavõtud ja küsimused täiskogu stenogrammidest, pluss iga saadiku esitatud arupärimised ja kirjalikud küsimused jooksval koosseisul. Vaheta mõõdikut, et ümber järjestada. Arvud kajastavad aktiivsuse mahtu, mitte selle sisu."
       }
     }
   },
   "viz": {
     "noData": "Puuduvad andmed.",
+    "activity": {
+      "metricLabel": "Aktiivsuse mõõt",
+      "metric": {
+        "speeches": "Sõnavõtud",
+        "questions": "Küsimused",
+        "interpellations": "Arupärimised",
+        "writtenQuestions": "Kirjalikud küsimused"
+      }
+    },
     "loading": "Laen…",
     "loadFailed": "Ei õnnestunud laadida:",
     "a11y": {

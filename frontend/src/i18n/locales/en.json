@@ -142,7 +142,8 @@
       "toc7": "Speed & pattern",
       "toc8": "Political landscape",
       "toc9": "Real collaboration",
-      "toc10": "Night votes"
+      "toc10": "Night votes",
+      "toc11": "Most active MPs"
     },
     "sec": {
       "agreement": {
@@ -214,11 +215,27 @@
         "titleEm": "after hours",
         "titlePost": "",
         "note": "Riigikogu's regular sittings run during the day. Named votes cast before 08:00 or after 22:00 — or on weekends — are listed here, with time, margin, and linked bill. It doesn't automatically mean something is wrong, but it's worth a look."
+      },
+      "activity": {
+        "kicker": "Who does the work",
+        "titlePre": "The most ",
+        "titleEm": "active",
+        "titlePost": " MPs",
+        "note": "Speeches and questions from the plenary stenograms, plus the interpellations and written questions each MP submitted, over the current term. Switch the metric to re-rank. Counts reflect the volume of activity, not its substance."
       }
     }
   },
   "viz": {
     "noData": "No data available.",
+    "activity": {
+      "metricLabel": "Activity metric",
+      "metric": {
+        "speeches": "Speeches",
+        "questions": "Questions",
+        "interpellations": "Interpellations",
+        "writtenQuestions": "Written questions"
+      }
+    },
     "loading": "Loading…",
     "loadFailed": "Failed to load:",
     "a11y": {

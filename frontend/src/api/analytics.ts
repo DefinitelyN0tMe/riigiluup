@@ -31,6 +31,19 @@ export type DisciplineBreaker = {
 };
 export type DisciplineBreakers = { items: DisciplineBreaker[]; computedAt: string };
 
+export type MemberActivityItem = {
+  memberSlug: string;
+  memberName: string;
+  factionShortName: string | null;
+  factionColorHex: string | null;
+  speeches: number;
+  questions: number;
+  interpellations: number;
+  writtenQuestions: number;
+};
+export type MemberActivityBoard = { items: MemberActivityItem[]; computedAt: string };
+export type ActivityMetric = "speeches" | "questions" | "interpellations" | "writtenQuestions";
+
 export type BillFlowNode = { id: string; label: string; count: number };
 export type BillFlowLink = { source: string; target: string; count: number };
 export type BillFlow = { nodes: BillFlowNode[]; links: BillFlowLink[]; totalBills: number; computedAt: string };
@@ -155,6 +168,7 @@ const B = "/api/v1/analytics";
 export const fetchFactionAgreement = () => apiGet<FactionAgreementMatrix>(`${B}/faction-agreement`);
 export const fetchDisciplineBreakers = (limit = 24) =>
   apiGet<DisciplineBreakers>(`${B}/discipline-breakers?limit=${limit}`);
+export const fetchMemberActivity = () => apiGet<MemberActivityBoard>(`${B}/member-activity`);
 export const fetchBillFlow = () => apiGet<BillFlow>(`${B}/bill-flow`);
 export const fetchAttendanceMatrix = (sittings = 40) =>
   apiGet<AttendanceMatrix>(`${B}/attendance-matrix?sittings=${sittings}`);

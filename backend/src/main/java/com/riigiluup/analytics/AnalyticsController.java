@@ -33,6 +33,11 @@ public class AnalyticsController {
         return service.factionAgreement(fromTs, toTs);
     }
 
+    @GetMapping("/member-activity")
+    public AnalyticsDto.MemberActivityBoard memberActivity() {
+        return service.memberActivity();
+    }
+
     @GetMapping("/discipline-breakers")
     public AnalyticsDto.DisciplineBreakers disciplineBreakers(
             @RequestParam(defaultValue = "24") int limit,

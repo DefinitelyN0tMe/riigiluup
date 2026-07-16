@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   fetchAttendanceMatrix, fetchBillFlow, fetchBillVelocity, fetchCoSponsorship,
-  fetchDisciplineBreakers, fetchFactionAgreement, fetchHighlights, fetchMpSimilarity,
+  fetchDisciplineBreakers, fetchFactionAgreement, fetchHighlights, fetchMemberActivity, fetchMpSimilarity,
   fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
 } from "../api/analytics";
 import SectionHead from "../components/SectionHead";
@@ -17,6 +17,7 @@ import MpScatter from "../components/analytics/MpScatter";
 import CoSponsorshipGraph from "../components/analytics/CoSponsorshipGraph";
 import HighlightsStrip from "../components/analytics/HighlightsStrip";
 import NightVotesLog from "../components/analytics/NightVotesLog";
+import ActiveMembers from "../components/analytics/ActiveMembers";
 import type { ReactNode } from "react";
 
 function Loading() {
@@ -52,6 +53,7 @@ export default function AnalyticsPage() {
   const cosp = useQuery({ queryKey: ["ana:cospons"], queryFn: () => fetchCoSponsorship(2) });
   const high = useQuery({ queryKey: ["ana:highlights"], queryFn: fetchHighlights });
   const night = useQuery({ queryKey: ["ana:night"], queryFn: () => fetchNightVotes(20) });
+  const activity = useQuery({ queryKey: ["ana:activity"], queryFn: fetchMemberActivity });
 
   const tocItems: [string, string][] = [
     ["I.", t("analytics.hero.toc1")],
@@ -64,6 +66,7 @@ export default function AnalyticsPage() {
     ["VIII.", t("analytics.hero.toc8")],
     ["IX.", t("analytics.hero.toc9")],
     ["X.", t("analytics.hero.toc10")],
+    ["XI.", t("analytics.hero.toc11")],
   ];
 
   return (
@@ -182,6 +185,15 @@ export default function AnalyticsPage() {
       >
         {night.isLoading ? <Loading /> : night.error ? <Failed err={night.error} /> :
           night.data && <NightVotesLog data={night.data} />}
+      </Section>
+
+      <Section
+        index="XI." kicker={t("analytics.sec.activity.kicker")}
+        title={<>{t("analytics.sec.activity.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.activity.titleEm")}</span>{t("analytics.sec.activity.titlePost")}</>}
+        note={t("analytics.sec.activity.note")}
+      >
+        {activity.isLoading ? <Loading /> : activity.error ? <Failed err={activity.error} /> :
+          activity.data && <ActiveMembers data={activity.data} />}
       </Section>
     </>
   );
