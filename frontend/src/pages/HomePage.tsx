@@ -263,7 +263,7 @@ function SplitLegit() {
     { n: "04.", h: t("homePage.split.step4H"), p: t("homePage.split.step4P"), link: t("homePage.split.step4L") },
   ];
   return (
-    <section className="bg-paper border-b border-rule px-5 sm:px-8 md:px-10 py-14 sm:py-20 md:py-24 grid grid-cols-1 md:grid-cols-[1fr_1.4fr] gap-10 md:gap-16">
+    <section className="bg-paper border-b border-rule px-5 sm:px-8 md:px-10 py-12 sm:py-16 md:py-20 grid grid-cols-1 md:grid-cols-[1fr_1.4fr] gap-10 md:gap-16">
       <div>
         <div className="font-mono text-[11px] tracking-[0.2em] uppercase text-blue font-bold flex items-center gap-2 mb-5">
           <span className="bg-blue text-white px-2 py-0.5 rounded font-bold tracking-[0.14em]">III.</span>
@@ -349,7 +349,7 @@ export default function HomePage() {
       />
       <MarqueeStrip />
 
-      <section className="bg-paper border-b border-rule px-5 sm:px-8 md:px-10 py-14 sm:py-20 md:py-24">
+      <section className="bg-paper border-b border-rule px-5 sm:px-8 md:px-10 py-12 sm:py-16 md:py-20">
         <SectionHead
           index="I."
           kicker={t("homePage.nowVoting.kicker")}
@@ -365,7 +365,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-off border-b border-rule px-5 sm:px-8 md:px-10 py-14 sm:py-20 md:py-24">
+      <section className="bg-off border-b border-rule px-5 sm:px-8 md:px-10 py-12 sm:py-16 md:py-20">
         <SectionHead
           index="II."
           kicker={t("homePage.bento.kicker")}
@@ -383,7 +383,7 @@ export default function HomePage() {
 
       <SplitLegit />
 
-      <section className="bg-paper px-5 sm:px-8 md:px-10 py-14 sm:py-20 md:py-24">
+      <section className="bg-paper px-5 sm:px-8 md:px-10 py-12 sm:py-16 md:py-20">
         <SectionHead
           index="IV."
           kicker={t("homePage.parties.kicker")}

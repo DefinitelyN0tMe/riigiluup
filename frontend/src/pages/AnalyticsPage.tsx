@@ -31,7 +31,7 @@ function Section({
   index, kicker, title, children, note,
 }: { index: string; kicker: string; title: ReactNode; children: ReactNode; note?: string }) {
   return (
-    <section className="px-5 sm:px-8 md:px-10 py-14 sm:py-20 md:py-24 border-b border-rule">
+    <section className="px-5 sm:px-8 md:px-10 py-10 sm:py-14 md:py-16 border-b border-rule">
       <SectionHead index={index} kicker={kicker} title={title} />
       {note && <p className="font-serif italic text-[16px] sm:text-[18px] text-ink-2 max-w-[64ch] mb-8 sm:mb-10">{note}</p>}
       {children}
@@ -68,7 +68,7 @@ export default function AnalyticsPage() {
 
   return (
     <>
-      <section className="bg-ink text-white relative overflow-hidden px-5 sm:px-8 md:px-10 pt-16 sm:pt-24 pb-16 sm:pb-20">
+      <section className="bg-ink text-white relative overflow-hidden px-5 sm:px-8 md:px-10 pt-14 sm:pt-20 pb-12 sm:pb-16">
         <div className="grain" />
         <div className="relative max-w-[1400px] mx-auto">
           <div className="font-mono text-[11px] tracking-[0.22em] uppercase text-blue-glow font-bold mb-6 flex items-center gap-3">
