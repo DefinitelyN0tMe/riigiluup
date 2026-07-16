@@ -33,7 +33,7 @@ function initials(p?: { firstName?: string; lastName?: string }) {
 function Hero({ syncedAt }: { syncedAt: string | null }) {
   const { t } = useTranslation();
   return (
-    <section className="relative bg-blue text-white overflow-hidden isolate px-5 sm:px-8 md:px-10 pt-10 sm:pt-14 pb-16 sm:pb-20 md:pb-24">
+    <section className="relative bg-blue text-white overflow-hidden isolate px-5 sm:px-8 md:px-10 pt-8 sm:pt-12 pb-12 sm:pb-16 md:pb-20">
       <div className="grain" />
       <div aria-hidden className="hidden sm:block absolute right-[-40px] sm:right-[-60px] top-4 font-serif italic font-light leading-[0.8] tracking-[-0.05em] text-white/[0.05] pointer-events-none select-none z-0"
            style={{ fontSize: "clamp(280px, 40vw, 620px)" }}>
@@ -46,7 +46,7 @@ function Hero({ syncedAt }: { syncedAt: string | null }) {
       <img src="/logo.png" alt="" aria-hidden
            className="hidden md:block absolute left-[-70px] bottom-[-90px] w-[340px] h-[340px] opacity-[0.07] pointer-events-none select-none z-0" />
 
-      <div className="relative z-[3] pt-6 sm:pt-10 md:pt-16 grid grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-10 md:gap-16 items-end">
+      <div className="relative z-[3] pt-4 sm:pt-8 md:pt-10 grid grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-10 md:gap-16 items-end">
         <div>
           <div className="inline-flex items-center gap-3.5 font-mono text-[10px] xs:text-[11px] sm:text-[12px] tracking-[0.18em] uppercase mb-6 sm:mb-8">
             <img src="/logo.png" alt="Riigiluup" className="w-8 h-8 rounded-full ring-1 ring-white/30 bg-white/95 object-contain p-0.5" />
@@ -106,7 +106,7 @@ function StatTile({
         <span className="bg-white/8 text-blue-glow px-2 py-0.5 rounded tracking-[0.14em]">{label}</span>
         <span className="hidden xs:inline">{hint}</span>
       </div>
-      <div className="font-display font-extrabold text-[54px] sm:text-[68px] md:text-[84px] leading-[0.95] tracking-[-0.05em]">
+      <div className="font-display font-extrabold text-[44px] sm:text-[56px] md:text-[68px] leading-[0.95] tracking-[-0.05em]">
         {value}
       </div>
       {spark && <div className="h-8 opacity-85"><Sparkline points={spark} color={sparkColor} filled={sparkFilled} height={32} /></div>}
@@ -132,7 +132,7 @@ function StatsStrip({ mpTotal, voteTotal, billTotal }: { mpTotal?: number; voteT
                   value={billTotal ?? "—"} spark={spark2} delta={t("homePage.stats.delta3")} deltaTone="hot" />
         <StatTile to="/data-status" label={t("homePage.stats.syncLabel")} hint={t("homePage.stats.syncHint")}
                   value={<><span className="text-blue-glow font-bold not-italic">6</span>
-                          <span className="font-serif italic font-light text-blue-glow text-[36px] sm:text-[44px] ml-1">h</span></>}
+                          <span className="font-serif italic font-light text-blue-glow text-[30px] sm:text-[38px] ml-1">h</span></>}
                   spark={spark3} delta={t("homePage.stats.delta4")} deltaTone="muted" />
       </div>
     </section>
@@ -212,7 +212,7 @@ function MpFeatureCard({ p }: { p: Politician | null }) {
         </div>
       </div>
       <div className="relative mt-6">
-        <h3 className="font-display font-bold text-[42px] sm:text-[54px] md:text-[68px] leading-[0.9] tracking-[-0.045em]">
+        <h3 className="font-display font-bold text-[34px] sm:text-[44px] md:text-[54px] leading-[0.92] tracking-[-0.045em]">
           {p?.firstName ?? "Kaja"}<br />
           <span className="font-serif italic font-light text-stroke-white">{p?.lastName ?? "Kallas"}.</span>
         </h3>
