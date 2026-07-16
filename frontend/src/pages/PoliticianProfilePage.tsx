@@ -201,6 +201,15 @@ export default function PoliticianProfilePage() {
             >
               {t("common.officialProfile")}
             </a>
+            <a
+              href={data.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${t("common.apiData").replace(" ↗", "")} (${t("a11y.opensNewTab")})`}
+              className="text-muted hover:underline"
+            >
+              {t("common.apiData")}
+            </a>
             {(() => {
               const wiki = i18n.resolvedLanguage === "et" ? data.wikipediaUrlEt
                 : i18n.resolvedLanguage === "ru" ? data.wikipediaUrlRu

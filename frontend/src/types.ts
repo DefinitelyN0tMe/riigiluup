@@ -170,6 +170,7 @@ export type VoteDetail = VoteListItem & {
   } | null;
   factionBreakdowns: VoteFactionBreakdown[];
   individualVotes: VoteIndividual[];
+  riigikoguPageUrl: string;
 };
 
 export type PoliticianVote = {
@@ -277,6 +278,7 @@ export type LegislationDetail = LegislationListItem & {
   stages: LegislationStage[];
   sponsors: LegislationSponsor[];
   topics: LegislationTopic[];
+  riigikoguPageUrl: string;
 };
 
 export type PoliticianLegislationResponse = {

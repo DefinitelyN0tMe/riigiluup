@@ -81,12 +81,18 @@ public class VoteDetailMapper {
                 v.getResultNeutral(), v.getResultPresent(), v.getResultAbsent(),
                 linkedBill,
                 breakdowns, individuals,
-                sourceUrl(v.getExternalId())
+                sourceUrl(v.getExternalId()),
+                riigikoguPageUrl(v.getExternalId())
         );
     }
 
     private static String sourceUrl(String uuid) {
         return "https://api.riigikogu.ee/api/votings/" + uuid;
+    }
+
+    /** Human-readable Riigikogu vote-result page (kept alongside the raw API URL). */
+    private static String riigikoguPageUrl(String uuid) {
+        return "https://www.riigikogu.ee/tegevus/tooulevaade/haaletused/haaletustulemused-kohalolekukontroll/" + uuid + "/";
     }
 
     private static final class FactionAcc {

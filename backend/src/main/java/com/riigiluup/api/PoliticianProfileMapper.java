@@ -79,7 +79,7 @@ public class PoliticianProfileMapper {
                 vTotal, vParticipated, vRate,
                 "Voting participation = (FOR + AGAINST + ABSTAINED) / eligible roll-call votes, "
                         + "computed from ingested Riigikogu roll-call records (current term, since 2023-04-10).",
-                m.getOfficialProfileUrl());
+                riigikoguMemberUrl(m));
 
         // Our own quorum-check (kohalolekukontroll) presence — a stricter, per-moment measure than
         // the Riigikogu sitting-attendance statistic above; shown alongside it so both are visible.
@@ -92,7 +92,7 @@ public class PoliticianProfileMapper {
                 cTotal, cPresent, cRate,
                 "Quorum-check presence = KOHAL / (KOHAL + PUUDUB), computed from ingested "
                         + "kohalolekukontroll records (current term, since 2023-04-10).",
-                m.getOfficialProfileUrl());
+                riigikoguMemberUrl(m));
 
         GroupAlignmentService.Result gaResult = groupAlignmentService.forMember(
                 m,
@@ -124,13 +124,13 @@ public class PoliticianProfileMapper {
                 .findById(m.getExternalId())
                 .map(a -> new PoliticianProfileDto.ActivityInfo(
                         a.getSpeeches(), a.getQuestions(), a.getInterpellations(), a.getWrittenQuestions(),
-                        m.getOfficialProfileUrl()))
+                        riigikoguMemberUrl(m)))
                 .orElse(null);
 
         return new PoliticianProfileDto(
                 m.getId(), m.getSlug(),
                 m.getFullName(), m.getFirstName(), m.getLastName(),
-                photoUrlRewriter.toProxyPath(m.getPhotoUrl()), m.getOfficialProfileUrl(),
+                photoUrlRewriter.toProxyPath(m.getPhotoUrl()), riigikoguMemberUrl(m),
                 m.getEmail(), m.getGender(), m.getDateOfBirth(),
                 m.getElectoralDistrict(),
                 m.getParliamentSeniorityDays(),
@@ -152,6 +152,17 @@ public class PoliticianProfileMapper {
                 election,
                 activity
         );
+    }
+
+    /**
+     * Working human-readable Riigikogu profile page. The URL the API stores
+     * (…/riigikogu-liikmed/liige/{uuid}/) now 404s after a site restructure; the current
+     * page lives under …/saadik/{uuid}/{name}/ and resolves by UUID (the name is decorative).
+     */
+    private static String riigikoguMemberUrl(PlenaryMember m) {
+        String slug = m.getFullName() == null ? "" : m.getFullName().trim().replace(' ', '-');
+        return "https://www.riigikogu.ee/riigikogu/koosseis/riigikogu-liikmed/saadik/"
+                + m.getExternalId() + "/" + slug + "/";
     }
 
     private PoliticianProfileDto.ExternalAffiliationDto toExternalDto(ExternalAffiliation e) {

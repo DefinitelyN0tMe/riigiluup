@@ -47,11 +47,14 @@ export default function LegislationDetailPage() {
         {data.leadingCommitteeName && (
           <p className="text-sm text-slate-500">{t("legislation.leadingCommittee", { name: data.leadingCommitteeName })}</p>
         )}
-        <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer"
-           aria-label={`${t("common.riigikoguSource").replace(" ↗", "")} (${t("a11y.opensNewTab")})`}
-           className="text-xs text-estonia hover:underline inline-block mt-1">
-          {t("common.riigikoguSource")}
-        </a>
+        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+          <a href={data.riigikoguPageUrl} target="_blank" rel="noopener noreferrer"
+             aria-label={`${t("common.riigikoguPage").replace(" ↗", "")} (${t("a11y.opensNewTab")})`}
+             className="text-estonia hover:underline">{t("common.riigikoguPage")}</a>
+          <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer"
+             aria-label={`${t("common.apiData").replace(" ↗", "")} (${t("a11y.opensNewTab")})`}
+             className="text-muted hover:underline">{t("common.apiData")}</a>
+        </div>
       </header>
 
       {data.topics.length > 0 && (

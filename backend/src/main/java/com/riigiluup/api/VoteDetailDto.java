@@ -24,7 +24,8 @@ public record VoteDetailDto(
         LinkedBill linkedBill,
         List<FactionBreakdown> factionBreakdowns,
         List<IndividualVoteDto> individualVotes,
-        String sourceUrl
+        String sourceUrl,
+        String riigikoguPageUrl
 ) {
     public record LinkedBill(UUID id, String externalId, Integer mark, String title, String phase) {}
 

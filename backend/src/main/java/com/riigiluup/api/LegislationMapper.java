@@ -62,11 +62,17 @@ public class LegislationMapper {
                         sp.getExternalId())).toList(),
                 topics.stream().map(it -> new LegislationDetailDto.TopicDto(
                         it.getTopic().getEdid(), it.getTopic().getText())).toList(),
-                sourceUrl(i.getExternalId())
+                sourceUrl(i.getExternalId()),
+                riigikoguPageUrl(i.getExternalId())
         );
     }
 
     private static String sourceUrl(String uuid) {
         return "https://api.riigikogu.ee/api/volumes/drafts/" + uuid;
+    }
+
+    /** Human-readable Riigikogu bill (eelnõu) page (kept alongside the raw API URL). */
+    private static String riigikoguPageUrl(String uuid) {
+        return "https://www.riigikogu.ee/tegevus/eelnoud/eelnou/" + uuid + "/";
     }
 }
