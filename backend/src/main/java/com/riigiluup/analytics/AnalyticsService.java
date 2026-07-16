@@ -736,41 +736,8 @@ public class AnalyticsService {
      * ============================================================ */
     @Cacheable("analytics-highlights")
     public AnalyticsDto.HighlightsBundle highlights() {
-        // Party-of-week: faction with highest cohesion in the last 30 days
-        Instant since = Instant.now().minusSeconds(30L * 86400L);
-        String pow = """
-            SELECT a.faction_external_id,
-                   SUM(CASE WHEN iv.choice = a.majority_choice THEN 1 ELSE 0 END) AS m,
-                   COUNT(*) AS t
-            FROM individual_vote iv
-            JOIN vote_faction_alignment a
-              ON a.vote_event_id = iv.vote_event_id
-             AND a.faction_external_id = iv.faction_external_id
-             AND a.has_clear_majority = TRUE
-             AND a.majority_choice IN ('FOR','AGAINST','ABSTAINED')
-            JOIN vote_event ve ON ve.id = iv.vote_event_id
-            WHERE iv.choice IN ('FOR','AGAINST','ABSTAINED')
-              AND ve.started_at >= :since
-            GROUP BY a.faction_external_id
-            HAVING COUNT(*) > 30
-            ORDER BY (SUM(CASE WHEN iv.choice = a.majority_choice THEN 1 ELSE 0 END)::float / COUNT(*)) DESC
-            LIMIT 1
-            """;
-        List<Object[]> powRows = em.createNativeQuery(pow).setParameter("since", since).getResultList();
         Map<String, Group> factionByExt = activeFactions().stream()
                 .collect(Collectors.toMap(Group::getExternalId, g -> g, (a, b) -> a));
-        AnalyticsDto.PartyOfDay partyOfWeek = null;
-        if (!powRows.isEmpty()) {
-            Object[] r = powRows.get(0);
-            String fex = (String) r[0];
-            long m = ((Number) r[1]).longValue();
-            long t = ((Number) r[2]).longValue();
-            Group g = factionByExt.get(fex);
-            if (g != null) {
-                partyOfWeek = new AnalyticsDto.PartyOfDay(fex, g.getName(), shortenFactionName(g.getName()),
-                        g.getColorHex(), (double) m / t, (int) t);
-            }
-        }
 
         // Streaks: recent attendance-check runs
         int recent = 8;
@@ -827,7 +794,7 @@ public class AnalyticsService {
                     forC, agnC, Math.abs(forC - agnC)));
         }
 
-        return new AnalyticsDto.HighlightsBundle(partyOfWeek, streaks, tightVotes);
+        return new AnalyticsDto.HighlightsBundle(streaks, tightVotes);
     }
 
     /* ============================================================

@@ -107,12 +107,9 @@ public final class AnalyticsDto {
 
     /* ================ HIGHLIGHTS BUNDLE ================ */
     public record HighlightsBundle(
-            PartyOfDay partyOfWeek,
             List<AttendanceStreak> streaks,
             List<VoteMargin> tightVotes
     ) {}
-    public record PartyOfDay(String factionExternalId, String factionName, String factionShortName,
-                             String colorHex, double unity, int votesConsidered) {}
     public record AttendanceStreak(String memberSlug, String memberName, String factionShortName,
                                    int consecutivePresent, int totalRecent) {}
     public record VoteMargin(UUID voteId, Integer voteNumber, String description, String startedAt,

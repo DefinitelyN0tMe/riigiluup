@@ -102,14 +102,6 @@ export type CoSponsorNode = {
 export type CoSponsorEdge = { source: string; target: string; weight: number };
 export type CoSponsorship = { nodes: CoSponsorNode[]; edges: CoSponsorEdge[]; totalBillsConsidered: number };
 
-export type PartyOfDay = {
-  factionExternalId: string;
-  factionName: string;
-  factionShortName: string | null;
-  colorHex: string | null;
-  unity: number;
-  votesConsidered: number;
-};
 export type AttendanceStreak = {
   memberSlug: string;
   memberName: string;
@@ -127,7 +119,6 @@ export type VoteMargin = {
   margin: number;
 };
 export type HighlightsBundle = {
-  partyOfWeek: PartyOfDay | null;
   streaks: AttendanceStreak[];
   tightVotes: VoteMargin[];
 };
