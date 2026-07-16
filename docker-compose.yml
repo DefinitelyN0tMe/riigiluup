@@ -10,15 +10,15 @@ services:
         max-size: "10m"
         max-file: "3"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-politico}
-      POSTGRES_USER: ${POSTGRES_USER:-politico}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-politico}
+      POSTGRES_DB: ${POSTGRES_DB:-riigiluup}
+      POSTGRES_USER: ${POSTGRES_USER:-riigiluup}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-riigiluup}
     ports:
       - "15432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-politico} -d ${POSTGRES_DB:-politico}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-riigiluup} -d ${POSTGRES_DB:-riigiluup}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -31,12 +31,12 @@ services:
         max-size: "10m"
         max-file: "3"
     environment:
-      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-politico}
-      DB_USER: ${POSTGRES_USER:-politico}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-politico}
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-riigiluup}
+      DB_USER: ${POSTGRES_USER:-riigiluup}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-riigiluup}
       SERVER_PORT: "8080"
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
-      POLITICO_ADMIN_ALLOWED_EMAILS: ${POLITICO_ADMIN_ALLOWED_EMAILS:-riigiluup@gmail.com}
+      RIIGILUUP_ADMIN_ALLOWED_EMAILS: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS:-riigiluup@gmail.com}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:-}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:-}
     ports:

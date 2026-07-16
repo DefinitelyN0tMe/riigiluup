@@ -3,7 +3,7 @@ set -euo pipefail
 
 FILE="${1:-}"
 if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
-  echo "Usage: restore.sh <path/to/politico-XXXX.dump>" >&2
+  echo "Usage: restore.sh <path/to/riigiluup-XXXX.dump>" >&2
   exit 1
 fi
 

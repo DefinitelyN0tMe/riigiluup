@@ -1,12 +1,12 @@
 <configuration>
-  <springProperty name="appName" source="spring.application.name" defaultValue="politico"/>
+  <springProperty name="appName" source="spring.application.name" defaultValue="riigiluup"/>
 
   <springProfile name="!local">
     <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
       <encoder class="net.logstash.logback.encoder.LogstashEncoder">
         <includeContext>true</includeContext>
         <includeMdc>true</includeMdc>
-        <customFields>{"app":"politico","env":"${SPRING_PROFILES_ACTIVE:-default}"}</customFields>
+        <customFields>{"app":"riigiluup","env":"${SPRING_PROFILES_ACTIVE:-default}"}</customFields>
       </encoder>
     </appender>
     <root level="INFO">
@@ -27,10 +27,10 @@
 
   <!-- DEBUG only locally; prod stays at INFO so a multi-day backfill can't flood the disk. -->
   <springProfile name="local">
-    <logger name="com.politico" level="DEBUG"/>
+    <logger name="com.riigiluup" level="DEBUG"/>
   </springProfile>
   <springProfile name="!local">
-    <logger name="com.politico" level="INFO"/>
+    <logger name="com.riigiluup" level="INFO"/>
   </springProfile>
   <logger name="org.springframework" level="WARN"/>
   <logger name="org.hibernate" level="WARN"/>

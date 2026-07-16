@@ -112,13 +112,13 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: politico
-          POSTGRES_USER: politico
-          POSTGRES_PASSWORD: politico
+          POSTGRES_DB: riigiluup
+          POSTGRES_USER: riigiluup
+          POSTGRES_PASSWORD: riigiluup
         ports:
           - 15432:5432
         options: >-
-          --health-cmd "pg_isready -U politico -d politico"
+          --health-cmd "pg_isready -U riigiluup -d riigiluup"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -154,9 +154,9 @@ jobs:
       - name: Start backend
         working-directory: backend
         env:
-          DB_URL: jdbc:postgresql://localhost:15432/politico
-          DB_USER: politico
-          DB_PASSWORD: politico
+          DB_URL: jdbc:postgresql://localhost:15432/riigiluup
+          DB_USER: riigiluup
+          DB_PASSWORD: riigiluup
           SERVER_PORT: "18080"
           SPRING_PROFILES_ACTIVE: local
         run: |

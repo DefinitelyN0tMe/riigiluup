@@ -1,10 +1,10 @@
 spring:
   application:
-    name: politico
+    name: riigiluup
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:15432/politico}
-    username: ${DB_USER:politico}
-    password: ${DB_PASSWORD:politico}
+    url: ${DB_URL:jdbc:postgresql://localhost:15432/riigiluup}
+    username: ${DB_USER:riigiluup}
+    password: ${DB_PASSWORD:riigiluup}
     hikari:
       # Cap any single statement at 30 s to prevent pathological richSearch combos
       # (all filters, cold cache) from starving the connection pool. Backfill and
@@ -50,7 +50,7 @@ management:
       access: unrestricted
   metrics:
     tags:
-      application: politico
+      application: riigiluup
 
 resilience4j:
   retry:
@@ -68,7 +68,7 @@ resilience4j:
         # Retrying on 429 during a batch backfill turns one failure into 3 API hits
         # in 7 seconds, which typically extends nginx's rolling window and keeps us
         # rate-limited longer. Better to skip the item (log WARN) and continue.
-        retryOnResultPredicate: com.politico.ingestion.riigikogu.Retry429Predicate
+        retryOnResultPredicate: com.riigiluup.ingestion.riigikogu.Retry429Predicate
   circuitbreaker:
     instances:
       riigikogu:
@@ -76,7 +76,7 @@ resilience4j:
         failureRateThreshold: 50
         waitDurationInOpenState: 30s
 
-politico:
+riigiluup:
   rate-limit:
     enabled: true
     per-minute: 60
@@ -90,7 +90,7 @@ politico:
     coalition-factions: reform,eesti 200
   riigikogu:
     base-url: https://api.riigikogu.ee
-    user-agent: "politico/0.0.1 (riigiluup@gmail.com)"
+    user-agent: "riigiluup/0.0.1 (riigiluup@gmail.com)"
     rate-limit-per-second: 1
   schedule:
     # Votes every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) — new roll-calls
@@ -103,6 +103,6 @@ politico:
     # Re-fetch a member's detail (bio / committees / faction) at most this often.
     member-detail-max-age-days: 7
   admin:
-    username: ${POLITICO_ADMIN_USERNAME:admin}
-    password: ${POLITICO_ADMIN_PASSWORD:change-me}
-    allowed-emails: ${POLITICO_ADMIN_ALLOWED_EMAILS:riigiluup@gmail.com}
+    username: ${RIIGILUUP_ADMIN_USERNAME:admin}
+    password: ${RIIGILUUP_ADMIN_PASSWORD:change-me}
+    allowed-emails: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS:riigiluup@gmail.com}

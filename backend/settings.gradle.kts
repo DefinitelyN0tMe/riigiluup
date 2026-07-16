@@ -1,1 +1,1 @@
-rootProject.name = "politico-backend"
+rootProject.name = "riigiluup-backend"

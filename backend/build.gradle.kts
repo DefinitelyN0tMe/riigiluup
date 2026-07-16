@@ -7,7 +7,7 @@ plugins {
 
 jacoco { toolVersion = "0.8.12" }
 
-group = "com.politico"
+group = "com.riigiluup"
 version = "0.0.1"
 
 java {
@@ -31,7 +31,7 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
     // bucket4j starter removed 2026-07-13 — 0.12.x SPI required a specific cache-backend module
-    // that never resolved cleanly with our Caffeine setup. Replaced by com.politico.api.RateLimitFilter
+    // that never resolved cleanly with our Caffeine setup. Replaced by com.riigiluup.api.RateLimitFilter
     // (60 lines, Caffeine window, per-IP).
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("org.flywaydb:flyway-core")
@@ -87,19 +87,19 @@ tasks.register<Test>("integrationTest") {
     shouldRunAfter(tasks.test)
     // Keep a single fork so the shared Testcontainer/external DB is reused.
     maxParallelForks = 1
-    // The DB backend is picked by com.politico.support.IntegrationDbSelector:
+    // The DB backend is picked by com.riigiluup.support.IntegrationDbSelector:
     //   - Default: boots a shared postgres:16-alpine via Testcontainers
     //     (works on Linux CI / any host with a working Docker socket).
-    //   - Windows dev escape hatch: set POLITICO_IT_JDBC_URL to point at a
+    //   - Windows dev escape hatch: set RIIGILUUP_IT_JDBC_URL to point at a
     //     pre-started Postgres. Needed on Docker Desktop 4.73 / Engine 29.4
     //     where docker-java's probe fails with HTTP 400 against the TCP
     //     proxy. Example:
-    //       docker run -d --rm --name politico-test-pg -p 25432:5432 \
-    //         -e POSTGRES_DB=politico_it -e POSTGRES_USER=politico \
-    //         -e POSTGRES_PASSWORD=politico postgres:16-alpine
-    //       set POLITICO_IT_JDBC_URL=jdbc:postgresql://localhost:25432/politico_it
-    listOf("POLITICO_IT_JDBC_URL", "POLITICO_IT_JDBC_USER",
-            "POLITICO_IT_JDBC_PASSWORD", "DOCKER_HOST").forEach { key ->
+    //       docker run -d --rm --name riigiluup-test-pg -p 25432:5432 \
+    //         -e POSTGRES_DB=riigiluup_it -e POSTGRES_USER=riigiluup \
+    //         -e POSTGRES_PASSWORD=riigiluup postgres:16-alpine
+    //       set RIIGILUUP_IT_JDBC_URL=jdbc:postgresql://localhost:25432/riigiluup_it
+    listOf("RIIGILUUP_IT_JDBC_URL", "RIIGILUUP_IT_JDBC_USER",
+            "RIIGILUUP_IT_JDBC_PASSWORD", "DOCKER_HOST").forEach { key ->
         System.getenv(key)?.let { environment(key, it) }
     }
     testLogging {

@@ -4,12 +4,12 @@ set -euo pipefail
 # First-time Let's Encrypt certificate provisioning.
 #
 # Handles the chicken-and-egg between Nginx (needs cert files to load
-# `politico.conf`) and Certbot (needs an accessible HTTP endpoint to solve
+# `riigiluup.conf`) and Certbot (needs an accessible HTTP endpoint to solve
 # the ACME challenge). Strategy:
-#   1) Temporarily point Nginx at politico-bootstrap.conf (HTTP-only + serves
+#   1) Temporarily point Nginx at riigiluup-bootstrap.conf (HTTP-only + serves
 #      /.well-known/acme-challenge/).
 #   2) Run certbot certonly --webroot.
-#   3) Swap back to the full politico.conf (with SSL) and reload.
+#   3) Swap back to the full riigiluup.conf (with SSL) and reload.
 #
 # Usage: bash issue-cert.sh <domain> <email>
 
@@ -23,9 +23,9 @@ fi
 DEPLOY_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${DEPLOY_DIR}"
 
-BOOTSTRAP="./nginx/politico-bootstrap.conf"
-FULL="./nginx/politico.conf"
-LIVE="./nginx/.politico.active.conf"
+BOOTSTRAP="./nginx/riigiluup-bootstrap.conf"
+FULL="./nginx/riigiluup.conf"
+LIVE="./nginx/.riigiluup.active.conf"
 
 if [ ! -f "${BOOTSTRAP}" ]; then
   echo "Missing ${BOOTSTRAP} — is the deploy tree intact?" >&2
@@ -33,13 +33,13 @@ if [ ! -f "${BOOTSTRAP}" ]; then
 fi
 
 # Substitute the domain sentinel in both configs (idempotent — grep first).
-sed -i.bak "s/POLITICO_DOMAIN/${DOMAIN}/g" "${BOOTSTRAP}"
-sed -i.bak "s/POLITICO_DOMAIN/${DOMAIN}/g" "${FULL}"
+sed -i.bak "s/RIIGILUUP_DOMAIN/${DOMAIN}/g" "${BOOTSTRAP}"
+sed -i.bak "s/RIIGILUUP_DOMAIN/${DOMAIN}/g" "${FULL}"
 rm -f "${BOOTSTRAP}.bak" "${FULL}.bak"
 
 echo "1) Swapping nginx to bootstrap (HTTP-only) config…"
 cp "${BOOTSTRAP}" "${LIVE}"
-# Compose already mounts ./nginx/politico.conf; overwrite it with the
+# Compose already mounts ./nginx/riigiluup.conf; overwrite it with the
 # bootstrap contents for the duration of the challenge.
 cp "${BOOTSTRAP}" "${FULL}"
 
@@ -56,15 +56,15 @@ docker compose -f docker-compose.prod.yml run --rm --entrypoint sh certbot -c "\
     --email ${EMAIL} --agree-tos --non-interactive"
 
 echo "4) Restoring full SSL nginx config…"
-git -C "${DEPLOY_DIR}/.." checkout -- "deploy/nginx/politico.conf" 2>/dev/null || {
-  echo "  (git not available or repo not clean — regenerating politico.conf from LIVE checkpoint)"
+git -C "${DEPLOY_DIR}/.." checkout -- "deploy/nginx/riigiluup.conf" 2>/dev/null || {
+  echo "  (git not available or repo not clean — regenerating riigiluup.conf from LIVE checkpoint)"
   cp "${LIVE}" "${FULL}"
-  echo "  MANUAL STEP REQUIRED: politico.conf currently holds bootstrap content."
+  echo "  MANUAL STEP REQUIRED: riigiluup.conf currently holds bootstrap content."
   echo "  Restore the full SSL version from your source tree, then run:"
   echo "  docker compose -f docker-compose.prod.yml exec nginx nginx -s reload"
   exit 0
 }
-sed -i "s/POLITICO_DOMAIN/${DOMAIN}/g" "${FULL}"
+sed -i "s/RIIGILUUP_DOMAIN/${DOMAIN}/g" "${FULL}"
 docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
 
 echo "Done. HTTPS should be live at https://${DOMAIN}/"

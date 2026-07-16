@@ -24,21 +24,21 @@ server:
   # SpringBootTest with RANDOM_PORT overrides this anyway.
   port: 0
 
-politico:
+riigiluup:
   riigikogu:
     base-url: http://localhost:0
-    user-agent: "politico-test/0.0.1"
+    user-agent: "riigiluup-test/0.0.1"
     rate-limit-per-second: 1000
   schedule:
     daily-refresh-cron: "-"
     daily-refresh-zone: "UTC"
   admin:
-    username: ${POLITICO_ADMIN_USERNAME:testadmin}
-    password: ${POLITICO_ADMIN_PASSWORD:testpass}
+    username: ${RIIGILUUP_ADMIN_USERNAME:testadmin}
+    password: ${RIIGILUUP_ADMIN_PASSWORD:testpass}
 
 logging:
   level:
     root: WARN
-    com.politico: INFO
+    com.riigiluup: INFO
     org.testcontainers: WARN
     com.github.dockerjava: WARN

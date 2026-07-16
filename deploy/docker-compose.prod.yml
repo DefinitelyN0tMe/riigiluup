@@ -35,9 +35,9 @@ services:
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       SERVER_PORT: "8080"
-      POLITICO_ADMIN_USERNAME: ${POLITICO_ADMIN_USERNAME}
-      POLITICO_ADMIN_PASSWORD: ${POLITICO_ADMIN_PASSWORD}
-      POLITICO_ADMIN_ALLOWED_EMAILS: ${POLITICO_ADMIN_ALLOWED_EMAILS}
+      RIIGILUUP_ADMIN_USERNAME: ${RIIGILUUP_ADMIN_USERNAME}
+      RIIGILUUP_ADMIN_PASSWORD: ${RIIGILUUP_ADMIN_PASSWORD}
+      RIIGILUUP_ADMIN_ALLOWED_EMAILS: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
@@ -70,7 +70,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/politico.conf:/etc/nginx/conf.d/politico.conf:ro
+      - ./nginx/riigiluup.conf:/etc/nginx/conf.d/riigiluup.conf:ro
       - letsencrypt:/etc/letsencrypt
       - certbot_webroot:/var/www/certbot
     depends_on:

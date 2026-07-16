@@ -8,7 +8,7 @@ cd "$(dirname "$0")/.."
 [ -f ./.env ] && { set -a; . ./.env; set +a; }
 
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
-OUT="./backups/politico-${STAMP}.dump"
+OUT="./backups/riigiluup-${STAMP}.dump"
 mkdir -p ./backups
 
 echo "Dumping to ${OUT}…"
@@ -17,7 +17,7 @@ docker compose -f docker-compose.prod.yml exec -T db \
 
 # Keep only the most recent 14 dumps. Consider copying ./backups off-box (rsync/object storage)
 # for real disaster recovery — retention here shares the DB's disk.
-ls -1t ./backups/politico-*.dump 2>/dev/null | tail -n +15 | xargs -r rm -f
+ls -1t ./backups/riigiluup-*.dump 2>/dev/null | tail -n +15 | xargs -r rm -f
 
 echo "OK. Retained:"
-ls -lh ./backups/politico-*.dump | head -n 14
+ls -lh ./backups/riigiluup-*.dump | head -n 14
