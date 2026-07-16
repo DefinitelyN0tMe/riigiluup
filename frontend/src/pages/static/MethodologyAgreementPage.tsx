@@ -9,9 +9,7 @@ export default function MethodologyAgreementPage() {
       <p>{t("methodology.agreement.intro")}</p>
 
       <h2>{t("methodology.agreement.formulaHeading")}</h2>
-      <p className="font-mono text-sm bg-slate-50 p-3 border border-slate-200 rounded">
-        {t("methodology.agreement.formula")}
-      </p>
+      <p>{t("methodology.agreement.formula")}</p>
 
       <h2>{t("methodology.agreement.sameDiffHeading")}</h2>
       <ul>

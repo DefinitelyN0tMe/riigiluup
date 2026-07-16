@@ -7,7 +7,7 @@ export default function MethodologyParticipationPage() {
       <h1 className="text-3xl font-semibold text-ink">{t("methodology.participation.title")}</h1>
 
       <h2>{t("methodology.participation.votingHeading")}</h2>
-      <p className="font-mono text-sm bg-slate-50 p-3 border border-slate-200 rounded">
+      <p>
         {t("methodology.participation.votingFormula")}
       </p>
       <p>{t("methodology.participation.participatedBody")}</p>
@@ -29,7 +29,7 @@ export default function MethodologyParticipationPage() {
       </p>
 
       <h2>{t("methodology.participation.sittingHeading")}</h2>
-      <p className="font-mono text-sm bg-slate-50 p-3 border border-slate-200 rounded">
+      <p>
         {t("methodology.participation.sittingFormula")}
       </p>
       <p>{t("methodology.participation.sittingBody")}</p>
@@ -39,7 +39,7 @@ export default function MethodologyParticipationPage() {
       </p>
 
       <h2>{t("methodology.participation.attendanceHeading")}</h2>
-      <p className="font-mono text-sm bg-slate-50 p-3 border border-slate-200 rounded">
+      <p>
         {t("methodology.participation.attendanceFormula")}
       </p>
       <p>

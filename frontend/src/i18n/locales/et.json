@@ -302,7 +302,7 @@
       "slowest": "Aeglaseim",
       "footer_one": "Põhineb {{count}} vastu võetud eelnõul.",
       "footer_other": "Põhineb {{count}} vastu võetud eelnõul.",
-      "formula": "Päevad = accepted_date − initiated_date.",
+      "formula": "Päevi eelnõu algatamisest vastuvõtmiseni.",
       "openBucket_one": "Ava {{count}} eelnõu vahemikust «{{label}}»",
       "openBucket_other": "Ava {{count}} eelnõu vahemikust «{{label}}»",
       "clickHint": "Kliki tulbal, et näha konkreetseid eelnõusid"
@@ -801,10 +801,10 @@
     "agreement": {
       "title": "Paariviisilise kokkulangevuse metoodika",
       "intro": "Paariviisiline kokkulangevus näitab, kui sageli teevad kaks saadikut sama võrreldava valiku hääletustel, kus mõlemad tegelikult hääletasid.",
-      "formulaHeading": "Valem",
-      "formula": "määr = sama / (sama + erinev)",
+      "formulaHeading": "Kuidas arvutatakse",
+      "formula": "Kokkulangevuse näitaja on nende võrreldavate hääletuste osakaal, kus mõlemad saadikud valisid sama variandi.",
       "sameDiffHeading": "Mis loeb \"samaks\" või \"erinevaks\"",
-      "same": "Sama: mõlemad saadikud tegid sama võrreldava valiku (mõlemad POOLT, mõlemad VASTU või mõlemad ERAPOOLETU).",
+      "same": "Sama: mõlemad saadikud hääletasid ühtemoodi — mõlemad poolt, mõlemad vastu või mõlemad erapooletu.",
       "different": "Erinev: mõlemad tegid võrreldavad valikud, kuid need erinevad.",
       "separateHeading": "Mis kajastatakse eraldi ja EI ole määras",
       "separate": "Vähemalt üks saadik ei osalenud (ei hääletanud, puudus, kohaloleku kontroll).",
@@ -814,10 +814,10 @@
     "alignment": {
       "title": "Rühmakuuluvuse metoodika",
       "intro": "Rühmakuuluvus näitab, kui sageli saadiku hääl langeb kokku tema parlamendirühma enamuse seisukohaga. See on faktiline võrdlus, mitte hinnang lojaalsusele või sõltumatusele.",
-      "formulaHeading": "Valem",
-      "formula": "määr = kokkulangevused / kvalifitseeruvad hääletused",
+      "formulaHeading": "Kuidas arvutatakse",
+      "formula": "Ühtelangevuse näitaja on nende arvestatud hääletuste osakaal, kus saadik hääletas samamoodi nagu tema rühma enamus.",
       "eligibleHeading": "Mis loeb \"kvalifitseeruvaks\"",
-      "eligible1": "Saadik tegi võrreldava valiku (POOLT, VASTU või ERAPOOLETU).",
+      "eligible1": "Saadik tegelikult hääletas — poolt, vastu või erapooletu.",
       "eligible2": "Saadiku rühm tegi vähemalt ühe võrreldava valiku.",
       "eligible3": "Rühmal oli selge enamus — üks valik ületas teisi rangelt. Viik EI ole selge enamus.",
       "matchHeading": "Mis loeb \"kokkulangevuseks\"",
@@ -832,8 +832,8 @@
     "participation": {
       "title": "Osaluse metoodika",
       "votingHeading": "Hääletustel osalemine",
-      "votingFormula": "määr = (POOLT + VASTU + ERAPOOLETU) / kõik nimelised hääletused, kus saadikul oli mandaat",
-      "participatedBody": "Osales loeb iga nimelist hääletust, kus saadik andis hääle POOLT, VASTU või ERAPOOLETU.",
+      "votingFormula": "Nende nimeliste hääletuste osakaal, milles saadik oleks saanud osaleda ja tegelikult hääletas — poolt, vastu või erapooletu.",
+      "participatedBody": "Osales loeb iga nimelist hääletust, kus saadik hääletas poolt, vastu või erapooletu.",
       "excludedNumerator": "Lugejast välja jäetud:",
       "excludedN1": "Ei hääletanud (oli kohal, kuid ei vajutanud nuppu).",
       "excludedN2": "Puudus istungilt.",
@@ -844,11 +844,11 @@
       "excludedB3": "Hääletused, kus saadikul polnud aktiivset mandaati.",
       "votingSourceLine": "Arvutatakse Riigikogust laaditud nimelistest hääletustest — samad, mis on loetletud jaotises Hääletused. Iga hääle esmane allikas on otspunkt ",
       "sittingHeading": "Kohalolek istungitel (Riigikogu ametlik statistika)",
-      "sittingFormula": "määr = osaletud istungid / istungid kokku perioodil",
+      "sittingFormula": "Perioodi istungite osakaal, millel saadik osales.",
       "sittingBody": "See on ametlik osalusnäitaja, mille Riigikogu avaldab oma andmete põhjal (väli \"sittings\"). Näitame seda muutmata kujul, ilma ümberarvutamata. See kajastab, kas saadiku kohalolek istungil registreeriti, ega ole täistööaja näitaja.",
       "sittingSourceLine": "Allikas: Riigikogu API otspunkt ",
       "attendanceHeading": "Kohaloleku kontroll",
-      "attendanceFormula": "määr = KOHAL / (KOHAL + PUUDUB)",
+      "attendanceFormula": "Nende kohaloleku kontrollide osakaal, kus saadik on märgitud kohal või puudu, mille juures ta oli kohal.",
       "attendanceBody1a": "Kohaloleku kontroll on Riigikogus konkreetne protseduur, kus liikmed registreerivad end istungil kohalolijaks. ",
       "attendanceBody1b": "See EI ole töötundide arv ega täispäeva kohaloleku näitaja.",
       "attendanceBody2": "Kõrge kohaloleku määr ei tähenda, et saadik viibib kogu istungil või igas komisjonis. Madal määr ei tähenda, et saadik puudus kogu tööst — ta võis olla komisjonide koosolekutel, ametireisidel või puhkusel.",
@@ -859,80 +859,80 @@
     },
     "analytics": {
       "title": "Analüütika metoodika",
-      "intro": "Iga graafik lehel /analytics on üks SQL-agregaat imporditud Riigikogu andmete peal — mingit imputeerimist, interpoleerimist ega masinõpet. See leht loetleb iga arvutuse täpse valemi, filtrikomplekti ja selle, mida ta EI ütle. Iga päringu lähtekood:",
+      "intro": "Iga graafik lehel /analytics on lihtne loendus või keskmine ametlike Riigikogu andmete põhjal — midagi ei arvata, ei hinnata pealtnäha ega genereeri tehisintellekt. Allpool on iga graafik selgitatud igapäevases keeles: mida see näitab, mis jääb välja ja mida see EI ütle.",
       "noteLabel": "Märkus.",
       "velocity": {
-        "heading": "Eelnõude kiiruse histogramm",
-        "body": "Arvestatakse ainult eelnõusid, mille phase = ADOPTED ning mõlemad kuupäevad on olemas. Vahemikud: ≤ 1 nädal, ≤ 1 kuu, ≤ 3 kuud, ≤ 6 kuud, ≤ 1 aasta, > 1 aasta.",
-        "note": "EI mõõda, kui kiiresti üks konkreetne lugemine läks — ainult algatusest vastuvõtmiseni. Tagasi võetud, tagasi lükatud ja pooleliolevad eelnõud on välja jäetud."
+        "heading": "Kui kaua eelnõud võtavad",
+        "body": "Iga seaduseks saanud eelnõu puhul loeme päevade arvu algatamise päevast vastuvõtmise päevani ja jaotame need vahemikesse — alla nädala, alla kuu ja nii edasi. \"Tüüpiline\" aeg on keskmine väärtus: pooled eelnõud olid kiiremad, pooled aeglasemad. \"9 kümnest\" näitaja on aeg, mille jooksul võeti vastu üheksa eelnõu kümnest.",
+        "note": "See ei mõõda, kui kiiresti üksik samm läks — ainult kogu teekonda algatamisest lõpliku vastuvõtmiseni. Tagasi võetud, tagasi lükatud ja veel pooleliolevad eelnõud jäävad välja."
       },
       "flow": {
-        "heading": "Eelnõude voog (Sankey)",
-        "body": "Faaside vahelised lülid on lihtsad loendused: algatatud → {komisjon | I lugemine | esitatud | muu}, I → II → III lugemine, III lugemine → vastu võetud, I lugemine → {tagasi lükatud | tagasi võetud}, komisjon → lugemistel. Lugemiste loendus on eelnõu kohta (kui eelnõul oli neli eraldi I-lugemise sündmust, loeb see ikkagi ühena).",
-        "note": "See on faaside hetkeseis, mitte pikilõikeline voog. Osa lülisid on ligikaudsed, sest Riigikogu API ei märgi iga \"lõpptulemust\" konkreetse lugemise külge."
+        "heading": "Eelnõu teekond",
+        "body": "Loeme, kui palju eelnõusid jõudis igasse etappi — algatatud, komisjoni saadetud, esimene, teine ja kolmas lugemine ning lõpuks vastu võetud, tagasi lükatud või tagasi võetud — ja kui palju liikus ühest etapist järgmisse. Iga eelnõu loetakse etapi kohta üks kord, isegi kui samm juhtus mitu korda.",
+        "note": "See on hetkeseis sellest, kui palju eelnõusid on igas etapis, mitte üksikute eelnõude samm-sammuline jälg. Osa lülisid on ligikaudsed, sest parlamendi andmed ei seo alati tulemust konkreetse lugemisega."
       },
       "factionAgreement": {
-        "heading": "Fraktsioonide kokkulangevuse maatriks",
-        "body": "\"Selge enamus\" tähendab, et fraktsiooni sees oli ühe võrreldava valiku (FOR, AGAINST või ABSTAINED) range enamus antud hääletusel. Viigid enamuseks ei loe; kohaloleku kontrollid on välja jäetud.",
-        "note": "Kõrge paariviisiline määr ütleb, et kahe fraktsiooni enamused langesid kokku nendel hääletustel, kus mõlemal oli enamus. See EI tähenda ideoloogilist ühtelangevust — paljud kokkulangevused on protseduurilistel või vastuvaidlemata hääletustel."
+        "heading": "Kui sageli fraktsioonid hääletavad ühtemoodi",
+        "body": "Iga hääletuse puhul, kus mõlemad fraktsioonid võtsid selge seisukoha, kontrollime, kas nad jäid samale poolele. Kokkulangevuse näitaja on nende hääletuste osakaal, kus nad hääletasid ühtemoodi. Fraktsioonil on \"selge seisukoht\", kui enamik selle liikmeid valis sama variandi — poolt, vastu või erapooletu; võrdselt jagunenud hääletused ja kohaloleku kontrollid jäävad välja.",
+        "note": "Kõrge näitaja tähendab, et kahe fraktsiooni enamused sattusid kokku, mitte et nad on ideoloogiliselt ühel meelel — paljud kokkulangevused on protseduurilistel või vaidlusteta hääletustel."
       },
       "cohesion": {
-        "heading": "Fraktsiooni ühtsus (nädala erakonna esiletõst)",
-        "body": "Piiratud viimase 30 päeva hääletustega, kus fraktsioonil oli selge enamus ja saadik andis võrreldava hääle. Fraktsioonid, kus aknas oli vähem kui 30 sellist häält, jäetakse edetabelist välja stabiilsuse säilitamiseks."
+        "heading": "Kui ühtselt fraktsioon hääletab",
+        "body": "Ühe fraktsiooni sees viimase 30 päeva jooksul vaatame, kui sageli selle liikmed hääletasid koos fraktsiooni enda enamusega. Mida suurem osakaal, seda ühtsemalt fraktsioon hääletas. Fraktsioonid, kus aknas oli väga vähe selliseid hääletusi, jäetakse välja, et edetabel oleks stabiilne."
       },
       "discipline": {
-        "heading": "Distsipliini rikkujad (kõrvalekaldumise määr)",
-        "body": "\"Kõlblik\" = saadik andis võrreldava hääle JA tema fraktsioonil oli selle hääletuse osas selge enamus. Saadikud, kellel on vähem kui minEligible kõlblikku häält (vaikimisi 20), jäetakse välja, et pingerida ei tekiks 1–2 valimi põhjal."
+        "heading": "Saadikud, kes lähevad fraktsioonist lahku",
+        "body": "Iga saadiku puhul loeme, kui sageli ta hääletas oma fraktsiooni enamuse vastu — kõigist hääletustest, kus tema fraktsioonil oli selge seisukoht. Mida suurem osakaal, seda sagedamini ta läks omadele vastu. Saadikud, kellel on väga vähe selliseid hääletusi, jäetakse välja, et edetabel ei põhineks ühel-kahel juhtumil."
       },
       "attendance": {
-        "heading": "Kohaloleku maatriks",
-        "body1": "present_count = kohaloleku kontrollid, kus saadiku individual_vote valik oli PRESENT, FOR, AGAINST või ABSTAINED. recorded_count = kohaloleku kontrollid, kus saadikul oli ÜLDSE mingi rida — reata lahtreid näidatakse kui \"—\" ja neid ei arvestata ei lugejasse ega nimetajasse.",
-        "body2": "Saadikud, kelle recorded_count < ⌈N/5⌉ (ehk kes olid mandaatis alla 20 % aknast), filtreeritakse välja, et osalise mandaadiga saadikud (asendajad, vanemapuhkusel, ministrid) ei ilmuks eksitava 20–40 %-määraga."
+        "heading": "Kohalolek kontrollidel",
+        "body1": "Iga saadiku puhul vaatame parlamendi kohaloleku kontrolle: kui mitmel ta oli märgitud kohalolijaks — kõigist kontrollidest, kus tal üldse kirje oli. Kontrollid, kus sellel saadikul kirjet pole, näidatakse kui \"—\" ja neid ei arvestata kummalegi poole.",
+        "body2": "Saadikud, kes olid kohal alla viiendiku perioodist — asendajad, ministrid või puhkusel olijad — jäetakse välja, et lühike periood ei näiks eksitavalt madala kohalolekuna."
       },
       "timing": {
-        "heading": "Hääletuste ajastuse soojuskaart",
-        "body": "Vahemikud: 7 rida esmaspäev..pühapäev × 24 veergu 0..23. Ajatemplid teisendatakse enne ekstraheerimist Europe/Tallinn ajavööndisse, seega suveaja üleminekud käsitleb Postgres."
+        "heading": "Millal parlament hääletab",
+        "body": "Iga hääletus paigutatakse ruudustikku nädalapäeva ja kellaaja järgi (Tallinna aeg) ning loeme, kui palju langeb igasse ruutu — see näitab, millal parlament kipub hääletama."
       },
       "night": {
-        "heading": "Öised hääletused",
-        "body": "Aken on iga päringu jaoks konfigureeritav (vaikimisi 08:00–20:00 Europe/Tallinn). Loetakse ainult type = OPEN sündmusi; kohaloleku kontrollid on välja jäetud."
+        "heading": "Hääletused väljaspool tööaega",
+        "body": "Nende arvestatud hääletuste osakaal, mis toimusid väljaspool tavalist tööaega — enne kella 8:00 hommikul või pärast 20:00 õhtul (Tallinna aeg). Kohaloleku kontrolle ei loeta, ainult tegelikke hääletusi."
       },
       "topics": {
-        "heading": "Teemade puukaart",
-        "body": "Teemad on Eurovoc-i deskriptorid, mida Riigikogu väljastab eelnõu detailide otspunktil. Üks eelnõu võib kuuluda mitmesse teemasse — see loeb igas. Top-N eelnõude arvu järgi tagastatakse; ülejäänud ei koondu \"Muu\" alla."
+        "heading": "Millest eelnõud räägivad",
+        "body": "Iga teemavaldkonna puhul loeme, kui mitu eraldi eelnõu seda puudutas — eelnõu võib kuuluda mitmesse valdkonda ja loeb igas. \"Vastuvõtmise määr\" on nende eelnõude osakaal, mis said seaduseks. Teemade nimetused pärinevad standardsest Euroopa teemade loetelust, mille parlament igale eelnõule lisab."
       },
       "scatter": {
-        "heading": "Saadikute sarnasuse hajuvusdiagramm",
-        "body1": "Mõlemad teljed on normaliseeritud vahemikku [-1, +1]. x → +1 tähendab, et saadik nõustub pigem koalitsiooni enamusega kui opositsiooni enamusega; x → −1 vastupidi. y → +1 tähendab, et saadik hääletab peaaegu alati oma fraktsiooni enamusega; y → −1 tähendab, et ta peaaegu alati läheb sellest lahku.",
-        "body2": "Väike deterministlik nihe (~4 %, seemitud saadiku slug'ist) lisatakse, et identsed skoorid visuaalselt üksteise peale ei kuhjuks. Mujal saidil kasutatav aluse arv on nihketa.",
-        "note": "See on kahemõõtmeline projektsioon, mitte ideoloogiline paigutus. Kaks saadikut samas koordinaadis hääletasid koondi peal sarnaselt — nad võivad ikkagi ühes konkreetses küsimuses eri arvamust olla."
+        "heading": "Kus iga saadik asub",
+        "body1": "Iga saadik saab kaks skoori, kumbki skaalal −1 kuni +1. Vasakult paremale näitab, kas ta pooldab pigem koalitsiooni (+1) või opositsiooni (−1). Alt üles näitab, kui tihedalt ta hoiab oma fraktsiooni: ülal hääletab ta peaaegu alati oma rühmaga, all läheb peaaegu alati oma teed.",
+        "body2": "Punkte nihutatakse pisikese fikseeritud summa võrra, et identsete skooridega saadikud ei istuks täpselt üksteise peal ja jääksid klõpsatavaks. Mujal saidil kasutatavad tegelikud arvud on nihketa.",
+        "note": "See on lihtne kahemõõtmeline pilt, mitte ideoloogiline paigutus. Kaks saadikut samas kohas hääletasid üldiselt sarnaselt — nad võivad ikkagi ühes konkreetses küsimuses eri arvamust olla."
       },
       "cosponsorship": {
-        "heading": "Koossponsorluse graaf",
-        "body": "Sõlmed: saadikud vähemalt ühe sponsoriga. Servad on filtreeritud minWeight (vaikimisi 2 jagatud eelnõu) järgi, et graaf oleks loetav. Arvestatakse ainult sponsor_kind = PLENARY_MEMBER — komisjoni-, valitsuse- ja fraktsioonisponsorlus jäetakse välja."
+        "heading": "Kes esitavad eelnõusid koos",
+        "body": "Kaht saadikut seob sama eelnõude ühine esitamine; mida rohkem eelnõusid nad koos esitasid, seda tugevam on side. Loevad ainult saadikute endi esitatud eelnõud — komisjonide, valitsuse või fraktsioonide ettepanekud jäävad välja. Ainult ühe ühise eelnõuga sidemed on peidetud, et pilt jääks loetavaks."
       },
       "streaks": {
-        "heading": "Kohaloleku seeriad",
-        "body": "Kasutab sama \"kohal\" definitsiooni, mis kohaloleku maatriks. Saadikud, kellel on vähem kui N kirjet (ehk kes ei viibinud kogu aknas), jäetakse seeriate loetelust välja, mitte ei loeta katkenuks."
+        "heading": "Täiusliku kohaloleku seeriad",
+        "body": "Saadikul on \"täiuslik seeria\", kui ta oli märgitud kohalolijaks igal viimasel mõnel kohaloleku kontrollil. Saadikud, kes ei viibinud kohal kogu perioodi, jäetakse välja, mitte ei näidata katkenud seeriaga."
       },
       "tight": {
-        "heading": "Tihedad hääletused (väikseim vahe)",
-        "body": "Järjestatud kasvavalt type = OPEN sündmuste hulgas, kus mõlemad loendused on > 0. Kohaloleku kontrollid ja üksmeelsed hääletused on välja jäetud (need annavad alati vahe 0 või triviaalse)."
+        "heading": "Kõige tihedamad hääletused",
+        "body": "Kui tihe hääletus oli — vahe poolt ja vastu häälte arvu vahel. Mida väiksem vahe, seda tihedam hääletus. Üksmeelsed hääletused ja kohaloleku kontrollid jäävad välja, sest nende vahe on alati null või tühine."
       },
       "exclusions": {
-        "heading": "Kõikidele analüüsidele ühised väljajätmised",
-        "item1": "Kohaloleku kontrollid on välja jäetud kõigist analüüsidest, mis nimetatud \"hääletuseks\", sest need on protseduurilised kohaloleku-kirjed ja ei otsusta seadusandluse üle.",
-        "item2": "Salajased hääletused ei avalda saadiku-põhiseid kirjeid, seega ei anna nad saadiku-põhistesse määradesse midagi.",
-        "item3": "Viigid fraktsiooni enamuse arvutustes loetakse \"selge enamuse puudumiseks\" — need hääletused kaovad ühtelangevuse/kokkulangevuse määradest välja.",
-        "item4": "Osalise mandaadiga saadikud (asendajad, ministrid, puhkusel olijad) on filtreeritud paneelidelt, kus saadiku-põhine nimetaja oleks muidu eksitav (kohaloleku maatriks, distsipliini rikkujad)."
+        "heading": "Mida me kõikjal välja jätame",
+        "item1": "Kohaloleku kontrollid on välja jäetud kõigest, mida nimetatakse \"hääletuseks\" — need vaid registreerivad, kes oli saalis, ega otsusta seaduste üle.",
+        "item2": "Salajased hääletused ei avalda saadiku-põhiseid kirjeid, seega ei lisa nad ühelegi isiklikule näitajale midagi.",
+        "item3": "Kui fraktsioon on võrdselt jagunenud ja selget enamust pole, jäetakse see hääletus kokkulangevuse ja ühtelangevuse näitajatest välja.",
+        "item4": "Osalise mandaadiga saadikud — asendajad, ministrid, puhkusel olijad — jäetakse välja paneelidelt, kus nende arvestamine oleks eksitav (kohalolek, fraktsioonist lahkuminek)."
       },
       "period": {
         "heading": "Ajavahemik",
-        "body": "Kõik /analytics analüüsid on vaikimisi kogu imporditud andmete akna kohta, kui paneel ei paku eraldi ajavahemiku valijat. Kohaloleku maatriks kasutab viimast N kohaloleku kontrolli (vaikimisi 40), sõltumata kalendri kuupäevast."
+        "body": "Kui paneelil pole oma kuupäevavalijat, kasutab iga graafik kogu andmete hulka, mis meil on. Kohaloleku ruudustik kasutab viimaseid kohaloleku kontrolle (vaikimisi 40), sõltumata kalendri kuupäevast."
       },
       "repro": {
         "heading": "Reprodutseeritavus",
-        "body": "Iga arv lehel /analytics on ühe deterministliku SQL-päringu väljund. Päringud asuvad failis backend/src/main/java/com/politico/analytics/AnalyticsService.java (avalik repositoorium) ja neid saab kohaliku dumbi peal reprodutseerida. Kui sama paneeli kaks käivitust muutumata andmetel annavad erinevad arvud, on see viga — palun teata sellest kaudu"
+        "body": "Iga arv lehel /analytics on ühe deterministliku päringu väljund: samad sisendandmed annavad alati sama tulemuse. Kui sama paneeli kaks käivitust muutumata andmetel annavad erinevad arvud, on see viga — palun teata sellest kaudu"
       }
     }
   },

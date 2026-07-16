@@ -302,7 +302,7 @@
       "slowest": "Slowest",
       "footer_one": "Based on {{count}} adopted bill.",
       "footer_other": "Based on {{count}} adopted bills.",
-      "formula": "Days = accepted_date − initiated_date.",
+      "formula": "Days from a bill's introduction to its adoption.",
       "openBucket_one": "Open {{count}} bill in range «{{label}}»",
       "openBucket_other": "Open {{count}} bills in range «{{label}}»",
       "clickHint": "Click a bar to see the specific bills"
@@ -801,10 +801,10 @@
     "agreement": {
       "title": "Pairwise agreement methodology",
       "intro": "Pairwise agreement measures how often two MPs cast the same comparable choice on votes where both actually voted.",
-      "formulaHeading": "Formula",
-      "formula": "rate = same / (same + different)",
+      "formulaHeading": "How it's counted",
+      "formula": "The agreement figure is the share of comparable votes where both MPs chose the same option.",
       "sameDiffHeading": "What counts as \"same\" or \"different\"",
-      "same": "Same: both MPs cast the same comparable choice (both FOR, both AGAINST, or both ABSTAINED).",
+      "same": "Same: both MPs voted the same way — both for, both against, or both abstained.",
       "different": "Different: both cast comparable choices but they differ.",
       "separateHeading": "What is reported separately, NOT in the rate",
       "separate": "At least one MP did not participate (did-not-vote, absent, attendance-check presence).",
@@ -814,10 +814,10 @@
     "alignment": {
       "title": "Group alignment methodology",
       "intro": "Group alignment measures how often an MP's vote matches their parliamentary group's majority position. It is a factual comparison, not a judgment about loyalty or independence.",
-      "formulaHeading": "Formula",
-      "formula": "rate = matches / eligible votes",
+      "formulaHeading": "How it's counted",
+      "formula": "The alignment figure is the share of eligible votes where the MP voted the same way as their group's majority.",
       "eligibleHeading": "What counts as \"eligible\"",
-      "eligible1": "The MP cast a comparable choice (FOR, AGAINST, or ABSTAINED).",
+      "eligible1": "The MP actually voted — for, against, or abstained.",
       "eligible2": "The MP's group cast at least one comparable choice.",
       "eligible3": "The group had a clear majority — a single choice strictly outnumbered the others. A tie is NOT a clear majority.",
       "matchHeading": "What counts as a \"match\"",
@@ -832,8 +832,8 @@
     "participation": {
       "title": "Participation methodology",
       "votingHeading": "Voting participation",
-      "votingFormula": "rate = (FOR + AGAINST + ABSTAINED) / every roll-call vote in which the MP held a mandate",
-      "participatedBody": "Participated counts every roll-call vote where the MP cast FOR, AGAINST, or ABSTAINED.",
+      "votingFormula": "The share of the roll-call votes the MP could have taken part in where they actually voted — for, against, or abstained.",
+      "participatedBody": "Participated counts every roll-call vote where the MP voted for, against, or abstained.",
       "excludedNumerator": "Excluded from the numerator:",
       "excludedN1": "Did-not-vote (present but did not press a button).",
       "excludedN2": "Absent from the sitting.",
@@ -844,11 +844,11 @@
       "excludedB3": "Votes where the MP did not have an active mandate.",
       "votingSourceLine": "Computed from the roll-call votes ingested from Riigikogu — the same ones listed under Votes. The primary source of each vote is the endpoint ",
       "sittingHeading": "Sitting attendance (Riigikogu official statistic)",
-      "sittingFormula": "rate = sittings attended / total sittings in the period",
+      "sittingFormula": "The share of the period's sittings that the MP attended.",
       "sittingBody": "This is the official participation figure Riigikogu publishes from its own data (the \"sittings\" field). We mirror it as reported, without recomputing. It reflects whether the MP was registered as attending the sitting, and is not a full-time presence measure.",
       "sittingSourceLine": "Source: Riigikogu API endpoint ",
       "attendanceHeading": "Quorum-check presence",
-      "attendanceFormula": "rate = KOHAL / (KOHAL + PUUDUB)",
+      "attendanceFormula": "The share of quorum checks — where an MP is marked either present or absent — at which this MP was present.",
       "attendanceBody1a": "Attendance checks are a specific procedure in the Riigikogu where members register presence at a sitting. ",
       "attendanceBody1b": "This is NOT total working hours or a full-day attendance measure.",
       "attendanceBody2": "A high attendance-check rate does not mean an MP is present for the entire sitting or every committee. A low rate does not mean the MP was absent from all work — they may have been in committee meetings, official trips, or on leave.",
@@ -859,80 +859,80 @@
     },
     "analytics": {
       "title": "Analytics methodology",
-      "intro": "Every chart on /analytics is a single SQL aggregate over the ingested Riigikogu data — no imputation, no interpolation, no ML. This page lists each computation's exact formula, its filter set, and what it does NOT tell you. Source of each query:",
+      "intro": "Every chart on /analytics is a plain count or average over the official Riigikogu data — nothing is guessed, estimated, or generated by AI. Below, each chart is explained in everyday language: what it measures, what is left out, and what it does NOT tell you.",
       "noteLabel": "Note.",
       "velocity": {
-        "heading": "Bill velocity histogram",
-        "body": "Only bills with phase = ADOPTED and both dates non-null are counted. Buckets: ≤ 1 week, ≤ 1 month, ≤ 3 months, ≤ 6 months, ≤ 1 year, > 1 year.",
-        "note": "Does NOT measure \"how fast\" any single reading was — only end-to-end initiation to adoption. Bills withdrawn, rejected, or still pending are excluded."
+        "heading": "How long bills take",
+        "body": "For every bill that became law, we count the days from the day it was introduced to the day it was passed, and sort them into ranges — under a week, under a month, and so on. The \"typical\" time is the middle value: half the bills were faster, half slower. The \"9-in-10\" figure is the time within which nine out of ten bills were passed.",
+        "note": "This does not measure how fast any single step was — only the whole journey from introduction to final passage. Bills that were withdrawn, rejected, or are still in progress are not counted."
       },
       "flow": {
-        "heading": "Bill flow (Sankey)",
-        "body": "Links between phases are simple counts: initiated → {committee | first-reading | submitted | other}, first→second→third-reading, third-reading → adopted, first-reading → {rejected | withdrawn}, committee → in-readings. Reading counts are per-item (a bill that had four separate first-reading events is still 1).",
-        "note": "This is a snapshot of phase counts, NOT a longitudinal flow. Some links are approximations because Riigikogu does not tag every \"outcome\" directly to a reading in the API."
+        "heading": "The path of a bill",
+        "body": "We count how many bills reached each stage — introduced, sent to committee, first, second and third reading, and finally passed, rejected or withdrawn — and how many moved from one stage to the next. Each bill is counted once per stage, even if a step happened several times.",
+        "note": "This is a snapshot of how many bills sit at each stage, not a step-by-step trace of individual bills. Some links are approximate, because parliament's data does not always tie an outcome to a specific reading."
       },
       "factionAgreement": {
-        "heading": "Faction agreement matrix",
-        "body": "A \"clear majority\" means a strict plurality of one comparable choice (FOR, AGAINST, or ABSTAINED) inside the faction on that vote. Ties do not count as a majority; attendance-checks are excluded.",
-        "note": "A high pairwise rate says the two factions' majorities coincided on the votes where both had one. It does NOT mean they agree ideologically — many coincidences are on procedural or unopposed motions."
+        "heading": "How often factions vote alike",
+        "body": "For every vote where two factions each took a clear side, we check whether they landed on the same side. The agreement figure is the share of those votes where they voted the same way. A faction has a \"clear side\" when most of its members chose the same option — for, against, or abstain; evenly split votes and presence checks are left out.",
+        "note": "A high figure means the two factions' majorities happened to coincide, not that they agree ideologically — many overlaps are on procedural or uncontested motions."
       },
       "cohesion": {
-        "heading": "Faction cohesion (party-of-week highlight)",
-        "body": "Restricted to votes from the last 30 days where the faction had a clear majority and the individual MP cast a comparable choice. Factions with fewer than 30 such votes in the window are excluded to keep the ranking stable."
+        "heading": "How united a faction votes",
+        "body": "Within a single faction over the last 30 days, we look at how often its members voted together with the faction's own majority. The higher the share, the more united the faction voted. Factions with very few such votes in the window are left out so the ranking stays stable."
       },
       "discipline": {
-        "heading": "Discipline breakers (defection rate)",
-        "body": "\"Eligible\" = the MP cast a comparable choice AND their faction had a clear majority on that vote. MPs with fewer than minEligible eligible votes (default 20) are excluded to avoid ranking based on 1–2 samples."
+        "heading": "MPs who break ranks",
+        "body": "For each MP we count how often they voted against their own faction's majority, out of all the votes where their faction had a clear position. A higher share means they broke ranks more often. MPs with very few such votes are left out so the ranking isn't based on one or two cases."
       },
       "attendance": {
-        "heading": "Attendance matrix",
-        "body1": "present_count = attendance checks where the MP's individual_vote choice was PRESENT, FOR, AGAINST, or ABSTAINED. recorded_count = attendance checks where the MP had ANY row at all — cells with no row are shown as \"—\" and don't count in either the numerator or denominator.",
-        "body2": "MPs with recorded_count < ⌈N/5⌉ (i.e. seated for less than 20 % of the window) are filtered out so that partial-mandate MPs (substitutes, maternity/paternity leave, ministers) don't appear as false 20–40 %-tenders."
+        "heading": "Presence at checks",
+        "body1": "For each MP we look at parliament's presence checks: how many they were marked present for, out of all the checks where they had any record at all. Checks with no record for that MP are shown as \"—\" and don't count either way.",
+        "body2": "MPs who were seated for less than a fifth of the period — substitutes, ministers, or those on leave — are left out, so a short stint doesn't show up as a misleadingly low attendance."
       },
       "timing": {
-        "heading": "Vote timing heatmap",
-        "body": "Buckets: 7 rows Monday..Sunday × 24 columns 0..23. Timestamps are converted to Europe/Tallinn before extraction, so DST shifts are handled by Postgres."
+        "heading": "When parliament votes",
+        "body": "Every vote is placed on a grid by weekday and hour of the day (Tallinn time), and we count how many fall in each square — showing when parliament tends to vote."
       },
       "night": {
-        "heading": "Night votes",
-        "body": "Window is configurable per request (defaults 08:00–20:00 Europe/Tallinn). Only type = OPEN vote events are counted; attendance-checks are excluded."
+        "heading": "Votes outside working hours",
+        "body": "The share of recorded votes that happened outside normal working hours — before 8:00 in the morning or after 8:00 in the evening (Tallinn time). Presence checks are not counted, only actual votes."
       },
       "topics": {
-        "heading": "Topic treemap",
-        "body": "Topics are Eurovoc descriptors emitted by Riigikogu on the bill detail endpoint. A single bill may map to several topics — it counts in each. Top-N by bill count is returned; the tail is not merged into \"Other\"."
+        "heading": "What bills are about",
+        "body": "For each subject area, we count how many separate bills touched on it — a bill can belong to several areas, and counts in each. The \"adoption rate\" is the share of those bills that became law. Subject labels come from the standard European topic list that parliament attaches to each bill."
       },
       "scatter": {
-        "heading": "MP similarity scatter",
-        "body1": "Both axes are normalised to [-1, +1]. x → +1 means the MP tends to agree with the coalition majority over the opposition majority; x → −1 the opposite. y → +1 means the MP nearly always votes with their own faction's majority; y → −1 means they nearly always deviate.",
-        "body2": "A small deterministic jitter (~4 %, seeded from the MP's slug) is added so that identical scores don't stack on top of each other visually. The underlying number used elsewhere on the site is unjittered.",
-        "note": "This is a 2-D projection, not an ideological placement. Two MPs at the same coordinate voted similarly on the aggregate set — they may still disagree on any single issue."
+        "heading": "Where each MP stands",
+        "body1": "Each MP gets two scores, each on a scale from −1 to +1. Left-to-right shows whether they more often side with the coalition (+1) or the opposition (−1). Bottom-to-top shows how closely they stick to their own faction: near the top they almost always vote with their group, near the bottom they almost always go their own way.",
+        "body2": "Points are nudged by a tiny, fixed amount so that MPs with identical scores don't sit exactly on top of one another and stay clickable. The actual numbers used elsewhere on the site are not nudged.",
+        "note": "This is a simple two-way picture, not an ideological placement. Two MPs in the same spot voted similarly overall — they may still disagree on any single issue."
       },
       "cosponsorship": {
-        "heading": "Co-sponsorship graph",
-        "body": "Nodes: MPs with ≥ 1 sponsorship. Edges filtered by minWeight (default 2 shared bills) to keep the graph legible. Only sponsor_kind = PLENARY_MEMBER is considered — commission, government, and faction sponsorships are ignored for the graph."
+        "heading": "Who proposes bills together",
+        "body": "Two MPs are linked when they have jointly put forward the same bills; the more bills they co-sponsored, the stronger the link. Only bills sponsored by MPs themselves count — proposals from committees, the government or factions are left out. Links backed by just a single shared bill are hidden to keep the picture readable."
       },
       "streaks": {
-        "heading": "Attendance streaks",
-        "body": "Uses the same \"present\" definition as the attendance matrix. MPs with fewer than N records (i.e. not seated the whole window) are excluded from the streak list rather than counted as broken."
+        "heading": "Perfect attendance runs",
+        "body": "An MP has a \"perfect streak\" if they were marked present at every one of the last several presence checks. MPs who weren't seated for the whole period are left out rather than shown as having a broken streak."
       },
       "tight": {
-        "heading": "Tight votes (smallest margin)",
-        "body": "Ranked ascending among type = OPEN vote events where both counts are > 0. Attendance checks and unanimous votes are excluded (they always yield a margin of 0 or a trivial one)."
+        "heading": "The closest votes",
+        "body": "How close a vote was — the gap between the number voting for and against. The smaller the gap, the tighter the vote. Unanimous votes and presence checks are left out, since their gap is always zero or trivial."
       },
       "exclusions": {
-        "heading": "Common exclusions across all analytics",
-        "item1": "Attendance-check events are excluded from anything labelled \"vote\", because they are procedural presence-records and do not decide legislation.",
-        "item2": "Secret ballots publish no per-MP records, so they contribute nothing to per-MP rates.",
-        "item3": "Ties in faction-majority calculations are treated as \"no clear majority\" — those votes drop out of alignment/agreement rates.",
-        "item4": "MPs on partial mandates (substitutes, ministers, leave) are filtered from panels where a per-MP denominator would otherwise be misleading (attendance matrix, discipline breakers)."
+        "heading": "What we leave out everywhere",
+        "item1": "Presence checks are left out of anything called a \"vote\" — they only record who was in the room, they don't decide legislation.",
+        "item2": "Secret ballots publish no per-MP record, so they add nothing to any individual figure.",
+        "item3": "When a faction is evenly split with no clear majority, that vote is dropped from agreement and alignment figures.",
+        "item4": "MPs on partial mandates — substitutes, ministers, those on leave — are left out of panels where counting them would be misleading (attendance, breaking ranks)."
       },
       "period": {
         "heading": "Time period",
-        "body": "All analytics on /analytics default to the entire ingested data window unless the panel exposes an explicit range picker. Attendance matrix uses the last N attendance checks (default 40) regardless of calendar date."
+        "body": "Unless a panel has its own date picker, every chart uses the full range of data we hold. The attendance grid uses the most recent presence checks (40 by default), regardless of the calendar date."
       },
       "repro": {
         "heading": "Reproducibility",
-        "body": "Every number on /analytics is the output of a single deterministic SQL query. The queries are in backend/src/main/java/com/politico/analytics/AnalyticsService.java (public repository) and can be reproduced against a local dump. If two runs of the same panel return different numbers with unchanged data, that is a bug — please report it via"
+        "body": "Every number on /analytics is the output of a single deterministic query over the ingested data — identical inputs always yield identical results. If two runs of the same panel return different numbers with unchanged data, that is a bug — please report it via"
       }
     }
   },

@@ -9,9 +9,7 @@ export default function MethodologyAlignmentPage() {
       <p>{t("methodology.alignment.intro")}</p>
 
       <h2>{t("methodology.alignment.formulaHeading")}</h2>
-      <p className="font-mono text-sm bg-slate-50 p-3 border border-slate-200 rounded">
-        {t("methodology.alignment.formula")}
-      </p>
+      <p>{t("methodology.alignment.formula")}</p>
 
       <h2>{t("methodology.alignment.eligibleHeading")}</h2>
       <ul>
