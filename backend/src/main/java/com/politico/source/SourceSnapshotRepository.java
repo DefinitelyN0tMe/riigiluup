@@ -40,7 +40,7 @@ public interface SourceSnapshotRepository extends JpaRepository<SourceSnapshot, 
     @Transactional
     @Query("delete from SourceSnapshot s "
             + "where s.entityType in :entityTypes and s.fetchedAt < :cutoff")
-    long deleteByEntityTypeInAndFetchedAtBefore(
+    int deleteByEntityTypeInAndFetchedAtBefore(
             @org.springframework.data.repository.query.Param("entityTypes")
                     Collection<String> entityTypes,
             @org.springframework.data.repository.query.Param("cutoff") Instant cutoff

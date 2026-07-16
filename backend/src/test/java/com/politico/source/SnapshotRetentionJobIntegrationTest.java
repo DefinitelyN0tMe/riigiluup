@@ -65,10 +65,10 @@ class SnapshotRetentionJobIntegrationTest extends AbstractIntegrationTest {
         repo.save(snapshot("voting-detail", "old-2", longAgo));
         repo.saveAndFlush(snapshot("voting-detail", "fresh", Instant.now()));
 
-        long deleted = repo.deleteByEntityTypeInAndFetchedAtBefore(
+        int deleted = repo.deleteByEntityTypeInAndFetchedAtBefore(
                 SnapshotRetentionJob.DETAIL_ENTITY_TYPES, cutoff);
 
-        assertThat(deleted).isEqualTo(2L);
+        assertThat(deleted).isEqualTo(2);
     }
 
     private static SourceSnapshot snapshot(String entityType, String externalId,

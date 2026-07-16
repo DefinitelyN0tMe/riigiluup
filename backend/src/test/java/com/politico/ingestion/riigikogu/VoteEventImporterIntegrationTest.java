@@ -102,13 +102,16 @@ class VoteEventImporterIntegrationTest extends AbstractIntegrationTest {
         ImportRunLog run = importer.runWindow(
                 LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 16));
 
-        // vot-1000 committed with full detail + voters; vot-2000 gets a summary
-        // row without voters (importer swallows detail exception).
-        assertThat(run.getStatus()).isEqualTo("SUCCESS");
-        assertThat(voteEventRepo.count()).isEqualTo(2);
+        // vot-1000 commits with full detail + voters; vot-2000's detail fetch fails (500), so its
+        // whole per-record transaction rolls back — no misleading vote event without voters is
+        // left behind — while the run continues and finishes PARTIAL rather than failing outright.
+        assertThat(run.getStatus()).isEqualTo("PARTIAL");
+        assertThat(voteEventRepo.count()).isEqualTo(1);
         assertThat(individualVoteRepo.count()).isEqualTo(3);
         assertThat(voteEventRepo.findBySourceNameAndExternalId("riigikogu", "vot-1000"))
                 .isPresent();
+        assertThat(voteEventRepo.findBySourceNameAndExternalId("riigikogu", "vot-2000"))
+                .isEmpty();
     }
 
     private void seedMembers() {

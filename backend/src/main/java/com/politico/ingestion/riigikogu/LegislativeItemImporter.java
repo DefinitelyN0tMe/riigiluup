@@ -131,15 +131,12 @@ public class LegislativeItemImporter {
                 .startedAt(Instant.now()).status("RUNNING").build());
         int seen = 0, upserted = 0;
         try {
-            LocalDate cursor = from;
-            while (!cursor.isAfter(to)) {
-                LocalDate windowEnd = cursor.plusDays(6);
-                if (windowEnd.isAfter(to)) windowEnd = to;
-                int[] cnt = paginateAndUpsert(cursor, windowEnd);
-                seen += cnt[0];
-                upserted += cnt[1];
-                cursor = windowEnd.plusDays(1);
-            }
+            // /api/volumes/drafts ignores its date params (see runAllDrafts), so a single pass over
+            // the catalogue covers the whole range — sub-windowing would just re-scan the same
+            // drafts N times (and, with change-detection, most are skipped anyway).
+            int[] cnt = paginateAndUpsert(from, to);
+            seen = cnt[0];
+            upserted = cnt[1];
             run.setStatus("SUCCESS");
         } catch (Exception e) {
             log.error("legislation window import failed", e);
