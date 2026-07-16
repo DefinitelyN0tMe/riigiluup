@@ -5,12 +5,10 @@ import BrandLogo from "./BrandLogo";
 export default function ManifestoFooter() {
   const { t } = useTranslation();
   return (
-    <footer className="bg-ink text-white relative overflow-hidden px-5 sm:px-8 md:px-10 pt-16 sm:pt-24 md:pt-28 pb-10">
+    <footer className="bg-ink text-white relative overflow-hidden px-5 sm:px-8 md:px-10 pt-12 sm:pt-16 md:pt-20 pb-10">
       <div className="grain" />
-      <img src="/logo.png" alt="" aria-hidden
-           className="hidden md:block absolute right-[-60px] top-[-40px] w-[280px] h-[280px] opacity-[0.06] pointer-events-none select-none" />
       {/* Manifesto */}
-      <div className="relative font-display font-extrabold h-display-xl leading-[0.9]">
+      <div className="relative font-display font-extrabold h-display-xl leading-[0.95]">
         <span className="block">{t("chrome.manifesto.l1")}</span>
         <span className="block font-serif italic font-light text-stroke-white">{t("chrome.manifesto.l2")}</span>
         <span className="block">
@@ -20,7 +18,7 @@ export default function ManifestoFooter() {
       </div>
 
       {/* Foot columns */}
-      <div className="relative mt-14 sm:mt-20 pt-8 sm:pt-10 border-t border-white/[0.14] grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
+      <div className="relative mt-10 sm:mt-14 pt-8 sm:pt-10 border-t border-white/[0.14] grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10">
         <div className="col-span-2 md:col-span-1">
           <BrandLogo variant="light" />
           <p className="mt-4 text-sm opacity-60 leading-relaxed max-w-[34ch]">

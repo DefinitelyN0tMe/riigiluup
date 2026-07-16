@@ -43,9 +43,6 @@ function Hero({ syncedAt }: { syncedAt: string | null }) {
         <div className="absolute inset-[60px] border border-dashed border-white/12 rounded-full" />
       </div>
 
-      <img src="/logo.png" alt="" aria-hidden
-           className="hidden md:block absolute left-[-70px] bottom-[-90px] w-[340px] h-[340px] opacity-[0.07] pointer-events-none select-none z-0" />
-
       <div className="relative z-[3] pt-4 sm:pt-8 md:pt-10 grid grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-10 md:gap-16 items-end">
         <div>
           <div className="inline-flex items-center gap-3.5 font-mono text-[10px] xs:text-[11px] sm:text-[12px] tracking-[0.18em] uppercase mb-6 sm:mb-8">

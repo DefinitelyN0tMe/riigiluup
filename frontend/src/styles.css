@@ -97,6 +97,6 @@
 
 /* Fluid display type — used in hero + manifesto */
 .h-display-mega { font-size: clamp(2.5rem,  8vw, 7rem);    line-height: 0.9;  letter-spacing: -0.05em;  }
-.h-display-xl   { font-size: clamp(2.25rem, 7vw, 5.5rem);  line-height: 0.92; letter-spacing: -0.045em; }
+.h-display-xl   { font-size: clamp(1.9rem,  5.5vw, 4.5rem); line-height: 0.95; letter-spacing: -0.04em;  }
 .h-display-lg   { font-size: clamp(1.85rem, 5vw, 4rem);    line-height: 0.95; letter-spacing: -0.035em; }
 .h-display-md   { font-size: clamp(1.75rem, 4vw, 3.25rem); line-height: 0.95; letter-spacing: -0.025em; }
