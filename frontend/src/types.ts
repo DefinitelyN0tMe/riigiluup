@@ -97,6 +97,7 @@ export type PoliticianProfile = {
   sourceUrl: string;
   externalAffiliations: ExternalAffiliation[];
   election?: ElectionInfo | null;
+  activity?: ActivityInfo | null;
 };
 export type ElectionInfo = {
   electionCode: string;
@@ -105,6 +106,13 @@ export type ElectionInfo = {
   districtNumber: number | null;
   partyName: string | null;
   ballotNumber: number | null;
+  sourceUrl: string;
+};
+export type ActivityInfo = {
+  speeches: number;
+  questions: number;
+  interpellations: number;
+  writtenQuestions: number;
   sourceUrl: string;
 };
 export type FactionOption = { externalId: string; name: string; memberCount: number };

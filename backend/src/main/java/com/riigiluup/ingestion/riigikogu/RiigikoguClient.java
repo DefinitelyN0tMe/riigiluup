@@ -197,4 +197,56 @@ public class RiigikoguClient {
                 .retrieve()
                 .body(DraftDetailDto.class);
     }
+
+    // --- MP activity (speeches, interpellations, written questions) ---
+
+    /** Per-member plenary speech/question counts over a date range, in a single call (uuids CSV). */
+    public List<SpeechCountDto> fetchSpeechCounts(List<String> uuids, LocalDate from, LocalDate to) {
+        throttle();
+        String csv = String.join(",", uuids);
+        SpeechCountDto[] arr = rest.get()
+                .uri(b -> b.path("/api/steno/speeches")
+                        .queryParam("uuids", csv)
+                        .queryParam("startDate", from.toString())
+                        .queryParam("endDate", to.toString())
+                        .queryParam("type", "IS")
+                        .build())
+                .retrieve()
+                .body(SpeechCountDto[].class);
+        return arr == null ? List.of() : List.of(arr);
+    }
+
+    /** Number of interpellations submitted by the given MP (HAL page.totalElements). */
+    public int countInterpellations(String enquirerUuid) {
+        throttle();
+        JsonNode n = rest.get()
+                .uri(b -> b.path("/api/volumes/interpellations")
+                        .queryParam("enquirerUuid", enquirerUuid)
+                        .queryParam("size", 1)
+                        .queryParam("lang", "et")
+                        .build())
+                .retrieve()
+                .body(JsonNode.class);
+        return pageTotal(n);
+    }
+
+    /** Number of written questions submitted by the given MP (HAL page.totalElements). */
+    public int countWrittenQuestions(String enquirerUuid) {
+        throttle();
+        JsonNode n = rest.get()
+                .uri(b -> b.path("/api/volumes/written-questions")
+                        .queryParam("enquirerUuid", enquirerUuid)
+                        .queryParam("size", 1)
+                        .queryParam("lang", "et")
+                        .build())
+                .retrieve()
+                .body(JsonNode.class);
+        return pageTotal(n);
+    }
+
+    private static int pageTotal(JsonNode n) {
+        if (n == null) return 0;
+        JsonNode p = n.path("page").path("totalElements");
+        return p.isNumber() ? p.asInt() : n.path("totalElements").asInt(0);
+    }
 }

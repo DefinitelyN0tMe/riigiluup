@@ -617,6 +617,14 @@
         "COMPENSATION": "Kompensatsioonimandaat"
       }
     },
+    "activity": {
+      "title": "Aktiivsus parlamendis",
+      "speeches": "Sõnavõtud",
+      "questions": "Esitatud küsimused",
+      "interpellations": "Arupärimised",
+      "writtenQuestions": "Kirjalikud küsimused",
+      "source": "Riigikogu lehel"
+    },
     "groupAlignmentDetail": "{{matches}} / {{eligible}} kvalifitseeruvat hääletust vastasid fraktsiooni enamuse valikule.",
     "recentDeviations": "Hiljutised kõrvalekalded",
     "mpChoice": "Saadik",

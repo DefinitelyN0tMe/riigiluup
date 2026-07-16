@@ -3,6 +3,7 @@ package com.riigiluup.api;
 import com.riigiluup.alignment.GroupAlignmentService;
 import com.riigiluup.alignment.VoteFactionAlignment;
 import com.riigiluup.alignment.VoteFactionAlignmentRepository;
+import com.riigiluup.activity.MemberActivityRepository;
 import com.riigiluup.common.PhotoUrlRewriter;
 import com.riigiluup.election.ElectionResultRepository;
 import com.riigiluup.group.GroupMembership;
@@ -35,6 +36,7 @@ public class PoliticianProfileMapper {
     private final ExternalAffiliationRepository externalAffiliations;
     private final IndividualVoteRepository individualVoteRepo;
     private final ElectionResultRepository electionResults;
+    private final MemberActivityRepository memberActivity;
 
     public PoliticianProfileDto toDto(PlenaryMember m, List<GroupMembership> memberships) {
         PoliticianProfileDto.Party party = factionLinks
@@ -118,6 +120,13 @@ public class PoliticianProfileMapper {
                         "https://rk2023.valimised.ee/et/election-result"))
                 .orElse(null);
 
+        PoliticianProfileDto.ActivityInfo activity = memberActivity
+                .findById(m.getExternalId())
+                .map(a -> new PoliticianProfileDto.ActivityInfo(
+                        a.getSpeeches(), a.getQuestions(), a.getInterpellations(), a.getWrittenQuestions(),
+                        m.getOfficialProfileUrl()))
+                .orElse(null);
+
         return new PoliticianProfileDto(
                 m.getId(), m.getSlug(),
                 m.getFullName(), m.getFirstName(), m.getLastName(),
@@ -140,7 +149,8 @@ public class PoliticianProfileMapper {
                 m.getBiographyHtml(),
                 "https://api.riigikogu.ee/api/plenary-members/" + m.getExternalId(),
                 external,
-                election
+                election,
+                activity
         );
     }
 

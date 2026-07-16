@@ -1,5 +1,6 @@
 package com.riigiluup.api;
 
+import com.riigiluup.activity.MemberActivityImporter;
 import com.riigiluup.alignment.FactionAlignmentBackfillService;
 import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.ingestion.riigikogu.ImportRunLog;
@@ -35,6 +36,7 @@ public class AdminIngestionController {
     private final WikidataImporter wikidataImporter;
     private final SponsorRelinker sponsorRelinker;
     private final ElectionResultsImporter electionResultsImporter;
+    private final MemberActivityImporter memberActivityImporter;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -110,5 +112,14 @@ public class AdminIngestionController {
     @PostMapping("/elections")
     public Map<String, Object> runElectionResultsImport() {
         return Map.of("matched", electionResultsImporter.importRk2023());
+    }
+
+    /**
+     * Recompute per-MP activity (speeches, questions, interpellations, written questions)
+     * from the Riigikogu API into member_activity. A few hundred throttled calls (~minutes).
+     */
+    @PostMapping("/activity")
+    public Map<String, Object> runActivityCompute() {
+        return Map.of("computed", memberActivityImporter.computeAll());
     }
 }

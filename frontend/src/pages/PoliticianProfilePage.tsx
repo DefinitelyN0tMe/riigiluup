@@ -20,6 +20,17 @@ function pct(v: number | null): string {
   return `${(v * 100).toFixed(1)}%`;
 }
 
+function ActivityStat({ value, label }: { value: number; label: string }) {
+  return (
+    <div>
+      <div className="font-display font-bold text-[28px] leading-none tracking-[-0.03em] text-ink">
+        {value.toLocaleString()}
+      </div>
+      <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">{label}</div>
+    </div>
+  );
+}
+
 function LoadFailed() {
   const { t } = useTranslation();
   return <p className="text-sm text-hot" role="alert">{t("profile.loadFailed")}</p>;
@@ -269,6 +280,24 @@ export default function PoliticianProfilePage() {
           <a href={data.election.sourceUrl} target="_blank" rel="noreferrer noopener"
              className="inline-block mt-4 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
             {t("profile.election.source")} ↗
+          </a>
+        </section>
+      )}
+
+      {data.activity && (
+        <section aria-label={t("profile.activity.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-4">
+            {t("profile.activity.title")}
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <ActivityStat value={data.activity.speeches} label={t("profile.activity.speeches")} />
+            <ActivityStat value={data.activity.questions} label={t("profile.activity.questions")} />
+            <ActivityStat value={data.activity.interpellations} label={t("profile.activity.interpellations")} />
+            <ActivityStat value={data.activity.writtenQuestions} label={t("profile.activity.writtenQuestions")} />
+          </div>
+          <a href={data.activity.sourceUrl} target="_blank" rel="noreferrer noopener"
+             className="inline-block mt-4 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
+            {t("profile.activity.source")} ↗
           </a>
         </section>
       )}

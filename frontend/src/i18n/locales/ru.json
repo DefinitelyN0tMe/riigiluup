@@ -631,6 +631,14 @@
         "COMPENSATION": "Компенсационный мандат"
       }
     },
+    "activity": {
+      "title": "Активность в парламенте",
+      "speeches": "Выступления",
+      "questions": "Заданные вопросы",
+      "interpellations": "Интерпелляции",
+      "writtenQuestions": "Письменные вопросы",
+      "source": "На сайте Рийгикогу"
+    },
     "groupAlignmentDetail": "{{matches}} из {{eligible}} учитываемых голосований совпали с большинством фракции.",
     "recentDeviations": "Недавние отклонения",
     "mpChoice": "Депутат",

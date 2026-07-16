@@ -35,7 +35,8 @@ public record PoliticianProfileDto(
         String biographyHtml,
         String sourceUrl,
         List<ExternalAffiliationDto> externalAffiliations,
-        ElectionInfo election
+        ElectionInfo election,
+        ActivityInfo activity
 ) {
     /** How the MP won their seat (from opendata.valimised.ee); null if not matched. */
     public record ElectionInfo(
@@ -45,6 +46,14 @@ public record PoliticianProfileDto(
             Integer districtNumber,
             String partyName,
             Integer ballotNumber,
+            String sourceUrl
+    ) {}
+    /** Parliamentary activity over the term (from Riigikogu API); null if not yet computed. */
+    public record ActivityInfo(
+            int speeches,
+            int questions,
+            int interpellations,
+            int writtenQuestions,
             String sourceUrl
     ) {}
     public record Faction(String externalId, String name) {}
