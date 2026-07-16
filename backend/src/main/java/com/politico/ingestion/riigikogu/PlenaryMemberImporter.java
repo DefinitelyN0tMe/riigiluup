@@ -95,11 +95,20 @@ public class PlenaryMemberImporter {
             existing.setFirstName(incoming.getFirstName());
             existing.setLastName(incoming.getLastName());
             existing.setFullName(incoming.getFullName());
-            existing.setPhotoUrl(incoming.getPhotoUrl());
             existing.setOfficialProfileUrl(incoming.getOfficialProfileUrl());
             existing.setActive(incoming.isActive());
-            existing.setFactionExternalId(incoming.getFactionExternalId());
-            existing.setFactionName(incoming.getFactionName());
+            // Photo and faction come from the richer detail endpoint (PlenaryMemberDetailImporter).
+            // The /api/plenary-members list omits them for some members, so only refresh when the
+            // list actually carries a value — never overwrite detail-populated data with a list null
+            // (that stranded MPs with a blank photo + "no faction" whenever a later detail refresh
+            // failed, e.g. on a 429 mid-run).
+            if (incoming.getPhotoUrl() != null) {
+                existing.setPhotoUrl(incoming.getPhotoUrl());
+            }
+            if (incoming.getFactionExternalId() != null) {
+                existing.setFactionExternalId(incoming.getFactionExternalId());
+                existing.setFactionName(incoming.getFactionName());
+            }
             existing.setSourceSnapshot(snap);
             existing.setUpdatedAt(Instant.now());
         }
