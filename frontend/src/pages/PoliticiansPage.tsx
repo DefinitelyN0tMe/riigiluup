@@ -68,7 +68,7 @@ export default function PoliticiansPage() {
         q: q || undefined,
         faction: faction || undefined,
         page,
-        size: 50,
+        size: 52,
         activeOnly: true,
       }),
     placeholderData: (previous) => previous,

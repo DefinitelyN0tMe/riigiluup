@@ -14,6 +14,7 @@ import com.politico.statistics.ParticipationStats;
 import com.politico.statistics.StatisticsService;
 import com.politico.statistics.VotingStats;
 import com.politico.vote.IndividualVote;
+import com.politico.vote.IndividualVoteRepository;
 import com.politico.vote.VoteEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ public class PoliticianProfileMapper {
     private final GroupAlignmentService groupAlignmentService;
     private final VoteFactionAlignmentRepository alignmentRepo;
     private final ExternalAffiliationRepository externalAffiliations;
+    private final IndividualVoteRepository individualVoteRepo;
 
     public PoliticianProfileDto toDto(PlenaryMember m, List<GroupMembership> memberships) {
         PoliticianProfileDto.Party party = factionLinks
@@ -57,8 +59,23 @@ public class PoliticianProfileMapper {
         LocalDate today = LocalDate.now();
         ParticipationStats participation = stats.participation(
                 m.getExternalId(), StatisticsService.TERM_START, today);
-        VotingStats voting = stats.voting(
-                m.getExternalId(), StatisticsService.TERM_START, today);
+
+        // Voting participation is computed from our OWN ingested roll-call votes rather than the
+        // fragile live Riigikogu statistics passthrough — which returned 0/0 whenever the source
+        // API was rate-limited (e.g. during a backfill), making an active MP look like a non-voter.
+        // Estonia has 101 MPs and a stable record, so the local aggregate is authoritative and cheap.
+        java.time.Instant termStartTs = StatisticsService.TERM_START
+                .atStartOfDay().toInstant(java.time.ZoneOffset.UTC);
+        IndividualVoteRepository.ParticipationAgg vAgg =
+                individualVoteRepo.aggregateVotingParticipation(m.getId(), termStartTs);
+        int vTotal = (int) vAgg.getTotal();
+        int vParticipated = (int) vAgg.getParticipated();
+        Double vRate = vTotal == 0 ? null : (double) vParticipated / vTotal;
+        VotingStats voting = new VotingStats(
+                vTotal, vParticipated, vRate,
+                "Voting participation = (FOR + AGAINST + ABSTAINED) / eligible roll-call votes, "
+                        + "computed from ingested Riigikogu roll-call records (14th term).",
+                m.getOfficialProfileUrl());
 
         GroupAlignmentService.Result gaResult = groupAlignmentService.forMember(
                 m,
