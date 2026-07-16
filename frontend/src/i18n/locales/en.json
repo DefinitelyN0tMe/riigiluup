@@ -474,6 +474,7 @@
   },
   "a11y": {
     "skipToContent": "Skip to content",
+    "backToTop": "Back to top",
     "language": "Language",
     "pagination": "Pagination",
     "prevPage": "Previous page",

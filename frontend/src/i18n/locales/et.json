@@ -474,6 +474,7 @@
   },
   "a11y": {
     "skipToContent": "Liigu sisu juurde",
+    "backToTop": "Üles",
     "language": "Keel",
     "pagination": "Lehekülgede sirvimine",
     "prevPage": "Eelmine leht",

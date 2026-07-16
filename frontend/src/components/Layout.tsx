@@ -6,6 +6,7 @@ import LiveTicker from "./LiveTicker";
 import ManifestoFooter from "./ManifestoFooter";
 import LocaleSwitcher from "./LocaleSwitcher";
 import ErrorBoundary from "./ErrorBoundary";
+import ScrollToTopButton from "./ScrollToTopButton";
 
 /**
  * Site chrome. Nav is themed: transparent-on-blue on the home page (where hero is blue),
@@ -144,6 +145,8 @@ export default function Layout() {
 
       {/* Footer */}
       <ManifestoFooter />
+
+      <ScrollToTopButton />
     </div>
   );
 }
