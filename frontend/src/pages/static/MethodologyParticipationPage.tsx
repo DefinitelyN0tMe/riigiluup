@@ -28,6 +28,16 @@ export default function MethodologyParticipationPage() {
         <code>/api/votings/{`{uuid}`}</code>.
       </p>
 
+      <h2>{t("methodology.participation.sittingHeading")}</h2>
+      <p className="font-mono text-sm bg-slate-50 p-3 border border-slate-200 rounded">
+        {t("methodology.participation.sittingFormula")}
+      </p>
+      <p>{t("methodology.participation.sittingBody")}</p>
+      <p>
+        {t("methodology.participation.sittingSourceLine")}
+        <code>/api/statistics/participations/member/{`{uuid}`}?startDate=…&endDate=…</code>.
+      </p>
+
       <h2>{t("methodology.participation.attendanceHeading")}</h2>
       <p className="font-mono text-sm bg-slate-50 p-3 border border-slate-200 rounded">
         {t("methodology.participation.attendanceFormula")}
@@ -36,10 +46,11 @@ export default function MethodologyParticipationPage() {
         {t("methodology.participation.attendanceBody1a")}
         <strong>{t("methodology.participation.attendanceBody1b")}</strong>
       </p>
+      <p>{t("methodology.participation.attendanceWhyDiff")}</p>
       <p>{t("methodology.participation.attendanceBody2")}</p>
       <p>
         {t("methodology.participation.attendanceSourceLine")}
-        <code>/api/statistics/participations/member/{`{uuid}`}?startDate=…&endDate=…</code>.
+        <code>/api/votings/{`{uuid}`}</code>.
       </p>
 
       <h2>{t("methodology.participation.periodHeading")}</h2>

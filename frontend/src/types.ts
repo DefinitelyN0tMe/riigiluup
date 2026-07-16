@@ -90,6 +90,7 @@ export type PoliticianProfile = {
   party: Party | null;
   committees: CommitteeMembership[];
   participation: ParticipationStats;
+  attendanceChecks: ParticipationStats;
   voting: VotingStats;
   groupAlignment: GroupAlignmentDto;
   biographyHtml: string | null;

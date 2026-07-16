@@ -37,6 +37,29 @@ public interface IndividualVoteRepository extends JpaRepository<IndividualVote, 
     ParticipationAgg aggregateVotingParticipation(
             @Param("memberId") UUID memberId, @Param("from") Instant from);
 
+    /** Quorum-check (kohalolekukontroll) presence from our own ingested records. */
+    interface AttendanceAgg {
+        long getTotal();
+        long getPresent();
+    }
+
+    /**
+     * How often the member registered PRESENT (KOHAL) at an attendance check (kohalolekukontroll)
+     * since {@code from}. This is a stricter, per-moment presence measure than the Riigikogu
+     * sitting-attendance statistic, and is computed from the same records shown under Votes.
+     */
+    @Query(value = """
+        SELECT count(*) AS total,
+               count(*) FILTER (WHERE iv.choice = 'PRESENT') AS present
+        FROM individual_vote iv
+        JOIN vote_event ve ON ve.id = iv.vote_event_id
+        WHERE iv.plenary_member_id = :memberId
+          AND ve.type = 'ATTENDANCE_CHECK'
+          AND ve.started_at >= :from
+        """, nativeQuery = true)
+    AttendanceAgg aggregateAttendanceChecks(
+            @Param("memberId") UUID memberId, @Param("from") Instant from);
+
     Optional<IndividualVote> findByVoteEventAndPlenaryMember(
             VoteEvent voteEvent, PlenaryMember member);
 

@@ -77,6 +77,19 @@ public class PoliticianProfileMapper {
                         + "computed from ingested Riigikogu roll-call records (current term, since 2023-04-10).",
                 m.getOfficialProfileUrl());
 
+        // Our own quorum-check (kohalolekukontroll) presence — a stricter, per-moment measure than
+        // the Riigikogu sitting-attendance statistic above; shown alongside it so both are visible.
+        IndividualVoteRepository.AttendanceAgg cAgg =
+                individualVoteRepo.aggregateAttendanceChecks(m.getId(), termStartTs);
+        int cTotal = (int) cAgg.getTotal();
+        int cPresent = (int) cAgg.getPresent();
+        Double cRate = cTotal == 0 ? null : (double) cPresent / cTotal;
+        ParticipationStats attendanceChecks = new ParticipationStats(
+                cTotal, cPresent, cRate,
+                "Quorum-check presence = KOHAL / (KOHAL + PUUDUB), computed from ingested "
+                        + "kohalolekukontroll records (current term, since 2023-04-10).",
+                m.getOfficialProfileUrl());
+
         GroupAlignmentService.Result gaResult = groupAlignmentService.forMember(
                 m,
                 StatisticsService.TERM_START.atStartOfDay().toInstant(java.time.ZoneOffset.UTC),
@@ -112,7 +125,7 @@ public class PoliticianProfileMapper {
                                 m.getFactionExternalId(), m.getFactionName()),
                 party,
                 committees,
-                participation, voting,
+                participation, attendanceChecks, voting,
                 ga,
                 m.getBiographyHtml(),
                 "https://api.riigikogu.ee/api/plenary-members/" + m.getExternalId(),

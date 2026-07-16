@@ -29,6 +29,7 @@ public record PoliticianProfileDto(
         Party party,
         List<GroupMembershipDto> committees,
         ParticipationStats participation,
+        ParticipationStats attendanceChecks,
         VotingStats voting,
         GroupAlignment groupAlignment,
         String biographyHtml,
