@@ -54,6 +54,8 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
           AND (cast(:maxDays AS integer) IS NULL OR (
                 i.accepted_date IS NOT NULL AND i.initiated_date IS NOT NULL
                 AND (i.accepted_date - i.initiated_date) <= cast(:maxDays AS integer)))
+          AND (cast(:committee AS text) IS NULL
+                OR i.leading_committee_external_id = cast(:committee AS text))
         ORDER BY i.initiated_date DESC NULLS LAST, i.mark DESC NULLS LAST
         """,
         countQuery = """
@@ -72,6 +74,8 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
           AND (cast(:maxDays AS integer) IS NULL OR (
                 i.accepted_date IS NOT NULL AND i.initiated_date IS NOT NULL
                 AND (i.accepted_date - i.initiated_date) <= cast(:maxDays AS integer)))
+          AND (cast(:committee AS text) IS NULL
+                OR i.leading_committee_external_id = cast(:committee AS text))
         """,
         nativeQuery = true)
     Page<LegislativeItem> search(
@@ -81,6 +85,19 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
             @Param("topicEdid") Integer topicEdid,
             @Param("minDays") Integer minDays,
             @Param("maxDays") Integer maxDays,
+            @Param("committee") String committee,
             Pageable pageable
     );
+
+    /** Bills where this committee is the lead — for the committee page count. */
+    long countByLeadingCommitteeExternalId(String leadingCommitteeExternalId);
+
+    /** Most recent bills a committee leads; newest initiated first. Limit via Pageable. */
+    @Query("""
+        select i from LegislativeItem i
+        where i.leadingCommitteeExternalId = :committee
+        order by i.initiatedDate desc nulls last, i.mark desc nulls last
+        """)
+    java.util.List<LegislativeItem> findRecentByLeadingCommittee(
+            @Param("committee") String committee, Pageable pageable);
 }

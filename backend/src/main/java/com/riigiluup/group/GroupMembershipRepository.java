@@ -19,6 +19,15 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
 
     List<GroupMembership> findByGroupAndActiveTrue(Group group);
 
+    long countByGroupAndActiveTrue(Group group);
+
+    @Query("""
+        select gm from GroupMembership gm
+        join fetch gm.plenaryMember
+        where gm.group = :group and gm.active = true
+        """)
+    List<GroupMembership> findByGroupAndActiveTrueWithMemberFetch(@Param("group") Group group);
+
     @Query("""
         select gm from GroupMembership gm
         join fetch gm.group

@@ -42,6 +42,7 @@ public class LegislationController {
             @RequestParam(required = false) Integer topicEdid,
             @RequestParam(required = false) Integer minDays,
             @RequestParam(required = false) Integer maxDays,
+            @RequestParam(required = false) String committee,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size
     ) {
@@ -51,6 +52,7 @@ public class LegislationController {
         Page<LegislativeItem> p = itemRepo.search(
                 (q == null || q.isBlank()) ? null : q,
                 phaseParam, membership, topicEdid, minDays, maxDays,
+                (committee == null || committee.isBlank()) ? null : committee,
                 PageRequest.of(page, Math.min(size, 100)));
         return PageResponse.of(p.map(mapper::toListItem));
     }

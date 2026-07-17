@@ -131,6 +131,16 @@ public class InitiativeService {
                 .toList();
     }
 
+    /** Initiatives assigned to a Riigikogu committee (by group id). Parliament-addressed only. */
+    public List<InitiativeDto.ListItem> byCommittee(UUID groupId) {
+        return repo.findByCommitteeGroupId(groupId).stream().map(this::toListItem).toList();
+    }
+
+    /** Count of parliament-addressed initiatives assigned to a committee (0 if none). */
+    public long countByCommitteeIfAny(UUID groupId) {
+        return repo.countByCommitteeGroupId(groupId);
+    }
+
     private InitiativeDto.ListItem toListItem(Initiative i) {
         return new InitiativeDto.ListItem(
                 i.getId(),
