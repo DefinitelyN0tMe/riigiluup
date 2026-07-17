@@ -958,6 +958,16 @@
       "recomputeAlignments": "Recompute faction alignments",
       "legislation": "Bills (last 90 days)",
       "linkVotesToBills": "Link votes to bills"
+    },
+    "initiativeLinks": {
+      "title": "Initiative → bill links",
+      "subtitle": "Citizen initiatives Riigikogu took up as a draft act. The source names no bill, so an admin asserts the link against the primary source, and we record who and when.",
+      "openPublic": "Open public initiatives page",
+      "empty": "No initiatives are currently awaiting a link.",
+      "searchPlaceholder": "Search bills by title…",
+      "link": "Link",
+      "unlink": "Unlink",
+      "confirmUnlink": "Unlink this bill? The public page will stop showing it."
     }
   },
   "notFound": {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AdminUnauthorizedError, fetchAdminStatus, triggerAdminImport } from "../api/admin";
 import AdminAffiliationsSection from "../components/admin/AdminAffiliationsSection";
+import AdminInitiativeLinksSection from "../components/admin/AdminInitiativeLinksSection";
 import type { AdminStatus } from "../types";
 import { formatDateTime } from "../lib/formatDate";
 
@@ -145,6 +146,8 @@ export default function AdminPage() {
       </section>
 
       <AdminAffiliationsSection onUnauthorized={() => setAuthState("unauthorized")} />
+
+      <AdminInitiativeLinksSection onUnauthorized={() => setAuthState("unauthorized")} />
 
       <section aria-label="Recent runs">
         <h2 className="text-lg font-semibold text-ink mb-2">{t("admin.recentRuns")}</h2>

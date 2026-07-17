@@ -958,6 +958,16 @@
       "recomputeAlignments": "Arvuta fraktsioonikuuluvus uuesti",
       "legislation": "Eelnõud (viimased 90 päeva)",
       "linkVotesToBills": "Seosta hääletused eelnõudega"
+    },
+    "initiativeLinks": {
+      "title": "Rahvaalgatuse → eelnõu seosed",
+      "subtitle": "Kodanikualgatused, mille Riigikogu võttis üle eelnõuna. Allikas ei nimeta eelnõud, seega kinnitab admin seose primaarallika põhjal ja me salvestame, kes ja millal.",
+      "openPublic": "Ava avalik algatuste leht",
+      "empty": "Ühtegi algatust ei oota hetkel seostamist.",
+      "searchPlaceholder": "Otsi eelnõusid pealkirja järgi…",
+      "link": "Seosta",
+      "unlink": "Eemalda seos",
+      "confirmUnlink": "Eemaldada see eelnõu seos? Muudatus on koheselt avalik."
     }
   },
   "notFound": {

@@ -96,3 +96,17 @@ export async function deleteAffiliation(id: string): Promise<void> {
     method: "DELETE",
   });
 }
+
+/* ============ Initiative → bill link ============ */
+export async function linkInitiativeToBill(id: number, legislativeItemId: string): Promise<void> {
+  await adminFetch(`/api/v1/admin/initiatives/${id}/legislative-item`, {
+    method: "PUT",
+    body: JSON.stringify({ legislativeItemId }),
+  });
+}
+
+export async function unlinkInitiativeFromBill(id: number): Promise<void> {
+  await adminFetch(`/api/v1/admin/initiatives/${id}/legislative-item`, {
+    method: "DELETE",
+  });
+}
