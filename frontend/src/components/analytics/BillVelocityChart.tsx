@@ -81,11 +81,11 @@ export default function BillVelocityChart({ data }: { data: BillVelocity }) {
         </li>
         <li className="flex items-baseline justify-between border-b border-rule pb-2">
           <span className="uppercase tracking-[0.16em] text-muted">{t("viz.velocity.fastest")}</span>
-          <span className="font-display font-bold text-[18px] tracking-[-0.03em] text-live">{data.fastestDays}d</span>
+          <span className="font-display font-bold text-[18px] tracking-[-0.03em] text-live-deep">{data.fastestDays}d</span>
         </li>
         <li className="flex items-baseline justify-between">
           <span className="uppercase tracking-[0.16em] text-muted">{t("viz.velocity.slowest")}</span>
-          <span className="font-display font-bold text-[18px] tracking-[-0.03em] text-hot">{data.slowestDays}d</span>
+          <span className="font-display font-bold text-[18px] tracking-[-0.03em] text-hot-deep">{data.slowestDays}d</span>
         </li>
         <li className="pt-2 text-muted text-[10px] leading-relaxed">
           {t("viz.velocity.footer", { count: data.totalAdopted })} {t("viz.velocity.formula")}

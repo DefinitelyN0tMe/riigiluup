@@ -65,7 +65,7 @@ export default function AttendanceHeatmap({ data }: { data: AttendanceMatrix }) 
               })}
               {/* Rate at right */}
               <text x={nameW + cols.length * cell + 8} y={y + rowH / 2} dominantBaseline="middle"
-                    fontFamily="'JetBrains Mono', monospace" fontSize={9.5} fill={rate < 0.7 ? "#FF4B3E" : "#0A0A0A"} fontWeight={700}>
+                    fontFamily="'JetBrains Mono', monospace" fontSize={9.5} fill={rate < 0.7 ? "#C7291D" : "#0A0A0A"} fontWeight={700}>
                 {Math.round(rate * 100)}%
               </text>
             </g>

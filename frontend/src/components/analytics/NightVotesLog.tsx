@@ -76,7 +76,7 @@ export default function NightVotesLog({ data }: { data: NightVotes }) {
                          style={{ height: `${wkdH}%` }} title={`${b.weekday}`} />
                   )}
                 </div>
-                <div className={`font-mono text-[8px] ${isNight ? "text-hot font-bold" : "text-muted"}`}>
+                <div className={`font-mono text-[8px] ${isNight ? "text-hot-deep font-bold" : "text-muted"}`}>
                   {String(b.hourOfDay).padStart(2, "0")}
                 </div>
               </div>
@@ -132,7 +132,7 @@ export default function NightVotesLog({ data }: { data: NightVotes }) {
                   )}
                   <div className="mt-2 flex flex-wrap gap-3 font-mono text-[11px] text-muted">
                     <span><b className="text-blue">{it.forCount}</b> {t("viz.highlights.for")}</span>
-                    <span><b className="text-hot">{it.againstCount}</b> {t("viz.highlights.against")}</span>
+                    <span><b className="text-hot-deep">{it.againstCount}</b> {t("viz.highlights.against")}</span>
                     <span>· {t("pages.voteDetail.margin")} <b className="text-ink">±{it.margin}</b></span>
                     {it.voteNumber != null && <span>· #{it.voteNumber}</span>}
                   </div>

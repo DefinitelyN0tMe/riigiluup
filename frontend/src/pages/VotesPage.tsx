@@ -138,7 +138,7 @@ export default function VotesPage() {
       )}
 
       {isLoading && <p className="text-muted font-mono text-sm tracking-[0.06em]" role="status">{t("common.loading")}</p>}
-      {error && <p className="text-hot font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
+      {error && <p className="text-hot-deep font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
 
       {data && (
         <>

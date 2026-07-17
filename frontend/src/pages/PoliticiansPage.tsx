@@ -162,7 +162,7 @@ export default function PoliticiansPage() {
             <button
               type="button"
               onClick={clearCompare}
-              className="font-mono text-[11px] tracking-[0.14em] uppercase text-muted hover:text-hot"
+              className="font-mono text-[11px] tracking-[0.14em] uppercase text-muted hover:text-hot-deep"
             >
               {t("compare.clear")}
             </button>
@@ -172,7 +172,7 @@ export default function PoliticiansPage() {
       )}
 
       {isLoading && !data && <p className="text-muted font-mono text-sm tracking-[0.06em]" role="status">{t("common.loading")}</p>}
-      {error && <p className="text-hot font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
+      {error && <p className="text-hot-deep font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
 
       {data && (
         <>
@@ -259,7 +259,7 @@ function CompareTray({
         <button
           type="button"
           onClick={onClear}
-          className="ml-auto font-mono text-[10px] tracking-[0.14em] uppercase text-muted hover:text-hot"
+          className="ml-auto font-mono text-[10px] tracking-[0.14em] uppercase text-muted hover:text-hot-deep"
         >
           {t("compare.clear")}
         </button>

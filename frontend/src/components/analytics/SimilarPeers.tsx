@@ -35,7 +35,7 @@ function PeerList({
 }) {
   const { t } = useTranslation();
   const barColor = tone === "hot" ? "bg-hot" : "bg-blue";
-  const rankColor = tone === "hot" ? "text-hot" : "text-blue";
+  const rankColor = tone === "hot" ? "text-hot-deep" : "text-blue";
   return (
     <div>
       <div className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted mb-1">{title}</div>

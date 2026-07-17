@@ -28,7 +28,7 @@ function Loading() {
 }
 function Failed({ err }: { err: unknown }) {
   const { t } = useTranslation();
-  return <div className="text-hot font-mono text-sm py-6">{t("viz.loadFailed")} {(err as Error).message}</div>;
+  return <div className="text-hot-deep font-mono text-sm py-6">{t("viz.loadFailed")} {(err as Error).message}</div>;
 }
 function Section({
   index, kicker, title, children, note,

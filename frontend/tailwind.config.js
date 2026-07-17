@@ -23,6 +23,11 @@ export default {
         muted: "#7A7A72",
         live: "#4DFF9C",
         hot: "#FF4B3E",
+        // Text-safe variants for small text (<18.66px bold / <24px regular) on light
+        // backgrounds: live/hot only hit AA contrast (4.5:1) on the dark ink strips.
+        // live-deep 5.2:1 and hot-deep 5.1:1 on `off`, same hue families.
+        "live-deep": "#067647",
+        "hot-deep": "#C7291D",
         amber: "#FFB020",
       },
       fontFamily: {

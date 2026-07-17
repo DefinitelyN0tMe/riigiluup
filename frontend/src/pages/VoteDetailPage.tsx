@@ -102,10 +102,10 @@ export default function VoteDetailPage() {
             <div className="font-mono text-[10px] tracking-[0.06em] uppercase text-muted mt-2 flex justify-between">
               <span>{t("pages.voteDetail.forShort")} <b className="text-blue">{data.resultInFavor}</b></span>
               <span>{t("pages.voteDetail.quorum")}</span>
-              <span>{t("pages.voteDetail.againstShort")} <b className="text-hot">{data.resultAgainst}</b></span>
+              <span>{t("pages.voteDetail.againstShort")} <b className="text-hot-deep">{data.resultAgainst}</b></span>
             </div>
             {tight && (
-              <div className="mt-3 font-serif italic text-[13px] text-hot leading-snug">
+              <div className="mt-3 font-serif italic text-[13px] text-hot-deep leading-snug">
                 {t("pages.voteDetail.tightNote")}
               </div>
             )}

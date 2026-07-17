@@ -68,7 +68,7 @@ export default function DataStatusPage() {
                       }) : "—"}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.14em] uppercase font-bold ${success ? "text-live" : "text-hot"}`}>
+                      <span className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.14em] uppercase font-bold ${success ? "text-live-deep" : "text-hot-deep"}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${success ? "bg-live" : "bg-hot"}`} />
                         {s.lastRunStatus}
                       </span>

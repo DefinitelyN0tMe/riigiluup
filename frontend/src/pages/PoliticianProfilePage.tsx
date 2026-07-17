@@ -21,10 +21,11 @@ function pct(v: number | null): string {
 }
 
 function ActivityStat({ value, label, hint }: { value: number; label: string; hint?: string }) {
+  const { i18n } = useTranslation();
   return (
     <div>
       <div className="font-display font-bold text-[28px] leading-none tracking-[-0.03em] text-ink">
-        {value.toLocaleString()}
+        {value.toLocaleString(i18n.resolvedLanguage)}
       </div>
       <div
         className={`font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5${
@@ -40,7 +41,7 @@ function ActivityStat({ value, label, hint }: { value: number; label: string; hi
 
 function LoadFailed() {
   const { t } = useTranslation();
-  return <p className="text-sm text-hot" role="alert">{t("profile.loadFailed")}</p>;
+  return <p className="text-sm text-hot-deep" role="alert">{t("profile.loadFailed")}</p>;
 }
 
 function VotingHistory({ slug }: { slug: string }) {
@@ -270,7 +271,7 @@ export default function PoliticianProfilePage() {
           <div className="flex flex-wrap gap-x-10 gap-y-4">
             <div>
               <div className="font-display font-bold text-[32px] leading-none tracking-[-0.03em] text-ink">
-                {data.election.personalVotes.toLocaleString()}
+                {data.election.personalVotes.toLocaleString(i18n.resolvedLanguage)}
               </div>
               <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">
                 {t("profile.election.personalVotes")}

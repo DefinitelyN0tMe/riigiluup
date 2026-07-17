@@ -56,7 +56,7 @@ export default function AffiliationTimeline({ items }: { items: ExternalAffiliat
                 {t(`affiliation.kind.${it.orgKind}`, { defaultValue: it.orgKind })}
               </span>
               {!it.validTo && (
-                <span className="inline-flex items-center gap-1.5 font-mono text-[9px] tracking-[0.16em] uppercase font-bold text-live">
+                <span className="inline-flex items-center gap-1.5 font-mono text-[9px] tracking-[0.16em] uppercase font-bold text-live-deep">
                   <span className="w-1.5 h-1.5 rounded-full bg-live shadow-[0_0_6px_theme(colors.live)] animate-pulse-dot" />
                   {t("affiliation.current")}
                 </span>

@@ -108,7 +108,7 @@ export default function VoteDefectorsPanel({ v }: { v: VoteDetail }) {
                 <div className="font-mono text-[11px] tracking-[0.06em]">
                   <span className="text-blue"><b className="font-bold">{g.withMajority.length}</b> {t("viz.defectors.withMajority")}</span>
                   {g.defectors.length > 0 && (
-                    <> · <span className="text-hot"><b className="font-bold">{g.defectors.length}</b> {t("viz.defectors.defected")}</span></>
+                    <> · <span className="text-hot-deep"><b className="font-bold">{g.defectors.length}</b> {t("viz.defectors.defected")}</span></>
                   )}
                   {g.nonComp.length > 0 && (
                     <> · <span className="text-muted"><b className="font-bold">{g.nonComp.length}</b> {t("viz.defectors.nonComparable")}</span></>
@@ -124,7 +124,7 @@ export default function VoteDefectorsPanel({ v }: { v: VoteDetail }) {
               {/* Defector names */}
               {g.defectors.length > 0 && (
                 <div className="font-serif italic text-[14px] leading-snug text-ink-2">
-                  <span className="text-hot font-semibold not-italic">
+                  <span className="text-hot-deep font-semibold not-italic">
                     {t("viz.defectors.editorialLine", {
                       count: g.defectors.length,
                       faction: g.faction.factionName,

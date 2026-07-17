@@ -43,7 +43,7 @@ export default function HighlightsStrip({ data }: { data: HighlightsBundle }) {
               <li key={v.voteId}>
                 <Link to={`/votes/${encodeURIComponent(v.voteId)}`} className="block py-2.5 hover:bg-off px-2 -mx-2 rounded">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[11px] font-bold text-hot">±{v.margin}</span>
+                    <span className="font-mono text-[11px] font-bold text-hot-deep">±{v.margin}</span>
                     <span className="font-display text-sm font-semibold tracking-[-0.015em] truncate flex-1">
                       {v.description ?? "—"}
                     </span>

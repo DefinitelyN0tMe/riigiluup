@@ -229,7 +229,7 @@ export default function AdminAffiliationsSection({
             </button>
           )}
         </div>
-        {err && <p className="mt-3 text-hot text-sm" role="alert">{err}</p>}
+        {err && <p className="mt-3 text-hot-deep text-sm" role="alert">{err}</p>}
       </form>
 
       {/* FILTER */}
@@ -265,7 +265,7 @@ export default function AdminAffiliationsSection({
                   <button onClick={() => startEdit(it)} className="text-blue text-sm font-semibold hover:underline">
                     {t("admin.affiliations.edit")}
                   </button>
-                  <button onClick={() => remove(it.id)} className="text-hot text-sm font-semibold hover:underline">
+                  <button onClick={() => remove(it.id)} className="text-hot-deep text-sm font-semibold hover:underline">
                     {t("admin.affiliations.delete")}
                   </button>
                 </div>
