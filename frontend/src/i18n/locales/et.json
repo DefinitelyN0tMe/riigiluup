@@ -7,6 +7,7 @@
     "bills": "Eelnõud",
     "speeches": "Kõned",
     "analytics": "Analüütika",
+    "initiatives": "Pöördumised",
     "brand": "Riigiluup"
   },
   "chrome": {
@@ -158,7 +159,8 @@
       "toc10": "Öised hääled",
       "toc11": "Kõige aktiivsemad saadikud",
       "toc12": "Kes sai enim hääli",
-      "toc13": "Parteide rahastamine"
+      "toc13": "Parteide rahastamine",
+      "toc15": "Kollektiivsed pöördumised"
     },
     "sec": {
       "agreement": {
@@ -258,6 +260,13 @@
         "titleEm": "vastab",
         "titlePost": " tähtaegselt",
         "note": "Jooksva koosseisu arupärimised ja kirjalikud küsimused, mõõdetuna allika enda fikseeritud vastamistähtaja vastu: esitamisest registreeritud kirjaliku vastuseni või täiskogu istungini, kus minister arupärimisele vastas. Alla viie küsimusega ministrid on peidetud; esitajatele tagastatud küsimused on välja jäetud."
+      },
+      "initiatives": {
+        "kicker": "Otsedemokraatia",
+        "titlePre": "Mis saab ",
+        "titleEm": "kollektiivsetest pöördumistest",
+        "titlePost": "",
+        "note": "Iga Rahvaalgatus.ee kaudu Riigikogule esitatud kollektiivne pöördumine, esimesest kavandist lõpliku otsuseni. Andmestiku kaks kõnekamat lünka — pöördumised, mis täitsid allkirjade lävendi, kuid mida ei saadetud kunagi Riigikogusse, ning pöördumised, mis saadeti Riigikogusse ilma andmete järgi lävendit täitmata — on näidatud sellisena, nagu need on, mitte silutuna."
       }
     }
   },
@@ -760,7 +769,89 @@
     "sponsors": "Algatajad ({{count}})",
     "timeline": "Menetluse ajajoon",
     "noStages": "Etappe pole registreeritud.",
-    "noName": "(nimi puudub)"
+    "noName": "(nimi puudub)",
+    "startedAsInitiative": "Sai alguse kollektiivsest pöördumisest"
+  },
+  "initiatives": {
+    "title": "Kollektiivsed pöördumised",
+    "lede": "Iga Riigikogule esitatud kollektiivne pöördumine, esimesest kavandist lõpliku otsuseni — pärit otse Rahvaalgatus.ee-st.",
+    "searchPlaceholder": "Otsi pöördumisi pealkirja järgi…",
+    "filterByDecision": "Filtreeri otsuse järgi",
+    "allPhases": "Kõik etapid",
+    "allDecisions": "Kõik otsused",
+    "chip": {
+      "phase": "Etapp",
+      "decision": "Otsus",
+      "committee": "Komisjon",
+      "filters": "Aktiivsed filtrid"
+    },
+    "results_one": "{{count}} kollektiivne pöördumine",
+    "results_other": "{{count}} kollektiivset pöördumist",
+    "empty": "Neile filtritele ei vasta ükski kollektiivne pöördumine.",
+    "viewDetails": "Vaata lähemalt",
+    "openSourceAria": "Ava allikas: {{title}}",
+    "openSource": "Ava allikas",
+    "sentToParliamentInline": "Riigikogusse saadetud {{date}}",
+    "signatureProgress": "Allkirjad: {{count}}/{{threshold}}",
+    "signaturesShort_one": "{{count}} allkiri",
+    "signaturesShort_other": "{{count}} allkirja",
+    "backAll": "Tagasi kollektiivsete pöördumiste juurde",
+    "timelineTitle": "Ajajoon",
+    "phase": {
+      "edit": "Koostamisel",
+      "sign": "Allkirjastamisel",
+      "parliament": "Riigikogus",
+      "government": "Valitsuses",
+      "done": "Lõppenud"
+    },
+    "decision": {
+      "return": "Tagastatud esitajale",
+      "reject": "Tagasi lükatud",
+      "solve-differently": "Lahendatud muul viisil",
+      "forward": "Edastatud",
+      "forward-to-government": "Edastatud Vabariigi Valitsusele",
+      "draft-act-or-national-matter": "Eelnõu või riiklikult tähtis küsimus"
+    },
+    "timeline": {
+      "thresholdReached": "Lävend täidetud",
+      "thresholdNotReached": "Lävend täitmata",
+      "published": "Avaldatud",
+      "noData": "Andmed allikast puuduvad",
+      "signingStarted": "Allkirjastamine algas",
+      "lastSigned": "Viimane registreeritud allkiri",
+      "threshold": "Allkirjade lävend",
+      "sentToParliament": "Saadetud Riigikogusse",
+      "committees": "Komisjonid",
+      "finished": "Riigikogu menetlus lõppenud",
+      "noFinishDate": "Lõppemiskuupäev allikast puudub",
+      "sentToGovernment": "Saadetud Vabariigi Valitsusele",
+      "finishedInGovernment": "Valitsuse menetlus lõppenud",
+      "linkedBill": "Seotud eelnõu",
+      "linkedByAt": "Sidus {{who}}, {{date}}"
+    },
+    "funnel": {
+      "aria": "Lehtergraafik: {{targeted}} Riigikogule suunatud pöördumist, {{signing}} allkirjastamisel, {{threshold}} täitis allkirjade lävendi, {{sent}} saadeti Riigikogusse, {{decided}} otsustati, {{draftAct}} sai eelnõuks.",
+      "step": {
+        "targeted": "Riigikogule suunatud",
+        "signing": "Allkirjade kogumisel",
+        "threshold": "Allkirjade lävend täitunud",
+        "sent": "Riigikogusse saadetud",
+        "decided": "Otsustatud",
+        "draftAct": "Sai eelnõuks"
+      },
+      "openStep_one": "{{label}}: {{count}} pöördumine, ava filtreeritud loend",
+      "openStep_other": "{{label}}: {{count}} pöördumist, ava filtreeritud loend",
+      "decisionsTitle": "Otsused",
+      "committeesTitle": "Komisjonid",
+      "note": {
+        "headline": "Riigikogule suunatud {{targeted}} kollektiivsest pöördumisest sai eelnõuks {{draftAct}}.",
+        "neverSent_one": "{{count}} pöördumine kogus nõutud 1000 allkirja, kuid seda Riigikogule kunagi ei saadetud.",
+        "neverSent_other": "{{count}} pöördumist kogus nõutud 1000 allkirja, kuid neid Riigikogule kunagi ei saadetud.",
+        "belowThreshold_one": "{{count}} pöördumine saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
+        "belowThreshold_other": "{{count}} pöördumist saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
+        "median": "Mediaan otsuseni: {{days}} päeva (n = {{n}})."
+      }
+    }
   },
   "compare": {
     "disagreementsLede": "Kronoloogiline logi hääletustest, kus need kaks saadikut valisid võrreldavatest võimalustest erinevalt. Iga rida on kliki kaugusel originaalvormist.",
@@ -1071,7 +1162,17 @@
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
     "licenseBody1c": " alusel. Selle saidi enda koondsisu ja kood on avaldatud sama litsentsi alusel, et taaskasutus oleks lihtne.",
     "updateFrequency": "Uuendussagedus",
-    "updateBody": "Hääletused sünkroonitakse iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), nii et uued nimelised hääletused ilmuvad samal päeval. Saadikud, fraktsioonid, profiilide detailid ja eelnõud värskenduvad kord ööpäevas (04:30 Europe/Tallinn): need muutuvad aeglaselt ning varasemad andmed on muutumatud ega laadita uuesti. Päise \"Viimane sünkroonimine\" märgis näitab viimase eduka värskenduse ajatemplit."
+    "updateBody": "Hääletused sünkroonitakse iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), nii et uued nimelised hääletused ilmuvad samal päeval. Saadikud, fraktsioonid, profiilide detailid ja eelnõud värskenduvad kord ööpäevas (04:30 Europe/Tallinn): need muutuvad aeglaselt ning varasemad andmed on muutumatud ega laadita uuesti. Päise \"Viimane sünkroonimine\" märgis näitab viimase eduka värskenduse ajatemplit.",
+    "additional": "Muud allikad",
+    "rahvaalgatus": {
+      "title": "Kollektiivsed pöördumised",
+      "pre": "Kollektiivsete pöördumiste andmed pärinevad keskkonnast ",
+      "mid": ", mida haldab ",
+      "operator": "SA Eesti Koostöö Kogu",
+      "suffix": ".",
+      "what": "Riigiluup impordib kollektiivsete pöördumiste CSV-väljavõtte, mis katab kõik etapid — koostamisest ja allkirjade kogumisest kuni Riigikogu ja valitsuse menetluseni.",
+      "cadence": "Värskendatakse iga päev kell 05:40 (Europe/Tallinn)."
+    }
   },
   "dataStatus": {
     "kicker": "Läbipaistvus · Sünkroonimine",

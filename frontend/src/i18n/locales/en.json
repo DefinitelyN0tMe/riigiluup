@@ -7,6 +7,7 @@
     "bills": "Bills",
     "speeches": "Speeches",
     "analytics": "Analytics",
+    "initiatives": "Initiatives",
     "brand": "Riigiluup"
   },
   "chrome": {
@@ -158,7 +159,8 @@
       "toc10": "Night votes",
       "toc11": "Most active MPs",
       "toc12": "Who got the most votes",
-      "toc13": "Party funding"
+      "toc13": "Party funding",
+      "toc15": "Citizen initiatives"
     },
     "sec": {
       "agreement": {
@@ -258,6 +260,13 @@
         "titleEm": "answers",
         "titlePost": " on time",
         "note": "Interpellations and written questions of the current term, measured against the answer deadline the source itself records: from submission to the registered written reply, or to the plenary sitting where the minister answered an interpellation. Ministers with fewer than five questions are hidden; questions returned to their submitters are excluded."
+      },
+      "initiatives": {
+        "kicker": "Direct democracy",
+        "titlePre": "What happens to ",
+        "titleEm": "citizen initiatives",
+        "titlePost": "",
+        "note": "Every citizen initiative submitted to the Riigikogu through rahvaalgatus.ee, tracked from first draft to final decision. The two most striking gaps in the source data — initiatives that reached the signature threshold but were never sent to parliament, and initiatives sent to parliament without reaching it in this data — are shown as they are, not smoothed over."
       }
     }
   },
@@ -760,7 +769,89 @@
     "sponsors": "Sponsors ({{count}})",
     "timeline": "Legislative timeline",
     "noStages": "No stages recorded.",
-    "noName": "(no name)"
+    "noName": "(no name)",
+    "startedAsInitiative": "Started as a citizen initiative"
+  },
+  "initiatives": {
+    "title": "Citizen initiatives",
+    "lede": "Every citizen initiative submitted to the Riigikogu, from first draft to final decision — sourced directly from Rahvaalgatus.ee.",
+    "searchPlaceholder": "Search initiatives by title…",
+    "filterByDecision": "Filter by decision",
+    "allPhases": "All phases",
+    "allDecisions": "All decisions",
+    "chip": {
+      "phase": "Phase",
+      "decision": "Decision",
+      "committee": "Committee",
+      "filters": "Active filters"
+    },
+    "results_one": "{{count}} citizen initiative",
+    "results_other": "{{count}} citizen initiatives",
+    "empty": "No citizen initiatives match these filters.",
+    "viewDetails": "View details",
+    "openSourceAria": "Open source page for {{title}}",
+    "openSource": "Open source",
+    "sentToParliamentInline": "Sent to parliament {{date}}",
+    "signatureProgress": "Signatures: {{count}} of {{threshold}}",
+    "signaturesShort_one": "{{count}} signature",
+    "signaturesShort_other": "{{count}} signatures",
+    "backAll": "Back to citizen initiatives",
+    "timelineTitle": "Timeline",
+    "phase": {
+      "edit": "Drafting",
+      "sign": "Collecting signatures",
+      "parliament": "In parliament",
+      "government": "With the government",
+      "done": "Finished"
+    },
+    "decision": {
+      "return": "Returned to submitters",
+      "reject": "Rejected",
+      "solve-differently": "Resolved by other means",
+      "forward": "Forwarded",
+      "forward-to-government": "Forwarded to the government",
+      "draft-act-or-national-matter": "Taken up as a draft act or national matter"
+    },
+    "timeline": {
+      "thresholdReached": "Threshold reached",
+      "thresholdNotReached": "Threshold not reached",
+      "published": "Published",
+      "noData": "No data from the source",
+      "signingStarted": "Signing started",
+      "lastSigned": "Last signature recorded",
+      "threshold": "Signature threshold",
+      "sentToParliament": "Sent to parliament",
+      "committees": "Committees",
+      "finished": "Finished in parliament",
+      "noFinishDate": "No finish date from the source",
+      "sentToGovernment": "Sent to the Government",
+      "finishedInGovernment": "Finished at the Government",
+      "linkedBill": "Linked bill",
+      "linkedByAt": "Linked by {{who}} on {{date}}"
+    },
+    "funnel": {
+      "aria": "Funnel chart: {{targeted}} initiatives targeted at Riigikogu, {{signing}} in signing, {{threshold}} reached the signature threshold, {{sent}} sent to parliament, {{decided}} decided, {{draftAct}} became a draft act.",
+      "step": {
+        "targeted": "Aimed at Riigikogu",
+        "signing": "Collecting signatures",
+        "threshold": "Reached signature threshold",
+        "sent": "Sent to parliament",
+        "decided": "Decided",
+        "draftAct": "Became a draft act"
+      },
+      "openStep_one": "{{label}}: {{count}} initiative, open filtered list",
+      "openStep_other": "{{label}}: {{count}} initiatives, open filtered list",
+      "decisionsTitle": "Decisions",
+      "committeesTitle": "Committees",
+      "note": {
+        "headline": "Of {{targeted}} citizen initiatives aimed at Riigikogu, {{draftAct}} became a draft act.",
+        "neverSent_one": "{{count}} initiative collected the required 1,000 signatures and was never sent to parliament.",
+        "neverSent_other": "{{count}} initiatives collected the required 1,000 signatures and were never sent to parliament.",
+        "belowThreshold_one": "{{count}} initiative was sent to parliament without ever reaching the signature threshold in this data. The source does not explain why — we do not speculate.",
+        "belowThreshold_other": "{{count}} initiatives were sent to parliament without ever reaching the signature threshold in this data. The source does not explain why — we do not speculate.",
+        "median": "Median time to a decision: {{days}} days (n = {{n}})."
+      }
+    }
   },
   "compare": {
     "disagreementsLede": "Chronological log of votes where the two MPs picked different comparable choices. Every row is one click from the original form.",
@@ -1071,7 +1162,17 @@
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
     "licenseBody1c": ". This site's own aggregated content and code are released under the same license so downstream reuse is straightforward.",
     "updateFrequency": "Update frequency",
-    "updateBody": "Votes sync every 6 hours (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), so new roll-calls appear the same day. Members, factions, profile details and bills refresh once a day (04:30 Europe/Tallinn): they change slowly, and past records are immutable and never re-fetched. The \"Last sync\" badge in the header shows the timestamp of the last successful refresh."
+    "updateBody": "Votes sync every 6 hours (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), so new roll-calls appear the same day. Members, factions, profile details and bills refresh once a day (04:30 Europe/Tallinn): they change slowly, and past records are immutable and never re-fetched. The \"Last sync\" badge in the header shows the timestamp of the last successful refresh.",
+    "additional": "Other sources",
+    "rahvaalgatus": {
+      "title": "Citizen initiatives",
+      "pre": "Citizen initiative data comes from the platform ",
+      "mid": ", operated by ",
+      "operator": "SA Eesti Koostöö Kogu",
+      "suffix": " (Estonian Cooperation Assembly).",
+      "what": "Riigiluup imports the CSV export of citizen initiatives, covering every phase from drafting and signature collection through to parliamentary and government proceedings.",
+      "cadence": "Refreshed daily at 05:40 Europe/Tallinn."
+    }
   },
   "dataStatus": {
     "kicker": "Transparency · Sync",

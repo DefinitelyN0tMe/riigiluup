@@ -35,6 +35,19 @@ export default function SourcesPage() {
       </p>
       <h2>{t("sources.updateFrequency")}</h2>
       <p>{t("sources.updateBody")}</p>
+      <h2>{t("sources.additional")}</h2>
+      <h3>{t("sources.rahvaalgatus.title")}</h3>
+      <p>
+        {t("sources.rahvaalgatus.pre")}
+        <a href="https://rahvaalgatus.ee" target="_blank" rel="noopener noreferrer"
+           aria-label={`Rahvaalgatus.ee (${t("a11y.opensNewTab")})`}
+           className="text-estonia hover:underline">Rahvaalgatus.ee</a>
+        {t("sources.rahvaalgatus.mid")}
+        {t("sources.rahvaalgatus.operator")}
+        {t("sources.rahvaalgatus.suffix")}
+      </p>
+      <p>{t("sources.rahvaalgatus.what")}</p>
+      <p>{t("sources.rahvaalgatus.cadence")}</p>
     </article>
   );
 }
