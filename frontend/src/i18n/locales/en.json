@@ -8,6 +8,7 @@
     "speeches": "Speeches",
     "analytics": "Analytics",
     "initiatives": "Initiatives",
+    "committees": "Committees",
     "brand": "Riigiluup"
   },
   "chrome": {
@@ -757,7 +758,8 @@
     "chip": {
       "filters": "Active filters",
       "topic": "Topic",
-      "velocity": "Processing time"
+      "velocity": "Processing time",
+      "committee": "Committee"
     },
     "meta": "Initiated {{date}}",
     "initiatedInline": "Initiated {{date}}",
@@ -773,6 +775,27 @@
     "noName": "(no name)",
     "relatedInitiatives_one": "Related citizen initiative",
     "relatedInitiatives_other": "Related citizen initiatives"
+  },
+  "committees": {
+    "title": "Committees",
+    "lede": "The 11 standing committees of the Riigikogu — who sits on them, the bills they lead, and the citizen initiatives assigned to them.",
+    "secretariat": "Secretariat",
+    "backAll": "← All committees",
+    "notFound": "Committee not found.",
+    "noBills": "No bills led.",
+    "members_one": "{{count}} member",
+    "members_other": "{{count}} members",
+    "ledBills_one": "{{count}} bill led",
+    "ledBills_other": "{{count}} bills led",
+    "initiatives_one": "{{count}} initiative",
+    "initiatives_other": "{{count}} initiatives",
+    "allBills_one": "All {{count}} bill",
+    "allBills_other": "All {{count}} bills",
+    "section": {
+      "members": "Members",
+      "ledBills": "Bills led",
+      "initiatives": "Citizen initiatives"
+    }
   },
   "initiatives": {
     "title": "Citizen initiatives",

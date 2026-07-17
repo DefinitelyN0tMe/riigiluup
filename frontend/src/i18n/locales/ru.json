@@ -8,6 +8,7 @@
     "speeches": "Выступления",
     "analytics": "Аналитика",
     "initiatives": "Инициативы",
+    "committees": "Комиссии",
     "brand": "Riigiluup"
   },
   "chrome": {
@@ -775,7 +776,8 @@
     "chip": {
       "filters": "Активные фильтры",
       "topic": "Тема",
-      "velocity": "Срок рассмотрения"
+      "velocity": "Срок рассмотрения",
+      "committee": "Комиссия"
     },
     "meta": "Внесён {{date}}",
     "initiatedInline": "Внесён {{date}}",
@@ -792,6 +794,31 @@
     "relatedInitiatives_one": "Связанная гражданская инициатива",
     "relatedInitiatives_few": "Связанные гражданские инициативы",
     "relatedInitiatives_many": "Связанные гражданские инициативы"
+  },
+  "committees": {
+    "title": "Комиссии",
+    "lede": "11 постоянных комиссий Рийгикогу — кто в них входит, какие законопроекты они ведут и какие гражданские инициативы им назначены.",
+    "secretariat": "Секретариат",
+    "backAll": "← Все комиссии",
+    "notFound": "Комиссия не найдена.",
+    "noBills": "Нет ведомых законопроектов.",
+    "members_one": "{{count}} член",
+    "members_few": "{{count}} члена",
+    "members_many": "{{count}} членов",
+    "ledBills_one": "{{count}} ведомый законопроект",
+    "ledBills_few": "{{count}} ведомых законопроекта",
+    "ledBills_many": "{{count}} ведомых законопроектов",
+    "initiatives_one": "{{count}} инициатива",
+    "initiatives_few": "{{count}} инициативы",
+    "initiatives_many": "{{count}} инициатив",
+    "allBills_one": "Все {{count}} законопроект",
+    "allBills_few": "Все {{count}} законопроекта",
+    "allBills_many": "Все {{count}} законопроектов",
+    "section": {
+      "members": "Состав",
+      "ledBills": "Ведомые законопроекты",
+      "initiatives": "Гражданские инициативы"
+    }
   },
   "initiatives": {
     "title": "Гражданские инициативы",

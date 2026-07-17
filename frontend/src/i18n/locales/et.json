@@ -8,6 +8,7 @@
     "speeches": "Kõned",
     "analytics": "Analüütika",
     "initiatives": "Pöördumised",
+    "committees": "Komisjonid",
     "brand": "Riigiluup"
   },
   "chrome": {
@@ -757,7 +758,8 @@
     "chip": {
       "filters": "Aktiivsed filtrid",
       "topic": "Teema",
-      "velocity": "Menetlusaeg"
+      "velocity": "Menetlusaeg",
+      "committee": "Komisjon"
     },
     "meta": "Algatatud {{date}}",
     "initiatedInline": "Algatatud {{date}}",
@@ -773,6 +775,27 @@
     "noName": "(nimi puudub)",
     "relatedInitiatives_one": "Seotud kollektiivne pöördumine",
     "relatedInitiatives_other": "Seotud kollektiivsed pöördumised"
+  },
+  "committees": {
+    "title": "Komisjonid",
+    "lede": "Riigikogu 11 alatist komisjoni — kes neisse kuuluvad, milliseid eelnõusid nad juhivad ja millised kollektiivsed pöördumised on neile määratud.",
+    "secretariat": "Sekretariaat",
+    "backAll": "← Kõik komisjonid",
+    "notFound": "Komisjoni ei leitud.",
+    "noBills": "Juhitavaid eelnõusid ei ole.",
+    "members_one": "{{count}} liige",
+    "members_other": "{{count}} liiget",
+    "ledBills_one": "{{count}} juhitav eelnõu",
+    "ledBills_other": "{{count}} juhitavat eelnõu",
+    "initiatives_one": "{{count}} pöördumine",
+    "initiatives_other": "{{count}} pöördumist",
+    "allBills_one": "Kõik {{count}} eelnõu",
+    "allBills_other": "Kõik {{count}} eelnõu",
+    "section": {
+      "members": "Liikmed",
+      "ledBills": "Juhitavad eelnõud",
+      "initiatives": "Kollektiivsed pöördumised"
+    }
   },
   "initiatives": {
     "title": "Kollektiivsed pöördumised",
