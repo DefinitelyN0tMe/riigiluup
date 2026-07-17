@@ -1,0 +1,6 @@
+id,uuid,title,authors,destination,phase,published_at,signing_started_at,signing_ends_at,signature_count,last_signed_at,sent_to_parliament_at,parliament_committees,parliament_decision,finished_in_parliament_at,sent_to_government_at,finished_in_government_at
+101,uuid-101,Initiative A - single committee,Jane Citizen,parliament,done,2026-01-01T00:00:00.000Z,2026-01-02T00:00:00.000Z,2026-02-01T00:00:00.000Z,1500,2026-01-31T00:00:00.000Z,2026-02-05T00:00:00.000Z,social-affairs,draft-act-or-national-matter,2026-03-01T00:00:00.000Z,,
+102,uuid-102,Initiative B - two committees,John Doe,parliament,parliament,2025-11-01T00:00:00.000Z,2025-11-02T00:00:00.000Z,2025-12-01T00:00:00.000Z,1200,2025-11-30T00:00:00.000Z,2025-12-10T00:00:00.000Z,"social-affairs
+environment",,,,
+103,uuid-103,Initiative C - municipal (tallinn),Ann Resident,tallinn,sign,2026-01-05T00:00:00.000Z,2026-01-06T00:00:00.000Z,2026-03-06T00:00:00.000Z,300,2026-01-20T00:00:00.000Z,,,,,,
+104,uuid-104,Initiative D - blank signature count,Mari Maasikas,parliament,parliament,2025-09-01T00:00:00.000Z,2025-09-02T00:00:00.000Z,2025-10-02T00:00:00.000Z,,,2025-10-10T00:00:00.000Z,,,,,

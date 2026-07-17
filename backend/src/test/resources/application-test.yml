@@ -29,6 +29,8 @@ riigiluup:
     base-url: http://localhost:0
     user-agent: "riigiluup-test/0.0.1"
     rate-limit-per-second: 1000
+  rahvaalgatus:
+    base-url: http://localhost:0
   schedule:
     daily-refresh-cron: "-"
     daily-refresh-zone: "UTC"

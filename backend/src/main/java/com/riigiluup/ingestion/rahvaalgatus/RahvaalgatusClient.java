@@ -19,16 +19,17 @@ import org.springframework.web.client.RestClient;
 public class RahvaalgatusClient {
 
     public static final String SOURCE_NAME = "rahvaalgatus";
+    /** Documents the live default; the actual base URL is {@link RahvaalgatusProperties#baseUrl()}. */
     public static final String CSV_URL = "https://rahvaalgatus.ee/initiatives";
 
     private final RestClient rest;
 
-    public RahvaalgatusClient() {
+    public RahvaalgatusClient(RahvaalgatusProperties props) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(5_000);
         factory.setReadTimeout(30_000);
         this.rest = RestClient.builder()
-                .baseUrl("https://rahvaalgatus.ee")
+                .baseUrl(props.baseUrl())
                 .defaultHeader(HttpHeaders.USER_AGENT, "riigiluup/0.0.1 (riigiluup@gmail.com)")
                 .defaultHeader(HttpHeaders.ACCEPT, "text/csv")
                 .requestFactory(factory)

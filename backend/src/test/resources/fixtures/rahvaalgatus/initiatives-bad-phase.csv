@@ -1,0 +1,2 @@
+id,uuid,title,authors,destination,phase,published_at,signing_started_at,signing_ends_at,signature_count,last_signed_at,sent_to_parliament_at,parliament_committees,parliament_decision,finished_in_parliament_at,sent_to_government_at,finished_in_government_at
+201,uuid-201,Initiative with bogus phase,Some Author,parliament,bogus-phase,2026-01-01T00:00:00.000Z,,,,,,,,,,

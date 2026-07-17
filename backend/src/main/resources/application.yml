@@ -97,6 +97,8 @@ riigiluup:
     base-url: https://api.riigikogu.ee
     user-agent: "riigiluup/0.0.1 (riigiluup@gmail.com)"
     rate-limit-per-second: 1
+  rahvaalgatus:
+    base-url: https://rahvaalgatus.ee
   schedule:
     # Votes every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) — new roll-calls
     # appear the same day; the votings list is date-filtered so this stays cheap.

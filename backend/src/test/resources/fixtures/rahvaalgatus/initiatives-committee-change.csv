@@ -1,0 +1,2 @@
+id,uuid,title,authors,destination,phase,published_at,signing_started_at,signing_ends_at,signature_count,last_signed_at,sent_to_parliament_at,parliament_committees,parliament_decision,finished_in_parliament_at,sent_to_government_at,finished_in_government_at
+102,uuid-102,Initiative B - two committees,John Doe,parliament,parliament,2025-11-01T00:00:00.000Z,2025-11-02T00:00:00.000Z,2025-12-01T00:00:00.000Z,1200,2025-11-30T00:00:00.000Z,2025-12-10T00:00:00.000Z,social-affairs,,,,
