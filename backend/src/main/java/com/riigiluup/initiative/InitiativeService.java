@@ -1,12 +1,16 @@
 package com.riigiluup.initiative;
 
+import com.riigiluup.legislation.LegislativeItemRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -34,6 +38,122 @@ public class InitiativeService {
     private static final String PARLIAMENT = "parliament";
 
     private final EntityManager em;
+    private final InitiativeRepository repo;
+    private final InitiativeCommitteeLinkRepository linkRepo;
+    private final LegislativeItemRepository legislativeItemRepo;
+
+    /** Source page for one initiative — every fact on our pages links back to it. */
+    public static String sourceUrl(String externalId) {
+        return "https://rahvaalgatus.ee/initiatives/" + externalId;
+    }
+
+    public InitiativeDto.ListPage list(
+            String q, String phase, String decision, String committee, int page, int size) {
+        StringBuilder where = new StringBuilder(" WHERE i.destination = :dest ");
+        Map<String, Object> params = new HashMap<>();
+        params.put("dest", PARLIAMENT);
+        if (q != null && !q.isBlank()) {
+            where.append(" AND i.title ILIKE :q ");
+            params.put("q", "%" + q.trim() + "%");
+        }
+        if (phase != null && !phase.isBlank()) {
+            where.append(" AND i.phase = :phase ");
+            params.put("phase", InitiativePhase.fromSlug(phase).slug());
+        }
+        if (decision != null && !decision.isBlank()) {
+            where.append(" AND i.parliament_decision = :decision ");
+            params.put("decision", ParliamentDecision.fromSlug(decision).slug());
+        }
+        if (committee != null && !committee.isBlank()) {
+            where.append(" AND EXISTS (SELECT 1 FROM initiative_committee ic "
+                    + "WHERE ic.initiative_id = i.id AND ic.committee_slug = :committee) ");
+            params.put("committee", committee);
+        }
+
+        var countQuery = em.createNativeQuery("SELECT count(*) FROM initiative i" + where);
+        params.forEach(countQuery::setParameter);
+        long total = ((Number) countQuery.getSingleResult()).longValue();
+
+        var idQuery = em.createNativeQuery(
+                "SELECT i.id FROM initiative i" + where
+                        + " ORDER BY i.sent_to_parliament_at DESC NULLS LAST, i.published_at DESC NULLS LAST"
+                        + " LIMIT :size OFFSET :offset");
+        params.forEach(idQuery::setParameter);
+        idQuery.setParameter("size", size);
+        idQuery.setParameter("offset", (long) page * size);
+        List<Long> ids = ((List<?>) idQuery.getResultList()).stream()
+                .map(o -> ((Number) o).longValue()).toList();
+
+        List<InitiativeDto.ListItem> items = ids.stream()
+                .map(id -> repo.findById(id).orElseThrow())
+                .map(this::toListItem)
+                .toList();
+
+        int totalPages = size == 0 ? 0 : (int) Math.ceil((double) total / size);
+        return new InitiativeDto.ListPage(items, page, totalPages, total);
+    }
+
+    public Optional<InitiativeDto.Detail> detail(Long id) {
+        return repo.findById(id).map(i -> new InitiativeDto.Detail(
+                i.getId(),
+                i.getExternalId(),
+                i.getTitle(),
+                i.getAuthors(),
+                i.getPhase() == null ? null : i.getPhase().slug(),
+                i.getSignatureCount(),
+                PARLIAMENT.equals(i.getDestination()) ? PARLIAMENT_THRESHOLD : null,
+                i.getPublishedAt(),
+                i.getSigningStartedAt(),
+                i.getSigningEndsAt(),
+                i.getLastSignedAt(),
+                i.getSentToParliamentAt(),
+                i.getParliamentDecision() == null ? null : i.getParliamentDecision().slug(),
+                i.getFinishedInParliamentAt(),
+                i.getSentToGovernmentAt(),
+                i.getFinishedInGovernmentAt(),
+                committeesOf(i.getId()),
+                linkedBill(i),
+                sourceUrl(i.getExternalId())));
+    }
+
+    /** Reverse link for the bill page: "this act started as a citizen initiative". */
+    public List<InitiativeDto.ListItem> byLegislativeItem(UUID legislativeItemId) {
+        return repo.findByLegislativeItemId(legislativeItemId).stream()
+                .map(this::toListItem)
+                .toList();
+    }
+
+    private InitiativeDto.ListItem toListItem(Initiative i) {
+        return new InitiativeDto.ListItem(
+                i.getId(),
+                i.getExternalId(),
+                i.getTitle(),
+                i.getAuthors(),
+                i.getPhase() == null ? null : i.getPhase().slug(),
+                i.getSignatureCount(),
+                i.getParliamentDecision() == null ? null : i.getParliamentDecision().slug(),
+                i.getSentToParliamentAt(),
+                committeesOf(i.getId()),
+                sourceUrl(i.getExternalId()));
+    }
+
+    private InitiativeDto.LinkedBill linkedBill(Initiative i) {
+        if (i.getLegislativeItemId() == null) return null;
+        return legislativeItemRepo.findById(i.getLegislativeItemId())
+                .map(b -> new InitiativeDto.LinkedBill(
+                        b.getId(), b.getTitle(), i.getLinkedBy(), i.getLinkedAt()))
+                .orElse(null);
+    }
+
+    private List<InitiativeDto.CommitteeRef> committeesOf(Long initiativeId) {
+        return linkRepo.findByInitiativeId(initiativeId).stream()
+                .map(l -> new InitiativeDto.CommitteeRef(
+                        l.getCommitteeSlug(),
+                        InitiativeCommittee.fromSlug(l.getCommitteeSlug())
+                                .map(InitiativeCommittee::committeeName).orElse(null),
+                        l.getGroupId()))
+                .toList();
+    }
 
     /** Pure math, extracted so the funnel's contract is testable without a database. */
     static List<InitiativeDto.FunnelStep> buildFunnel(
