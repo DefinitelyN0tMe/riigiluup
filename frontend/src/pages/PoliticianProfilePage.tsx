@@ -359,6 +359,22 @@ export default function PoliticianProfilePage() {
         </section>
       )}
 
+      {/* Interest declarations live behind e-ID auth in the state register (no open data),
+          so this is a pointer, not a mirror — see the body copy for the honest framing. */}
+      <section aria-label={t("profile.declaration.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+        <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
+          {t("profile.declaration.title")}
+        </h2>
+        <p className="font-serif italic text-[14px] text-ink-2 mb-3 max-w-[64ch]">
+          {t("profile.declaration.body")}
+        </p>
+        <a href="https://www.emta.ee/eraklient/e-teenused-maksutarkus/registrid-paringud/huvide-deklaratsioon"
+           target="_blank" rel="noreferrer noopener"
+           className="inline-block font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
+          {t("profile.declaration.link")} ↗
+        </a>
+      </section>
+
       {data.slug && (
         <section aria-label={t("pages.profileEnh.deviationsTitle")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
           <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-3">

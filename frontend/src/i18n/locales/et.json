@@ -679,6 +679,11 @@
       "positions": "Peetud ametid",
       "source": "Allikas: Wikidata (CC0). Nimetused eesti keeles."
     },
+    "declaration": {
+      "title": "Huvide deklaratsioon",
+      "body": "Iga Riigikogu liige esitab kord aastas huvide deklaratsiooni — majanduslikud huvid, kõrvaltegevused, kohustused. Selle avalik osa on igaühele nähtav pärast autentimist riiklikus registris. Registrit ei avaldata avaandmetena, seega me seda siin ei peegelda — deklaratsiooni saab vaadata otse.",
+      "link": "Vaata registris (vajab autentimist)"
+    },
     "groupAlignmentDetail": "{{matches}} / {{eligible}} kvalifitseeruvat hääletust vastasid fraktsiooni enamuse valikule.",
     "recentDeviations": "Hiljutised kõrvalekalded",
     "mpChoice": "Saadik",

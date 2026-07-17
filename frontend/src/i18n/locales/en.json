@@ -679,6 +679,11 @@
       "positions": "Offices held",
       "source": "Source: Wikidata (CC0). Labels shown in Estonian."
     },
+    "declaration": {
+      "title": "Declaration of interests",
+      "body": "Every MP files an annual declaration of interests — economic interests, side activities, liabilities. Its public part is viewable by anyone after authenticating in the state register. The register is not published as open data, so we do not mirror it here — you can look it up directly.",
+      "link": "View in the register (requires authentication)"
+    },
     "groupAlignmentDetail": "{{matches}} of {{eligible}} eligible votes matched the faction majority.",
     "recentDeviations": "Recent deviations",
     "mpChoice": "MP",
