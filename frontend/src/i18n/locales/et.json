@@ -510,6 +510,19 @@
     "unity": "Ühtsus",
     "attendance": "Osalus"
   },
+  "partyAffiliation": {
+    "title": "Poliitiline kuuluvus",
+    "partyMembership": "Erakonna liikmesus",
+    "faction": "Praegune fraktsioon",
+    "election": "Valimised",
+    "nonAttached": "Fraktsiooni mittekuuluv",
+    "ranForParty": "Kandideeris: {{party}}",
+    "noPartyData": "Erakonna liikmesuse andmed puuduvad (Wikidata).",
+    "since": "alates {{year}}",
+    "until": "kuni {{year}}",
+    "dateUnknown": "kuupäev teadmata",
+    "source": "Erakonnaajalugu: Wikidata (CC0). Erakond ≠ fraktsioon ≠ valimisnimekiri."
+  },
   "affiliation": {
     "title": "Väline liikmete-ajajoon (mitte Riigikogu allikas)",
     "disclaimer": "Käesolev ajajoon EI pärine Riigikogu ametlikest andmetest. See on toimetuse poolt käsitsi kureeritud kokkuvõte saadiku parteilistest sidemetest väljaspool parlamendifraktsiooni, iga kanne kannab kontrollitavat välist allikat.",

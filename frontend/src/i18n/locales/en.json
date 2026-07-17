@@ -510,6 +510,19 @@
     "unity": "Unity",
     "attendance": "Attendance"
   },
+  "partyAffiliation": {
+    "title": "Political affiliation",
+    "partyMembership": "Party membership",
+    "faction": "Current faction",
+    "election": "Election",
+    "nonAttached": "Non-attached",
+    "ranForParty": "Ran for: {{party}}",
+    "noPartyData": "No party-membership data (Wikidata).",
+    "since": "since {{year}}",
+    "until": "until {{year}}",
+    "dateUnknown": "date unknown",
+    "source": "Party history: Wikidata (CC0). Party ≠ faction ≠ electoral list."
+  },
   "affiliation": {
     "title": "External affiliation timeline (non-Riigikogu source)",
     "disclaimer": "This timeline is NOT from Riigikogu's official data. It is an editorially curated summary of the MP's party ties outside the parliamentary faction; every entry cites a verifiable external source.",
