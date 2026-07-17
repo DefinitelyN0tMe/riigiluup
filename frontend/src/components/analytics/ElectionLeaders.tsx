@@ -9,7 +9,7 @@ const TOP_N = 15;
  * breakdown on top. Bars are faction-coloured; every row links to the profile.
  */
 export default function ElectionLeaders({ data }: { data: ElectionBoard }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   if (!data.members.length) return <div className="text-muted font-mono text-sm">{t("viz.noData")}</div>;
 
   const ranked = data.members.slice(0, TOP_N); // already votes-desc from the API
@@ -55,7 +55,7 @@ export default function ElectionLeaders({ data }: { data: ElectionBoard }) {
                   </div>
                 </div>
                 <div className="font-display font-bold text-[22px] sm:text-[26px] leading-none tracking-[-0.03em] text-ink justify-self-end tabular-nums">
-                  {m.personalVotes.toLocaleString()}
+                  {m.personalVotes.toLocaleString(i18n.resolvedLanguage)}
                 </div>
               </Link>
             </li>

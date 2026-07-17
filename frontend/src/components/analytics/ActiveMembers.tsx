@@ -11,7 +11,7 @@ const TOP_N = 15;
  * (so party activity reads at a glance); every row links to the MP's profile.
  */
 export default function ActiveMembers({ data }: { data: MemberActivityBoard }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [metric, setMetric] = useState<ActivityMetric>("speeches");
   if (!data.items.length) return <div className="text-muted font-mono text-sm">{t("viz.noData")}</div>;
 
@@ -65,7 +65,7 @@ export default function ActiveMembers({ data }: { data: MemberActivityBoard }) {
                   </div>
                 </div>
                 <div className="font-display font-bold text-[22px] sm:text-[26px] leading-none tracking-[-0.03em] text-ink justify-self-end tabular-nums">
-                  {val.toLocaleString()}
+                  {val.toLocaleString(i18n.resolvedLanguage)}
                 </div>
               </Link>
             </li>
