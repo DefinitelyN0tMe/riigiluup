@@ -11,6 +11,7 @@ import com.riigiluup.group.GroupType;
 import com.riigiluup.party.ExternalAffiliation;
 import com.riigiluup.party.ExternalAffiliationRepository;
 import com.riigiluup.party.FactionPartyLinkRepository;
+import com.riigiluup.person.MpPartyMembershipRepository;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.statistics.ParticipationStats;
 import com.riigiluup.statistics.StatisticsService;
@@ -36,6 +37,7 @@ public class PoliticianProfileMapper {
     private final ExternalAffiliationRepository externalAffiliations;
     private final IndividualVoteRepository individualVoteRepo;
     private final ElectionResultRepository electionResults;
+    private final MpPartyMembershipRepository partyMembershipRepo;
     private final MemberActivityRepository memberActivity;
 
     public PoliticianProfileDto toDto(PlenaryMember m, List<GroupMembership> memberships) {
@@ -128,6 +130,12 @@ public class PoliticianProfileMapper {
                         riigikoguMemberUrl(m)))
                 .orElse(null);
 
+        List<PoliticianProfileDto.PartyMembership> partyMemberships = partyMembershipRepo
+                .findByMemberExternalIdOrderByStartDateAsc(m.getExternalId()).stream()
+                .map(pm -> new PoliticianProfileDto.PartyMembership(
+                        pm.getPartyLabel(), pm.getPartyQid(), pm.getStartDate(), pm.getEndDate()))
+                .toList();
+
         return new PoliticianProfileDto(
                 m.getId(), m.getSlug(),
                 m.getFullName(), m.getFirstName(), m.getLastName(),
@@ -153,7 +161,8 @@ public class PoliticianProfileMapper {
                 election,
                 activity,
                 m.getEducation(),
-                m.getPositions()
+                m.getPositions(),
+                partyMemberships
         );
     }
 

@@ -38,7 +38,8 @@ public record PoliticianProfileDto(
         ElectionInfo election,
         ActivityInfo activity,
         String education,
-        String positions
+        String positions,
+        List<PartyMembership> partyMemberships
 ) {
     /** How the MP won their seat (from opendata.valimised.ee); null if not matched. */
     public record ElectionInfo(
@@ -50,6 +51,9 @@ public record PoliticianProfileDto(
             Integer ballotNumber,
             String sourceUrl
     ) {}
+    /** A party-membership period from Wikidata P102. Distinct from faction and electoral list. */
+    public record PartyMembership(String partyLabel, String partyQid,
+                                  LocalDate startDate, LocalDate endDate) {}
     /** Parliamentary activity over the term (from Riigikogu API); null if not yet computed. */
     public record ActivityInfo(
             int speeches,
