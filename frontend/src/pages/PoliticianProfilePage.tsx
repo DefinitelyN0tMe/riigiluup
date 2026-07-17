@@ -10,6 +10,7 @@ import CommitteeChip from "../components/CommitteeChip";
 import FactionBadge from "../components/FactionBadge";
 import MpTopicRadar from "../components/analytics/MpTopicRadar";
 import AffiliationTimeline from "../components/analytics/AffiliationTimeline";
+import PartyAffiliationPanel from "../components/PartyAffiliationPanel";
 import DeviationsCalendar from "../components/analytics/DeviationsCalendar";
 import SimilarPeers from "../components/analytics/SimilarPeers";
 import { fetchMpTopicRadar, fetchMpDeviationsTimeline, fetchMpSimilarPeers } from "../api/analytics";
@@ -441,6 +442,14 @@ export default function PoliticianProfilePage() {
           </div>
         </section>
       )}
+
+      <div className="mb-6">
+        <PartyAffiliationPanel
+          memberships={data.partyMemberships}
+          factionName={data.faction?.name ?? null}
+          ranForParty={data.election?.partyName ?? null}
+        />
+      </div>
 
       {data.externalAffiliations && data.externalAffiliations.length > 0 && (
         <AffiliationTimeline items={data.externalAffiliations} />

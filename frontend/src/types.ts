@@ -101,6 +101,13 @@ export type PoliticianProfile = {
   activity?: ActivityInfo | null;
   education?: string | null;
   positions?: string | null;
+  partyMemberships: PartyMembership[];
+};
+export type PartyMembership = {
+  partyLabel: string;
+  partyQid: string;
+  startDate: string | null;
+  endDate: string | null;
 };
 export type ElectionInfo = {
   electionCode: string;
