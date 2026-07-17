@@ -39,6 +39,7 @@ class InitiativeApiIntegrationTest extends AbstractIntegrationTest {
     @Autowired private InitiativeCommitteeLinkRepository linkRepo;
 
     private Initiative decided;
+    private Initiative municipal;
 
     @BeforeEach
     void seed() {
@@ -108,7 +109,7 @@ class InitiativeApiIntegrationTest extends AbstractIntegrationTest {
                 .importedAt(now)
                 .build());
 
-        initiativeRepo.save(Initiative.builder()
+        municipal = initiativeRepo.save(Initiative.builder()
                 .sourceName("rahvaalgatus")
                 .externalId("it-municipal")
                 .uuid("uuid-municipal")
@@ -154,6 +155,13 @@ class InitiativeApiIntegrationTest extends AbstractIntegrationTest {
     @Test
     void detail_unknownId_returns404() throws Exception {
         mockMvc.perform(get("/api/v1/initiatives/999999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void detail_municipalId_returns404() throws Exception {
+        // Municipal initiatives are stored but never served — even by numeric id.
+        mockMvc.perform(get("/api/v1/initiatives/" + municipal.getId()))
                 .andExpect(status().isNotFound());
     }
 

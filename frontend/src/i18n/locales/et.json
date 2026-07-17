@@ -845,8 +845,8 @@
       "committeesTitle": "Komisjonid",
       "note": {
         "headline": "Riigikogule suunatud {{targeted}} kollektiivsest pöördumisest võeti {{draftAct}} menetlusse eelnõuna või olulise tähtsusega riikliku küsimusena. Allikas käsitleb neid kui üht tulemust ega ütle, kumb neist kahest üksikjuhtumil tegelikult toimus.",
-        "neverSent_one": "{{count}} pöördumine kogus nõutud 1000 allkirja, kuid seda Riigikogule kunagi ei saadetud.",
-        "neverSent_other": "{{count}} pöördumist kogus nõutud 1000 allkirja, kuid neid Riigikogule kunagi ei saadetud.",
+        "neverSent_one": "{{count}} pöördumine kogus nõutud 1000 allkirja (MSVS § 7¹), kuid seda Riigikogule kunagi ei saadetud.",
+        "neverSent_other": "{{count}} pöördumist kogus nõutud 1000 allkirja (MSVS § 7¹), kuid neid Riigikogule kunagi ei saadetud.",
         "belowThreshold_one": "{{count}} pöördumine saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
         "belowThreshold_other": "{{count}} pöördumist saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
         "median": "Mediaan otsuseni: {{days}} päeva (n = {{n}})."

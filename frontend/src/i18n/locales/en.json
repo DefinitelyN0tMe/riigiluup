@@ -845,8 +845,8 @@
       "committeesTitle": "Committees",
       "note": {
         "headline": "Of {{targeted}} citizen initiatives aimed at Riigikogu, {{draftAct}} were taken up as a draft act or a matter of national importance. The source records these as a single outcome and does not say which of the two applies to any individual initiative.",
-        "neverSent_one": "{{count}} initiative collected the required 1,000 signatures and was never sent to parliament.",
-        "neverSent_other": "{{count}} initiatives collected the required 1,000 signatures and were never sent to parliament.",
+        "neverSent_one": "{{count}} initiative collected the required 1,000 signatures (MSVS § 7¹) and was never sent to parliament.",
+        "neverSent_other": "{{count}} initiatives collected the required 1,000 signatures (MSVS § 7¹) and were never sent to parliament.",
         "belowThreshold_one": "{{count}} initiative was sent to parliament without ever reaching the signature threshold in this data. The source does not explain why — we do not speculate.",
         "belowThreshold_other": "{{count}} initiatives were sent to parliament without ever reaching the signature threshold in this data. The source does not explain why — we do not speculate.",
         "median": "Median time to a decision: {{days}} days (n = {{n}})."

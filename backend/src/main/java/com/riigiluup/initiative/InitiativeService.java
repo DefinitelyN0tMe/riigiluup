@@ -27,11 +27,17 @@ import java.util.UUID;
 public class InitiativeService {
 
     /**
-     * Signature threshold for a collective address to Riigikogu.
+     * Signature threshold for a collective address (kollektiivne pöördumine) to the Riigikogu:
+     * at least 1000 supporting signatures ("vähemalt 1000 toetusallkirja"), set by the
+     * Märgukirjale ja selgitustaotlusele vastamise ning kollektiivse pöördumise esitamise
+     * seadus (MSVS) § 7¹ lõige 1 (added by RT I, 01.04.2014, 1 — jõust. 11.04.2014; unchanged
+     * by the most recent amendment, RT I, 18.12.2024, 2, which only touched §6's response
+     * deadline). Verified against the current consolidated text at
+     * https://www.riigiteataja.ee/akt/MSVS#para7b1 (2026-07-17).
      *
-     * <p>TODO(before merge): verify the exact statute (MSVS §4¹ vs RKKTS §152¹) against
-     * riigiteataja.ee and cite it in the methodology page. Do NOT cite from memory — the spec
-     * flagged this deliberately.
+     * <p>RKKTS §152⁹–152¹³ (added by the same 2014 act) governs only the Riigikogu's internal
+     * procedure for deciding whether to accept an already-submitted pöördumine for processing
+     * — it does not itself set the signature threshold.
      */
     public static final int PARLIAMENT_THRESHOLD = 1000;
 
@@ -94,26 +100,28 @@ public class InitiativeService {
     }
 
     public Optional<InitiativeDto.Detail> detail(Long id) {
-        return repo.findById(id).map(i -> new InitiativeDto.Detail(
-                i.getId(),
-                i.getExternalId(),
-                i.getTitle(),
-                i.getAuthors(),
-                i.getPhase() == null ? null : i.getPhase().slug(),
-                i.getSignatureCount(),
-                PARLIAMENT.equals(i.getDestination()) ? PARLIAMENT_THRESHOLD : null,
-                i.getPublishedAt(),
-                i.getSigningStartedAt(),
-                i.getSigningEndsAt(),
-                i.getLastSignedAt(),
-                i.getSentToParliamentAt(),
-                i.getParliamentDecision() == null ? null : i.getParliamentDecision().slug(),
-                i.getFinishedInParliamentAt(),
-                i.getSentToGovernmentAt(),
-                i.getFinishedInGovernmentAt(),
-                committeesOf(i.getId()),
-                linkedBill(i),
-                sourceUrl(i.getExternalId())));
+        return repo.findById(id)
+                .filter(i -> PARLIAMENT.equals(i.getDestination()))
+                .map(i -> new InitiativeDto.Detail(
+                        i.getId(),
+                        i.getExternalId(),
+                        i.getTitle(),
+                        i.getAuthors(),
+                        i.getPhase() == null ? null : i.getPhase().slug(),
+                        i.getSignatureCount(),
+                        PARLIAMENT.equals(i.getDestination()) ? PARLIAMENT_THRESHOLD : null,
+                        i.getPublishedAt(),
+                        i.getSigningStartedAt(),
+                        i.getSigningEndsAt(),
+                        i.getLastSignedAt(),
+                        i.getSentToParliamentAt(),
+                        i.getParliamentDecision() == null ? null : i.getParliamentDecision().slug(),
+                        i.getFinishedInParliamentAt(),
+                        i.getSentToGovernmentAt(),
+                        i.getFinishedInGovernmentAt(),
+                        committeesOf(i.getId()),
+                        linkedBill(i),
+                        sourceUrl(i.getExternalId())));
     }
 
     /** Reverse link for the bill page: "this act started as a citizen initiative". */
