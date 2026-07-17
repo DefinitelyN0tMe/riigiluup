@@ -36,6 +36,7 @@ export type Party = {
   officialUrl: string | null;
 };
 export type CommitteeMembership = {
+  externalId: string;
   name: string;
   shortName: string | null;
   colorHex: string | null;

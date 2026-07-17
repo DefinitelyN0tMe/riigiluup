@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import type { CommitteeMembership } from "../types";
 
 export default function CommitteeChip({ c }: { c: CommitteeMembership }) {
@@ -9,7 +10,13 @@ export default function CommitteeChip({ c }: { c: CommitteeMembership }) {
       className="border rounded-full px-3 py-1 text-sm bg-white text-ink"
       style={{ borderColor: border }}
     >
-      <span className="font-medium">{c.name}</span>
+      {c.externalId ? (
+        <Link to={`/committees/${c.externalId}`} className="font-medium hover:underline">
+          {c.name}
+        </Link>
+      ) : (
+        <span className="font-medium">{c.name}</span>
+      )}
       {c.role !== "MEMBER" && (
         <span className="text-slate-500"> — {t(`committeeRole.${c.role}` as const, { defaultValue: c.role })}</span>
       )}

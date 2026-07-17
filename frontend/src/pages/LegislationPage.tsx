@@ -20,6 +20,8 @@ export default function LegislationPage() {
   const minDays = sp.get("minDays") ? Number(sp.get("minDays")) : undefined;
   const maxDays = sp.get("maxDays") ? Number(sp.get("maxDays")) : undefined;
   const velocityLabel = sp.get("velocityLabel") ?? undefined;
+  const committee = sp.get("committee") ?? "";
+  const committeeName = sp.get("committeeName") ?? undefined;   // frontend-only hint from the committee page
   const page = sp.get("page") ? Number(sp.get("page")) : 0;
 
   function updateParams(next: Record<string, string | number | undefined | null>) {
@@ -41,13 +43,14 @@ export default function LegislationPage() {
     code === "" ? t("legislation.allPhases") : t(`phase.${code}` as const, { defaultValue: code });
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["legislation", q, phase, topicEdid, minDays, maxDays, page],
+    queryKey: ["legislation", q, phase, topicEdid, minDays, maxDays, committee, page],
     queryFn: () => fetchLegislation({
       q: q || undefined,
       phase: phase || undefined,
       topicEdid,
       minDays,
       maxDays,
+      committee: committee || undefined,
       page,
       size: 50,
     }),
@@ -66,8 +69,13 @@ export default function LegislationPage() {
       label: `${t("legislation.chip.velocity")}: ${velocityLabel ?? `${minDays ?? 0}–${maxDays ?? "∞"}d`}`,
       removeKeys: ["minDays", "maxDays", "velocityLabel"],
     });
+    if (committee) out.push({
+      key: "committee",
+      label: `${t("legislation.chip.committee")}: ${committeeName ?? committee}`,
+      removeKeys: ["committee", "committeeName"],
+    });
     return out;
-  }, [topicEdid, topicLabel, minDays, maxDays, velocityLabel, t]);
+  }, [topicEdid, topicLabel, minDays, maxDays, velocityLabel, committee, committeeName, t]);
 
   return (
     <div className="px-5 sm:px-8 md:px-10 py-10 sm:py-14 md:py-16 max-w-[1440px] mx-auto w-full">

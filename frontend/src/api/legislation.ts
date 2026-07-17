@@ -13,12 +13,14 @@ export function fetchLegislation(params: {
   topicEdid?: number;
   minDays?: number;
   maxDays?: number;
+  committee?: string;
   page?: number;
   size?: number;
 }) {
   const q = new URLSearchParams();
   if (params.q) q.set("q", params.q);
   if (params.phase) q.set("phase", params.phase);
+  if (params.committee) q.set("committee", params.committee);
   if (params.membership !== undefined) q.set("membership", String(params.membership));
   if (params.topicEdid !== undefined) q.set("topicEdid", String(params.topicEdid));
   if (params.minDays !== undefined) q.set("minDays", String(params.minDays));
