@@ -78,6 +78,7 @@ export default function AnalyticsPage() {
     ["XI.", t("analytics.hero.toc11")],
     ["XII.", t("analytics.hero.toc12")],
     ["XIII.", t("analytics.hero.toc13")],
+    ["XIV.", t("analytics.hero.toc14")],
     ["XV.", t("analytics.hero.toc15")],
   ];
 
