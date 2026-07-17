@@ -77,6 +77,11 @@ resilience4j:
         waitDurationInOpenState: 30s
 
 riigiluup:
+  cors:
+    # Origins allowed to call /api/v1/admin/** with credentials. Empty = same-origin only
+    # (prod serves the SPA behind the same nginx). The local profile below opens the Vite
+    # dev server so the admin panel works against a bootRun backend.
+    admin-origins: ${RIIGILUUP_ADMIN_CORS_ORIGINS:}
   rate-limit:
     enabled: true
     per-minute: 60
@@ -106,3 +111,12 @@ riigiluup:
     username: ${RIIGILUUP_ADMIN_USERNAME:admin}
     password: ${RIIGILUUP_ADMIN_PASSWORD:change-me}
     allowed-emails: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS:riigiluup@gmail.com}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+riigiluup:
+  cors:
+    admin-origins: http://localhost:5173

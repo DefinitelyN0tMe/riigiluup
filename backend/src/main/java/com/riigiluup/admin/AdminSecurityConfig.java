@@ -30,11 +30,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +71,9 @@ public class AdminSecurityConfig {
 
     @Value("${GOOGLE_OAUTH_CLIENT_SECRET:}")
     private String googleClientSecret;
+
+    @Value("${riigiluup.cors.admin-origins:}")
+    private String adminCorsOriginsCsv;
 
     private static final RequestMatcher ADMIN_MATCHER = new OrRequestMatcher(
             new AntPathRequestMatcher("/api/v1/admin/**"),
@@ -112,6 +119,7 @@ public class AdminSecurityConfig {
                                           ObjectMapper objectMapper) throws Exception {
         http
                 .securityMatcher(ADMIN_MATCHER)
+                .cors(c -> c.configurationSource(adminCorsConfigurationSource()))
                 .csrf(c -> c.disable())
                 .exceptionHandling(e -> e.defaultAuthenticationEntryPointFor(
                         jsonUnauthorized(objectMapper),
@@ -149,6 +157,27 @@ public class AdminSecurityConfig {
                 .csrf(c -> c.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
+    }
+
+    /**
+     * CORS for the admin API. Empty origins (the default) means same-origin only — in
+     * production the SPA sits behind the same nginx, so no cross-origin access is needed.
+     * The local profile allows the Vite dev server (5173) so the admin panel works against
+     * a bootRun backend. Unlike the public API's {@code @CrossOrigin("*")}, this sends
+     * allow-credentials, which the admin session/Basic auth requires.
+     */
+    private CorsConfigurationSource adminCorsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        List<String> origins = Arrays.stream(adminCorsOriginsCsv.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).toList();
+        if (origins.isEmpty()) return source;
+        CorsConfiguration cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(origins);
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setAllowCredentials(true);
+        source.registerCorsConfiguration("/api/v1/admin/**", cfg);
+        return source;
     }
 
     /**
