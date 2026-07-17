@@ -13,7 +13,6 @@ export default function MpScatter({ data }: { data: MpSimilarity }) {
   const navigate = useNavigate();
   const [hover, setHover] = useState<string | null>(null);
   const points = data.points;
-  if (!points.length) return <div className="text-muted font-mono text-sm">{t("viz.noData")}</div>;
 
   const size = 640;
   const pad = 56;
@@ -38,6 +37,10 @@ export default function MpScatter({ data }: { data: MpSimilarity }) {
 
   const highlighted = points.find((p) => p.slug === hover);
   const LABEL = "'JetBrains Mono', monospace";
+
+  // After the hooks — an early return above useMemo breaks the rules of hooks
+  // (hook order changes when data flips between empty and non-empty).
+  if (!points.length) return <div className="text-muted font-mono text-sm">{t("viz.noData")}</div>;
 
   return (
     <div className="relative">
