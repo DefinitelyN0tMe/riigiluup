@@ -244,6 +244,24 @@ public class RiigikoguClient {
         return pageTotal(n);
     }
 
+    /**
+     * Full verbatim records (agenda items + speech texts) for sittings in the window.
+     * One request returns the whole window, so callers should keep windows to ~2 weeks —
+     * a sitting week is a few MB of text and the read timeout is 20 s.
+     */
+    public List<VerbatimDto> fetchVerbatims(LocalDate from, LocalDate to) {
+        throttle();
+        VerbatimDto[] arr = rest.get()
+                .uri(b -> b.path("/api/steno/verbatims")
+                        .queryParam("startDate", from.toString())
+                        .queryParam("endDate", to.toString())
+                        .queryParam("lang", "et")
+                        .build())
+                .retrieve()
+                .body(VerbatimDto[].class);
+        return arr == null ? List.of() : List.of(arr);
+    }
+
     static int pageTotal(JsonNode n) {
         if (n == null) return 0;
         JsonNode p = n.path("page").path("totalElements");

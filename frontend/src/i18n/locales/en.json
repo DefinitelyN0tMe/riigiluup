@@ -5,6 +5,7 @@
     "votes": "Votes",
     "compare": "Compare",
     "bills": "Bills",
+    "speeches": "Speeches",
     "analytics": "Analytics",
     "brand": "Riigiluup"
   },
@@ -125,6 +126,18 @@
       "more": "Party comparison",
       "loading": "Loading factions…"
     }
+  },
+  "speeches": {
+    "title": "Speeches",
+    "lede": "Every word spoken at the plenary lectern, searchable. Texts come from the official verbatim records; every excerpt links to the full stenogram.",
+    "searchPlaceholder": "Search speeches…",
+    "filterMember": "MP",
+    "clearMember": "Clear MP filter",
+    "results_one": "{{count}} speech",
+    "results_other": "{{count}} speeches",
+    "empty": "No speeches match. Search is exact-wordform (no Estonian stemming), so try the word form used in the chamber.",
+    "openStenogram": "Open the stenogram",
+    "searchNote": "Search matches exact word forms in the original language of the speech (mostly Estonian). Speeches by the chair, ministers and guests appear under the name printed in the stenogram."
   },
   "analytics": {
     "hero": {
@@ -670,7 +683,8 @@
       "interpellations": "Questions to ministers",
       "interpellationsHint": "A formal demand that a minister answer in the chamber, followed by debate.",
       "writtenQuestions": "Written questions",
-      "source": "On the Riigikogu site"
+      "source": "On the Riigikogu site",
+      "allSpeeches": "All speeches, searchable"
     },
     "bio": {
       "title": "Education & career",

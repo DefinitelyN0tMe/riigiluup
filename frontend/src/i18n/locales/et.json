@@ -5,6 +5,7 @@
     "votes": "Hääletused",
     "compare": "Võrdle",
     "bills": "Eelnõud",
+    "speeches": "Kõned",
     "analytics": "Analüütika",
     "brand": "Riigiluup"
   },
@@ -125,6 +126,18 @@
       "more": "Erakondade võrdlus",
       "loading": "Laen fraktsioone…"
     }
+  },
+  "speeches": {
+    "title": "Kõned",
+    "lede": "Iga täiskogu kõnepuldist öeldud sõna — otsitav. Tekstid pärinevad ametlikest stenogrammidest; iga katkend viib täisstenogrammini.",
+    "searchPlaceholder": "Otsi kõnedest…",
+    "filterMember": "Saadik",
+    "clearMember": "Eemalda saadiku filter",
+    "results_one": "{{count}} sõnavõtt",
+    "results_other": "{{count}} sõnavõttu",
+    "empty": "Midagi ei leitud. Otsing on täpne sõnavormide järgi (eesti tüvestust pole) — proovi sõnavormi, nagu see saalis kõlas.",
+    "openStenogram": "Ava stenogramm",
+    "searchNote": "Otsing leiab täpsed sõnavormid kõne originaalkeeles (peamiselt eesti). Istungi juhataja, ministrite ja külaliste sõnavõtud kuvatakse stenogrammis trükitud nime all."
   },
   "analytics": {
     "hero": {
@@ -670,7 +683,8 @@
       "interpellations": "Arupärimised",
       "interpellationsHint": "Ametlik nõue, millele minister peab istungil vastama, ja sellele järgnev arutelu.",
       "writtenQuestions": "Kirjalikud küsimused",
-      "source": "Riigikogu lehel"
+      "source": "Riigikogu lehel",
+      "allSpeeches": "Kõik sõnavõtud otsinguga"
     },
     "bio": {
       "title": "Haridus ja karjäär",

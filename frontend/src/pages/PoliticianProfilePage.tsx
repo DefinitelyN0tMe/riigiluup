@@ -312,10 +312,16 @@ export default function PoliticianProfilePage() {
             <ActivityStat value={data.activity.interpellations} label={t("profile.activity.interpellations")} hint={t("profile.activity.interpellationsHint")} />
             <ActivityStat value={data.activity.writtenQuestions} label={t("profile.activity.writtenQuestions")} />
           </div>
-          <a href={data.activity.sourceUrl} target="_blank" rel="noreferrer noopener"
-             className="inline-block mt-4 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
-            {t("profile.activity.source")} ↗
-          </a>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 items-baseline">
+            <Link to={`/speeches?member=${encodeURIComponent(data.slug ?? "")}&memberName=${encodeURIComponent(data.fullName ?? "")}`}
+                  className="font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
+              {t("profile.activity.allSpeeches")} →
+            </Link>
+            <a href={data.activity.sourceUrl} target="_blank" rel="noreferrer noopener"
+               className="font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
+              {t("profile.activity.source")} ↗
+            </a>
+          </div>
         </section>
       )}
 

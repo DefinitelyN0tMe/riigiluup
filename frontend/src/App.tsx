@@ -13,6 +13,7 @@ const VoteDetailPage = lazy(() => import("./pages/VoteDetailPage"));
 const LegislationDetailPage = lazy(() => import("./pages/LegislationDetailPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
+const SpeechesPage = lazy(() => import("./pages/SpeechesPage"));
 const AboutPage = lazy(() => import("./pages/static/AboutPage"));
 const MethodologyIndexPage = lazy(() => import("./pages/static/MethodologyIndexPage"));
 const MethodologyParticipationPage = lazy(() => import("./pages/static/MethodologyParticipationPage"));
@@ -103,6 +104,7 @@ export default function App() {
         <Route path="/data-status" element={<Suspense fallback={fallback}><DataStatusPage /></Suspense>} />
         <Route path="/corrections" element={<Suspense fallback={fallback}><CorrectionsPage /></Suspense>} />
         <Route path="/analytics" element={<Suspense fallback={fallback}><AnalyticsPage /></Suspense>} />
+        <Route path="/speeches" element={<Suspense fallback={fallback}><SpeechesPage /></Suspense>} />
         <Route path="/admin" element={<Suspense fallback={fallback}><AdminPage /></Suspense>} />
         <Route path="*" element={<Suspense fallback={fallback}><NotFoundPage /></Suspense>} />
       </Route>
