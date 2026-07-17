@@ -41,6 +41,7 @@ public class AdminIngestionController {
     private final PartyFinanceImporter partyFinanceImporter;
     private final com.riigiluup.ingestion.riigikogu.GovernmentQuestionImporter governmentQuestionImporter;
     private final com.riigiluup.ingestion.riigiteataja.RtLinker rtLinker;
+    private final com.riigiluup.ingestion.rahvaalgatus.RahvaalgatusImporter rahvaalgatusImporter;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -149,5 +150,10 @@ public class AdminIngestionController {
     @PostMapping("/rt-links")
     public Map<String, Integer> runRtLinking(@RequestParam(defaultValue = "100") int limit) {
         return rtLinker.linkBatch(Math.min(limit, 1000));
+    }
+
+    @PostMapping("/initiatives")
+    public ImportRunLog runInitiativesImport() {
+        return rahvaalgatusImporter.runFullRefresh();
     }
 }
