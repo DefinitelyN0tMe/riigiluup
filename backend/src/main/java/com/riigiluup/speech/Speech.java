@@ -7,9 +7,11 @@ import lombok.*;
 import java.time.Instant;
 
 /**
- * One speech from a Riigikogu plenary verbatim record. No source_snapshot: the raw payload
- * is megabytes of text per sitting week; source_url points at the public stenogram instead.
- * The tsv search column is DB-generated (V23) and deliberately unmapped.
+ * One speech from a Riigikogu plenary verbatim record. There is no per-event natural key in
+ * the source (its event uuid identifies the speaker), so re-imports replace whole sittings
+ * by source_url. No source_snapshot: the raw payload is megabytes of text per sitting week;
+ * source_url points at the public stenogram instead. The tsv search column is DB-generated
+ * (V23) and deliberately unmapped.
  */
 @Entity
 @Table(name = "speech")
@@ -23,8 +25,9 @@ public class Speech {
     @Column(name = "source_name", nullable = false, length = 64)
     private String sourceName;
 
-    @Column(name = "external_id", nullable = false, length = 64)
-    private String externalId;
+    /** Riigikogu person uuid of the speaker as printed in the verbatim; null for guests. */
+    @Column(name = "speaker_uuid", length = 64)
+    private String speakerUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plenary_member_id")

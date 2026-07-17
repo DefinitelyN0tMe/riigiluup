@@ -7,11 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
-import java.util.Optional;
 
 public interface SpeechRepository extends JpaRepository<Speech, Long> {
 
-    Optional<Speech> findBySourceNameAndExternalId(String sourceName, String externalId);
+    /** Per-sitting replace on re-import — the source has no per-event natural key. */
+    long deleteBySourceNameAndSourceUrl(String sourceName, String sourceUrl);
 
     /**
      * Full-text search over speech texts. 'simple' config — PostgreSQL has no Estonian

@@ -20,8 +20,9 @@ import java.util.Optional;
 /**
  * Imports full speech texts from plenary verbatim records. Windows are chunked to ~2 weeks
  * per request (one verbatims call returns the whole window as one payload). Each sitting is
- * upserted in its own transaction; re-imports overwrite text and speaker because stenograms
- * are edited after publication (the source carries an `edited` flag).
+ * replaced wholesale in its own transaction — the source has no per-event key (its event
+ * uuid identifies the speaker) and stenograms are edited after publication, so delete +
+ * reinsert per sitting is the only way to stay converged with the source.
  */
 @Slf4j
 @Service
@@ -64,7 +65,7 @@ public class SpeechImporter {
         int upserted = 0;
         int failedSittings = 0;
         try {
-            Map<String, List<PlenaryMember>> roster = rosterByFullName();
+            Roster roster = loadRoster();
             LocalDate cursor = from;
             while (!cursor.isAfter(to)) {
                 LocalDate windowEnd = cursor.plusDays(CHUNK_DAYS - 1);
@@ -75,7 +76,7 @@ public class SpeechImporter {
                     List<SpeechMapper.FlatSpeech> speeches = mapper.flatten(verbatim);
                     seenSpeeches += speeches.size();
                     try {
-                        tx.executeWithoutResult(status -> upsertSitting(speeches, roster));
+                        tx.executeWithoutResult(status -> replaceSitting(verbatim.link(), speeches, roster));
                         upserted += speeches.size();
                     } catch (CallNotPermittedException e) {
                         throw e; // circuit breaker open → abort the run cleanly (FAILED)
@@ -106,44 +107,47 @@ public class SpeechImporter {
         return run;
     }
 
-    private Map<String, List<PlenaryMember>> rosterByFullName() {
+    private record Roster(Map<String, PlenaryMember> byExternalId,
+                          Map<String, List<PlenaryMember>> byFullName) {}
+
+    private Roster loadRoster() {
+        Map<String, PlenaryMember> byId = new HashMap<>();
         Map<String, List<PlenaryMember>> byName = new HashMap<>();
         for (PlenaryMember m : memberRepo.findAll()) {
+            byId.put(m.getExternalId(), m);
             byName.computeIfAbsent(m.getFullName(), k -> new java.util.ArrayList<>()).add(m);
         }
-        return byName;
+        return new Roster(byId, byName);
     }
 
-    private void upsertSitting(List<SpeechMapper.FlatSpeech> speeches,
-                               Map<String, List<PlenaryMember>> roster) {
+    /**
+     * The verbatim speaker uuid is the Riigikogu person uuid, i.e. exactly our members'
+     * external_id — so uuid match is primary and exact. Name matching (role prefix
+     * stripping) only kicks in when the source omits the uuid.
+     */
+    private PlenaryMember resolveSpeaker(SpeechMapper.FlatSpeech f, Roster roster) {
+        if (f.speakerUuid() != null) {
+            return roster.byExternalId().get(f.speakerUuid());
+        }
+        return SpeechMapper.matchSpeaker(f.speakerRaw(), roster.byFullName()).orElse(null);
+    }
+
+    private void replaceSitting(String sittingLink, List<SpeechMapper.FlatSpeech> speeches,
+                                Roster roster) {
+        speechRepo.deleteBySourceNameAndSourceUrl(client.sourceName(), sittingLink);
         for (SpeechMapper.FlatSpeech f : speeches) {
-            PlenaryMember member = SpeechMapper.matchSpeaker(f.speakerRaw(), roster).orElse(null);
-            Speech existing = speechRepo
-                    .findBySourceNameAndExternalId(client.sourceName(), f.uuid())
-                    .orElse(null);
-            if (existing == null) {
-                speechRepo.save(Speech.builder()
-                        .sourceName(client.sourceName())
-                        .externalId(f.uuid())
-                        .plenaryMember(member)
-                        .speakerRaw(f.speakerRaw())
-                        .spokenAt(f.spokenAt())
-                        .sittingTitle(f.sittingTitle())
-                        .agendaItemTitle(f.agendaItemTitle())
-                        .text(f.text())
-                        .sourceUrl(f.sittingLink())
-                        .importedAt(Instant.now())
-                        .build());
-            } else {
-                existing.setPlenaryMember(member);
-                existing.setSpeakerRaw(f.speakerRaw());
-                existing.setSpokenAt(f.spokenAt());
-                existing.setSittingTitle(f.sittingTitle());
-                existing.setAgendaItemTitle(f.agendaItemTitle());
-                existing.setText(f.text());
-                existing.setSourceUrl(f.sittingLink());
-                speechRepo.save(existing);
-            }
+            speechRepo.save(Speech.builder()
+                    .sourceName(client.sourceName())
+                    .speakerUuid(f.speakerUuid())
+                    .plenaryMember(resolveSpeaker(f, roster))
+                    .speakerRaw(f.speakerRaw())
+                    .spokenAt(f.spokenAt())
+                    .sittingTitle(f.sittingTitle())
+                    .agendaItemTitle(f.agendaItemTitle())
+                    .text(f.text())
+                    .sourceUrl(f.sittingLink())
+                    .importedAt(Instant.now())
+                    .build());
         }
     }
 }

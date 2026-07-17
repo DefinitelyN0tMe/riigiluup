@@ -37,28 +37,34 @@ class SpeechMapperTest {
 
     @Test
     void flattens_only_speech_events_with_text_and_parses_offset_datetime() {
+        // NB: the event `uuid` in the source identifies the SPEAKER (person uuid), not the
+        // event — verified against live data; the OpenAPI description is wrong. It may be
+        // null for guests, and a null-uuid speech must still be kept.
         VerbatimDto v = new VerbatimDto(15, 7, "https://stenogrammid.riigikogu.ee/202606081500",
                 "2026-06-08T12:00:00.000+00:00", "XV Riigikogu, VII istungjärk, täiskogu istung", false,
                 List.of(new VerbatimDto.AgendaItem("ai-1", "2026-06-08T15:00:00.000+00:00",
-                        "Istungi rakendamine",
+                        "<p>Istungi <b>rakendamine</b></p>",
                         List.of(
-                                event("SPEECH", "sp-1", "Esimees Lauri Hussar", "Austatud Riigikogu!"),
+                                event("SPEECH", "person-1", "Esimees Lauri Hussar", "Austatud Riigikogu!"),
                                 event("VOTING_EVENT", "vt-1", null, null),
-                                event("SPEECH", "sp-2", "Kaja Kallas", "   "),
+                                event("SPEECH", "person-2", "Kaja Kallas", "   "),
+                                event("SPEECH", null, "Külaline Mari Mets", "Tänan kutse eest!"),
                                 event("SESSION_END", "se-1", null, null)
                         ))));
 
         List<SpeechMapper.FlatSpeech> out = mapper.flatten(v);
 
-        assertThat(out).hasSize(1);
+        assertThat(out).hasSize(2);
         SpeechMapper.FlatSpeech s = out.get(0);
-        assertThat(s.uuid()).isEqualTo("sp-1");
+        assertThat(s.speakerUuid()).isEqualTo("person-1");
         assertThat(s.speakerRaw()).isEqualTo("Esimees Lauri Hussar");
         assertThat(s.spokenAt()).isEqualTo(Instant.parse("2026-06-08T15:00:44Z"));
         assertThat(s.sittingTitle()).isEqualTo("XV Riigikogu, VII istungjärk, täiskogu istung");
         assertThat(s.sittingLink()).isEqualTo("https://stenogrammid.riigikogu.ee/202606081500");
         assertThat(s.agendaItemTitle()).isEqualTo("Istungi rakendamine");
         assertThat(s.text()).isEqualTo("Austatud Riigikogu!");
+        assertThat(out.get(1).speakerUuid()).isNull();
+        assertThat(out.get(1).text()).isEqualTo("Tänan kutse eest!");
     }
 
     @Test

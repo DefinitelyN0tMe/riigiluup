@@ -1,6 +1,7 @@
 package com.riigiluup.ingestion.riigikogu;
 
 import com.riigiluup.person.PlenaryMember;
+import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -15,7 +16,8 @@ import java.util.Optional;
 public class SpeechMapper {
 
     public record FlatSpeech(
-            String uuid,
+            /** Person uuid of the speaker (the source's event `uuid` — misdocumented upstream). */
+            String speakerUuid,
             String speakerRaw,
             Instant spokenAt,
             String sittingTitle,
@@ -31,14 +33,14 @@ public class SpeechMapper {
             if (item.events() == null) continue;
             for (VerbatimDto.Event e : item.events()) {
                 if (!"SPEECH".equals(e.type())) continue;
-                if (e.uuid() == null || e.text() == null || e.text().isBlank()) continue;
+                if (e.text() == null || e.text().isBlank()) continue;
                 out.add(new FlatSpeech(
                         e.uuid(),
                         e.speaker() == null ? "—" : e.speaker(),
                         parseInstant(e.date()),
                         verbatim.title(),
                         verbatim.link(),
-                        item.title(),
+                        plainText(item.title()),
                         e.text()
                 ));
             }
@@ -49,6 +51,11 @@ public class SpeechMapper {
     /** Verbatim timestamps carry an explicit offset (unlike votings), so no zone assumption here. */
     private static Instant parseInstant(String s) {
         return s == null ? null : OffsetDateTime.parse(s).toInstant();
+    }
+
+    /** Agenda item titles arrive as HTML fragments ("<p>…</p>") — keep only the text. */
+    private static String plainText(String html) {
+        return html == null ? null : Jsoup.parse(html).text();
     }
 
     /**
