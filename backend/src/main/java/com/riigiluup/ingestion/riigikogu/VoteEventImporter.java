@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -214,6 +215,28 @@ public class VoteEventImporter {
                 incoming.setChoice(fresh.getChoice());
                 incoming.setChoiceSourceCode(fresh.getChoiceSourceCode());
                 individualVoteRepo.save(incoming);
+            }
+        }
+        removeVotersGoneFromSource(event, detail);
+    }
+
+    /**
+     * Riigikogu occasionally corrects a published roll-call. Mirror such corrections: a
+     * stored individual vote whose member is no longer in the source voter list is removed,
+     * so we never keep showing a vote the source itself has retracted. Runs before
+     * {@link #recomputeAlignmentsForEvent} so faction alignments reflect the correction.
+     */
+    private void removeVotersGoneFromSource(VoteEvent event, VotingDetailDto detail) {
+        Set<String> sourceUuids = detail.voters().stream()
+                .map(VotingDetailDto.Voter::uuid)
+                .collect(Collectors.toSet());
+        List<IndividualVote> stored = individualVoteRepo
+                .findByVoteEventOrderByFactionNameAscPlenaryMember_LastNameAsc(event);
+        for (IndividualVote iv : stored) {
+            if (!sourceUuids.contains(iv.getPlenaryMember().getExternalId())) {
+                individualVoteRepo.delete(iv);
+                log.info("removed vote by {} on {} — voter no longer in source roll-call",
+                        iv.getPlenaryMember().getExternalId(), event.getExternalId());
             }
         }
     }

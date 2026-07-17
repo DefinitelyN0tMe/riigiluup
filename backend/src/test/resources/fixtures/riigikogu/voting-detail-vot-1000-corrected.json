@@ -1,0 +1,29 @@
+{
+  "uuid": "vot-1000",
+  "votingNumber": 1,
+  "type": {"code": "AVALIK", "value": "Avalik"},
+  "description": "Ettepanek võtta seaduseelnõu vastu",
+  "startDateTime": "2026-01-15T10:15:00",
+  "endDateTime": "2026-01-15T10:16:00",
+  "present": 95,
+  "absent": 6,
+  "inFavor": 59,
+  "against": 30,
+  "neutral": 2,
+  "abstained": 4,
+  "sitting": {"uuid": "sit-100", "title": "IX istungjärgu 1. istung"},
+  "voters": [
+    {
+      "uuid": "mp-A",
+      "fullName": "Kaja Kallas",
+      "faction": {"uuid": "F-Reform", "name": "Reformierakonna fraktsioon"},
+      "decision": {"code": "POOLT", "value": "Poolt"}
+    },
+    {
+      "uuid": "mp-C",
+      "fullName": "Mart Helme",
+      "faction": {"uuid": "F-EKRE", "name": "EKRE fraktsioon"},
+      "decision": {"code": "VASTU", "value": "Vastu"}
+    }
+  ]
+}

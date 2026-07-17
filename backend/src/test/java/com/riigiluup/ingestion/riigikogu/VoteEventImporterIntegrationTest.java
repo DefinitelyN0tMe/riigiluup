@@ -114,6 +114,33 @@ class VoteEventImporterIntegrationTest extends AbstractIntegrationTest {
                 .isEmpty();
     }
 
+    @Test
+    void removes_voters_that_disappeared_from_the_source_roll_call() {
+        seedMembers();
+        stubHappyPath();
+        importer.runWindow(LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 16));
+        assertThat(individualVoteRepo.count()).isEqualTo(5);
+
+        // Source correction: mp-B is no longer on the vot-1000 roll-call. The later stub
+        // wins over the happy-path one at the same priority.
+        wireMock.stubFor(get(urlPathEqualTo("/api/votings/vot-1000"))
+                .willReturn(aResponse().withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(WireMockSupport.fixture(
+                                "fixtures/riigikogu/voting-detail-vot-1000-corrected.json"))));
+
+        ImportRunLog second = importer.runWindow(
+                LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 16));
+
+        assertThat(second.getStatus()).isEqualTo("SUCCESS");
+        assertThat(individualVoteRepo.count()).isEqualTo(4);
+        VoteEvent v1 = voteEventRepo.findBySourceNameAndExternalId("riigikogu", "vot-1000")
+                .orElseThrow();
+        PlenaryMember b = memberRepo.findBySourceNameAndExternalId("riigikogu", "mp-B")
+                .orElseThrow();
+        assertThat(individualVoteRepo.findByVoteEventAndPlenaryMember(v1, b)).isEmpty();
+    }
+
     private void seedMembers() {
         PlenaryMember a = EntityFactory.member("mp-A", "Kaja", "Kallas", "Reformierakond", true);
         PlenaryMember b = EntityFactory.member("mp-B", "Anna", "Aavik", "Reformierakond", true);
