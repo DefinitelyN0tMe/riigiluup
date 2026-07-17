@@ -753,6 +753,8 @@
     "initiatedInline": "Initiated {{date}}",
     "acceptedInline": "Accepted {{date}}",
     "leadingCommittee": "Leading committee: {{name}}",
+    "rtPublication": "Riigi Teataja",
+    "rtCurrent": "Text in force",
     "introduction": "Introduction",
     "sponsors": "Sponsors ({{count}})",
     "timeline": "Legislative timeline",

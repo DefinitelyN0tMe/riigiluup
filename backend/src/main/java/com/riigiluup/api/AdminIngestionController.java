@@ -40,6 +40,7 @@ public class AdminIngestionController {
     private final MemberActivityImporter memberActivityImporter;
     private final PartyFinanceImporter partyFinanceImporter;
     private final com.riigiluup.ingestion.riigikogu.GovernmentQuestionImporter governmentQuestionImporter;
+    private final com.riigiluup.ingestion.riigiteataja.RtLinker rtLinker;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -139,5 +140,14 @@ public class AdminIngestionController {
     @PostMapping("/questions")
     public ImportRunLog runQuestionsImport() {
         return governmentQuestionImporter.runFullRefresh();
+    }
+
+    /**
+     * Link adopted laws to Riigi Teataja (1 throttled RT call per candidate, newest
+     * first). The historical backlog is ~3.8k candidates — run in slices.
+     */
+    @PostMapping("/rt-links")
+    public Map<String, Integer> runRtLinking(@RequestParam(defaultValue = "100") int limit) {
+        return rtLinker.linkBatch(Math.min(limit, 1000));
     }
 }

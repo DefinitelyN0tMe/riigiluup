@@ -771,6 +771,8 @@
     "initiatedInline": "Внесён {{date}}",
     "acceptedInline": "Принят {{date}}",
     "leadingCommittee": "Ведущая комиссия: {{name}}",
+    "rtPublication": "Riigi Teataja",
+    "rtCurrent": "Действующая редакция",
     "introduction": "Введение",
     "sponsors": "Инициаторы ({{count}})",
     "timeline": "Хронология рассмотрения",

@@ -59,6 +59,13 @@ public class LegislativeItem {
     @Column(name = "accepted_date")
     private LocalDate acceptedDate;
 
+    /** Riigi Teataja act id — encodes the official citation; null until (unambiguously) linked. */
+    @Column(name = "rt_act_id")
+    private Long rtActId;
+
+    @Column(name = "rt_published")
+    private LocalDate rtPublished;
+
     @Column(name = "amendments_deadline")
     private Instant amendmentsDeadline;
 

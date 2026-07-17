@@ -281,6 +281,8 @@ export type LegislationDetail = LegislationListItem & {
   sponsors: LegislationSponsor[];
   topics: LegislationTopic[];
   riigikoguPageUrl: string;
+  rtActId: number | null;
+  rtPublished: string | null;
 };
 
 export type PoliticianLegislationResponse = {

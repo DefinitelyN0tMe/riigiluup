@@ -54,6 +54,16 @@ export default function LegislationDetailPage() {
           <a href={data.sourceUrl} target="_blank" rel="noopener noreferrer"
              aria-label={`${t("common.apiData").replace(" ↗", "")} (${t("a11y.opensNewTab")})`}
              className="text-muted hover:underline">{t("common.apiData")}</a>
+          {data.rtActId != null && (
+            <>
+              <a href={`https://www.riigiteataja.ee/akt/${data.rtActId}`} target="_blank" rel="noopener noreferrer"
+                 aria-label={`${t("legislation.rtPublication")} (${t("a11y.opensNewTab")})`}
+                 className="text-estonia hover:underline">{t("legislation.rtPublication")} ↗</a>
+              <a href={`https://www.riigiteataja.ee/akt/${data.rtActId}?leiaKehtiv`} target="_blank" rel="noopener noreferrer"
+                 aria-label={`${t("legislation.rtCurrent")} (${t("a11y.opensNewTab")})`}
+                 className="text-estonia hover:underline">{t("legislation.rtCurrent")} ↗</a>
+            </>
+          )}
         </div>
       </header>
 

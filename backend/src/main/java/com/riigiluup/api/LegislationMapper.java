@@ -63,7 +63,9 @@ public class LegislationMapper {
                 topics.stream().map(it -> new LegislationDetailDto.TopicDto(
                         it.getTopic().getEdid(), it.getTopic().getText())).toList(),
                 sourceUrl(i.getExternalId()),
-                riigikoguPageUrl(i.getExternalId())
+                riigikoguPageUrl(i.getExternalId()),
+                i.getRtActId(),
+                i.getRtPublished()
         );
     }
 

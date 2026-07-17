@@ -753,6 +753,8 @@
     "initiatedInline": "Algatatud {{date}}",
     "acceptedInline": "Vastu võetud {{date}}",
     "leadingCommittee": "Juhtiv komisjon: {{name}}",
+    "rtPublication": "Riigi Teataja",
+    "rtCurrent": "Kehtiv redaktsioon",
     "introduction": "Sissejuhatus",
     "sponsors": "Algatajad ({{count}})",
     "timeline": "Menetluse ajajoon",

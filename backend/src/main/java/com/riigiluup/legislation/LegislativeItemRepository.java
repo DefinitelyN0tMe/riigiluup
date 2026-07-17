@@ -14,6 +14,25 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
     Optional<LegislativeItem> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     /**
+     * Adopted laws (SE only — Riigikogu decisions publish in RT III with a different id
+     * scheme) not yet linked to Riigi Teataja, with their publication date taken from the
+     * AVALDATUD_RIIGITEATAJAS stage already stored by the bill importer. Newest first so
+     * the daily batch covers fresh publications before the historical backlog.
+     */
+    @Query(nativeQuery = true, value = """
+        SELECT li.id AS id, li.title AS title,
+               cast(max(s.occurred_at) AT TIME ZONE 'Europe/Tallinn' AS date) AS published
+        FROM legislative_item li
+        JOIN legislative_stage s ON s.legislative_item_id = li.id
+             AND s.status_code = 'AVALDATUD_RIIGITEATAJAS'
+        WHERE li.rt_act_id IS NULL AND li.draft_type_code = 'SE'
+        GROUP BY li.id, li.title
+        ORDER BY published DESC
+        LIMIT cast(:limit AS integer)
+        """)
+    java.util.List<Object[]> findRtLinkCandidates(@Param("limit") int limit);
+
+    /**
      * Rich search — every filter is null-safe. topicEdid drills into Eurovoc tags;
      * minDays/maxDays filter by (accepted_date − initiated_date) inclusive of both bounds,
      * and imply "must be ADOPTED with both dates known" — matches how the velocity chart

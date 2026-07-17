@@ -27,7 +27,9 @@ public record LegislationDetailDto(
         List<SponsorDto> sponsors,
         List<TopicDto> topics,
         String sourceUrl,
-        String riigikoguPageUrl
+        String riigikoguPageUrl,
+        Long rtActId,
+        LocalDate rtPublished
 ) {
     public record StageDto(
             String readingCode,
