@@ -830,21 +830,21 @@
       "linkedByAt": "Linked by {{who}} on {{date}}"
     },
     "funnel": {
-      "aria": "Funnel chart: {{targeted}} initiatives targeted at Riigikogu, {{signing}} in signing, {{threshold}} reached the signature threshold, {{sent}} sent to parliament, {{decided}} decided, {{draftAct}} became a draft act.",
+      "aria": "Funnel chart: {{targeted}} initiatives targeted at Riigikogu, {{signing}} in signing, {{threshold}} reached the signature threshold, {{sent}} sent to parliament, {{decided}} decided, {{draftAct}} taken up as a draft act or national matter.",
       "step": {
         "targeted": "Aimed at Riigikogu",
         "signing": "Collecting signatures",
         "threshold": "Reached signature threshold",
         "sent": "Sent to parliament",
         "decided": "Decided",
-        "draftAct": "Became a draft act"
+        "draftAct": "Taken up as a draft act or national matter"
       },
       "openStep_one": "{{label}}: {{count}} initiative, open filtered list",
       "openStep_other": "{{label}}: {{count}} initiatives, open filtered list",
       "decisionsTitle": "Decisions",
       "committeesTitle": "Committees",
       "note": {
-        "headline": "Of {{targeted}} citizen initiatives aimed at Riigikogu, {{draftAct}} became a draft act.",
+        "headline": "Of {{targeted}} citizen initiatives aimed at Riigikogu, {{draftAct}} were taken up as a draft act or a matter of national importance. The source records these as a single outcome and does not say which of the two applies to any individual initiative.",
         "neverSent_one": "{{count}} initiative collected the required 1,000 signatures and was never sent to parliament.",
         "neverSent_other": "{{count}} initiatives collected the required 1,000 signatures and were never sent to parliament.",
         "belowThreshold_one": "{{count}} initiative was sent to parliament without ever reaching the signature threshold in this data. The source does not explain why — we do not speculate.",
