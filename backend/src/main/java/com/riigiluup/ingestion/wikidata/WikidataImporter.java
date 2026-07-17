@@ -3,6 +3,8 @@ package com.riigiluup.ingestion.wikidata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.riigiluup.ingestion.riigikogu.ImportRunLog;
 import com.riigiluup.ingestion.riigikogu.ImportRunLogRepository;
+import com.riigiluup.person.MpPartyMembership;
+import com.riigiluup.person.MpPartyMembershipRepository;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.person.PlenaryMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.web.client.RestClient;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * One-shot importer that cross-references our PlenaryMember rows with Wikidata
@@ -81,7 +85,22 @@ public class WikidataImporter {
             GROUP BY ?person
             """;
 
+    // Party membership (P102) with start/end qualifiers — statement-node form (not wdt:) so the
+    // dates come through. One row per (person, membership statement). et label, en fallback.
+    private static final String PARTY_SPARQL_TEMPLATE = """
+            SELECT ?person ?party ?partyLabelEt ?partyLabelEn ?start ?end WHERE {
+              VALUES ?person { %s }
+              ?person p:P102 ?stmt.
+              ?stmt ps:P102 ?party.
+              OPTIONAL { ?stmt pq:P580 ?start. }
+              OPTIONAL { ?stmt pq:P582 ?end. }
+              OPTIONAL { ?party rdfs:label ?partyLabelEt. FILTER(lang(?partyLabelEt) = "et") }
+              OPTIONAL { ?party rdfs:label ?partyLabelEn. FILTER(lang(?partyLabelEn) = "en") }
+            }
+            """;
+
     private final PlenaryMemberRepository memberRepo;
+    private final MpPartyMembershipRepository partyMembershipRepo;
     private final ImportRunLogRepository runLogRepo;
     private final RestClient rest = RestClient.builder()
             // Wikidata's UA policy: identify the client + contact so they can reach out.
@@ -182,6 +201,7 @@ public class WikidataImporter {
                     matched, mps.size(), seen);
 
             enrichBio(matchedByQid);
+            enrichParties(matchedByQid);
             run.setStatus("SUCCESS");
         } catch (Exception e) {
             log.error("wikidata cross-ref failed", e);
@@ -227,6 +247,86 @@ public class WikidataImporter {
             // Bio is a nice-to-have; never let it fail the whole cross-reference.
             log.warn("wikidata bio enrichment failed (education/positions skipped): {}", e.getMessage());
         }
+    }
+
+    /** Third pass over matched QIDs: party membership periods (P102) into mp_party_membership. */
+    private void enrichParties(Map<String, PlenaryMember> matchedByQid) {
+        if (matchedByQid.isEmpty()) return;
+        String values = matchedByQid.keySet().stream()
+                .map(q -> "wd:" + q)
+                .collect(Collectors.joining(" "));
+        try {
+            JsonNode result = rest.get()
+                    .uri(SPARQL_ENDPOINT + "?query={q}&format=json",
+                            String.format(PARTY_SPARQL_TEMPLATE, values))
+                    .retrieve()
+                    .body(JsonNode.class);
+            if (result == null) return;
+            List<PartyRow> rows = parsePartyRows(result.path("results").path("bindings"));
+            // Full refresh of the Wikidata source; äriregister rows (phase 2) are left untouched.
+            partyMembershipRepo.deleteBySource("wikidata");
+            Instant now = Instant.now();
+            int stored = 0;
+            for (PartyRow r : rows) {
+                PlenaryMember mp = matchedByQid.get(r.personQid());
+                if (mp == null) continue;
+                partyMembershipRepo.save(MpPartyMembership.builder()
+                        .memberExternalId(mp.getExternalId())
+                        .partyQid(r.partyQid())
+                        .partyLabel(r.label())
+                        .startDate(r.startDate())
+                        .endDate(r.endDate())
+                        .source("wikidata")
+                        .importedAt(now)
+                        .build());
+                stored++;
+            }
+            log.info("wikidata parties: stored {} P102 memberships", stored);
+        } catch (Exception e) {
+            // Party history is a nice-to-have; never let it fail the whole cross-reference.
+            log.warn("wikidata party enrichment failed (P102 skipped): {}", e.getMessage());
+        }
+    }
+
+    /** One P102 statement parsed from Wikidata, before the person is resolved to an MP. */
+    record PartyRow(String personQid, String partyQid, String label,
+                    LocalDate startDate, LocalDate endDate) {
+    }
+
+    static List<PartyRow> parsePartyRows(JsonNode bindings) {
+        List<PartyRow> rows = new ArrayList<>();
+        for (JsonNode row : bindings) {
+            String personUri = row.path("person").path("value").asText(null);
+            String partyUri = row.path("party").path("value").asText(null);
+            if (personUri == null || partyUri == null) continue;
+            String partyQid = partyUri.substring(partyUri.lastIndexOf('/') + 1);
+            String label = firstNonBlank(
+                    row.path("partyLabelEt").path("value").asText(null),
+                    row.path("partyLabelEn").path("value").asText(null),
+                    partyQid);
+            rows.add(new PartyRow(
+                    personUri.substring(personUri.lastIndexOf('/') + 1),
+                    partyQid, label,
+                    parseWdDate(row.path("start").path("value").asText(null)),
+                    parseWdDate(row.path("end").path("value").asText(null))));
+        }
+        return rows;
+    }
+
+    private static LocalDate parseWdDate(String raw) {
+        if (raw == null || raw.length() < 10) return null;
+        try {
+            return LocalDate.parse(raw.substring(0, 10));
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    private static String firstNonBlank(String... vals) {
+        for (String v : vals) {
+            if (v != null && !v.isBlank()) return v;
+        }
+        return null;
     }
 
     private static void setIfPresent(JsonNode row, String key, Consumer<String> setter) {
