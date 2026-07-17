@@ -789,7 +789,9 @@
     "timeline": "Хронология рассмотрения",
     "noStages": "Стадий не зарегистрировано.",
     "noName": "(без имени)",
-    "startedAsInitiative": "Началось как гражданская инициатива"
+    "relatedInitiatives_one": "Связанная гражданская инициатива",
+    "relatedInitiatives_few": "Связанные гражданские инициативы",
+    "relatedInitiatives_many": "Связанные гражданские инициативы"
   },
   "initiatives": {
     "title": "Гражданские инициативы",

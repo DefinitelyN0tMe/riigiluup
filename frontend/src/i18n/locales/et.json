@@ -771,7 +771,8 @@
     "timeline": "Menetluse ajajoon",
     "noStages": "Etappe pole registreeritud.",
     "noName": "(nimi puudub)",
-    "startedAsInitiative": "Sai alguse kollektiivsest pöördumisest"
+    "relatedInitiatives_one": "Seotud kollektiivne pöördumine",
+    "relatedInitiatives_other": "Seotud kollektiivsed pöördumised"
   },
   "initiatives": {
     "title": "Kollektiivsed pöördumised",

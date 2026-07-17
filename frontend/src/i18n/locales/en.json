@@ -771,7 +771,8 @@
     "timeline": "Legislative timeline",
     "noStages": "No stages recorded.",
     "noName": "(no name)",
-    "startedAsInitiative": "Started as a citizen initiative"
+    "relatedInitiatives_one": "Related citizen initiative",
+    "relatedInitiatives_other": "Related citizen initiatives"
   },
   "initiatives": {
     "title": "Citizen initiatives",

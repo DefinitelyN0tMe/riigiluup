@@ -74,9 +74,9 @@ export default function LegislationDetailPage() {
       </header>
 
       {initiativesQuery.data && initiativesQuery.data.length > 0 && (
-        <section aria-label={t("legislation.startedAsInitiative", { defaultValue: "Started as a citizen initiative" })}>
+        <section aria-label={t("legislation.relatedInitiatives", { count: initiativesQuery.data.length, defaultValue: "Related citizen initiatives" })}>
           <h2 className="text-lg font-semibold text-ink mb-2">
-            {t("legislation.startedAsInitiative", { defaultValue: "Started as a citizen initiative" })}
+            {t("legislation.relatedInitiatives", { count: initiativesQuery.data.length, defaultValue: "Related citizen initiatives" })}
           </h2>
           <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
             {initiativesQuery.data.map((ini) => (
