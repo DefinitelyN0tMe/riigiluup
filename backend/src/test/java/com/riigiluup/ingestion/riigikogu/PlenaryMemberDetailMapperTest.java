@@ -140,6 +140,40 @@ class PlenaryMemberDetailMapperTest {
     }
 
     @Test
+    void sanitizes_biography_html_on_ingest() {
+        PlenaryMemberDetailDto dto = new PlenaryMemberDetailDto(
+                "id-5", "A", "B", "A B", null, null, null,
+                "<p onclick=\"steal()\">bio <b>bold</b></p>"
+                        + "<script>alert(1)</script>"
+                        + "<a href=\"javascript:alert(1)\">link</a>"
+                        + "<a href=\"https://riigikogu.ee\">ok</a>",
+                null, null, List.of()
+        );
+        PlenaryMember m = blankMember("id-5", "a-b-5");
+
+        mapper.applyDetail(m, dto);
+
+        assertThat(m.getBiographyHtml())
+                .doesNotContain("<script")
+                .doesNotContain("onclick")
+                .doesNotContain("javascript:")
+                .contains("<b>bold</b>")
+                .contains("https://riigikogu.ee");
+    }
+
+    @Test
+    void null_biography_stays_null() {
+        PlenaryMemberDetailDto dto = new PlenaryMemberDetailDto(
+                "id-6", "A", "B", "A B", null, null, null, null, null, null, List.of()
+        );
+        PlenaryMember m = blankMember("id-6", "a-b-6");
+
+        mapper.applyDetail(m, dto);
+
+        assertThat(m.getBiographyHtml()).isNull();
+    }
+
+    @Test
     void handles_missing_photo() {
         PlenaryMemberDetailDto dto = new PlenaryMemberDetailDto(
                 "id-4", "A", "B", "A B", null, null, null, null, null,

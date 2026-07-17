@@ -38,6 +38,8 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.7")
+    // Sanitizes Riigikogu biography HTML at ingest — it is rendered raw on the profile page.
+    implementation("org.jsoup:jsoup:1.18.3")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

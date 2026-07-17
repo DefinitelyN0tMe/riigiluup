@@ -1,6 +1,9 @@
 package com.riigiluup.ingestion.riigikogu;
 
 import com.riigiluup.person.PlenaryMember;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -17,7 +20,7 @@ public class PlenaryMemberDetailMapper {
         target.setEmail(dto.email());
         target.setGender(dto.gender());
         target.setDateOfBirth(parseDate(dto.dateOfBirth()));
-        target.setBiographyHtml(dto.biography());
+        target.setBiographyHtml(sanitizeHtml(dto.biography()));
         target.setParliamentSeniorityDays(dto.parliamentSeniority());
         target.setPhotoUrl(photoDownloadUrl(dto));
 
@@ -48,6 +51,16 @@ public class PlenaryMemberDetailMapper {
     private static boolean hasActiveRoleItem(PlenaryMemberDetailDto.Membership m) {
         if (m.membershipRoleItems() == null) return false;
         return m.membershipRoleItems().stream().anyMatch(r -> r.endDate() == null);
+    }
+
+    /**
+     * The biography is rendered with dangerouslySetInnerHTML on the profile page, so strip
+     * scripts, event handlers and javascript: URLs here rather than trusting CSP alone.
+     */
+    private static String sanitizeHtml(String html) {
+        if (html == null || html.isBlank()) return html;
+        return Jsoup.clean(html, "", Safelist.relaxed(),
+                new Document.OutputSettings().prettyPrint(false));
     }
 
     private static LocalDate parseDate(String iso) {
