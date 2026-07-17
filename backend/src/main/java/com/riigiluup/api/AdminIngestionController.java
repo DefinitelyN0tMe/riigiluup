@@ -39,6 +39,7 @@ public class AdminIngestionController {
     private final ElectionResultsImporter electionResultsImporter;
     private final MemberActivityImporter memberActivityImporter;
     private final PartyFinanceImporter partyFinanceImporter;
+    private final com.riigiluup.ingestion.riigikogu.GovernmentQuestionImporter governmentQuestionImporter;
 
     @PostMapping("/plenary-members")
     public ImportRunLog runPlenaryMembersImport() {
@@ -129,5 +130,14 @@ public class AdminIngestionController {
     @PostMapping("/party-finance")
     public Map<String, Object> runPartyFinanceImport() {
         return Map.of("rows", partyFinanceImporter.importAll());
+    }
+
+    /**
+     * Full refresh of interpellation / written-question volumes with response dates
+     * (~23 throttled list calls for the whole corpus since 2007).
+     */
+    @PostMapping("/questions")
+    public ImportRunLog runQuestionsImport() {
+        return governmentQuestionImporter.runFullRefresh();
     }
 }

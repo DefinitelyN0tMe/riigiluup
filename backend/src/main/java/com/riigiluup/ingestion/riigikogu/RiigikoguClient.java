@@ -244,6 +244,32 @@ public class RiigikoguClient {
         return pageTotal(n);
     }
 
+    /** One HAL page of interpellation volumes (response-latency data lives on the LIST). */
+    public QuestionListDto fetchInterpellationsPage(int page, int size) {
+        throttle();
+        return rest.get()
+                .uri(b -> b.path("/api/volumes/interpellations")
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .queryParam("lang", "et")
+                        .build())
+                .retrieve()
+                .body(QuestionListDto.class);
+    }
+
+    /** One HAL page of written-question volumes. */
+    public QuestionListDto fetchWrittenQuestionsPage(int page, int size) {
+        throttle();
+        return rest.get()
+                .uri(b -> b.path("/api/volumes/written-questions")
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .queryParam("lang", "et")
+                        .build())
+                .retrieve()
+                .body(QuestionListDto.class);
+    }
+
     /**
      * Full verbatim records (agenda items + speech texts) for sittings in the window.
      * One request returns the whole window, so callers should keep windows to ~2 weeks —

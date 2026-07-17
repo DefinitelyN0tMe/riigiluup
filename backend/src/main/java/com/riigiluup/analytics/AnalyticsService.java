@@ -63,6 +63,7 @@ public class AnalyticsService {
     private final ElectionResultRepository electionResultRepo;
     private final PartyReceiptRepository partyReceiptRepo;
     private final PartyRepository partyRepo;
+    private final com.riigiluup.question.GovernmentQuestionRepository governmentQuestionRepo;
 
     /**
      * Faction name substrings currently in the governing coalition. Drives the
@@ -273,6 +274,28 @@ public class AnalyticsService {
                 .map(en -> new AnalyticsDto.MandateCount(en.getKey(), en.getValue()))
                 .toList();
         return new AnalyticsDto.ElectionBoard(items, mandates, Instant.now());
+    }
+
+    /* ============================================================
+     *  Government response latency — interpellations + written questions
+     * ============================================================ */
+
+    /**
+     * How long ministers take to answer, measured against the legal deadline the source
+     * itself provides. Current term only; ministers with fewer than 5 questions are
+     * dropped so a single late answer can't dominate the board.
+     */
+    @Cacheable("analytics-response-latency")
+    public AnalyticsDto.ResponseLatencyBoard responseLatency() {
+        LocalDate since = com.riigiluup.statistics.StatisticsService.TERM_START;
+        List<AnalyticsDto.ResponseLatencyItem> items = governmentQuestionRepo
+                .latencyByAddressee(since, 5).stream()
+                .map(r -> new AnalyticsDto.ResponseLatencyItem(
+                        r.getAddresseeName(), r.getAddresseeRole(),
+                        r.getTotal(), r.getAnswered(), r.getAnsweredOnTime(),
+                        r.getMedianDaysToAnswer(), r.getOverdueNow()))
+                .toList();
+        return new AnalyticsDto.ResponseLatencyBoard(items, since, Instant.now());
     }
 
     /* ============================================================

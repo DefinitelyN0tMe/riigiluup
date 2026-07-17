@@ -146,6 +146,13 @@ public final class AnalyticsDto {
     public record PartyFinanceItem(String partyName, String colorHex, long total, List<FinanceBucket> buckets) {}
     public record FinanceBucket(String key, long amount) {}
 
+    /* ================ GOVERNMENT RESPONSE LATENCY ================ */
+    public record ResponseLatencyBoard(List<ResponseLatencyItem> ministers,
+                                       java.time.LocalDate since, Instant computedAt) {}
+    public record ResponseLatencyItem(String addresseeName, String addresseeRole,
+                                      long total, long answered, long answeredOnTime,
+                                      Double medianDaysToAnswer, long overdueNow) {}
+
     /* ================ MP TOPIC RADAR ================ */
     public record MpTopicRadar(String slug, List<TopicSlice> topics, int totalBills) {}
 

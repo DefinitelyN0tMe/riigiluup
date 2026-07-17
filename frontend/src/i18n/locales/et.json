@@ -251,6 +251,13 @@
         "titleEm": "rahastatud",
         "titlePost": "",
         "note": "Parlamendiparteide deklareeritud tulud alates 2023. aastast allikate kaupa, ERJK rahastamisregistrist. Enamikul on suurim osa riigitoetus, kuid mõned toetuvad tugevalt annetustele. Summad on aruandelised, eurodes."
+      },
+      "latency": {
+        "kicker": "Parlamentaarne järelevalve",
+        "titlePre": "Kes ",
+        "titleEm": "vastab",
+        "titlePost": " tähtaegselt",
+        "note": "Jooksva koosseisu arupärimised ja kirjalikud küsimused, mõõdetuna allika enda fikseeritud vastamistähtaja vastu: esitamisest registreeritud kirjaliku vastuseni või täiskogu istungini, kus minister arupärimisele vastas. Alla viie küsimusega ministrid on peidetud; esitajatele tagastatud küsimused on välja jäetud."
       }
     }
   },
@@ -265,6 +272,13 @@
         "interpellations": "Arupärimised",
         "writtenQuestions": "Kirjalikud küsimused"
       }
+    },
+    "latency": {
+      "questions_one": "{{count}} küsimus",
+      "questions_other": "{{count}} küsimust",
+      "onTime": "{{pct}}% tähtaegselt",
+      "overdue": "üle tähtaja praegu: {{count}}",
+      "medianDays": "mediaan, päeva"
     },
     "finance": {
       "footnote": "Tulud alates {{year}}",

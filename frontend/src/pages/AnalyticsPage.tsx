@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   fetchAttendanceMatrix, fetchBillFlow, fetchBillVelocity, fetchCoSponsorship,
   fetchDisciplineBreakers, fetchElections, fetchFactionAgreement, fetchHighlights, fetchMemberActivity,
-  fetchMpSimilarity, fetchPartyFinance, fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
+  fetchMpSimilarity, fetchPartyFinance, fetchResponseLatency, fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
 } from "../api/analytics";
 import SectionHead from "../components/SectionHead";
 import FactionHeatmap from "../components/analytics/FactionHeatmap";
@@ -20,6 +20,7 @@ import NightVotesLog from "../components/analytics/NightVotesLog";
 import ActiveMembers from "../components/analytics/ActiveMembers";
 import ElectionLeaders from "../components/analytics/ElectionLeaders";
 import PartyFinance from "../components/analytics/PartyFinance";
+import ResponseLatency from "../components/analytics/ResponseLatency";
 import type { ReactNode } from "react";
 
 function Loading() {
@@ -58,6 +59,7 @@ export default function AnalyticsPage() {
   const activity = useQuery({ queryKey: ["ana:activity"], queryFn: fetchMemberActivity });
   const elections = useQuery({ queryKey: ["ana:elections"], queryFn: fetchElections });
   const finance = useQuery({ queryKey: ["ana:finance"], queryFn: fetchPartyFinance });
+  const latency = useQuery({ queryKey: ["ana:latency"], queryFn: fetchResponseLatency });
 
   const tocItems: [string, string][] = [
     ["I.", t("analytics.hero.toc1")],
@@ -218,6 +220,15 @@ export default function AnalyticsPage() {
       >
         {finance.isLoading ? <Loading /> : finance.error ? <Failed err={finance.error} /> :
           finance.data && <PartyFinance data={finance.data} />}
+      </Section>
+
+      <Section
+        index="XIV." kicker={t("analytics.sec.latency.kicker")}
+        title={<>{t("analytics.sec.latency.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.latency.titleEm")}</span>{t("analytics.sec.latency.titlePost")}</>}
+        note={t("analytics.sec.latency.note")}
+      >
+        {latency.isLoading ? <Loading /> : latency.error ? <Failed err={latency.error} /> :
+          latency.data && <ResponseLatency data={latency.data} />}
       </Section>
     </>
   );

@@ -60,6 +60,17 @@ export type FinanceBucket = { key: string; amount: number };
 export type PartyFinanceItem = { partyName: string; colorHex: string | null; total: number; buckets: FinanceBucket[] };
 export type PartyFinanceBoard = { parties: PartyFinanceItem[]; sinceYear: number; computedAt: string };
 
+export type ResponseLatencyItem = {
+  addresseeName: string;
+  addresseeRole: string | null;
+  total: number;
+  answered: number;
+  answeredOnTime: number;
+  medianDaysToAnswer: number | null;
+  overdueNow: number;
+};
+export type ResponseLatencyBoard = { ministers: ResponseLatencyItem[]; since: string; computedAt: string };
+
 export type BillFlowNode = { id: string; label: string; count: number };
 export type BillFlowLink = { source: string; target: string; count: number };
 export type BillFlow = { nodes: BillFlowNode[]; links: BillFlowLink[]; totalBills: number; computedAt: string };
@@ -178,6 +189,7 @@ export const fetchDisciplineBreakers = (limit = 24) =>
 export const fetchMemberActivity = () => apiGet<MemberActivityBoard>(`${B}/member-activity`);
 export const fetchElections = () => apiGet<ElectionBoard>(`${B}/elections`);
 export const fetchPartyFinance = () => apiGet<PartyFinanceBoard>(`${B}/party-finance`);
+export const fetchResponseLatency = () => apiGet<ResponseLatencyBoard>(`${B}/response-latency`);
 export const fetchBillFlow = () => apiGet<BillFlow>(`${B}/bill-flow`);
 export const fetchAttendanceMatrix = (sittings = 40) =>
   apiGet<AttendanceMatrix>(`${B}/attendance-matrix?sittings=${sittings}`);

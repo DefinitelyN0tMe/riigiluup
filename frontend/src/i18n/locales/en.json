@@ -251,6 +251,13 @@
         "titleEm": "funded",
         "titlePost": "",
         "note": "Declared income of the parliamentary parties since 2023, split by source, from the ERJK financing register. State support is the biggest slice for most, but some parties lean heavily on donations. Figures are reported totals in euros."
+      },
+      "latency": {
+        "kicker": "Parliamentary oversight",
+        "titlePre": "Who ",
+        "titleEm": "answers",
+        "titlePost": " on time",
+        "note": "Interpellations and written questions of the current term, measured against the answer deadline the source itself records: from submission to the registered written reply, or to the plenary sitting where the minister answered an interpellation. Ministers with fewer than five questions are hidden; questions returned to their submitters are excluded."
       }
     }
   },
@@ -265,6 +272,13 @@
         "interpellations": "Questions to ministers",
         "writtenQuestions": "Written questions"
       }
+    },
+    "latency": {
+      "questions_one": "{{count}} question",
+      "questions_other": "{{count}} questions",
+      "onTime": "{{pct}}% on time",
+      "overdue": "overdue now: {{count}}",
+      "medianDays": "median days"
     },
     "finance": {
       "footnote": "Income since {{year}}",

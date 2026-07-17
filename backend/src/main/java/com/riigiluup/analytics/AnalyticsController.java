@@ -48,6 +48,11 @@ public class AnalyticsController {
         return service.partyFinance();
     }
 
+    @GetMapping("/response-latency")
+    public AnalyticsDto.ResponseLatencyBoard responseLatency() {
+        return service.responseLatency();
+    }
+
     @GetMapping("/discipline-breakers")
     public AnalyticsDto.DisciplineBreakers disciplineBreakers(
             @RequestParam(defaultValue = "24") int limit,
