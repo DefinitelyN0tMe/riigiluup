@@ -86,3 +86,7 @@ export function fetchInitiative(id: string): Promise<InitiativeDetail> {
 export function fetchInitiativeFunnel(): Promise<InitiativeFunnel> {
   return apiGet<InitiativeFunnel>("/api/v1/analytics/initiative-funnel");
 }
+
+export function fetchInitiativesByBill(legislativeItemId: string): Promise<InitiativeListItem[]> {
+  return apiGet<InitiativeListItem[]>(`/api/v1/initiatives/by-legislative-item/${legislativeItemId}`);
+}

@@ -48,6 +48,7 @@ export default function Layout() {
     { to: "/politicians", label: t("nav.mps"), end: false },
     { to: "/votes", label: t("nav.votes"), end: false },
     { to: "/legislation", label: t("nav.bills"), end: false },
+    { to: "/initiatives", label: t("nav.initiatives"), end: false },
     { to: "/speeches", label: t("nav.speeches"), end: false },
     { to: "/analytics", label: t("nav.analytics"), end: false },
     { to: "/methodology", label: t("footer.methodology"), end: false },

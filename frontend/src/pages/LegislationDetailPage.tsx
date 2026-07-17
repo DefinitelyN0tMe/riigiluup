@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchLegislationDetail } from "../api/legislation";
+import { fetchInitiativesByBill } from "../api/initiatives";
 import StageTimeline from "../components/StageTimeline";
 import TopicChip from "../components/TopicChip";
 import { formatDate } from "../lib/formatDate";
@@ -12,6 +13,11 @@ export default function LegislationDetailPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["legislation", id],
     queryFn: () => fetchLegislationDetail(id!),
+    enabled: !!id,
+  });
+  const initiativesQuery = useQuery({
+    queryKey: ["legislation-initiatives", id],
+    queryFn: () => fetchInitiativesByBill(id!),
     enabled: !!id,
   });
 
@@ -66,6 +72,26 @@ export default function LegislationDetailPage() {
           )}
         </div>
       </header>
+
+      {initiativesQuery.data && initiativesQuery.data.length > 0 && (
+        <section aria-label={t("legislation.startedAsInitiative", { defaultValue: "Started as a citizen initiative" })}>
+          <h2 className="text-lg font-semibold text-ink mb-2">
+            {t("legislation.startedAsInitiative", { defaultValue: "Started as a citizen initiative" })}
+          </h2>
+          <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
+            {initiativesQuery.data.map((ini) => (
+              <li key={ini.id} className="p-3 text-sm flex items-center justify-between gap-3">
+                <Link to={`/initiatives/${ini.id}`} className="min-w-0 truncate hover:underline text-ink">
+                  {ini.title ?? `#${ini.externalId}`}
+                </Link>
+                <span className="shrink-0 text-xs text-slate-500 font-mono">
+                  {t("initiatives.signaturesShort", { defaultValue: "{{count}} signatures", count: ini.signatureCount ?? 0 })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {data.topics.length > 0 && (
         <section aria-label="Topics">

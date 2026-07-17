@@ -5,7 +5,9 @@ import {
   fetchDisciplineBreakers, fetchElections, fetchFactionAgreement, fetchHighlights, fetchMemberActivity,
   fetchMpSimilarity, fetchPartyFinance, fetchResponseLatency, fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
 } from "../api/analytics";
+import { fetchInitiativeFunnel } from "../api/initiatives";
 import SectionHead from "../components/SectionHead";
+import InitiativeFunnel from "../components/InitiativeFunnel";
 import FactionHeatmap from "../components/analytics/FactionHeatmap";
 import DisciplineBreakersView from "../components/analytics/DisciplineBreakers";
 import BillFlowSankey from "../components/analytics/BillFlowSankey";
@@ -60,6 +62,7 @@ export default function AnalyticsPage() {
   const elections = useQuery({ queryKey: ["ana:elections"], queryFn: fetchElections });
   const finance = useQuery({ queryKey: ["ana:finance"], queryFn: fetchPartyFinance });
   const latency = useQuery({ queryKey: ["ana:latency"], queryFn: fetchResponseLatency });
+  const initiatives = useQuery({ queryKey: ["ana:initiatives"], queryFn: fetchInitiativeFunnel });
 
   const tocItems: [string, string][] = [
     ["I.", t("analytics.hero.toc1")],
@@ -75,6 +78,7 @@ export default function AnalyticsPage() {
     ["XI.", t("analytics.hero.toc11")],
     ["XII.", t("analytics.hero.toc12")],
     ["XIII.", t("analytics.hero.toc13")],
+    ["XV.", t("analytics.hero.toc15")],
   ];
 
   return (
@@ -229,6 +233,15 @@ export default function AnalyticsPage() {
       >
         {latency.isLoading ? <Loading /> : latency.error ? <Failed err={latency.error} /> :
           latency.data && <ResponseLatency data={latency.data} />}
+      </Section>
+
+      <Section
+        index="XV." kicker={t("analytics.sec.initiatives.kicker")}
+        title={<>{t("analytics.sec.initiatives.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.initiatives.titleEm")}</span>{t("analytics.sec.initiatives.titlePost")}</>}
+        note={t("analytics.sec.initiatives.note")}
+      >
+        {initiatives.isLoading ? <Loading /> : initiatives.error ? <Failed err={initiatives.error} /> :
+          initiatives.data && <InitiativeFunnel data={initiatives.data} />}
       </Section>
     </>
   );
