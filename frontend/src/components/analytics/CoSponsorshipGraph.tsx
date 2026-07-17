@@ -40,7 +40,7 @@ export default function CoSponsorshipGraph({ data }: { data: CoSponsorship }) {
       }
     }
     return out;
-  }, [data.nodes, cx, cy, rad]);
+  }, [data, cx, cy, rad]);
 
   const posBySlug = useMemo(() => {
     const m = new Map<string, { x: number; y: number; color: string; faction: string | null; name: string }>();

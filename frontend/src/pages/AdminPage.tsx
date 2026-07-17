@@ -45,7 +45,6 @@ export default function AdminPage() {
 
   useEffect(() => {
     refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function trigger(path: string, label: string) {
@@ -87,7 +86,7 @@ export default function AdminPage() {
         >
           {t("admin.signInWithGoogle", { defaultValue: "Sign in with Google" })}
         </a>
-        {error && <p className="text-hot text-sm" role="alert">{error}</p>}
+        {error && <p className="text-hot-deep text-sm" role="alert">{error}</p>}
       </div>
     );
   }
