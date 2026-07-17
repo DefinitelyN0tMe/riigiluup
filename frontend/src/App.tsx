@@ -14,6 +14,7 @@ const LegislationDetailPage = lazy(() => import("./pages/LegislationDetailPage")
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const SpeechesPage = lazy(() => import("./pages/SpeechesPage"));
+const InitiativesPage = lazy(() => import("./pages/InitiativesPage"));
 const AboutPage = lazy(() => import("./pages/static/AboutPage"));
 const MethodologyIndexPage = lazy(() => import("./pages/static/MethodologyIndexPage"));
 const MethodologyParticipationPage = lazy(() => import("./pages/static/MethodologyParticipationPage"));
@@ -92,6 +93,7 @@ export default function App() {
         <Route path="/compare" element={<Suspense fallback={fallback}><ComparePage /></Suspense>} />
         <Route path="/legislation" element={<Suspense fallback={fallback}><LegislationPage /></Suspense>} />
         <Route path="/legislation/:id" element={<Suspense fallback={fallback}><LegislationDetailPage /></Suspense>} />
+        <Route path="/initiatives" element={<Suspense fallback={fallback}><InitiativesPage /></Suspense>} />
         <Route path="/about" element={<Suspense fallback={fallback}><AboutPage /></Suspense>} />
         <Route path="/methodology" element={<Suspense fallback={fallback}><MethodologyIndexPage /></Suspense>} />
         <Route path="/methodology/participation" element={<Suspense fallback={fallback}><MethodologyParticipationPage /></Suspense>} />
