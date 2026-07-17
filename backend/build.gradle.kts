@@ -40,6 +40,9 @@ dependencies {
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.7")
     // Sanitizes Riigikogu biography HTML at ingest — it is rendered raw on the profile page.
     implementation("org.jsoup:jsoup:1.18.3")
+    // CSV с многострочными полями внутри значений (rahvaalgatus title / parliament_committees).
+    // Версия управляется Spring Boot BOM — Jackson уже в проекте транзитивно.
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
 
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
