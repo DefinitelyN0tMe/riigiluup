@@ -136,6 +136,9 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
      * Paginated iteration of VoteEvents that still need bill linking
      * (legislative_item still NULL). Ordered so the caller gets a stable slice window.
      */
+    java.util.List<VoteEvent> findByLegislativeItemOrderByStartedAtAsc(
+            com.riigiluup.legislation.LegislativeItem legislativeItem);
+
     @Query("select v from VoteEvent v where v.legislativeItem is null "
             + "order by v.startedAt asc nulls last, v.id asc")
     Slice<VoteEvent> findUnlinkedByStartedAtAsc(Pageable pageable);

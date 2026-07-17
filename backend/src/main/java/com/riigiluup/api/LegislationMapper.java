@@ -31,7 +31,8 @@ public class LegislationMapper {
             LegislativeItem i,
             List<LegislativeStage> stages,
             List<LegislativeSponsorship> sponsors,
-            List<LegislativeItemTopic> topics
+            List<LegislativeItemTopic> topics,
+            List<com.riigiluup.vote.VoteEvent> votes
     ) {
         return new LegislationDetailDto(
                 i.getId(),
@@ -65,7 +66,12 @@ public class LegislationMapper {
                 sourceUrl(i.getExternalId()),
                 riigikoguPageUrl(i.getExternalId()),
                 i.getRtActId(),
-                i.getRtPublished()
+                i.getRtPublished(),
+                votes.stream().map(v -> new LegislationDetailDto.BillVoteDto(
+                        v.getId(), v.getVotingNumber(),
+                        v.getType() == null ? null : v.getType().name(),
+                        v.getDescription(), v.getStartedAt(),
+                        v.getResultInFavor(), v.getResultAgainst(), v.getResultAbstained())).toList()
         );
     }
 

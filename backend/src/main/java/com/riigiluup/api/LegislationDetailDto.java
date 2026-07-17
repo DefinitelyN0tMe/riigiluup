@@ -29,7 +29,8 @@ public record LegislationDetailDto(
         String sourceUrl,
         String riigikoguPageUrl,
         Long rtActId,
-        LocalDate rtPublished
+        LocalDate rtPublished,
+        List<BillVoteDto> votes
 ) {
     public record StageDto(
             String readingCode,
@@ -47,4 +48,16 @@ public record LegislationDetailDto(
     ) {}
 
     public record TopicDto(int edid, String text) {}
+
+    /** A roll-call linked to this bill — adoption votes and per-amendment votings alike. */
+    public record BillVoteDto(
+            UUID id,
+            Integer votingNumber,
+            String type,
+            String description,
+            Instant startedAt,
+            int resultInFavor,
+            int resultAgainst,
+            int resultAbstained
+    ) {}
 }

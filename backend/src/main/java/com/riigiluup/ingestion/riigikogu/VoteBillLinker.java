@@ -80,9 +80,14 @@ public class VoteBillLinker {
                 .orElse(null);
         if (snapshot == null) return false;
         JsonNode payload = snapshot.getPayload();
-        JsonNode sitting = payload.get("sitting");
-        if (sitting == null) return false;
-        JsonNode draft = sitting.get("draft");
+        // The source puts the bill reference at the top level as relatedDraft. Snapshots
+        // written before the DTO captured that field have neither path and stay unlinked
+        // until the vote window is re-imported.
+        JsonNode draft = payload.get("relatedDraft");
+        if (draft == null || draft.isNull()) {
+            JsonNode sitting = payload.get("sitting");
+            draft = sitting == null ? null : sitting.get("draft");
+        }
         if (draft == null || draft.isNull()) return false;
         String billExternalId;
         if (draft.isTextual()) {

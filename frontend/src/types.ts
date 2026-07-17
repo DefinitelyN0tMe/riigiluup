@@ -283,6 +283,18 @@ export type LegislationDetail = LegislationListItem & {
   riigikoguPageUrl: string;
   rtActId: number | null;
   rtPublished: string | null;
+  votes: BillVote[];
+};
+
+export type BillVote = {
+  id: string;
+  votingNumber: number | null;
+  type: string | null;
+  description: string | null;
+  startedAt: string | null;
+  resultInFavor: number;
+  resultAgainst: number;
+  resultAbstained: number;
 };
 
 export type PoliticianLegislationResponse = {

@@ -755,6 +755,7 @@
     "leadingCommittee": "Leading committee: {{name}}",
     "rtPublication": "Riigi Teataja",
     "rtCurrent": "Text in force",
+    "votesTitle": "Roll-call votes on this bill",
     "introduction": "Introduction",
     "sponsors": "Sponsors ({{count}})",
     "timeline": "Legislative timeline",

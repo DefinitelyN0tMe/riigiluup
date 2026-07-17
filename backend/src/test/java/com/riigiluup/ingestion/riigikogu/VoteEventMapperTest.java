@@ -85,6 +85,7 @@ class VoteEventMapperTest {
                 "Uus kirjeldus",
                 "2026-06-02T10:00:00", "2026-06-02T10:00:20",
                 80, 21, 70, 6, 2, 25,
+                null,
                 new VotingDetailDto.Sitting("s-2", "Uus istung"),
                 java.util.List.of()
         );

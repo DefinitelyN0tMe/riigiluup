@@ -106,6 +106,25 @@ export default function LegislationDetailPage() {
         <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.timeline")}</h2>
         <StageTimeline stages={data.stages} />
       </section>
+
+      {data.votes.length > 0 && (
+        <section aria-label={t("legislation.votesTitle")}>
+          <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.votesTitle")}</h2>
+          <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
+            {data.votes.map((v) => (
+              <li key={v.id}>
+                <Link to={`/votes/${v.id}`} className="p-3 flex items-baseline justify-between gap-3 hover:bg-off transition-colors">
+                  <span className="min-w-0 text-sm text-ink truncate">{v.description ?? "—"}</span>
+                  <span className="shrink-0 flex items-baseline gap-3 font-mono text-[11px] tracking-[0.06em]">
+                    <span className="text-muted">{v.startedAt ? formatDate(v.startedAt) : ""}</span>
+                    <span><b className="text-blue">{v.resultInFavor}</b> / <b className="text-hot-deep">{v.resultAgainst}</b> / {v.resultAbstained}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

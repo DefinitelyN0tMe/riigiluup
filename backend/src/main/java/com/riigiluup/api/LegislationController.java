@@ -31,6 +31,7 @@ public class LegislationController {
     private final LegislativeStageRepository stageRepo;
     private final LegislativeSponsorshipRepository sponsorshipRepo;
     private final LegislativeItemTopicRepository itemTopicRepo;
+    private final com.riigiluup.vote.VoteEventRepository voteEventRepo;
     private final LegislationMapper mapper;
 
     @GetMapping
@@ -63,6 +64,7 @@ public class LegislationController {
                 item,
                 stageRepo.findByLegislativeItemOrderBySequenceAsc(item),
                 sponsorshipRepo.findByLegislativeItem(item),
-                itemTopicRepo.findByLegislativeItem(item)));
+                itemTopicRepo.findByLegislativeItem(item),
+                voteEventRepo.findByLegislativeItemOrderByStartedAtAsc(item)));
     }
 }

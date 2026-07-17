@@ -755,6 +755,7 @@
     "leadingCommittee": "Juhtiv komisjon: {{name}}",
     "rtPublication": "Riigi Teataja",
     "rtCurrent": "Kehtiv redaktsioon",
+    "votesTitle": "Nimelised hääletused eelnõu üle",
     "introduction": "Sissejuhatus",
     "sponsors": "Algatajad ({{count}})",
     "timeline": "Menetluse ajajoon",

@@ -18,11 +18,16 @@ public record VotingDetailDto(
         Integer against,
         Integer neutral,
         Integer abstained,
+        RelatedDraft relatedDraft,
         Sitting sitting,
         List<Voter> voters
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Sitting(String uuid, String title) {}
+
+    /** Present only on bill-related votings (readings, per-amendment votes). */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record RelatedDraft(String uuid, String title, Integer mark) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Voter(

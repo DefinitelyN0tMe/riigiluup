@@ -773,6 +773,7 @@
     "leadingCommittee": "Ведущая комиссия: {{name}}",
     "rtPublication": "Riigi Teataja",
     "rtCurrent": "Действующая редакция",
+    "votesTitle": "Поимённые голосования по законопроекту",
     "introduction": "Введение",
     "sponsors": "Инициаторы ({{count}})",
     "timeline": "Хронология рассмотрения",

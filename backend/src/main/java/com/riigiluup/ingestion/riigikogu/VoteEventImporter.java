@@ -45,6 +45,7 @@ public class VoteEventImporter {
     private final VoteEventRepository voteEventRepo;
     private final IndividualVoteRepository individualVoteRepo;
     private final PlenaryMemberRepository memberRepo;
+    private final com.riigiluup.legislation.LegislativeItemRepository itemRepo;
     private final SourceSnapshotRepository snapshotRepo;
     private final ImportRunLogRepository runLogRepo;
     private final TransactionTemplate tx;
@@ -60,6 +61,7 @@ public class VoteEventImporter {
             VoteEventRepository voteEventRepo,
             IndividualVoteRepository individualVoteRepo,
             PlenaryMemberRepository memberRepo,
+            com.riigiluup.legislation.LegislativeItemRepository itemRepo,
             SourceSnapshotRepository snapshotRepo,
             ImportRunLogRepository runLogRepo,
             PlatformTransactionManager txManager,
@@ -74,6 +76,7 @@ public class VoteEventImporter {
         this.voteEventRepo = voteEventRepo;
         this.individualVoteRepo = individualVoteRepo;
         this.memberRepo = memberRepo;
+        this.itemRepo = itemRepo;
         this.snapshotRepo = snapshotRepo;
         this.runLogRepo = runLogRepo;
         this.tx = new TransactionTemplate(txManager);
@@ -174,6 +177,7 @@ public class VoteEventImporter {
         SourceSnapshot detailSnap = snapshotForDetail(detail);
         eventMapper.applyDetail(existing, detail);
         existing.setSourceSnapshot(detailSnap);
+        linkRelatedDraft(existing, detail);
 
         reconcileVoters(existing, detail, memberCache);
         recomputeAlignmentsForEvent(existing);
@@ -187,6 +191,7 @@ public class VoteEventImporter {
                 s.startDateTime(), s.endDateTime(),
                 s.present(), s.absent(),
                 s.inFavor(), s.against(), s.neutral(), s.abstained(),
+                null,
                 sitting == null ? null : new VotingDetailDto.Sitting(sitting.uuid(), sitting.title()),
                 List.of()
         );
@@ -218,6 +223,18 @@ public class VoteEventImporter {
             }
         }
         removeVotersGoneFromSource(event, detail);
+    }
+
+    /**
+     * Bill linkage straight from the source: the detail's relatedDraft is the draft volume
+     * uuid, i.e. exactly legislative_item.external_id. Only set, never cleared — a re-import
+     * without the field (procedural votes) must not unlink a previously linked bill.
+     * (VoteBillLinker used to look for a field our DTO never captured, hence zero links.)
+     */
+    private void linkRelatedDraft(VoteEvent event, VotingDetailDto detail) {
+        if (detail.relatedDraft() == null || detail.relatedDraft().uuid() == null) return;
+        itemRepo.findBySourceNameAndExternalId(client.sourceName(), detail.relatedDraft().uuid())
+                .ifPresent(event::setLegislativeItem);
     }
 
     /**
