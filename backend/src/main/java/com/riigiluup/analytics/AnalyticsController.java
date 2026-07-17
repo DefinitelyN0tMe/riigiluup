@@ -22,6 +22,7 @@ public class AnalyticsController {
     private static final ZoneId DISPLAY_ZONE = ZoneId.of("Europe/Tallinn");
 
     private final AnalyticsService service;
+    private final com.riigiluup.initiative.InitiativeService initiativeService;
 
     @GetMapping("/faction-agreement")
     public AnalyticsDto.FactionAgreementMatrix factionAgreement(
@@ -139,5 +140,10 @@ public class AnalyticsController {
             @RequestParam(defaultValue = "8") int limit
     ) {
         return ResponseEntity.ok(service.mpTopicRadar(slug, Math.min(limit, 20)));
+    }
+
+    @GetMapping("/initiative-funnel")
+    public com.riigiluup.initiative.InitiativeDto.Funnel initiativeFunnel() {
+        return initiativeService.funnel();
     }
 }
