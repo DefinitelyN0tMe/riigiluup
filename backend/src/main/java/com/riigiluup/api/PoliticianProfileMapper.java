@@ -53,6 +53,7 @@ public class PoliticianProfileMapper {
                 .filter(gm -> gm.getGroup().getType() == GroupType.STANDING_COMMITTEE
                            || gm.getGroup().getType() == GroupType.SPECIAL_COMMITTEE)
                 .map(gm -> new PoliticianProfileDto.GroupMembershipDto(
+                        gm.getGroup().getExternalId(),
                         gm.getGroup().getName(),
                         gm.getGroup().getShortName(),
                         gm.getGroup().getColorHex(),

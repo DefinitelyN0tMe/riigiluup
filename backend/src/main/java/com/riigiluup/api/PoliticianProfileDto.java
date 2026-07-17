@@ -60,8 +60,8 @@ public record PoliticianProfileDto(
     ) {}
     public record Faction(String externalId, String name) {}
     public record Party(String shortName, String fullName, String colorHex, String officialUrl) {}
-    public record GroupMembershipDto(String name, String shortName, String colorHex,
-                                    String role, boolean active) {}
+    public record GroupMembershipDto(String externalId, String name, String shortName,
+                                    String colorHex, String role, boolean active) {}
     public record GroupAlignment(
             Double rate,
             int matches,
