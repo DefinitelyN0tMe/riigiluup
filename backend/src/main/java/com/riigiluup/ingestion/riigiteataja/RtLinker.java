@@ -49,7 +49,16 @@ public class RtLinker {
 
     /** Returns linked/ambiguous counts. Safe to re-run: only NULL rt_act_id rows are picked. */
     public Map<String, Integer> linkBatch(int limit) {
-        List<Object[]> candidates = itemRepo.findRtLinkCandidates(Math.max(1, limit));
+        return linkBatch(limit, null);
+    }
+
+    /**
+     * As {@link #linkBatch(int)}, but only considers acts published on/after {@code since}
+     * (null = no bound). The historical seed passes its own {@code from} so the drain stays
+     * within the seeded window instead of grinding decades of unmatchable old acts.
+     */
+    public Map<String, Integer> linkBatch(int limit, LocalDate since) {
+        List<Object[]> candidates = itemRepo.findRtLinkCandidates(since, Math.max(1, limit));
         int linked = 0;
         int unmatched = 0;
         for (Object[] row : candidates) {

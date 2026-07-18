@@ -103,7 +103,7 @@ class HistoricalBackfillOrchestratorTest {
         when(memberActivityImporter.computeAll()).thenReturn(101);
         when(voteBillLinker.linkAll()).thenReturn(46);
         when(sponsorRelinker.relinkOrphanSponsors()).thenReturn(3);
-        when(rtLinker.linkBatch(anyInt())).thenReturn(Map.of("candidates", 0, "linked", 0, "unmatched", 0));
+        when(rtLinker.linkBatch(anyInt(), any())).thenReturn(Map.of("candidates", 0, "linked", 0, "unmatched", 0));
     }
 
     @Test
@@ -132,7 +132,7 @@ class HistoricalBackfillOrchestratorTest {
         o.verify(memberActivityImporter).computeAll();
         o.verify(voteBillLinker).linkAll();
         o.verify(sponsorRelinker).relinkOrphanSponsors();
-        o.verify(rtLinker).linkBatch(anyInt());
+        o.verify(rtLinker).linkBatch(anyInt(), any());
 
         assertThat(run.getStatus()).isEqualTo(HistoricalBackfillOrchestrator.STATUS_COMPLETED);
         assertThat(run.getPhase()).isEqualTo("completed");
@@ -159,7 +159,7 @@ class HistoricalBackfillOrchestratorTest {
         verify(governmentQuestionImporter, never()).runFullRefresh();
         verify(voteBillLinker, never()).linkAll();
         verify(sponsorRelinker, never()).relinkOrphanSponsors();
-        verify(rtLinker, never()).linkBatch(anyInt());
+        verify(rtLinker, never()).linkBatch(anyInt(), any());
         assertThat(run.getStatus()).isEqualTo(HistoricalBackfillOrchestrator.STATUS_COMPLETED);
     }
 
@@ -167,14 +167,14 @@ class HistoricalBackfillOrchestratorTest {
     void rt_link_drain_loops_until_a_batch_makes_no_progress() {
         BackfillRun run = seedRun(0);
         // First two batches link rows, third links nothing → drain stops after 3 calls.
-        when(rtLinker.linkBatch(anyInt()))
+        when(rtLinker.linkBatch(anyInt(), any()))
                 .thenReturn(Map.of("candidates", 500, "linked", 500, "unmatched", 0))
                 .thenReturn(Map.of("candidates", 500, "linked", 120, "unmatched", 380))
                 .thenReturn(Map.of("candidates", 380, "linked", 0, "unmatched", 380));
 
         orchestrator.runLoop(run.getId(), run.getFromDate(), run.getToDate(), Set.of("RT_LINKS"));
 
-        verify(rtLinker, org.mockito.Mockito.times(3)).linkBatch(anyInt());
+        verify(rtLinker, org.mockito.Mockito.times(3)).linkBatch(anyInt(), any());
         assertThat(run.getStepCounts()).contains("\"rtLinks\":620");
         assertThat(run.getStatus()).isEqualTo(HistoricalBackfillOrchestrator.STATUS_COMPLETED);
     }

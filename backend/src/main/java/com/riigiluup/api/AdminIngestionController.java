@@ -148,8 +148,10 @@ public class AdminIngestionController {
      * first). The historical backlog is ~3.8k candidates — run in slices.
      */
     @PostMapping("/rt-links")
-    public Map<String, Integer> runRtLinking(@RequestParam(defaultValue = "100") int limit) {
-        return rtLinker.linkBatch(Math.min(limit, 1000));
+    public Map<String, Integer> runRtLinking(
+            @RequestParam(defaultValue = "100") int limit,
+            @RequestParam(required = false) LocalDate since) {
+        return rtLinker.linkBatch(Math.min(limit, 1000), since);
     }
 
     @PostMapping("/initiatives")

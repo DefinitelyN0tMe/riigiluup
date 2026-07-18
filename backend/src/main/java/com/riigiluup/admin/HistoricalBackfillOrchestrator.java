@@ -271,7 +271,7 @@ public class HistoricalBackfillOrchestrator {
             if (!oneShot(runId, kinds, "BILLS", "sponsorRelinks", counts,
                     sponsorRelinker::relinkOrphanSponsors)) return;
         }
-        if (!rtLinkDrain(runId, kinds, counts)) return;
+        if (!rtLinkDrain(runId, from, kinds, counts)) return;
 
         // Finalize. A cancel during the very last step already returned above.
         BackfillRun run = runRepo.findById(runId).orElse(null);
@@ -406,7 +406,7 @@ public class HistoricalBackfillOrchestrator {
      * on the first batch that links nothing (no progress) rather than on an empty candidate set,
      * which would spin forever on that unmatchable tail. Capped as a runaway backstop.
      */
-    private boolean rtLinkDrain(UUID runId, Set<String> kinds, Map<String, Integer> counts) {
+    private boolean rtLinkDrain(UUID runId, LocalDate since, Set<String> kinds, Map<String, Integer> counts) {
         if (!kinds.contains("RT_LINKS")) return true;
         BackfillRun run = runRepo.findById(runId).orElse(null);
         if (run == null) return false;
@@ -426,7 +426,8 @@ public class HistoricalBackfillOrchestrator {
                     finishCancel(cur);
                     return false;
                 }
-                Map<String, Integer> r = rtLinker.linkBatch(RT_BATCH);
+                // Bounded to the seed's from-date so we don't grind decades of unmatchable acts.
+                Map<String, Integer> r = rtLinker.linkBatch(RT_BATCH, since);
                 int linked = r.getOrDefault("linked", 0);
                 totalLinked += linked;
                 if (linked == 0) break; // no progress — remaining acts are unmatchable for now

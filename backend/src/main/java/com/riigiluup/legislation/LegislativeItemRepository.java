@@ -18,6 +18,11 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
      * scheme) not yet linked to Riigi Teataja, with their publication date taken from the
      * AVALDATUD_RIIGITEATAJAS stage already stored by the bill importer. Newest first so
      * the daily batch covers fresh publications before the historical backlog.
+     *
+     * <p>{@code since} bounds the candidate set to acts published on/after that date; pass null
+     * for no bound. Without it, a large-limit drain grinds decades of pre-2010 acts the RT search
+     * mostly can't match — each costing an HTTP call — so the historical seed passes its own
+     * {@code from} date here.
      */
     @Query(nativeQuery = true, value = """
         SELECT li.id AS id, li.title AS title,
@@ -27,10 +32,13 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
              AND s.status_code = 'AVALDATUD_RIIGITEATAJAS'
         WHERE li.rt_act_id IS NULL AND li.draft_type_code = 'SE'
         GROUP BY li.id, li.title
+        HAVING cast(:since AS date) IS NULL
+            OR cast(max(s.occurred_at) AT TIME ZONE 'Europe/Tallinn' AS date) >= cast(:since AS date)
         ORDER BY published DESC
         LIMIT cast(:limit AS integer)
         """)
-    java.util.List<Object[]> findRtLinkCandidates(@Param("limit") int limit);
+    java.util.List<Object[]> findRtLinkCandidates(
+            @Param("since") java.time.LocalDate since, @Param("limit") int limit);
 
     /**
      * Rich search — every filter is null-safe. topicEdid drills into Eurovoc tags;
