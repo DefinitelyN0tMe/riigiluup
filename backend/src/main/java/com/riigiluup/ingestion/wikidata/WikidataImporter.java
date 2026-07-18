@@ -20,6 +20,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -262,7 +263,8 @@ public class WikidataImporter {
                     .retrieve()
                     .body(JsonNode.class);
             if (result == null) return;
-            List<PartyRow> rows = parsePartyRows(result.path("results").path("bindings"));
+            List<PartyRow> rows = dedupeForUniqueKey(
+                    parsePartyRows(result.path("results").path("bindings")));
             // Full refresh of the Wikidata source; äriregister rows (phase 2) are left untouched.
             partyMembershipRepo.deleteBySource("wikidata");
             Instant now = Instant.now();
@@ -291,6 +293,35 @@ public class WikidataImporter {
     /** One P102 statement parsed from Wikidata, before the person is resolved to an MP. */
     record PartyRow(String personQid, String partyQid, String label,
                     LocalDate startDate, LocalDate endDate) {
+    }
+
+    /**
+     * Collapse P102 statements that map to the same unique key. Wikidata sometimes carries two
+     * claims for one person+party with the same start date (a re-stated or duplicated membership),
+     * which would violate {@code ux_mp_party_membership (member_external_id, party_qid, start_date,
+     * source)}. Worse than the failed row: the constraint error marks the surrounding transaction
+     * rollback-only, so it would sink the whole cross-reference (QIDs + bio), not just P102. Keep
+     * the first occurrence, but prefer one that carries an end date (more complete). Rows with a
+     * null start date can't collide — Postgres treats NULLs as distinct in a unique index — so
+     * they're all kept.
+     */
+    static List<PartyRow> dedupeForUniqueKey(List<PartyRow> rows) {
+        List<PartyRow> nullStart = new ArrayList<>();
+        Map<String, PartyRow> byKey = new LinkedHashMap<>();
+        for (PartyRow r : rows) {
+            if (r.startDate() == null) {
+                nullStart.add(r);
+                continue;
+            }
+            String key = r.personQid() + "|" + r.partyQid() + "|" + r.startDate();
+            PartyRow existing = byKey.get(key);
+            if (existing == null || (existing.endDate() == null && r.endDate() != null)) {
+                byKey.put(key, r);
+            }
+        }
+        List<PartyRow> out = new ArrayList<>(byKey.values());
+        out.addAll(nullStart);
+        return out;
     }
 
     static List<PartyRow> parsePartyRows(JsonNode bindings) {

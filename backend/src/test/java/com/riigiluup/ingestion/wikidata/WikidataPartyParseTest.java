@@ -76,4 +76,34 @@ class WikidataPartyParseTest {
 
         assertThat(rows.get(0).label()).isEqualTo("Q9");
     }
+
+    /** Two claims collapsing to the same (person, party, start) — the crash from the ALL seed —
+     *  collapse to one, keeping the row that carries an end date. */
+    @Test
+    void dedupesSamePersonPartyStart_preferringRowWithEndDate() {
+        var noEnd = new WikidataImporter.PartyRow("Q1", "Q79854", "Isamaa",
+                LocalDate.of(1986, 1, 1), null);
+        var withEnd = new WikidataImporter.PartyRow("Q1", "Q79854", "Isamaa",
+                LocalDate.of(1986, 1, 1), LocalDate.of(1995, 1, 1));
+
+        List<WikidataImporter.PartyRow> out =
+                WikidataImporter.dedupeForUniqueKey(List.of(noEnd, withEnd));
+
+        assertThat(out).hasSize(1);
+        assertThat(out.get(0).endDate()).isEqualTo(LocalDate.of(1995, 1, 1));
+    }
+
+    /** Distinct keys survive; null-start rows never collide (Postgres NULLs are distinct). */
+    @Test
+    void keepsDistinctKeysAndAllNullStartRows() {
+        var a = new WikidataImporter.PartyRow("Q1", "Q10", "A", LocalDate.of(2000, 1, 1), null);
+        var b = new WikidataImporter.PartyRow("Q1", "Q11", "B", LocalDate.of(2000, 1, 1), null);
+        var n1 = new WikidataImporter.PartyRow("Q1", "Q10", "A", null, null);
+        var n2 = new WikidataImporter.PartyRow("Q1", "Q10", "A", null, null);
+
+        List<WikidataImporter.PartyRow> out =
+                WikidataImporter.dedupeForUniqueKey(List.of(a, b, n1, n2));
+
+        assertThat(out).hasSize(4);
+    }
 }
