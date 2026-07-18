@@ -1,5 +1,4 @@
+# Private beta — keep the whole site out of every index. The nginx auth gate already returns
+# 401 to crawlers; this is belt-and-suspenders. Restore Allow: / (+ sitemap) when going public.
 User-agent: *
-Allow: /
-Disallow: /admin
-
-Sitemap: /sitemap.xml
+Disallow: /
