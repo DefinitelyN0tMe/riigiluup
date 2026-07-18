@@ -171,14 +171,24 @@ class InitiativeApiIntegrationTest extends AbstractIntegrationTest {
         // 2 at/above the 1000 threshold (threshold=2), all 3 sent (sent=3), 2 decided
         // (decided=2), 1 of those decisions is draft-act-or-national-matter (draftAct=1),
         // and 1 sent despite being below threshold (sentBelowThreshold=1).
+        // Funnel steps are emitted in a fixed order (InitiativeService#buildFunnel): targeted,
+        // signing, threshold, sent, decided, draftAct. Assert by index and check the key — the
+        // filter idiom $.steps[?(@.key=='x')].count[0] resolves to an empty result under this
+        // Jayway JsonPath version, so it never actually verified the counts.
         mockMvc.perform(get("/api/v1/analytics/initiative-funnel"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.steps[?(@.key=='targeted')].count[0]", equalTo(3)))
-                .andExpect(jsonPath("$.steps[?(@.key=='signing')].count[0]", equalTo(3)))
-                .andExpect(jsonPath("$.steps[?(@.key=='threshold')].count[0]", equalTo(2)))
-                .andExpect(jsonPath("$.steps[?(@.key=='sent')].count[0]", equalTo(3)))
-                .andExpect(jsonPath("$.steps[?(@.key=='decided')].count[0]", equalTo(2)))
-                .andExpect(jsonPath("$.steps[?(@.key=='draftAct')].count[0]", equalTo(1)))
+                .andExpect(jsonPath("$.steps[0].key", equalTo("targeted")))
+                .andExpect(jsonPath("$.steps[0].count", equalTo(3)))
+                .andExpect(jsonPath("$.steps[1].key", equalTo("signing")))
+                .andExpect(jsonPath("$.steps[1].count", equalTo(3)))
+                .andExpect(jsonPath("$.steps[2].key", equalTo("threshold")))
+                .andExpect(jsonPath("$.steps[2].count", equalTo(2)))
+                .andExpect(jsonPath("$.steps[3].key", equalTo("sent")))
+                .andExpect(jsonPath("$.steps[3].count", equalTo(3)))
+                .andExpect(jsonPath("$.steps[4].key", equalTo("decided")))
+                .andExpect(jsonPath("$.steps[4].count", equalTo(2)))
+                .andExpect(jsonPath("$.steps[5].key", equalTo("draftAct")))
+                .andExpect(jsonPath("$.steps[5].count", equalTo(1)))
                 .andExpect(jsonPath("$.sentBelowThreshold", equalTo(1)))
                 .andExpect(jsonPath("$.sentBelowThreshold", greaterThan(0)));
     }
