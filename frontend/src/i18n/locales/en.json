@@ -992,10 +992,29 @@
       "plenaryMembers": "MPs (list)",
       "usergroups": "Usergroups (fractions + committees)",
       "plenaryMemberDetails": "MP details (photo + committees)",
+      "elections": "Election results (RK 2023)",
+      "wikidata": "Wikidata (parties + education + bio)",
       "votes": "Votes (last 90 days)",
       "recomputeAlignments": "Recompute faction alignments",
       "legislation": "Bills (last 90 days)",
-      "linkVotesToBills": "Link votes to bills"
+      "linkVotesToBills": "Link votes to bills",
+      "relinkSponsors": "Relink orphan bill sponsors",
+      "questions": "Govt questions + response latency",
+      "initiatives": "Citizen initiatives (rahvaalgatus)",
+      "activity": "MP activity counts",
+      "partyFinance": "Party finance (ERJK)",
+      "rtLinks": "Riigi Teataja links (batch)"
+    },
+    "seed": {
+      "title": "Full seed",
+      "help": "Runs every importer in dependency order in one background job, so a fresh database is populated in one click. Long (an hour or more over multiple years); poll progress below.",
+      "fromLabel": "From date",
+      "start": "Start full seed (ALL sources)",
+      "confirm": "Start a full seed from {{from}} to today? This runs every importer and can take over an hour.",
+      "checkProgress": "Check progress",
+      "statusLabel": "Status",
+      "phaseLabel": "Phase",
+      "windowsLabel": "Windows"
     },
     "initiativeLinks": {
       "title": "Initiative → bill links",

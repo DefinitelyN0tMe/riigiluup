@@ -59,6 +59,14 @@ public class BackfillRun {
     @Column(name = "error_message", columnDefinition = "text")
     private String errorMessage;
 
+    /** Human-readable label of the pipeline step currently executing (e.g. "wikidata"). */
+    @Column(name = "phase", columnDefinition = "text")
+    private String phase;
+
+    /** JSON object of per-step upsert counts, e.g. {"members":101,"bills":1450}. */
+    @Column(name = "step_counts", columnDefinition = "text")
+    private String stepCounts;
+
     /** JPA optimistic-lock guard; see HistoricalBackfillOrchestrator race handling. */
     @Version
     @Column(name = "version", nullable = false)

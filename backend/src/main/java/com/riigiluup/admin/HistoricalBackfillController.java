@@ -113,9 +113,10 @@ public class HistoricalBackfillController {
         for (String token : raw.split(",")) {
             String t = token.trim().toUpperCase(Locale.ROOT);
             if (t.isEmpty()) continue;
-            if (!t.equals("BILLS") && !t.equals("VOTES")) {
+            if (!t.equals("ALL") && !HistoricalBackfillOrchestrator.ALL_KINDS.contains(t)) {
                 throw new IllegalArgumentException(
-                        "Unknown kind '" + t + "'. Allowed: BILLS, VOTES");
+                        "Unknown kind '" + t + "'. Allowed: ALL, "
+                                + String.join(", ", HistoricalBackfillOrchestrator.ALL_KINDS));
             }
             out.add(t);
         }
@@ -131,12 +132,14 @@ public class HistoricalBackfillController {
         m.put("toDate", r.getToDate());
         m.put("currentWindowStart", r.getCurrentWindowStart());
         m.put("kinds", r.getKinds());
+        m.put("phase", r.getPhase());
         m.put("startedAt", nullSafe(r.getStartedAt()));
         m.put("endedAt", nullSafe(r.getEndedAt()));
         m.put("billsImported", r.getBillsImported());
         m.put("votesImported", r.getVotesImported());
         m.put("windowsCompleted", r.getWindowsCompleted());
         m.put("windowsTotal", r.getWindowsTotal());
+        m.put("stepCounts", r.getStepCounts());
         m.put("errorMessage", r.getErrorMessage());
         return m;
     }

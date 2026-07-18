@@ -1,10 +1,23 @@
 package com.riigiluup.admin;
 
+import com.riigiluup.activity.MemberActivityImporter;
+import com.riigiluup.election.ElectionResultsImporter;
+import com.riigiluup.finance.PartyFinanceImporter;
+import com.riigiluup.ingestion.rahvaalgatus.RahvaalgatusImporter;
+import com.riigiluup.ingestion.riigikogu.GovernmentQuestionImporter;
 import com.riigiluup.ingestion.riigikogu.ImportRunLog;
 import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
+import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
+import com.riigiluup.ingestion.riigikogu.PlenaryMemberImporter;
+import com.riigiluup.ingestion.riigikogu.SpeechImporter;
+import com.riigiluup.ingestion.riigikogu.SponsorRelinker;
+import com.riigiluup.ingestion.riigikogu.UsergroupImporter;
 import com.riigiluup.ingestion.riigikogu.VoteBillLinker;
 import com.riigiluup.ingestion.riigikogu.VoteEventImporter;
+import com.riigiluup.ingestion.riigiteataja.RtLinker;
+import com.riigiluup.ingestion.wikidata.WikidataImporter;
 import jakarta.annotation.PreDestroy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -14,7 +27,11 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -23,14 +40,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Long-running, resumable historical backfill.
+ * Long-running, resumable historical backfill — the single entry point that turns a freshly
+ * migrated database into a fully populated one.
+ *
+ * <p>The run walks a dependency-ordered pipeline over every importer, gated by the requested
+ * {@code kinds} set ({@code ALL} expands to the whole pipeline). One-shot importers that fetch
+ * their full corpus regardless of date (members, wikidata, questions, finance, …) run exactly
+ * once; only {@code VOTES}/{@code SPEECHES} walk the {@code from..to} range in 30-day windows,
+ * which is where resumability matters. Progress — the current {@link BackfillRun#getPhase()
+ * phase} and per-step counts — is persisted to {@code backfill_run} so ops can poll/cancel it.
  *
  * <p>Complementary to {@link AdminBackfillController}, which runs a single window inline.
- * This orchestrator walks a multi-year range in 30-day sliding windows on a background
- * thread, persisting progress to {@code backfill_run} so ops can poll/cancel it.
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class HistoricalBackfillOrchestrator {
 
     public static final String STATUS_RUNNING = "RUNNING";
@@ -38,34 +62,57 @@ public class HistoricalBackfillOrchestrator {
     public static final String STATUS_FAILED = "FAILED";
     public static final String STATUS_CANCELLED = "CANCELLED";
 
+    /**
+     * Every pipeline step, in dependency order. {@code ALL} expands to exactly this list;
+     * an explicit {@code kinds} set is projected onto it so execution order is deterministic
+     * regardless of the order the caller listed them in. Members come first because every
+     * other importer references them; linkers ({@code RT_LINKS}) come last because they need
+     * the adopted acts to exist.
+     */
+    public static final List<String> ALL_KINDS = List.of(
+            "MEMBERS", "GROUPS", "DETAILS", "ELECTIONS", "WIKIDATA", "BILLS",
+            "VOTES", "SPEECHES", "QUESTIONS", "INITIATIVES", "FINANCE", "ACTIVITY", "RT_LINKS");
+
+    /** The two kinds that walk the date range; everything else is a one-shot full-corpus import. */
+    private static final Set<String> WINDOWED_KINDS = Set.of("VOTES", "SPEECHES");
+
     /** Length of each backfill window in days (importers internally sub-window per week). */
     private static final int WINDOW_DAYS = 30;
     /** Breathing-room sleep between windows in milliseconds. */
     private static final long INTER_WINDOW_SLEEP_MS = 100L;
     /** Fail-fast threshold — abort the whole run if this many windows fail back-to-back. */
     private static final int MAX_CONSECUTIVE_WINDOW_FAILURES = 5;
+    /** RT-link drain: candidates per batch, and a hard cap on batches as a runaway backstop. */
+    private static final int RT_BATCH = 500;
+    private static final int RT_MAX_BATCHES = 40;
 
     private final BackfillRunRepository runRepo;
+    private final PlenaryMemberImporter memberImporter;
+    private final UsergroupImporter usergroupImporter;
+    private final PlenaryMemberDetailImporter detailImporter;
+    private final ElectionResultsImporter electionResultsImporter;
+    private final WikidataImporter wikidataImporter;
     private final LegislativeItemImporter legislationImporter;
     private final VoteEventImporter voteImporter;
+    private final SpeechImporter speechImporter;
+    private final GovernmentQuestionImporter governmentQuestionImporter;
+    private final RahvaalgatusImporter rahvaalgatusImporter;
+    private final PartyFinanceImporter partyFinanceImporter;
+    private final MemberActivityImporter memberActivityImporter;
     private final VoteBillLinker voteBillLinker;
-    private final ExecutorService executor;
+    private final SponsorRelinker sponsorRelinker;
+    private final RtLinker rtLinker;
 
-    public HistoricalBackfillOrchestrator(
-            BackfillRunRepository runRepo,
-            LegislativeItemImporter legislationImporter,
-            VoteEventImporter voteImporter,
-            VoteBillLinker voteBillLinker
-    ) {
-        this.runRepo = runRepo;
-        this.legislationImporter = legislationImporter;
-        this.voteImporter = voteImporter;
-        this.voteBillLinker = voteBillLinker;
-        this.executor = Executors.newSingleThreadExecutor(r -> {
-            Thread t = new Thread(r, "historical-backfill");
-            t.setDaemon(true);
-            return t;
-        });
+    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "historical-backfill");
+        t.setDaemon(true);
+        return t;
+    });
+
+    /** A pipeline step that imports something and returns an upsert/row count; may throw. */
+    @FunctionalInterface
+    private interface Step {
+        int run() throws Exception;
     }
 
     /**
@@ -77,8 +124,9 @@ public class HistoricalBackfillOrchestrator {
         if (runRepo.findFirstByStatusOrderByStartedAtDesc(STATUS_RUNNING).isPresent()) {
             return Optional.empty();
         }
-        Set<String> normalized = normalizeKinds(kinds);
-        int totalWindows = countWindows(from, to);
+        LinkedHashSet<String> normalized = canonicalize(kinds);
+        boolean windowed = normalized.stream().anyMatch(WINDOWED_KINDS::contains);
+        int totalWindows = windowed ? countWindows(from, to) : 0;
         BackfillRun run = BackfillRun.builder()
                 .id(UUID.randomUUID())
                 .startedAt(Instant.now())
@@ -87,6 +135,7 @@ public class HistoricalBackfillOrchestrator {
                 .currentWindowStart(from)
                 .kinds(String.join(",", normalized))
                 .status(STATUS_RUNNING)
+                .phase("queued")
                 .billsImported(0)
                 .votesImported(0)
                 .windowsCompleted(0)
@@ -107,10 +156,10 @@ public class HistoricalBackfillOrchestrator {
     }
 
     /**
-     * Flip the run to CANCELLED. The background loop notices at the next window boundary
+     * Flip the run to CANCELLED. The background loop notices at the next step/window boundary
      * and stops cleanly. Retries once on optimistic-lock collision with the loop's own
      * progress save; if it still loses the race we log and move on — the loop will pick
-     * up the CANCELLED status on its next iteration anyway.
+     * up the CANCELLED status on its next boundary anyway.
      */
     public Optional<BackfillRun> cancel(UUID runId) {
         for (int attempt = 0; attempt < 2; attempt++) {
@@ -167,80 +216,155 @@ public class HistoricalBackfillOrchestrator {
 
     // ------------------------------------------------------------------------
 
-    private void runLoop(UUID runId, LocalDate from, LocalDate to, Set<String> kinds) {
+    /** Package-private for the sequencing test, which drives the pipeline synchronously. */
+    void runLoop(UUID runId, LocalDate from, LocalDate to, Set<String> kinds) {
         log.info("historical backfill {} starting from={} to={} kinds={}", runId, from, to, kinds);
+        Map<String, Integer> counts = new LinkedHashMap<>();
+
+        // Phase group 1 — foundational + enrichment one-shots. Order matters: members underpin
+        // everything, groups/details layer committee & faction data on top, then elections and
+        // Wikidata enrich matched members. Each fetches its whole corpus regardless of from/to.
+        if (!oneShot(runId, kinds, "MEMBERS", "members", counts,
+                () -> safeUpserted(memberImporter.runOnce()))) return;
+        if (!oneShot(runId, kinds, "GROUPS", "groups", counts,
+                () -> safeUpserted(usergroupImporter.runOnce()))) return;
+        if (!oneShot(runId, kinds, "DETAILS", "details", counts,
+                () -> safeUpserted(detailImporter.runOnce()))) return;
+        if (!oneShot(runId, kinds, "ELECTIONS", "elections", counts,
+                electionResultsImporter::importRk2023)) return;
+        if (!oneShot(runId, kinds, "WIKIDATA", "wikidata", counts,
+                () -> safeUpserted(wikidataImporter.runOnce()))) return;
+
+        // Bills: a single all-drafts pass. Riigikogu's /api/volumes/drafts ignores
+        // startDate/endDate for filtering, so calling it per-window is a pointless
+        // multiplication (see LegislativeItemImporter#runAllDrafts).
+        if (kinds.contains("BILLS")) {
+            if (!oneShot(runId, kinds, "BILLS", "bills", counts, () -> {
+                int n = safeUpserted(legislationImporter.runAllDrafts());
+                mutate(runId, r -> r.setBillsImported(r.getBillsImported() + n));
+                return n;
+            })) return;
+        }
+
+        // Phase group 2 — windowed historical walk for votes and speeches.
+        if (kinds.stream().anyMatch(WINDOWED_KINDS::contains)) {
+            if (!walkWindows(runId, from, to, kinds, counts)) return;
+        }
+
+        // Phase group 3 — full-corpus one-shots that don't depend on the window walk.
+        if (!oneShot(runId, kinds, "QUESTIONS", "questions", counts,
+                () -> safeUpserted(governmentQuestionImporter.runFullRefresh()))) return;
+        if (!oneShot(runId, kinds, "INITIATIVES", "initiatives", counts,
+                () -> safeUpserted(rahvaalgatusImporter.runFullRefresh()))) return;
+        if (!oneShot(runId, kinds, "FINANCE", "finance", counts,
+                partyFinanceImporter::importAll)) return;
+        if (!oneShot(runId, kinds, "ACTIVITY", "activity", counts,
+                memberActivityImporter::computeAll)) return;
+
+        // Phase group 4 — linkers. Vote↔bill linking needs both sides; sponsor relink needs
+        // bills; both are implicit consequences of importing those kinds, not standalone kinds.
+        if (kinds.contains("BILLS") && kinds.contains("VOTES")) {
+            if (!oneShot(runId, kinds, "VOTES", "voteBillLinks", counts,
+                    voteBillLinker::linkAll)) return;
+        }
+        if (kinds.contains("BILLS")) {
+            if (!oneShot(runId, kinds, "BILLS", "sponsorRelinks", counts,
+                    sponsorRelinker::relinkOrphanSponsors)) return;
+        }
+        if (!rtLinkDrain(runId, kinds, counts)) return;
+
+        // Finalize. A cancel during the very last step already returned above.
+        BackfillRun run = runRepo.findById(runId).orElse(null);
+        if (run == null) return;
+        if (STATUS_CANCELLED.equals(run.getStatus())) return;
+        run.setStatus(STATUS_COMPLETED);
+        run.setPhase("completed");
+        run.setEndedAt(Instant.now());
+        saveQuietly(run);
+        log.info("historical backfill {} COMPLETED kinds={} counts={}", runId, kinds, counts);
+    }
+
+    /**
+     * Run a single one-shot step if its kind was requested. Returns {@code true} to keep the
+     * pipeline going, {@code false} to stop (the run was cancelled or vanished). Importer
+     * failures are non-fatal: they are logged, recorded, and the pipeline continues — one dead
+     * upstream should not block every other source.
+     */
+    private boolean oneShot(UUID runId, Set<String> kinds, String kind, String label,
+                            Map<String, Integer> counts, Step step) {
+        if (!kinds.contains(kind)) return true;
+        BackfillRun run = runRepo.findById(runId).orElse(null);
+        if (run == null) return false;
+        if (STATUS_CANCELLED.equals(run.getStatus())) {
+            finishCancel(run);
+            return false;
+        }
+        run.setPhase(label);
+        saveQuietly(run);
+
+        try {
+            int n = step.run();
+            counts.put(label, n);
+            log.info("backfill {} step {}: {}", runId, label, n);
+        } catch (Exception e) {
+            log.error("backfill {} step {} failed: {}", runId, label, e.toString());
+            counts.put(label, -1); // -1 marks a failed step in step_counts
+            mutate(runId, r -> r.setErrorMessage(label + ": " + e));
+        }
+        persistCounts(runId, counts);
+        return true;
+    }
+
+    /**
+     * Walk {@code from..to} in 30-day windows, importing votes and/or speeches per window.
+     * Resumable via {@code current_window_start}; aborts the whole run after
+     * {@link #MAX_CONSECUTIVE_WINDOW_FAILURES} back-to-back failures so a fully broken upstream
+     * does not march through every window as "ok" and finish COMPLETED with empty windows.
+     */
+    private boolean walkWindows(UUID runId, LocalDate from, LocalDate to,
+                                Set<String> kinds, Map<String, Integer> counts) {
+        boolean doVotes = kinds.contains("VOTES");
+        boolean doSpeeches = kinds.contains("SPEECHES");
         int consecutiveFailures = 0;
         LocalDate cursor = from;
-        boolean doBills = kinds.contains("BILLS");
-        boolean doVotes = kinds.contains("VOTES");
-
-        // Bills: a single all-drafts pass at the top. Riigikogu's /api/volumes/drafts
-        // ignores startDate/endDate for filtering, so calling it per-window is a
-        // pointless multiplication (see LegislativeItemImporter#runAllDrafts).
-        if (doBills) {
-            try {
-                log.info("backfill {} running one-shot all-drafts import", runId);
-                ImportRunLog r = legislationImporter.runAllDrafts();
-                BackfillRun snap = runRepo.findById(runId).orElse(null);
-                if (snap == null) return;
-                if (STATUS_CANCELLED.equals(snap.getStatus())) {
-                    log.info("backfill {} cancelled after all-drafts pass", runId);
-                    snap.setEndedAt(Instant.now());
-                    runRepo.save(snap);
-                    return;
-                }
-                snap.setBillsImported(snap.getBillsImported() + safeUpserted(r));
-                runRepo.save(snap);
-            } catch (Exception e) {
-                log.error("backfill {} all-drafts pass failed: {}", runId, e.toString());
-                // Non-fatal: proceed with votes anyway; ops can re-run bills alone.
-            }
-        }
-
-        // If only BILLS was requested, we're done — no window loop for votes.
-        if (!doVotes) {
-            BackfillRun finished = runRepo.findById(runId).orElse(null);
-            if (finished == null) return;
-            if (STATUS_CANCELLED.equals(finished.getStatus())) return;
-            finished.setStatus(STATUS_COMPLETED);
-            finished.setEndedAt(Instant.now());
-            runRepo.save(finished);
-            log.info("backfill {} completed (BILLS-only)", runId);
-            return;
-        }
 
         while (!cursor.isAfter(to)) {
-            // Re-fetch each iteration so a CANCELLED status flip is observed promptly.
             BackfillRun run = runRepo.findById(runId).orElse(null);
             if (run == null) {
                 log.warn("backfill run {} disappeared mid-flight, stopping", runId);
-                return;
+                return false;
             }
             if (STATUS_CANCELLED.equals(run.getStatus())) {
                 log.info("backfill run {} cancelled at cursor={}", runId, cursor);
-                run.setEndedAt(Instant.now());
-                runRepo.save(run);
-                return;
+                finishCancel(run);
+                return false;
             }
 
             LocalDate windowEnd = cursor.plusDays(WINDOW_DAYS - 1L);
             if (windowEnd.isAfter(to)) windowEnd = to;
+            run.setPhase("window " + cursor + ".." + windowEnd);
             log.info("backfill {} window {}..{} ({}/{} done)",
                     runId, cursor, windowEnd, run.getWindowsCompleted(), run.getWindowsTotal());
 
             boolean windowOk = true;
             try {
-                // Bills are handled in one shot before the loop — see runAllDrafts above.
                 if (doVotes) {
                     ImportRunLog r = voteImporter.runWindow(cursor, windowEnd);
                     run.setVotesImported(run.getVotesImported() + safeUpserted(r));
+                    counts.merge("votes", safeUpserted(r), Integer::sum);
                     // runWindow swallows its own exceptions and reports via status, so inspect it
-                    // rather than trusting the (rarely-thrown) try/catch — otherwise a fully broken
-                    // upstream marches through every window as "ok" and the run finishes COMPLETED
-                    // with empty windows that are never revisited.
+                    // rather than trusting the (rarely-thrown) try/catch.
                     if ("FAILED".equals(r.getStatus())) {
                         windowOk = false;
                         run.setErrorMessage(cursor + ".." + windowEnd + ": vote window import returned FAILED");
+                    }
+                }
+                if (doSpeeches) {
+                    ImportRunLog r = speechImporter.runWindow(cursor, windowEnd);
+                    counts.merge("speeches", safeUpserted(r), Integer::sum);
+                    if ("FAILED".equals(r.getStatus())) {
+                        windowOk = false;
+                        run.setErrorMessage(cursor + ".." + windowEnd + ": speech window import returned FAILED");
                     }
                 }
             } catch (Exception e) {
@@ -260,45 +384,91 @@ public class HistoricalBackfillOrchestrator {
                     run.setErrorMessage("aborted after " + consecutiveFailures
                             + " consecutive window failures; last error: " + run.getErrorMessage());
                     run.setEndedAt(Instant.now());
-                    runRepo.save(run);
-                    return;
+                    run.setStepCounts(jsonCounts(counts));
+                    saveQuietly(run);
+                    return false;
                 }
             }
 
             cursor = windowEnd.plusDays(1);
             run.setCurrentWindowStart(cursor);
             run.setWindowsCompleted(run.getWindowsCompleted() + 1);
-            try {
-                runRepo.save(run);
-            } catch (ObjectOptimisticLockingFailureException e) {
-                // A concurrent cancel() bumped the version out from under us.
-                // Next loop iteration will re-read and see CANCELLED, so just log.
-                log.info("progress save for run {} lost optimistic lock — likely a "
-                        + "concurrent cancel; will observe status on next iteration", runId);
-            }
-
+            run.setStepCounts(jsonCounts(counts));
+            saveQuietly(run);
             sleepQuietly(INTER_WINDOW_SLEEP_MS);
         }
+        return true;
+    }
 
-        // Link votes to bills once at the end (only meaningful when both kinds ran).
-        if (doBills && doVotes) {
-            try {
-                int linked = voteBillLinker.linkAll();
-                log.info("backfill {} linked {} votes to bills", runId, linked);
-            } catch (Exception e) {
-                log.warn("backfill {} vote-bill link step failed: {}", runId, e.toString());
-            }
+    /**
+     * Drain the Riigi Teataja link backlog. Each batch links the newest still-unlinked adopted
+     * acts; permanently-unmatchable acts stay NULL and reappear every batch, so the loop stops
+     * on the first batch that links nothing (no progress) rather than on an empty candidate set,
+     * which would spin forever on that unmatchable tail. Capped as a runaway backstop.
+     */
+    private boolean rtLinkDrain(UUID runId, Set<String> kinds, Map<String, Integer> counts) {
+        if (!kinds.contains("RT_LINKS")) return true;
+        BackfillRun run = runRepo.findById(runId).orElse(null);
+        if (run == null) return false;
+        if (STATUS_CANCELLED.equals(run.getStatus())) {
+            finishCancel(run);
+            return false;
         }
+        run.setPhase("rtLinks");
+        saveQuietly(run);
 
+        int totalLinked = 0;
+        try {
+            for (int i = 0; i < RT_MAX_BATCHES; i++) {
+                BackfillRun cur = runRepo.findById(runId).orElse(null);
+                if (cur == null) return false;
+                if (STATUS_CANCELLED.equals(cur.getStatus())) {
+                    finishCancel(cur);
+                    return false;
+                }
+                Map<String, Integer> r = rtLinker.linkBatch(RT_BATCH);
+                int linked = r.getOrDefault("linked", 0);
+                totalLinked += linked;
+                if (linked == 0) break; // no progress — remaining acts are unmatchable for now
+            }
+        } catch (Exception e) {
+            log.error("backfill {} step rtLinks failed: {}", runId, e.toString());
+            mutate(runId, r -> r.setErrorMessage("rtLinks: " + e));
+        }
+        counts.put("rtLinks", totalLinked);
+        log.info("backfill {} step rtLinks: {}", runId, totalLinked);
+        persistCounts(runId, counts);
+        return true;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /** Re-read the run, apply a mutation, and save (swallowing optimistic-lock races). */
+    private void mutate(UUID runId, java.util.function.Consumer<BackfillRun> mutation) {
         BackfillRun run = runRepo.findById(runId).orElse(null);
         if (run == null) return;
-        // If it was cancelled during the very last window we already returned above; treat this as done.
-        run.setStatus(STATUS_COMPLETED);
+        mutation.accept(run);
+        saveQuietly(run);
+    }
+
+    private void persistCounts(UUID runId, Map<String, Integer> counts) {
+        mutate(runId, r -> r.setStepCounts(jsonCounts(counts)));
+    }
+
+    private void finishCancel(BackfillRun run) {
         run.setEndedAt(Instant.now());
-        runRepo.save(run);
-        log.info("historical backfill {} COMPLETED bills={} votes={} windows={}/{}",
-                runId, run.getBillsImported(), run.getVotesImported(),
-                run.getWindowsCompleted(), run.getWindowsTotal());
+        saveQuietly(run);
+    }
+
+    private void saveQuietly(BackfillRun run) {
+        try {
+            runRepo.save(run);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // A concurrent cancel() bumped the version out from under us. The next boundary
+            // re-reads and observes CANCELLED, so losing this write is harmless.
+            log.debug("progress save for run {} lost optimistic lock — concurrent cancel likely",
+                    run.getId());
+        }
     }
 
     private static int safeUpserted(ImportRunLog r) {
@@ -311,20 +481,47 @@ public class HistoricalBackfillOrchestrator {
         return (int) ((days + WINDOW_DAYS - 1) / WINDOW_DAYS);
     }
 
-    private static Set<String> normalizeKinds(Set<String> raw) {
-        Set<String> out = new LinkedHashSet<>();
+    /**
+     * Project a requested kind set onto {@link #ALL_KINDS} so execution order is deterministic.
+     * {@code ALL} selects the whole pipeline; unknown tokens are dropped (the controller
+     * validates and rejects them before we get here). Empty resolves to the legacy
+     * bills+votes default so old callers keep working.
+     */
+    public static LinkedHashSet<String> canonicalize(Set<String> raw) {
+        boolean all = false;
+        Set<String> requested = new java.util.HashSet<>();
         if (raw != null) {
             for (String k : raw) {
                 if (k == null) continue;
-                String up = k.trim().toUpperCase();
-                if (up.equals("BILLS") || up.equals("VOTES")) out.add(up);
+                String up = k.trim().toUpperCase(Locale.ROOT);
+                if (up.equals("ALL")) {
+                    all = true;
+                } else if (ALL_KINDS.contains(up)) {
+                    requested.add(up);
+                }
             }
+        }
+        LinkedHashSet<String> out = new LinkedHashSet<>();
+        for (String k : ALL_KINDS) {
+            if (all || requested.contains(k)) out.add(k);
         }
         if (out.isEmpty()) {
             out.add("BILLS");
             out.add("VOTES");
         }
         return out;
+    }
+
+    /** Minimal JSON serializer for the {label: count} step map — keys are known-safe literals. */
+    private static String jsonCounts(Map<String, Integer> counts) {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        for (Map.Entry<String, Integer> e : counts.entrySet()) {
+            if (!first) sb.append(',');
+            sb.append('"').append(e.getKey()).append("\":").append(e.getValue());
+            first = false;
+        }
+        return sb.append('}').toString();
     }
 
     private static void sleepQuietly(long ms) {

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AdminUnauthorizedError, fetchAdminStatus, triggerAdminImport } from "../api/admin";
+import {
+  AdminUnauthorizedError,
+  fetchAdminStatus,
+  fetchLatestBackfill,
+  startFullBackfill,
+  triggerAdminImport,
+  type BackfillRunStatus,
+} from "../api/admin";
 import AdminAffiliationsSection from "../components/admin/AdminAffiliationsSection";
 import AdminInitiativeLinksSection from "../components/admin/AdminInitiativeLinksSection";
 import type { AdminStatus } from "../types";
@@ -10,10 +17,18 @@ const IMPORT_JOBS = [
   { path: "/api/v1/admin/import/plenary-members", labelKey: "admin.jobs.plenaryMembers" },
   { path: "/api/v1/admin/import/usergroups", labelKey: "admin.jobs.usergroups" },
   { path: "/api/v1/admin/import/plenary-member-details", labelKey: "admin.jobs.plenaryMemberDetails" },
+  { path: "/api/v1/admin/import/elections", labelKey: "admin.jobs.elections" },
+  { path: "/api/v1/admin/import/wikidata", labelKey: "admin.jobs.wikidata" },
   { path: "/api/v1/admin/import/votes", labelKey: "admin.jobs.votes" },
   { path: "/api/v1/admin/import/recompute-alignments", labelKey: "admin.jobs.recomputeAlignments" },
   { path: "/api/v1/admin/import/legislation", labelKey: "admin.jobs.legislation" },
   { path: "/api/v1/admin/import/link-votes-to-bills", labelKey: "admin.jobs.linkVotesToBills" },
+  { path: "/api/v1/admin/import/relink-sponsors", labelKey: "admin.jobs.relinkSponsors" },
+  { path: "/api/v1/admin/import/questions", labelKey: "admin.jobs.questions" },
+  { path: "/api/v1/admin/import/initiatives", labelKey: "admin.jobs.initiatives" },
+  { path: "/api/v1/admin/import/activity", labelKey: "admin.jobs.activity" },
+  { path: "/api/v1/admin/import/party-finance", labelKey: "admin.jobs.partyFinance" },
+  { path: "/api/v1/admin/import/rt-links", labelKey: "admin.jobs.rtLinks" },
 ] as const;
 
 const BASE = import.meta.env.VITE_API_BASE_URL ?? "";
@@ -27,6 +42,9 @@ export default function AdminPage() {
   const [status, setStatus] = useState<AdminStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [seed, setSeed] = useState<BackfillRunStatus | null>(null);
+  const [seedFrom, setSeedFrom] = useState("2022-01-01");
+  const [seedBusy, setSeedBusy] = useState(false);
 
   async function refresh() {
     setError(null);
@@ -34,6 +52,7 @@ export default function AdminPage() {
       const s = await fetchAdminStatus();
       setStatus(s);
       setAuthState("authorized");
+      setSeed(await fetchLatestBackfill());
     } catch (e) {
       if (e instanceof AdminUnauthorizedError) {
         setAuthState("unauthorized");
@@ -41,6 +60,29 @@ export default function AdminPage() {
       } else {
         setError((e as Error).message);
       }
+    }
+  }
+
+  async function startSeed() {
+    if (!confirm(t("admin.seed.confirm", { from: seedFrom }))) return;
+    setSeedBusy(true);
+    setError(null);
+    try {
+      setSeed(await startFullBackfill(seedFrom, "ALL"));
+    } catch (e) {
+      if (e instanceof AdminUnauthorizedError) setAuthState("unauthorized");
+      else setError((e as Error).message);
+    } finally {
+      setSeedBusy(false);
+    }
+  }
+
+  async function refreshSeed() {
+    try {
+      setSeed(await fetchLatestBackfill());
+    } catch (e) {
+      if (e instanceof AdminUnauthorizedError) setAuthState("unauthorized");
+      else setError((e as Error).message);
     }
   }
 
@@ -122,6 +164,62 @@ export default function AdminPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-label="Full seed" className="border border-slate-200 rounded-lg p-4">
+        <h2 className="text-lg font-semibold text-ink mb-1">{t("admin.seed.title")}</h2>
+        <p className="text-sm text-muted mb-3">{t("admin.seed.help")}</p>
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="text-sm">
+            <span className="block text-xs uppercase text-slate-500 mb-1">{t("admin.seed.fromLabel")}</span>
+            <input
+              type="date"
+              value={seedFrom}
+              onChange={(e) => setSeedFrom(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1.5 text-sm"
+            />
+          </label>
+          <button
+            onClick={startSeed}
+            disabled={seedBusy || seed?.status === "RUNNING"}
+            className="px-4 py-2 rounded-md bg-blue text-white text-sm hover:bg-blue-deep disabled:opacity-50"
+          >
+            {seedBusy ? t("admin.running") : t("admin.seed.start")}
+          </button>
+          <button onClick={refreshSeed} className="text-sm text-estonia hover:underline">
+            {t("admin.seed.checkProgress")}
+          </button>
+        </div>
+        {seed && (
+          <div className="mt-3 text-sm border-t border-slate-100 pt-3">
+            <div className="flex flex-wrap gap-x-6 gap-y-1">
+              <span>
+                {t("admin.seed.statusLabel")}:{" "}
+                <span
+                  className={`font-medium ${
+                    seed.status === "COMPLETED"
+                      ? "text-emerald-600"
+                      : seed.status === "RUNNING"
+                        ? "text-blue"
+                        : seed.status === "FAILED"
+                          ? "text-red-600"
+                          : "text-slate-600"
+                  }`}
+                >
+                  {seed.status}
+                </span>
+              </span>
+              {seed.phase && <span>{t("admin.seed.phaseLabel")}: <span className="font-medium">{seed.phase}</span></span>}
+              {seed.windowsTotal > 0 && (
+                <span>{t("admin.seed.windowsLabel")}: <span className="font-medium">{seed.windowsCompleted}/{seed.windowsTotal}</span></span>
+              )}
+            </div>
+            {seed.stepCounts && seed.stepCounts !== "{}" && (
+              <pre className="mt-2 text-xs bg-slate-50 rounded p-2 overflow-x-auto text-slate-700">{seed.stepCounts}</pre>
+            )}
+            {seed.errorMessage && <p className="text-red-600 text-xs mt-1">{seed.errorMessage}</p>}
+          </div>
+        )}
       </section>
 
       <section aria-label="Trigger">

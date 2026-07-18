@@ -992,10 +992,29 @@
       "plenaryMembers": "Saadikud (nimekiri)",
       "usergroups": "Kasutajarühmad (fraktsioonid + komisjonid)",
       "plenaryMemberDetails": "Saadikute detailid (foto + komisjonid)",
+      "elections": "Valimistulemused (RK 2023)",
+      "wikidata": "Wikidata (erakonnad + haridus + bio)",
       "votes": "Hääletused (viimased 90 päeva)",
       "recomputeAlignments": "Arvuta fraktsioonikuuluvus uuesti",
       "legislation": "Eelnõud (viimased 90 päeva)",
-      "linkVotesToBills": "Seosta hääletused eelnõudega"
+      "linkVotesToBills": "Seosta hääletused eelnõudega",
+      "relinkSponsors": "Seosta orvuks jäänud algatajad uuesti",
+      "questions": "Valitsuse küsimused + vastamisaeg",
+      "initiatives": "Kodanikualgatused (rahvaalgatus)",
+      "activity": "Saadikute aktiivsuse loendurid",
+      "partyFinance": "Erakondade rahastus (ERJK)",
+      "rtLinks": "Riigi Teataja seosed (pakett)"
+    },
+    "seed": {
+      "title": "Täisimport",
+      "help": "Käivitab kõik importijad sõltuvusjärjekorras ühe taustatööna, nii et värske andmebaas täitub ühe klõpsuga. Pikk (mitme aasta puhul tund või rohkem); jälgi edenemist allpool.",
+      "fromLabel": "Alguskuupäev",
+      "start": "Käivita täisimport (KÕIK allikad)",
+      "confirm": "Käivitada täisimport alates {{from}} kuni tänaseni? See käivitab kõik importijad ja võib kesta üle tunni.",
+      "checkProgress": "Kontrolli edenemist",
+      "statusLabel": "Olek",
+      "phaseLabel": "Etapp",
+      "windowsLabel": "Aknad"
     },
     "initiativeLinks": {
       "title": "Rahvaalgatuse → eelnõu seosed",
