@@ -269,9 +269,19 @@ public class WikidataImporter {
             partyMembershipRepo.deleteBySource("wikidata");
             Instant now = Instant.now();
             int stored = 0;
+            Set<String> insertedKeys = new HashSet<>();
             for (PartyRow r : rows) {
                 PlenaryMember mp = matchedByQid.get(r.personQid());
                 if (mp == null) continue;
+                // Guard the ACTUAL DB unique key (member_external_id, party_qid, start_date): two
+                // Wikidata person entities can resolve to the same MP, so deduping on personQid
+                // upstream isn't enough. A violation marks the transaction rollback-only and sinks
+                // the whole cross-reference (QIDs + bio). Null start dates don't collide (Postgres
+                // treats NULLs as distinct in a unique index), so only dated rows are guarded.
+                if (r.startDate() != null && !insertedKeys.add(
+                        mp.getExternalId() + "|" + r.partyQid() + "|" + r.startDate())) {
+                    continue;
+                }
                 partyMembershipRepo.save(MpPartyMembership.builder()
                         .memberExternalId(mp.getExternalId())
                         .partyQid(r.partyQid())
