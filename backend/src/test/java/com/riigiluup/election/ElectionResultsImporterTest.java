@@ -1,12 +1,24 @@
 package com.riigiluup.election;
 
+import com.riigiluup.ingestion.riigikogu.ImportRunLog;
+import com.riigiluup.ingestion.riigikogu.ImportRunLogRepository;
 import com.riigiluup.person.PlenaryMember;
+import com.riigiluup.person.PlenaryMemberRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ElectionResultsImporterTest {
 
@@ -34,6 +46,28 @@ class ElectionResultsImporterTest {
 
         assertThat(idxA.get(key).getExternalId()).isEqualTo("ACTIVE");
         assertThat(idxB.get(key).getExternalId()).isEqualTo("ACTIVE");
+    }
+
+    /** An empty RESULTS.xml must never wipe the table — the run fails, existing rows stay. */
+    @Test
+    void empty_source_result_keeps_existing_rows_and_marks_run_failed() {
+        ElectionResultsClient client = mock(ElectionResultsClient.class);
+        ElectionResultRepository repo = mock(ElectionResultRepository.class);
+        ImportRunLogRepository runLogRepo = mock(ImportRunLogRepository.class);
+        when(runLogRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(client.fetchRk2023Results()).thenReturn(List.of());
+
+        ElectionResultsImporter importer = new ElectionResultsImporter(
+                client, mock(PlenaryMemberRepository.class), repo, runLogRepo,
+                mock(PlatformTransactionManager.class));
+
+        assertThat(importer.importRk2023()).isZero();
+
+        verify(repo, never()).deleteByElectionCode(anyString());
+        ArgumentCaptor<ImportRunLog> captor = ArgumentCaptor.forClass(ImportRunLog.class);
+        verify(runLogRepo, atLeastOnce()).save(captor.capture());
+        assertThat(captor.getValue().getStatus()).isEqualTo("FAILED");
+        assertThat(captor.getValue().getFinishedAt()).isNotNull();
     }
 
     @Test

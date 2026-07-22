@@ -93,9 +93,10 @@ class WikidataPartyParseTest {
         assertThat(out.get(0).endDate()).isEqualTo(LocalDate.of(1995, 1, 1));
     }
 
-    /** Distinct keys survive; null-start rows never collide (Postgres NULLs are distinct). */
+    /** Distinct keys survive; null-start duplicates collapse too — the V29 constraint is
+     *  NULLS NOT DISTINCT, so they would collide in the DB. */
     @Test
-    void keepsDistinctKeysAndAllNullStartRows() {
+    void keepsDistinctKeysAndCollapsesNullStartDuplicates() {
         var a = new WikidataImporter.PartyRow("Q1", "Q10", "A", LocalDate.of(2000, 1, 1), null);
         var b = new WikidataImporter.PartyRow("Q1", "Q11", "B", LocalDate.of(2000, 1, 1), null);
         var n1 = new WikidataImporter.PartyRow("Q1", "Q10", "A", null, null);
@@ -104,6 +105,7 @@ class WikidataPartyParseTest {
         List<WikidataImporter.PartyRow> out =
                 WikidataImporter.dedupeForUniqueKey(List.of(a, b, n1, n2));
 
-        assertThat(out).hasSize(4);
+        assertThat(out).hasSize(3);
+        assertThat(out.stream().filter(r -> r.startDate() == null)).hasSize(1);
     }
 }

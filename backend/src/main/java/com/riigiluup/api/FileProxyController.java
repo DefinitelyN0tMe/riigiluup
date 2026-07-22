@@ -55,7 +55,9 @@ public class FileProxyController {
         /** Serialize cross-key file fetches so we don't burst Riigikogu's per-IP limit. */
         private final ReentrantLock fetchLock = new ReentrantLock(true);
 
-        @Cacheable(value = CacheConfig.CACHE_FILES, key = "#uuid", sync = true)
+        // Don't pin an empty upstream response (missing photo, transient miss) for 6 hours.
+        @Cacheable(value = CacheConfig.CACHE_FILES, key = "#uuid", sync = true,
+                unless = "#result == null || #result.length == 0")
         public byte[] load(String uuid) {
             fetchLock.lock();
             try {

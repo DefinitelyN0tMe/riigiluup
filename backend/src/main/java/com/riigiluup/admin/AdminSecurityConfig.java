@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -99,9 +101,13 @@ public class AdminSecurityConfig {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsManager() {
-        UserDetails admin = User.withDefaultPasswordEncoder()
+        // Delegating encoder ({bcrypt} by default) instead of the deprecated
+        // withDefaultPasswordEncoder(), so the stored credential is a hash rather than
+        // the plain password. Matches DaoAuthenticationProvider's default encoder.
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        UserDetails admin = User.builder()
                 .username(username)
-                .password(password)
+                .password(encoder.encode(password))
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(admin);

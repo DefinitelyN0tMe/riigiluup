@@ -1,7 +1,7 @@
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.5"
+    id("org.springframework.boot") version "3.3.13"
     id("io.spring.dependency-management") version "1.1.6"
 }
 

@@ -7,11 +7,11 @@ import com.riigiluup.person.MpPartyMembership;
 import com.riigiluup.person.MpPartyMembershipRepository;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.person.PlenaryMemberRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestClient;
 
 import java.time.Instant;
@@ -37,12 +37,15 @@ import java.util.stream.Collectors;
  * existing MPs by (fullName, dateOfBirth); a name-only fallback is used only when the name is
  * unambiguous on both sides. Matches update the four Wikidata columns on plenary_member.
  *
+ * <p>The three SPARQL calls run outside any transaction; each write pass commits in its own
+ * short {@link TransactionTemplate} so no DB connection is held across HTTP (same pattern as
+ * the Riigikogu importers).
+ *
  * <p>Idempotent: safe to re-run. Not scheduled — triggered by
  * {@code POST /api/v1/admin/import/wikidata}.
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class WikidataImporter {
 
     private static final String JOB_NAME = "wikidata.mp-crossref";
@@ -103,106 +106,43 @@ public class WikidataImporter {
     private final PlenaryMemberRepository memberRepo;
     private final MpPartyMembershipRepository partyMembershipRepo;
     private final ImportRunLogRepository runLogRepo;
+    private final TransactionTemplate tx;
     private final RestClient rest = RestClient.builder()
             // Wikidata's UA policy: identify the client + contact so they can reach out.
             .defaultHeader(HttpHeaders.USER_AGENT, "riigiluup/0.1 (riigiluup@gmail.com)")
             .defaultHeader(HttpHeaders.ACCEPT, "application/sparql-results+json")
             .build();
 
-    @Transactional
+    public WikidataImporter(PlenaryMemberRepository memberRepo,
+                            MpPartyMembershipRepository partyMembershipRepo,
+                            ImportRunLogRepository runLogRepo,
+                            PlatformTransactionManager txManager) {
+        this.memberRepo = memberRepo;
+        this.partyMembershipRepo = partyMembershipRepo;
+        this.runLogRepo = runLogRepo;
+        this.tx = new TransactionTemplate(txManager);
+    }
+
+    /** Cross-reference pass result. The member entities are detached once the tx commits. */
+    private record CrossrefResult(int seen, int matched, Map<String, PlenaryMember> matchedByQid) {
+    }
+
     public ImportRunLog runOnce() {
         ImportRunLog run = runLogRepo.save(ImportRunLog.builder()
                 .sourceName("wikidata").jobName(JOB_NAME)
                 .startedAt(Instant.now()).status("RUNNING").build());
         int seen = 0, matched = 0;
         try {
-            JsonNode result = rest.get()
-                    .uri(SPARQL_ENDPOINT + "?query={q}&format=json", SPARQL)
-                    .retrieve()
-                    .body(JsonNode.class);
+            JsonNode result = fetchSparql(SPARQL); // network, outside any tx
             if (result == null) throw new IllegalStateException("empty Wikidata response");
             JsonNode bindings = result.path("results").path("bindings");
 
-            // Index MPs by (fullNameLower, dateOfBirth) — highest-specificity match — and by name.
-            List<PlenaryMember> mps = memberRepo.findAll();
-            Map<String, PlenaryMember> byNameDob = new HashMap<>();
-            Map<String, PlenaryMember> byNameOnly = new HashMap<>();
-            Map<String, Integer> ourNameFreq = new HashMap<>();
-            for (PlenaryMember m : mps) {
-                String nameKey = m.getFullName().toLowerCase();
-                byNameOnly.putIfAbsent(nameKey, m);
-                ourNameFreq.merge(nameKey, 1, Integer::sum);
-                if (m.getDateOfBirth() != null) {
-                    byNameDob.put(nameKey + "|" + m.getDateOfBirth(), m);
-                }
-            }
+            CrossrefResult crossref = tx.execute(status -> applyCrossref(bindings));
+            seen = crossref.seen();
+            matched = crossref.matched();
 
-            // The SPARQL set spans every Riigikogu member since 1919, so a name-only match risks
-            // stamping a historical namesake onto a current MP. Count Wikidata labels so a name-only
-            // match is only trusted when it's unambiguous on both sides.
-            Map<String, Integer> wdNameFreq = new HashMap<>();
-            for (JsonNode row : bindings) {
-                String label = row.path("personLabel").path("value").asText(null);
-                if (label != null) wdNameFreq.merge(label.toLowerCase(), 1, Integer::sum);
-            }
-
-            Set<UUID> assignedByDob = new HashSet<>(); // matched by the strong name+DOB key — never override
-            Map<String, PlenaryMember> matchedByQid = new HashMap<>(); // for the follow-up bio enrichment
-            for (JsonNode row : bindings) {
-                seen++;
-                String qUri = row.path("person").path("value").asText(null);
-                String label = row.path("personLabel").path("value").asText(null);
-                if (qUri == null || label == null) continue;
-                String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
-
-                LocalDate dob = null;
-                String dobRaw = row.path("dateOfBirth").path("value").asText(null);
-                if (dobRaw != null) {
-                    try {
-                        // ISO instants like "1962-03-14T00:00:00Z" — take the date part.
-                        dob = LocalDate.parse(dobRaw.substring(0, 10));
-                    } catch (DateTimeParseException ignored) { /* skip bad dates */ }
-                }
-
-                String nameKey = label.toLowerCase();
-                PlenaryMember mp = null;
-                boolean viaDob = false;
-                if (dob != null) {
-                    mp = byNameDob.get(nameKey + "|" + dob);
-                    if (mp != null) viaDob = true;
-                }
-                if (mp == null
-                        && wdNameFreq.getOrDefault(nameKey, 0) == 1
-                        && ourNameFreq.getOrDefault(nameKey, 0) == 1) {
-                    PlenaryMember cand = byNameOnly.get(nameKey);
-                    if (cand != null && !assignedByDob.contains(cand.getId())) mp = cand;
-                }
-                if (mp == null) continue;
-
-                // Don't clobber a QID already set (manual correction, or a stronger match) with a
-                // different one — re-runs and namesakes must not silently rewrite identities.
-                if (mp.getWikidataQid() != null && !mp.getWikidataQid().equals(qid)) {
-                    log.warn("wikidata QID conflict for {}: keeping existing {} (ignoring {})",
-                            mp.getFullName(), mp.getWikidataQid(), qid);
-                    continue;
-                }
-
-                mp.setWikidataQid(qid);
-                // Only overwrite URL fields with non-null values so a temporarily missing sitelink
-                // in Wikidata doesn't wipe a previously-good link.
-                setIfPresent(row, "enwiki", mp::setWikipediaUrlEn);
-                setIfPresent(row, "etwiki", mp::setWikipediaUrlEt);
-                setIfPresent(row, "ruwiki", mp::setWikipediaUrlRu);
-                mp.setUpdatedAt(Instant.now());
-                if (viaDob) assignedByDob.add(mp.getId());
-                matchedByQid.put(qid, mp);
-                matched++;
-            }
-            log.info("wikidata cross-ref: {}/{} MPs matched from {} Wikidata rows",
-                    matched, mps.size(), seen);
-
-            enrichBio(matchedByQid);
-            enrichParties(matchedByQid);
+            enrichBio(crossref.matchedByQid());
+            enrichParties(crossref.matchedByQid());
             run.setStatus("SUCCESS");
         } catch (Exception e) {
             log.error("wikidata cross-ref failed", e);
@@ -217,37 +157,132 @@ public class WikidataImporter {
         return run;
     }
 
+    private JsonNode fetchSparql(String query) {
+        return rest.get()
+                .uri(SPARQL_ENDPOINT + "?query={q}&format=json", query)
+                .retrieve()
+                .body(JsonNode.class);
+    }
+
+    /** Match the fetched rows to plenary_member and stamp QIDs + Wikipedia URLs (one tx). */
+    private CrossrefResult applyCrossref(JsonNode bindings) {
+        int seen = 0, matched = 0;
+
+        // Index MPs by (fullNameLower, dateOfBirth) — highest-specificity match — and by name.
+        List<PlenaryMember> mps = memberRepo.findAll();
+        Map<String, PlenaryMember> byNameDob = new HashMap<>();
+        Map<String, PlenaryMember> byNameOnly = new HashMap<>();
+        Map<String, Integer> ourNameFreq = new HashMap<>();
+        for (PlenaryMember m : mps) {
+            String nameKey = m.getFullName().toLowerCase();
+            byNameOnly.putIfAbsent(nameKey, m);
+            ourNameFreq.merge(nameKey, 1, Integer::sum);
+            if (m.getDateOfBirth() != null) {
+                byNameDob.put(nameKey + "|" + m.getDateOfBirth(), m);
+            }
+        }
+
+        // The SPARQL set spans every Riigikogu member since 1919, so a name-only match risks
+        // stamping a historical namesake onto a current MP. Count Wikidata labels so a name-only
+        // match is only trusted when it's unambiguous on both sides.
+        Map<String, Integer> wdNameFreq = new HashMap<>();
+        for (JsonNode row : bindings) {
+            String label = row.path("personLabel").path("value").asText(null);
+            if (label != null) wdNameFreq.merge(label.toLowerCase(), 1, Integer::sum);
+        }
+
+        Set<UUID> assignedByDob = new HashSet<>(); // matched by the strong name+DOB key — never override
+        Map<String, PlenaryMember> matchedByQid = new HashMap<>(); // for the follow-up bio enrichment
+        for (JsonNode row : bindings) {
+            seen++;
+            String qUri = row.path("person").path("value").asText(null);
+            String label = row.path("personLabel").path("value").asText(null);
+            if (qUri == null || label == null) continue;
+            String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
+
+            LocalDate dob = null;
+            String dobRaw = row.path("dateOfBirth").path("value").asText(null);
+            if (dobRaw != null) {
+                try {
+                    // ISO instants like "1962-03-14T00:00:00Z" — take the date part.
+                    dob = LocalDate.parse(dobRaw.substring(0, 10));
+                } catch (DateTimeParseException ignored) { /* skip bad dates */ }
+            }
+
+            String nameKey = label.toLowerCase();
+            PlenaryMember mp = null;
+            boolean viaDob = false;
+            if (dob != null) {
+                mp = byNameDob.get(nameKey + "|" + dob);
+                if (mp != null) viaDob = true;
+            }
+            if (mp == null
+                    && wdNameFreq.getOrDefault(nameKey, 0) == 1
+                    && ourNameFreq.getOrDefault(nameKey, 0) == 1) {
+                PlenaryMember cand = byNameOnly.get(nameKey);
+                if (cand != null && !assignedByDob.contains(cand.getId())) mp = cand;
+            }
+            if (mp == null) continue;
+
+            // Don't clobber a QID already set (manual correction, or a stronger match) with a
+            // different one — re-runs and namesakes must not silently rewrite identities.
+            if (mp.getWikidataQid() != null && !mp.getWikidataQid().equals(qid)) {
+                log.warn("wikidata QID conflict for {}: keeping existing {} (ignoring {})",
+                        mp.getFullName(), mp.getWikidataQid(), qid);
+                continue;
+            }
+
+            mp.setWikidataQid(qid);
+            // Only overwrite URL fields with non-null values so a temporarily missing sitelink
+            // in Wikidata doesn't wipe a previously-good link.
+            setIfPresent(row, "enwiki", mp::setWikipediaUrlEn);
+            setIfPresent(row, "etwiki", mp::setWikipediaUrlEt);
+            setIfPresent(row, "ruwiki", mp::setWikipediaUrlRu);
+            mp.setUpdatedAt(Instant.now());
+            if (viaDob) assignedByDob.add(mp.getId());
+            matchedByQid.put(qid, mp);
+            matched++;
+        }
+        log.info("wikidata cross-ref: {}/{} MPs matched from {} Wikidata rows",
+                matched, mps.size(), seen);
+        return new CrossrefResult(seen, matched, matchedByQid);
+    }
+
     /** Second pass over just the matched QIDs: attach education + prior offices from Wikidata. */
     private void enrichBio(Map<String, PlenaryMember> matchedByQid) {
         if (matchedByQid.isEmpty()) return;
         String values = matchedByQid.keySet().stream()
                 .map(q -> "wd:" + q)
-                .collect(java.util.stream.Collectors.joining(" "));
+                .collect(Collectors.joining(" "));
         String query = String.format(BIO_SPARQL_TEMPLATE, values);
         try {
-            JsonNode result = rest.get()
-                    .uri(SPARQL_ENDPOINT + "?query={q}&format=json", query)
-                    .retrieve()
-                    .body(JsonNode.class);
+            JsonNode result = fetchSparql(query); // network, outside any tx
             if (result == null) return;
-            int enriched = 0;
-            for (JsonNode row : result.path("results").path("bindings")) {
-                String qUri = row.path("person").path("value").asText(null);
-                if (qUri == null) continue;
-                String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
-                PlenaryMember mp = matchedByQid.get(qid);
-                if (mp == null) continue;
-                String edu = row.path("education").path("value").asText(null);
-                String pos = row.path("positions").path("value").asText(null);
-                if (edu != null && !edu.isBlank()) mp.setEducation(edu);
-                if (pos != null && !pos.isBlank()) mp.setPositions(pos);
-                enriched++;
-            }
+            int enriched = tx.execute(status ->
+                    applyBio(result.path("results").path("bindings"), matchedByQid));
             log.info("wikidata bio: enriched {} MPs with education/positions", enriched);
         } catch (Exception e) {
             // Bio is a nice-to-have; never let it fail the whole cross-reference.
             log.warn("wikidata bio enrichment failed (education/positions skipped): {}", e.getMessage());
         }
+    }
+
+    private int applyBio(JsonNode bindings, Map<String, PlenaryMember> matchedByQid) {
+        int enriched = 0;
+        for (JsonNode row : bindings) {
+            String qUri = row.path("person").path("value").asText(null);
+            if (qUri == null) continue;
+            String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
+            PlenaryMember mp = matchedByQid.get(qid);
+            if (mp == null) continue;
+            String edu = row.path("education").path("value").asText(null);
+            String pos = row.path("positions").path("value").asText(null);
+            if (edu != null && !edu.isBlank()) mp.setEducation(edu);
+            if (pos != null && !pos.isBlank()) mp.setPositions(pos);
+            memberRepo.save(mp); // re-attach: mp was detached when the cross-ref tx committed
+            enriched++;
+        }
+        return enriched;
     }
 
     /** Third pass over matched QIDs: party membership periods (P102) into mp_party_membership. */
@@ -257,47 +292,48 @@ public class WikidataImporter {
                 .map(q -> "wd:" + q)
                 .collect(Collectors.joining(" "));
         try {
-            JsonNode result = rest.get()
-                    .uri(SPARQL_ENDPOINT + "?query={q}&format=json",
-                            String.format(PARTY_SPARQL_TEMPLATE, values))
-                    .retrieve()
-                    .body(JsonNode.class);
+            JsonNode result = fetchSparql(String.format(PARTY_SPARQL_TEMPLATE, values)); // network, outside any tx
             if (result == null) return;
             List<PartyRow> rows = dedupeForUniqueKey(
                     parsePartyRows(result.path("results").path("bindings")));
-            // Full refresh of the Wikidata source; äriregister rows (phase 2) are left untouched.
-            partyMembershipRepo.deleteBySource("wikidata");
-            Instant now = Instant.now();
-            int stored = 0;
-            Set<String> insertedKeys = new HashSet<>();
-            for (PartyRow r : rows) {
-                PlenaryMember mp = matchedByQid.get(r.personQid());
-                if (mp == null) continue;
-                // Guard the ACTUAL DB unique key (member_external_id, party_qid, start_date): two
-                // Wikidata person entities can resolve to the same MP, so deduping on personQid
-                // upstream isn't enough. A violation marks the transaction rollback-only and sinks
-                // the whole cross-reference (QIDs + bio). Null start dates don't collide (Postgres
-                // treats NULLs as distinct in a unique index), so only dated rows are guarded.
-                if (r.startDate() != null && !insertedKeys.add(
-                        mp.getExternalId() + "|" + r.partyQid() + "|" + r.startDate())) {
-                    continue;
-                }
-                partyMembershipRepo.save(MpPartyMembership.builder()
-                        .memberExternalId(mp.getExternalId())
-                        .partyQid(r.partyQid())
-                        .partyLabel(r.label())
-                        .startDate(r.startDate())
-                        .endDate(r.endDate())
-                        .source("wikidata")
-                        .importedAt(now)
-                        .build());
-                stored++;
-            }
+            int stored = tx.execute(status -> replaceParties(rows, matchedByQid));
             log.info("wikidata parties: stored {} P102 memberships", stored);
         } catch (Exception e) {
             // Party history is a nice-to-have; never let it fail the whole cross-reference.
             log.warn("wikidata party enrichment failed (P102 skipped): {}", e.getMessage());
         }
+    }
+
+    private int replaceParties(List<PartyRow> rows, Map<String, PlenaryMember> matchedByQid) {
+        // Full refresh of the Wikidata source; äriregister rows (phase 2) are left untouched.
+        partyMembershipRepo.deleteBySource("wikidata");
+        Instant now = Instant.now();
+        int stored = 0;
+        Set<String> insertedKeys = new HashSet<>();
+        for (PartyRow r : rows) {
+            PlenaryMember mp = matchedByQid.get(r.personQid());
+            if (mp == null) continue;
+            // Guard the ACTUAL DB unique key (member_external_id, party_qid, start_date): two
+            // Wikidata person entities can resolve to the same MP, so deduping on personQid
+            // upstream isn't enough. A violation would roll back this whole refresh. Since V29
+            // the constraint is NULLS NOT DISTINCT, so null start dates collide too and every
+            // row is guarded.
+            if (!insertedKeys.add(
+                    mp.getExternalId() + "|" + r.partyQid() + "|" + r.startDate())) {
+                continue;
+            }
+            partyMembershipRepo.save(MpPartyMembership.builder()
+                    .memberExternalId(mp.getExternalId())
+                    .partyQid(r.partyQid())
+                    .partyLabel(r.label())
+                    .startDate(r.startDate())
+                    .endDate(r.endDate())
+                    .source("wikidata")
+                    .importedAt(now)
+                    .build());
+            stored++;
+        }
+        return stored;
     }
 
     /** One P102 statement parsed from Wikidata, before the person is resolved to an MP. */
@@ -309,29 +345,20 @@ public class WikidataImporter {
      * Collapse P102 statements that map to the same unique key. Wikidata sometimes carries two
      * claims for one person+party with the same start date (a re-stated or duplicated membership),
      * which would violate {@code ux_mp_party_membership (member_external_id, party_qid, start_date,
-     * source)}. Worse than the failed row: the constraint error marks the surrounding transaction
-     * rollback-only, so it would sink the whole cross-reference (QIDs + bio), not just P102. Keep
-     * the first occurrence, but prefer one that carries an end date (more complete). Rows with a
-     * null start date can't collide — Postgres treats NULLs as distinct in a unique index — so
-     * they're all kept.
+     * source)} and roll back the whole P102 refresh. Keep the first occurrence, but prefer one
+     * that carries an end date (more complete). Since V29 the constraint is
+     * {@code NULLS NOT DISTINCT}, so null-start rows collapse the same way.
      */
     static List<PartyRow> dedupeForUniqueKey(List<PartyRow> rows) {
-        List<PartyRow> nullStart = new ArrayList<>();
         Map<String, PartyRow> byKey = new LinkedHashMap<>();
         for (PartyRow r : rows) {
-            if (r.startDate() == null) {
-                nullStart.add(r);
-                continue;
-            }
             String key = r.personQid() + "|" + r.partyQid() + "|" + r.startDate();
             PartyRow existing = byKey.get(key);
             if (existing == null || (existing.endDate() == null && r.endDate() != null)) {
                 byKey.put(key, r);
             }
         }
-        List<PartyRow> out = new ArrayList<>(byKey.values());
-        out.addAll(nullStart);
-        return out;
+        return new ArrayList<>(byKey.values());
     }
 
     static List<PartyRow> parsePartyRows(JsonNode bindings) {

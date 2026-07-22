@@ -200,6 +200,12 @@ public class VoteEventImporter {
     private void reconcileVoters(VoteEvent event, VotingDetailDto detail,
                                  Map<String, PlenaryMember> byExternalId) {
         if (detail.voters() == null || detail.voters().isEmpty()) return;
+        // Load the event's stored votes once instead of one findBy per voter (~101
+        // queries per roll-call).
+        Map<java.util.UUID, IndividualVote> storedByMemberId = individualVoteRepo
+                .findByVoteEventOrderByFactionNameAscPlenaryMember_LastNameAsc(event).stream()
+                .collect(Collectors.toMap(iv -> iv.getPlenaryMember().getId(),
+                        Function.identity(), (a, b) -> a));
         for (VotingDetailDto.Voter voter : detail.voters()) {
             PlenaryMember m = byExternalId.get(voter.uuid());
             if (m == null) {
@@ -208,9 +214,7 @@ public class VoteEventImporter {
                 m = materialiseHistoricalVoter(voter, byExternalId);
                 if (m == null) continue;
             }
-            IndividualVote incoming = individualVoteRepo
-                    .findByVoteEventAndPlenaryMember(event, m)
-                    .orElse(null);
+            IndividualVote incoming = storedByMemberId.get(m.getId());
             IndividualVote fresh = voteMapper.toEntity(event, m, voter);
             if (incoming == null) {
                 individualVoteRepo.save(fresh);

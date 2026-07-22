@@ -24,6 +24,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -101,9 +105,10 @@ public class PoliticianProfileMapper {
                 m,
                 StatisticsService.TERM_START.atStartOfDay().toInstant(java.time.ZoneOffset.UTC),
                 java.time.Instant.now());
-        List<PoliticianProfileDto.Deviation> deviations = groupAlignmentService
-                .recentDeviations(m, 10).stream()
-                .map(this::toDeviationDto)
+        List<IndividualVote> deviationVotes = groupAlignmentService.recentDeviations(m, 10);
+        Map<String, VoteFactionAlignment> deviationAlignments = alignmentsFor(deviationVotes);
+        List<PoliticianProfileDto.Deviation> deviations = deviationVotes.stream()
+                .map(iv -> toDeviationDto(iv, deviationAlignments))
                 .toList();
         PoliticianProfileDto.GroupAlignment ga = new PoliticianProfileDto.GroupAlignment(
                 gaResult.rate(), gaResult.matches(), gaResult.eligible(), deviations,
@@ -187,13 +192,27 @@ public class PoliticianProfileMapper {
         );
     }
 
-    private PoliticianProfileDto.Deviation toDeviationDto(IndividualVote iv) {
+    /** One batched alignment fetch for the deviation list instead of a query per deviation. */
+    private Map<String, VoteFactionAlignment> alignmentsFor(List<IndividualVote> votes) {
+        List<VoteEvent> events = votes.stream()
+                .map(IndividualVote::getVoteEvent)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (events.isEmpty()) return Map.of();
+        return alignmentRepo.findByVoteEventIn(events).stream()
+                .collect(Collectors.toMap(
+                        a -> a.getVoteEvent().getId() + "|" + a.getFactionExternalId(),
+                        Function.identity(), (a, b) -> a));
+    }
+
+    private PoliticianProfileDto.Deviation toDeviationDto(
+            IndividualVote iv, Map<String, VoteFactionAlignment> alignments) {
         VoteEvent ev = iv.getVoteEvent();
-        String majority = alignmentRepo
-                .findByVoteEventAndFactionExternalId(ev, iv.getFactionExternalId())
-                .map(VoteFactionAlignment::getMajorityChoice)
-                .map(Enum::name)
-                .orElse(null);
+        VoteFactionAlignment alignment = ev == null ? null
+                : alignments.get(ev.getId() + "|" + iv.getFactionExternalId());
+        String majority = alignment == null || alignment.getMajorityChoice() == null
+                ? null : alignment.getMajorityChoice().name();
         return new PoliticianProfileDto.Deviation(
                 ev == null ? null : ev.getId(),
                 ev == null ? null : ev.getDescription(),

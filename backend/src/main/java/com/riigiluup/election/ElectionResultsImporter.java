@@ -1,11 +1,14 @@
 package com.riigiluup.election;
 
+import com.riigiluup.ingestion.riigikogu.ImportRunLog;
+import com.riigiluup.ingestion.riigikogu.ImportRunLogRepository;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.person.PlenaryMemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -27,23 +30,63 @@ public class ElectionResultsImporter {
 
     private static final Logger log = LoggerFactory.getLogger(ElectionResultsImporter.class);
     private static final String ELECTION_CODE = "RK_2023";
+    private static final String SOURCE_NAME = "valimised";
+    private static final String JOB_NAME = "elections.rk2023-import";
 
     private final ElectionResultsClient client;
     private final PlenaryMemberRepository memberRepo;
     private final ElectionResultRepository repo;
+    private final ImportRunLogRepository runLogRepo;
+    private final TransactionTemplate tx;
 
     public ElectionResultsImporter(ElectionResultsClient client,
                                    PlenaryMemberRepository memberRepo,
-                                   ElectionResultRepository repo) {
+                                   ElectionResultRepository repo,
+                                   ImportRunLogRepository runLogRepo,
+                                   PlatformTransactionManager txManager) {
         this.client = client;
         this.memberRepo = memberRepo;
         this.repo = repo;
+        this.runLogRepo = runLogRepo;
+        this.tx = new TransactionTemplate(txManager);
     }
 
-    @Transactional
     public int importRk2023() {
-        List<ElectionCandidateDto> candidates = client.fetchRk2023Results();
+        ImportRunLog run = runLogRepo.save(ImportRunLog.builder()
+                .sourceName(SOURCE_NAME)
+                .jobName(JOB_NAME)
+                .startedAt(Instant.now())
+                .status("RUNNING")
+                .build());
+        int seen = 0;
+        int matched = 0;
+        try {
+            List<ElectionCandidateDto> candidates = client.fetchRk2023Results(); // network, outside any tx
+            seen = candidates.size();
+            // An empty candidate list means a broken/changed source, not an empty election —
+            // a full refresh here would wipe the table, so keep the existing rows instead.
+            if (candidates.isEmpty()) {
+                log.warn("{} returned zero candidates — keeping existing election-result rows", ELECTION_CODE);
+                run.setStatus("FAILED");
+                run.setErrorMessage("source returned zero candidates; existing rows kept");
+                return 0;
+            }
+            matched = tx.execute(status -> replaceAll(candidates));
+            run.setStatus("SUCCESS");
+        } catch (Exception e) {
+            run.setStatus("FAILED");
+            run.setErrorMessage(e.getMessage());
+            throw e;
+        } finally {
+            run.setRecordsSeen(seen);
+            run.setRecordsUpserted(matched);
+            run.setFinishedAt(Instant.now());
+            runLogRepo.save(run);
+        }
+        return matched;
+    }
 
+    private int replaceAll(List<ElectionCandidateDto> candidates) {
         Map<String, PlenaryMember> byName = activeWinsNameIndex(memberRepo.findAll());
 
         repo.deleteByElectionCode(ELECTION_CODE); // full refresh — immutable source, keeps this idempotent
