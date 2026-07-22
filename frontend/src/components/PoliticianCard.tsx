@@ -44,7 +44,7 @@ export default function PoliticianCard({
           className={`absolute top-3 left-3 w-7 h-7 rounded-full grid place-items-center text-[13px] font-bold border transition-all
             ${compareActive
               ? "bg-blue text-white border-blue shadow-sm"
-              : "bg-white/85 text-ink border-rule opacity-0 group-hover:opacity-100 focus:opacity-100 hover:border-blue hover:text-blue"}
+              : "bg-white text-blue border-blue/50 shadow-sm hover:bg-blue hover:text-white hover:border-blue"}
             ${!canToggle ? "cursor-not-allowed opacity-30" : ""}`}
         >
           {compareActive ? "✓" : "+"}

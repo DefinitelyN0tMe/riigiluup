@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 export default function SourcesPage() {
   const { t } = useTranslation();
   return (
-    <article className="prose max-w-none text-slate-700">
+    <article className="prose max-w-[820px] mx-auto px-5 sm:px-8 md:px-10 py-10 sm:py-14 text-slate-700">
       <h1 className="text-3xl font-semibold text-ink">{t("sources.title")}</h1>
       <p>{t("sources.intro")}</p>
       <h2>{t("sources.primary")}</h2>

@@ -7,7 +7,7 @@ export default function CorrectionsPage() {
   const body = encodeURIComponent(t("corrections.mailTemplate"));
   const mailto = `mailto:${CORRECTIONS_EMAIL}?subject=${subject}&body=${body}`;
   return (
-    <article className="prose max-w-none text-slate-700">
+    <article className="prose max-w-[820px] mx-auto px-5 sm:px-8 md:px-10 py-10 sm:py-14 text-slate-700">
       <h1 className="text-3xl font-semibold text-ink">{t("corrections.title")}</h1>
       <p>{t("corrections.intro")}</p>
       <h2>{t("corrections.sendHeading")}</h2>
