@@ -47,7 +47,9 @@ export default function DeviationsCalendar({ data }: { data: MpDeviationsTimelin
   function cellFill(cell: { deviations: number; eligible: number } | null) {
     if (!cell) return "transparent";
     if (cell.eligible === 0) return "#EFEDE3";      // no data that day
-    if (cell.deviations === 0) return "#DDECD6";    // eligible but no deviation → soft green
+    // Clearly green, not pastel: ΔE to the no-data gray must stay ≥15 or the two
+    // states read identical (validated with the CVD palette checker).
+    if (cell.deviations === 0) return "#8BCE7F";    // eligible but no deviation → green
     const t = Math.min(1, cell.deviations / maxDeviations);
     // 1 dev → light red, more → deeper hot
     if (t < 0.34) return "#FFC5C1";
@@ -142,7 +144,7 @@ export default function DeviationsCalendar({ data }: { data: MpDeviationsTimelin
 
       <div className="mt-3 flex flex-wrap items-center gap-3 font-mono text-[10px] tracking-[0.12em] uppercase text-muted">
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: "#EFEDE3" }} /> {t("viz.deviations.legendNoData")}</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: "#DDECD6" }} /> {t("viz.deviations.legendWithMajority")}</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: "#8BCE7F" }} /> {t("viz.deviations.legendWithMajority")}</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: "#FFC5C1" }} /> {t("viz.deviations.legend1dev")}</span>
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm" style={{ background: "#FF4B3E" }} /> {t("viz.deviations.legendManyDev")}</span>
       </div>

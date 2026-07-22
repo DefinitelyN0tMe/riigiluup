@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { CORRECTIONS_EMAIL } from "../../config";
 
 export default function AboutPage() {
   const { t } = useTranslation();
@@ -28,8 +29,8 @@ export default function AboutPage() {
       <h2>{t("about.contact")}</h2>
       <p>
         {t("about.contactBody")}
-        <a href="mailto:corrections@riigiluup.ee" className="text-estonia hover:underline">
-          corrections@riigiluup.ee
+        <a href={`mailto:${CORRECTIONS_EMAIL}`} className="text-estonia hover:underline">
+          {CORRECTIONS_EMAIL}
         </a>
         .
       </p>
