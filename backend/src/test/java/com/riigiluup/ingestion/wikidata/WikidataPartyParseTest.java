@@ -93,6 +93,86 @@ class WikidataPartyParseTest {
         assertThat(out.get(0).endDate()).isEqualTo(LocalDate.of(1995, 1, 1));
     }
 
+    /** A malformed party QID (non-Q / over-long) is rejected: the whole P102 statement is dropped
+     *  so it can never reach the VARCHAR(32) party_qid column. */
+    @Test
+    void skipsStatementsWithMalformedQid() throws Exception {
+        JsonNode b = bindings("""
+            [
+              {"person":{"value":"http://www.wikidata.org/entity/Q1"},
+               "party":{"value":"http://www.wikidata.org/entity/not-a-qid"},
+               "partyLabelEt":{"value":"Bogus"}},
+              {"person":{"value":"http://www.wikidata.org/entity/Q1"},
+               "party":{"value":"http://www.wikidata.org/entity/Q200"},
+               "partyLabelEt":{"value":"Reformierakond"}}
+            ]
+            """);
+
+        List<WikidataImporter.PartyRow> rows = WikidataImporter.parsePartyRows(b);
+
+        assertThat(rows).hasSize(1);
+        assertThat(rows.get(0).partyQid()).isEqualTo("Q200");
+    }
+
+    /** An over-long label (world-editable free text) is truncated to the party_label column width. */
+    @Test
+    void truncatesOversizedLabel() throws Exception {
+        String huge = "x".repeat(5000);
+        JsonNode b = bindings("""
+            [
+              {"person":{"value":"http://www.wikidata.org/entity/Q1"},
+               "party":{"value":"http://www.wikidata.org/entity/Q2"},
+               "partyLabelEt":{"value":"%s"}}
+            ]
+            """.formatted(huge));
+
+        List<WikidataImporter.PartyRow> rows = WikidataImporter.parsePartyRows(b);
+
+        assertThat(rows).hasSize(1);
+        assertThat(rows.get(0).label()).hasSize(256);
+    }
+
+    /** QID format guard. */
+    @Test
+    void validatesQidFormat() {
+        assertThat(WikidataImporter.isValidQid("Q42")).isTrue();
+        assertThat(WikidataImporter.isValidQid("Q0")).isTrue();
+        assertThat(WikidataImporter.isValidQid("q42")).isFalse();
+        assertThat(WikidataImporter.isValidQid("Q42x")).isFalse();
+        assertThat(WikidataImporter.isValidQid("42")).isFalse();
+        assertThat(WikidataImporter.isValidQid("Q")).isFalse();
+        assertThat(WikidataImporter.isValidQid(null)).isFalse();
+    }
+
+    /** Only https *.wikipedia.org URLs are accepted; javascript:/http/off-domain are rejected so
+     *  they can never be persisted and later rendered as an href. */
+    @Test
+    void acceptsOnlyHttpsWikipediaUrls() {
+        assertThat(WikidataImporter.isWikipediaUrl("https://et.wikipedia.org/wiki/Foo")).isTrue();
+        assertThat(WikidataImporter.isWikipediaUrl("https://wikipedia.org/wiki/Foo")).isTrue();
+        assertThat(WikidataImporter.isWikipediaUrl("http://et.wikipedia.org/wiki/Foo")).isFalse();
+        assertThat(WikidataImporter.isWikipediaUrl("javascript:alert(1)")).isFalse();
+        assertThat(WikidataImporter.isWikipediaUrl("https://evil.example.com/wiki")).isFalse();
+        assertThat(WikidataImporter.isWikipediaUrl("https://et.wikipedia.org.evil.com/x")).isFalse();
+        assertThat(WikidataImporter.isWikipediaUrl("not a url")).isFalse();
+        assertThat(WikidataImporter.isWikipediaUrl(null)).isFalse();
+        // Bypass attempts: userinfo host-spoof, no-dot prefix, scheme case, backslash trick.
+        assertThat(WikidataImporter.isWikipediaUrl("https://et.wikipedia.org@evil.com/x")).isFalse();
+        assertThat(WikidataImporter.isWikipediaUrl("https://xxwikipedia.org/x")).isFalse();
+        assertThat(WikidataImporter.isWikipediaUrl("https://evil.com\\@et.wikipedia.org")).isFalse();
+        // Legitimate URLs with mixed case and non-ASCII path still pass.
+        assertThat(WikidataImporter.isWikipediaUrl("HTTPS://ET.WIKIPEDIA.ORG/wiki/Foo")).isTrue();
+        assertThat(WikidataImporter.isWikipediaUrl("https://et.wikipedia.org/wiki/Jüri_Ratas")).isTrue();
+    }
+
+    /** clamp leaves short values untouched and only shortens over-long ones. */
+    @Test
+    void clampLeavesShortValuesUntouched() {
+        assertThat(WikidataImporter.clamp("f", "Q1", "short", 256)).isEqualTo("short");
+        assertThat(WikidataImporter.clamp("f", "Q1", null, 256)).isNull();
+        assertThat(WikidataImporter.clamp("f", "Q1", "abcdef", 3)).isEqualTo("abc");
+    }
+
     /** Distinct keys survive; null-start duplicates collapse too — the V29 constraint is
      *  NULLS NOT DISTINCT, so they would collide in the DB. */
     @Test

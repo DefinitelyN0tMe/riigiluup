@@ -10,6 +10,10 @@ spring:
     username: ${DB_USER:riigiluup}
     password: ${DB_PASSWORD:riigiluup}
     hikari:
+      # Explicit pool sizing so a burst of concurrent (esp. analytics) requests has headroom
+      # beyond the default 10, while connection-timeout fails fast instead of queueing forever.
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      connection-timeout: 10000
       # Cap any single statement at 30 s to prevent pathological richSearch combos
       # (all filters, cold cache) from starving the connection pool. Backfill and
       # analytics queries are still comfortably within budget; upsert paths finish
@@ -88,11 +92,22 @@ riigiluup:
     admin-origins: ${RIIGILUUP_ADMIN_CORS_ORIGINS:}
   rate-limit:
     enabled: true
+    # Legacy single-rule fallback (used only if `rules` below is empty).
     per-minute: 60
-    # Exclude /files/ (photo proxy): a single MP grid loads 50 portraits, so normal browsing
-    # would otherwise burn the 60/min budget and show broken images. The proxy has its own
-    # 1 rps upstream serialization + Cache-Control.
-    path-regex: "/api/v1/(?!admin/|files/).*"
+    path-regex: "/api/v1/(?!admin/).*"
+    # Per-IP rules with separate buckets; first match wins, so specific paths precede the catch-all.
+    # files/* is generous (an MP grid loads ~50 portraits) but bounded, so the photo proxy is no
+    # longer fully excluded; analytics/* is stricter because those aggregations are expensive.
+    rules:
+      - name: files
+        pattern: "/api/v1/files/.*"
+        per-minute: 300
+      - name: analytics
+        pattern: "/api/v1/analytics/.*"
+        per-minute: 20
+      - name: default
+        pattern: "/api/v1/(?!admin/).*"
+        per-minute: 60
   analytics:
     # Faction name substrings currently in the governing coalition — drives the coalition/
     # opposition axis of the MP scatter. Update on any change of government (SDE left in 2025).
@@ -103,6 +118,14 @@ riigiluup:
     rate-limit-per-second: 1
   rahvaalgatus:
     base-url: https://rahvaalgatus.ee
+  wikidata:
+    # Wikidata QIDs of Estonian parliamentary parties (+ direct predecessors). Soft allow-list:
+    # a P102 membership whose party QID is outside this set is still imported, but logged WARN so
+    # a curator can review it — this avoids silently dropping a legitimate small/new party while
+    # still surfacing a potentially vandalised affiliation. Empty value disables the check.
+    # Q738947=Reform, Q163347=Isamaa, Q1428217=Pro Patria Union, Q928652=Centre, Q794028=EKRE,
+    # Q913551=SDE, Q56249403=Eesti 200, Q113677848=Parempoolsed, Q3896796=Republicans/Conservatives.
+    allowed-party-qids: ${RIIGILUUP_WIKIDATA_ALLOWED_PARTY_QIDS:Q738947,Q163347,Q1428217,Q928652,Q794028,Q913551,Q56249403,Q113677848,Q3896796}
   schedule:
     # Votes every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) — new roll-calls
     # appear the same day; the votings list is date-filtered so this stays cheap.

@@ -60,7 +60,7 @@ public class VoteController {
             throw new IllegalArgumentException("hour must be 0..23");
         if (dow != null && (dow < 0 || dow > 6))
             throw new IllegalArgumentException("dow must be 0..6 (Mon..Sun)");
-        int pageIdx = Math.max(0, page);
+        int pageIdx = Math.min(Math.max(0, page), 10_000);
         int pageSize = Math.min(Math.max(size, 1), 100);
 
         boolean anyRich = hour != null || dow != null

@@ -55,7 +55,7 @@ public class SpeechController {
         Instant fromTs = from == null ? null : from.atStartOfDay(TALLINN).toInstant();
         Instant toTs = to == null ? null : to.plusDays(1).atStartOfDay(TALLINN).toInstant();
         PageRequest pageable = PageRequest.of(
-                Math.max(0, page), Math.min(Math.max(1, size), MAX_PAGE_SIZE));
+                Math.min(Math.max(0, page), 10_000), Math.min(Math.max(1, size), MAX_PAGE_SIZE));
 
         Page<SpeechSearchRow> result = speechRepo.search(query, slug, fromTs, toTs, pageable);
         return new SpeechPage(

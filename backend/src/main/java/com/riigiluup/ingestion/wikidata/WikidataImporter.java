@@ -8,12 +8,14 @@ import com.riigiluup.person.MpPartyMembershipRepository;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.person.PlenaryMemberRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestClient;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -21,11 +23,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -50,6 +55,27 @@ public class WikidataImporter {
 
     private static final String JOB_NAME = "wikidata.mp-crossref";
     private static final String SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
+
+    // --- Input hardening (Wikidata is CC0 but world-editable — treat every value as untrusted).
+    //   Wikidata entity ids are the letter Q followed by digits; anything else is a garbage QID.
+    private static final Pattern QID_PATTERN = Pattern.compile("^Q[0-9]{1,15}$");
+    //   party_label column is VARCHAR(256); education/positions are TEXT but we still cap them so a
+    //   vandalised label can't balloon the row. Bio fields get more room than a single party label.
+    private static final int PARTY_LABEL_MAX = 256;
+    private static final int BIO_MAX = 2000;
+    //   Default allow-list of the Wikidata QIDs of Estonian parliamentary parties (+ direct
+    //   predecessors). Soft list: rows with a QID outside it are still stored, but logged for
+    //   review — see enrichParties. Overridable via riigiluup.wikidata.allowed-party-qids.
+    static final String DEFAULT_ALLOWED_PARTY_QIDS =
+            "Q738947,"      // Estonian Reform Party
+            + "Q163347,"    // Isamaa
+            + "Q1428217,"   // Pro Patria Union (Isamaaliit — predecessor of Isamaa)
+            + "Q928652,"    // Estonian Centre Party
+            + "Q794028,"    // Conservative People's Party of Estonia (EKRE)
+            + "Q913551,"    // Social Democratic Party (Estonia)
+            + "Q56249403,"  // Estonia 200
+            + "Q113677848," // Parempoolsed
+            + "Q3896796";   // People's Party of Republicans and Conservatives (predecessor)
     // Every person ever elected as Riigikogu MP.
     //   Q21100241 = "member of the Riigikogu" (position held).
     //   Q217799 = Riigikogu (institution) — used earlier by mistake; that returns only
@@ -107,6 +133,8 @@ public class WikidataImporter {
     private final MpPartyMembershipRepository partyMembershipRepo;
     private final ImportRunLogRepository runLogRepo;
     private final TransactionTemplate tx;
+    /** Known Estonian party QIDs; a P102 QID outside it is stored but flagged (see enrichParties). */
+    private final Set<String> allowedPartyQids;
     private final RestClient rest = RestClient.builder()
             // Wikidata's UA policy: identify the client + contact so they can reach out.
             .defaultHeader(HttpHeaders.USER_AGENT, "riigiluup/0.1 (riigiluup@gmail.com)")
@@ -116,11 +144,16 @@ public class WikidataImporter {
     public WikidataImporter(PlenaryMemberRepository memberRepo,
                             MpPartyMembershipRepository partyMembershipRepo,
                             ImportRunLogRepository runLogRepo,
-                            PlatformTransactionManager txManager) {
+                            PlatformTransactionManager txManager,
+                            @Value("${riigiluup.wikidata.allowed-party-qids:" + DEFAULT_ALLOWED_PARTY_QIDS + "}")
+                            List<String> allowedPartyQids) {
         this.memberRepo = memberRepo;
         this.partyMembershipRepo = partyMembershipRepo;
         this.runLogRepo = runLogRepo;
         this.tx = new TransactionTemplate(txManager);
+        this.allowedPartyQids = allowedPartyQids.stream()
+                .map(String::trim).filter(s -> !s.isEmpty())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /** Cross-reference pass result. The member entities are detached once the tx commits. */
@@ -199,6 +232,10 @@ public class WikidataImporter {
             String label = row.path("personLabel").path("value").asText(null);
             if (qUri == null || label == null) continue;
             String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
+            if (!isValidQid(qid)) {
+                log.warn("wikidata: skipping row with malformed person QID '{}' (label {})", qid, label);
+                continue;
+            }
 
             LocalDate dob = null;
             String dobRaw = row.path("dateOfBirth").path("value").asText(null);
@@ -234,10 +271,11 @@ public class WikidataImporter {
 
             mp.setWikidataQid(qid);
             // Only overwrite URL fields with non-null values so a temporarily missing sitelink
-            // in Wikidata doesn't wipe a previously-good link.
-            setIfPresent(row, "enwiki", mp::setWikipediaUrlEn);
-            setIfPresent(row, "etwiki", mp::setWikipediaUrlEt);
-            setIfPresent(row, "ruwiki", mp::setWikipediaUrlRu);
+            // in Wikidata doesn't wipe a previously-good link. URLs are validated first so a
+            // javascript:/http:/off-domain value can never reach the DB (later rendered as href).
+            setUrlIfValid(row, "enwiki", mp::setWikipediaUrlEn);
+            setUrlIfValid(row, "etwiki", mp::setWikipediaUrlEt);
+            setUrlIfValid(row, "ruwiki", mp::setWikipediaUrlRu);
             mp.setUpdatedAt(Instant.now());
             if (viaDob) assignedByDob.add(mp.getId());
             matchedByQid.put(qid, mp);
@@ -275,8 +313,8 @@ public class WikidataImporter {
             String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
             PlenaryMember mp = matchedByQid.get(qid);
             if (mp == null) continue;
-            String edu = row.path("education").path("value").asText(null);
-            String pos = row.path("positions").path("value").asText(null);
+            String edu = clamp("education", qid, row.path("education").path("value").asText(null), BIO_MAX);
+            String pos = clamp("positions", qid, row.path("positions").path("value").asText(null), BIO_MAX);
             if (edu != null && !edu.isBlank()) mp.setEducation(edu);
             if (pos != null && !pos.isBlank()) mp.setPositions(pos);
             memberRepo.save(mp); // re-attach: mp was detached when the cross-ref tx committed
@@ -321,6 +359,14 @@ public class WikidataImporter {
             if (!insertedKeys.add(
                     mp.getExternalId() + "|" + r.partyQid() + "|" + r.startDate())) {
                 continue;
+            }
+            // Soft allow-list: an unknown party QID is NOT dropped (that would silently lose a
+            // legitimate small/new party), but it is flagged so a curator can review whether the
+            // P102 statement is a genuine affiliation or a vandalised one before it is trusted.
+            if (!allowedPartyQids.isEmpty() && !allowedPartyQids.contains(r.partyQid())) {
+                log.warn("wikidata: P102 party {} ({}) for member {} is not in the known Estonian "
+                                + "party allow-list — stored, flag for review",
+                        r.partyQid(), r.label(), mp.getExternalId());
             }
             partyMembershipRepo.save(MpPartyMembership.builder()
                     .memberExternalId(mp.getExternalId())
@@ -367,13 +413,21 @@ public class WikidataImporter {
             String personUri = row.path("person").path("value").asText(null);
             String partyUri = row.path("party").path("value").asText(null);
             if (personUri == null || partyUri == null) continue;
+            String personQid = personUri.substring(personUri.lastIndexOf('/') + 1);
             String partyQid = partyUri.substring(partyUri.lastIndexOf('/') + 1);
-            String label = firstNonBlank(
+            // Reject malformed QIDs: party_qid is a VARCHAR(32) key and is trusted downstream, so a
+            // garbage value (too long / non-Q) must never be written — drop the whole statement.
+            if (!isValidQid(personQid) || !isValidQid(partyQid)) {
+                log.warn("wikidata: skipping P102 statement with malformed QID (person '{}', party '{}')",
+                        personQid, partyQid);
+                continue;
+            }
+            String label = clamp("partyLabel", partyQid, firstNonBlank(
                     row.path("partyLabelEt").path("value").asText(null),
                     row.path("partyLabelEn").path("value").asText(null),
-                    partyQid);
+                    partyQid), PARTY_LABEL_MAX);
             rows.add(new PartyRow(
-                    personUri.substring(personUri.lastIndexOf('/') + 1),
+                    personQid,
                     partyQid, label,
                     parseWdDate(row.path("start").path("value").asText(null)),
                     parseWdDate(row.path("end").path("value").asText(null))));
@@ -397,8 +451,48 @@ public class WikidataImporter {
         return null;
     }
 
-    private static void setIfPresent(JsonNode row, String key, Consumer<String> setter) {
+    /** Accept a URL only if it is https and points at a *.wikipedia.org host. */
+    private static void setUrlIfValid(JsonNode row, String key, Consumer<String> setter) {
         String v = row.path(key).path("value").asText(null);
-        if (v != null && !v.isBlank()) setter.accept(v);
+        if (v == null || v.isBlank()) return;
+        if (!isWikipediaUrl(v)) {
+            log.warn("wikidata: ignoring non-wikipedia {} URL '{}'", key, v);
+            return;
+        }
+        setter.accept(v.trim());
+    }
+
+    /**
+     * Wikidata entity id shape: {@code Q} followed by 1..15 digits. The upper bound keeps the
+     * value well inside the {@code party_qid VARCHAR(32)} column even for a crafted statement.
+     */
+    static boolean isValidQid(String qid) {
+        return qid != null && QID_PATTERN.matcher(qid).matches();
+    }
+
+    /**
+     * True only for {@code https://...wikipedia.org/...} URLs. Blocks {@code javascript:}, plain
+     * {@code http}, and arbitrary domains — anything that would later be rendered as an href.
+     */
+    static boolean isWikipediaUrl(String url) {
+        if (url == null || url.isBlank()) return false;
+        try {
+            URI u = URI.create(url.trim());
+            if (!"https".equalsIgnoreCase(u.getScheme())) return false;
+            String host = u.getHost();
+            if (host == null) return false;
+            host = host.toLowerCase(Locale.ROOT);
+            return host.equals("wikipedia.org") || host.endsWith(".wikipedia.org");
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /** Clamp an over-long free-text value from Wikidata to {@code max} chars, logging when it does. */
+    static String clamp(String field, String qid, String value, int max) {
+        if (value == null || value.length() <= max) return value;
+        log.warn("wikidata: truncating oversized {} for {} ({} -> {} chars)",
+                field, qid, value.length(), max);
+        return value.substring(0, max);
     }
 }

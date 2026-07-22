@@ -39,7 +39,7 @@ public class PoliticianVotesController {
         PlenaryMember m = memberRepo.findBySlug(slug).orElse(null);
         if (m == null) return ResponseEntity.notFound().build();
         Page<IndividualVote> p = individualVoteRepo.findByMemberChronological(
-                m, PageRequest.of(page, Math.min(size, 100)));
+                m, PageRequest.of(Math.min(Math.max(0, page), 10_000), Math.min(size, 100)));
         return ResponseEntity.ok(PageResponse.of(p.map(Item::of)));
     }
 

@@ -30,7 +30,7 @@ public class PoliticianController {
     ) {
         Page<PlenaryMember> p = repo.searchByFaction(
                 q, faction, activeOnly,
-                PageRequest.of(page, Math.min(size, 100),
+                PageRequest.of(Math.min(Math.max(0, page), 10_000), Math.min(size, 100),
                         Sort.by("lastName", "firstName"))
         );
         return PageResponse.of(p.map(mapper::toDto));

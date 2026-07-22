@@ -29,8 +29,12 @@ public class AnalyticsController {
             @RequestParam(required = false) LocalDate from,
             @RequestParam(required = false) LocalDate to
     ) {
-        Instant fromTs = from == null ? null : from.atStartOfDay(DISPLAY_ZONE).toInstant();
-        Instant toTs = to == null ? null : to.plusDays(1).atStartOfDay(DISPLAY_ZONE).toInstant();
+        // Round to month + clamp to [2023-01-01, today] so neighbouring dates share a cache key.
+        LocalDate today = LocalDate.now(DISPLAY_ZONE);
+        LocalDate fromN = AnalyticsParams.normalizeFrom(from, today);
+        LocalDate toN = AnalyticsParams.normalizeTo(to, today);
+        Instant fromTs = fromN == null ? null : fromN.atStartOfDay(DISPLAY_ZONE).toInstant();
+        Instant toTs = toN == null ? null : toN.plusDays(1).atStartOfDay(DISPLAY_ZONE).toInstant();
         return service.factionAgreement(fromTs, toTs);
     }
 
@@ -59,7 +63,9 @@ public class AnalyticsController {
             @RequestParam(defaultValue = "24") int limit,
             @RequestParam(defaultValue = "20") int minEligible
     ) {
-        return service.disciplineBreakers(Math.min(limit, 200), Math.max(minEligible, 5));
+        return service.disciplineBreakers(
+                AnalyticsParams.clamp(limit, 1, 200),
+                AnalyticsParams.clamp(minEligible, 5, 500));
     }
 
     @GetMapping("/bill-flow")
@@ -71,7 +77,7 @@ public class AnalyticsController {
     public AnalyticsDto.AttendanceMatrix attendanceMatrix(
             @RequestParam(defaultValue = "40") int sittings
     ) {
-        return service.attendanceMatrix(Math.min(sittings, 120));
+        return service.attendanceMatrix(AnalyticsParams.clamp(sittings, 1, 120));
     }
 
     @GetMapping("/vote-timing")
@@ -83,7 +89,7 @@ public class AnalyticsController {
     public AnalyticsDto.TopicTreemap topicTreemap(
             @RequestParam(defaultValue = "24") int limit
     ) {
-        return service.topicTreemap(Math.min(limit, 60));
+        return service.topicTreemap(AnalyticsParams.clamp(limit, 1, 60));
     }
 
     @GetMapping("/bill-velocity")
@@ -100,7 +106,7 @@ public class AnalyticsController {
     public AnalyticsDto.CoSponsorship coSponsorship(
             @RequestParam(defaultValue = "2") int minWeight
     ) {
-        return service.coSponsorship(Math.max(minWeight, 1));
+        return service.coSponsorship(AnalyticsParams.clamp(minWeight, 1, 50));
     }
 
     @GetMapping("/highlights")
@@ -114,7 +120,12 @@ public class AnalyticsController {
             @RequestParam(defaultValue = "22") int endHour,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        return service.nightVotes(startHour, endHour, Math.min(limit, 100));
+        // Clamp before the cache boundary — the service also clamps internally, but the cache key
+        // is built from these args, so out-of-range values must collapse here too.
+        return service.nightVotes(
+                AnalyticsParams.clamp(startHour, 0, 23),
+                AnalyticsParams.clamp(endHour, 0, 24),
+                AnalyticsParams.clamp(limit, 1, 100));
     }
 
     @GetMapping("/mp-deviations-timeline/{slug}")
@@ -139,7 +150,7 @@ public class AnalyticsController {
             @PathVariable String slug,
             @RequestParam(defaultValue = "8") int limit
     ) {
-        return ResponseEntity.ok(service.mpTopicRadar(slug, Math.min(limit, 20)));
+        return ResponseEntity.ok(service.mpTopicRadar(slug, AnalyticsParams.clamp(limit, 1, 20)));
     }
 
     @GetMapping("/initiative-funnel")
