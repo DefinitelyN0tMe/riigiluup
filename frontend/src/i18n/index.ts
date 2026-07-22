@@ -10,10 +10,13 @@ void i18n
   .use(initReactI18next)
   .init({
     resources: { en: { translation: en }, et: { translation: et }, ru: { translation: ru } },
-    fallbackLng: "en",
+    // Estonian-first: this is an Estonian Parliament site, so a first visit lands in Estonian
+    // rather than auto-switching to the browser's language. A saved choice (localStorage) or an
+    // explicit ?lng= wins; otherwise we fall back to Estonian. Users switch via the locale picker.
+    fallbackLng: "et",
     supportedLngs: ["en", "et", "ru"],
     interpolation: { escapeValue: false },
-    detection: { order: ["querystring", "localStorage", "navigator"], caches: ["localStorage"] },
+    detection: { order: ["querystring", "localStorage"], caches: ["localStorage"] },
   });
 
 export default i18n;
