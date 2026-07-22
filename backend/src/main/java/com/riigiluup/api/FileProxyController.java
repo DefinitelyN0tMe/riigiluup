@@ -53,6 +53,9 @@ public class FileProxyController {
         byte[] bytes;
         try {
             bytes = loader.load(uuid);
+        } catch (EmptyUpstreamException e) {
+            // Missing photo / transient upstream miss — 404, and (being an exception) not cached.
+            return ResponseEntity.notFound().build();
         } catch (UpstreamBusyException e) {
             // Upstream fetch slots exhausted — shed load instead of holding the thread.
             return ResponseEntity.status(503).header("Retry-After", "5").build();
@@ -60,7 +63,6 @@ public class FileProxyController {
             log.warn("file proxy failed for {}", uuid, e);
             return ResponseEntity.status(502).build();
         }
-        if (bytes == null || bytes.length == 0) return ResponseEntity.notFound().build();
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePublic())
@@ -84,6 +86,13 @@ public class FileProxyController {
         }
     }
 
+    /** Thrown when the upstream returns no bytes — surfaced as 404, and never cached. */
+    static class EmptyUpstreamException extends RuntimeException {
+        EmptyUpstreamException() {
+            super("empty upstream response");
+        }
+    }
+
     @Component
     static class Loader {
         private final RiigikoguClient client;
@@ -100,10 +109,10 @@ public class FileProxyController {
             this.acquireTimeoutMs = acquireTimeoutMs;
         }
 
-        // Don't pin an empty upstream response (missing photo, transient miss) for 6 hours.
-        // @Cacheable does not cache on exception, so an UpstreamBusyException never poisons the cache.
-        @Cacheable(value = CacheConfig.CACHE_FILES, key = "#uuid", sync = true,
-                unless = "#result == null || #result.length == 0")
+        // sync=true collapses a stampede on the same photo into one upstream fetch. It is
+        // incompatible with `unless`, so instead of not-caching empties we throw on them:
+        // @Cacheable never caches an exception, so a missing photo is not pinned for 6 hours.
+        @Cacheable(value = CacheConfig.CACHE_FILES, key = "#uuid", sync = true)
         public byte[] load(String uuid) {
             boolean acquired;
             try {
@@ -114,7 +123,9 @@ public class FileProxyController {
             }
             if (!acquired) throw new UpstreamBusyException();
             try {
-                return client.fetchFileBytes(uuid);
+                byte[] bytes = client.fetchFileBytes(uuid);
+                if (bytes == null || bytes.length == 0) throw new EmptyUpstreamException();
+                return bytes;
             } finally {
                 permits.release();
             }

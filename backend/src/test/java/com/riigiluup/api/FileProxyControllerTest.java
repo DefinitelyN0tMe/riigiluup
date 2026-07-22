@@ -1,12 +1,18 @@
 package com.riigiluup.api;
 
+import com.riigiluup.common.CacheConfig;
 import com.riigiluup.ingestion.riigikogu.RiigikoguClient;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -61,5 +67,54 @@ class FileProxyControllerTest {
         when(client.fetchFileBytes(VALID_UUID)).thenReturn(payload);
         FileProxyController.Loader loader = new FileProxyController.Loader(client, 4, 1000);
         assertThat(loader.load(VALID_UUID)).isEqualTo(payload);
+    }
+
+    @Test
+    void empty_upstream_throws_so_it_is_not_cached() {
+        RiigikoguClient client = mock(RiigikoguClient.class);
+        FileProxyController.Loader loader = new FileProxyController.Loader(client, 4, 1000);
+        for (byte[] empty : new byte[][]{null, new byte[0]}) {
+            when(client.fetchFileBytes(VALID_UUID)).thenReturn(empty);
+            assertThatThrownBy(() -> loader.load(VALID_UUID))
+                    .isInstanceOf(FileProxyController.EmptyUpstreamException.class);
+        }
+    }
+
+    @Test
+    void empty_upstream_maps_to_404() {
+        FileProxyController.Loader loader = mock(FileProxyController.Loader.class);
+        when(loader.load(VALID_UUID)).thenThrow(new FileProxyController.EmptyUpstreamException());
+        FileProxyController controller = new FileProxyController(loader);
+        assertThat(controller.download(VALID_UUID).getStatusCode().value()).isEqualTo(404);
+    }
+
+    /**
+     * Regression guard: the @Cacheable config must be valid when invoked through the real
+     * Spring cache proxy. A sync=true + unless combination compiles fine but blows up at the
+     * first call with IllegalStateException — which unit tests on the bare Loader never hit.
+     */
+    @Test
+    void cacheable_load_works_through_the_spring_cache_proxy_and_caches() {
+        RiigikoguClient client = mock(RiigikoguClient.class);
+        when(client.fetchFileBytes(VALID_UUID)).thenReturn(new byte[]{1, 2, 3});
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
+            ctx.getDefaultListableBeanFactory().registerSingleton("riigikoguClient", client);
+            ctx.register(CacheConfig.class, LoaderTestConfig.class);
+            ctx.refresh();
+
+            FileProxyController.Loader loader = ctx.getBean(FileProxyController.Loader.class);
+            assertThat(loader.load(VALID_UUID)).containsExactly(1, 2, 3);
+            assertThat(loader.load(VALID_UUID)).containsExactly(1, 2, 3);
+            // Cached: the upstream is hit exactly once across two loads.
+            verify(client, times(1)).fetchFileBytes(VALID_UUID);
+        }
+    }
+
+    @Configuration
+    static class LoaderTestConfig {
+        @Bean
+        FileProxyController.Loader loader(RiigikoguClient client) {
+            return new FileProxyController.Loader(client, 4, 1000);
+        }
     }
 }
