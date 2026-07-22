@@ -358,7 +358,13 @@
     },
     "timing": {
       "footer": "time Europe/Tallinn · {{votes}} votes total · peak {{max}}/hour",
-      "d1": "Mon", "d2": "Tue", "d3": "Wed", "d4": "Thu", "d5": "Fri", "d6": "Sat", "d7": "Sun",
+      "d1": "Mon",
+      "d2": "Tue",
+      "d3": "Wed",
+      "d4": "Thu",
+      "d5": "Fri",
+      "d6": "Sat",
+      "d7": "Sun",
       "openCell": "Open {{count}} votes ({{day}} {{hour}}:00)",
       "clickHint": "Click a cell to see votes in that hour"
     },
@@ -688,7 +694,6 @@
     "noVotes": "No recorded votes yet.",
     "loadingBills": "Loading bills…",
     "noBills": "No bills sponsored.",
-    "loadFailed": "Couldn't load this section. Please try again.",
     "billsSponsoredCaption": "bills sponsored / initiated",
     "initiatedLine": "{{phase}} · Initiated {{date}}",
     "metrics": {

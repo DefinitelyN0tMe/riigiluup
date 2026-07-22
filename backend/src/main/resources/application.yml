@@ -1,6 +1,10 @@
 spring:
   application:
     name: riigiluup
+  profiles:
+    # Bare `./gradlew bootRun` (README dev flow) runs as local; compose and prod
+    # deploys always pass SPRING_PROFILES_ACTIVE explicitly.
+    default: local
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:15432/riigiluup}
     username: ${DB_USER:riigiluup}

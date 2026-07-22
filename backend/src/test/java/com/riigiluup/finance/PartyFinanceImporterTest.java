@@ -9,6 +9,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -33,7 +34,7 @@ class PartyFinanceImporterTest {
     void empty_source_result_keeps_existing_rows_and_marks_run_failed() {
         when(client.fetchAllReceipts()).thenReturn(List.of());
 
-        assertThat(importer.importAll()).isZero();
+        assertThatThrownBy(importer::importAll).isInstanceOf(IllegalStateException.class);
 
         verify(repo, never()).deleteAllReceipts();
         ArgumentCaptor<ImportRunLog> captor = ArgumentCaptor.forClass(ImportRunLog.class);

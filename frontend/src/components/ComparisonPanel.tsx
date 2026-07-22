@@ -36,8 +36,10 @@ export default function ComparisonPanel({
   return (
     <div className="space-y-6">
       <section aria-label="Header" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[data.left, data.right].map((side) => (
-          <div key={side.slug} className="border border-slate-200 rounded-lg p-4 flex items-start gap-3 bg-white">
+        {/* Position is the identity here (left vs right panel); slug alone can collide
+            when a crafted URL compares a politician with themselves. */}
+        {[data.left, data.right].map((side, i) => (
+          <div key={`${i}-${side.slug}`} className="border border-slate-200 rounded-lg p-4 flex items-start gap-3 bg-white">
             {resolveMediaUrl(side.photoUrl) ? (
               <img src={resolveMediaUrl(side.photoUrl)} alt={side.fullName}
                    className="w-16 h-16 rounded-full object-cover bg-slate-100" />

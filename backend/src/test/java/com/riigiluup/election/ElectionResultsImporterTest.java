@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
@@ -61,7 +62,7 @@ class ElectionResultsImporterTest {
                 client, mock(PlenaryMemberRepository.class), repo, runLogRepo,
                 mock(PlatformTransactionManager.class));
 
-        assertThat(importer.importRk2023()).isZero();
+        assertThatThrownBy(importer::importRk2023).isInstanceOf(IllegalStateException.class);
 
         verify(repo, never()).deleteByElectionCode(anyString());
         ArgumentCaptor<ImportRunLog> captor = ArgumentCaptor.forClass(ImportRunLog.class);

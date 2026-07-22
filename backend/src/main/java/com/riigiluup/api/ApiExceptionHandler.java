@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -83,6 +85,15 @@ public class ApiExceptionHandler {
     }
 
     /** Catch-all: log the full stack, leak nothing into the response body. */
+    /**
+     * Security exceptions must reach Spring Security's ExceptionTranslationFilter (401/403,
+     * OAuth redirects) — rethrow so the catch-all below can never turn them into a 500.
+     */
+    @ExceptionHandler({AccessDeniedException.class, AuthenticationException.class})
+    public void rethrowSecurity(Exception ex) throws Exception {
+        throw ex;
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> internalError(Exception ex, HttpServletRequest req) {
         // Spring MVC exceptions (405, 406, 415, …) carry their own status — keep it instead

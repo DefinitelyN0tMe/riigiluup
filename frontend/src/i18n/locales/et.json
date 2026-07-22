@@ -358,7 +358,13 @@
     },
     "timing": {
       "footer": "aeg Europe/Tallinn · kokku {{votes}} hääletust · tipphõive {{max}}/tund",
-      "d1": "Esm", "d2": "Teis", "d3": "Kolm", "d4": "Nelj", "d5": "Reed", "d6": "Laup", "d7": "Püh",
+      "d1": "Esm",
+      "d2": "Teis",
+      "d3": "Kolm",
+      "d4": "Nelj",
+      "d5": "Reed",
+      "d6": "Laup",
+      "d7": "Püh",
       "openCell": "Ava {{count}} hääletust ({{day}} {{hour}}:00)",
       "clickHint": "Kliki lahtril, et näha hääletusi sellel tunnil"
     },
@@ -688,7 +694,6 @@
     "noVotes": "Registreeritud hääletusi veel pole.",
     "loadingBills": "Eelnõude laadimine…",
     "noBills": "Algatatud eelnõusid pole.",
-    "loadFailed": "Selle jaotise laadimine ebaõnnestus. Proovi uuesti.",
     "billsSponsoredCaption": "algatatud eelnõu",
     "initiatedLine": "{{phase}} · Algatatud {{date}}",
     "metrics": {

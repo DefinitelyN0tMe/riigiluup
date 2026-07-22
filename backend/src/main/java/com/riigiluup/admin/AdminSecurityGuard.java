@@ -3,6 +3,7 @@ package com.riigiluup.admin;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -34,8 +35,10 @@ public class AdminSecurityGuard {
 
     @PostConstruct
     void verify() {
+        // acceptsProfiles (not getActiveProfiles) so the spring.profiles.default=local
+        // fallback for bare bootRun is honoured too.
+        if (env.acceptsProfiles(Profiles.of("local", "test"))) return;
         List<String> profiles = Arrays.asList(env.getActiveProfiles());
-        if (profiles.contains("local") || profiles.contains("test")) return;
 
         boolean oidc = googleClientId != null && !googleClientId.isBlank();
         boolean weakPassword = adminPassword == null || adminPassword.isBlank()

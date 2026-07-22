@@ -61,12 +61,12 @@ public class PartyFinanceImporter {
             List<ErjkReceiptDto> receipts = client.fetchAllReceipts(); // network, outside any tx
             seen = receipts.size();
             // An empty payload is indistinguishable from a silently broken source — a
-            // full-replace here would wipe the table, so keep the existing rows instead.
+            // full-replace here would wipe the table. Keep the existing rows and fail the
+            // run, so callers (admin API, backfill orchestrator) see the same FAILED
+            // outcome as the run log.
             if (receipts.isEmpty()) {
                 log.warn("ERJK returned zero receipts — keeping existing party-receipt rows");
-                run.setStatus("FAILED");
-                run.setErrorMessage("source returned zero receipts; existing rows kept");
-                return 0;
+                throw new IllegalStateException("ERJK returned zero receipts; existing rows kept");
             }
             n = tx.execute(status -> replaceAll(receipts));
             run.setStatus("SUCCESS");

@@ -64,12 +64,12 @@ public class ElectionResultsImporter {
             List<ElectionCandidateDto> candidates = client.fetchRk2023Results(); // network, outside any tx
             seen = candidates.size();
             // An empty candidate list means a broken/changed source, not an empty election —
-            // a full refresh here would wipe the table, so keep the existing rows instead.
+            // a full refresh here would wipe the table. Keep the existing rows and fail the
+            // run, so callers see the same FAILED outcome as the run log.
             if (candidates.isEmpty()) {
                 log.warn("{} returned zero candidates — keeping existing election-result rows", ELECTION_CODE);
-                run.setStatus("FAILED");
-                run.setErrorMessage("source returned zero candidates; existing rows kept");
-                return 0;
+                throw new IllegalStateException(
+                        ELECTION_CODE + " source returned zero candidates; existing rows kept");
             }
             matched = tx.execute(status -> replaceAll(candidates));
             run.setStatus("SUCCESS");
