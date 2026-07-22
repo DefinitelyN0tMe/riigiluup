@@ -22,9 +22,11 @@ export default function LegislationDetailPage() {
     enabled: !!id,
   });
 
-  if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
-  if (error) return <LoadFailed error={error} className="text-red-600" />;
-  if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
+  const containerCls = "space-y-6 max-w-[1000px] mx-auto w-full px-5 sm:px-8 md:px-10 py-8 sm:py-12";
+
+  if (isLoading) return <div className={containerCls}><p className="text-slate-500" role="status">{t("common.loading")}</p></div>;
+  if (error) return <div className={containerCls}><LoadFailed error={error} className="text-red-600" /></div>;
+  if (!data) return <div className={containerCls}><p className="text-slate-500" role="status">{t("common.notFound")}</p></div>;
 
   const phaseLabel = t(`phase.${data.phase}` as const, { defaultValue: data.phase });
   const initiatedStr = data.initiatedDate
@@ -35,7 +37,7 @@ export default function LegislationDetailPage() {
     : "";
 
   return (
-    <div className="space-y-6">
+    <div className={containerCls}>
       <div>
         <Link to="/legislation" className="text-sm text-estonia hover:underline">{t("legislation.backAll")}</Link>
       </div>
