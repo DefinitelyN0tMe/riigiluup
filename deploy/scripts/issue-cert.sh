@@ -37,34 +37,30 @@ sed -i.bak "s/RIIGILUUP_DOMAIN/${DOMAIN}/g" "${BOOTSTRAP}"
 sed -i.bak "s/RIIGILUUP_DOMAIN/${DOMAIN}/g" "${FULL}"
 rm -f "${BOOTSTRAP}.bak" "${FULL}.bak"
 
-echo "1) Swapping nginx to bootstrap (HTTP-only) config…"
+echo "1) Backing up the full SSL config, then swapping nginx to bootstrap (HTTP-only)…"
+# Keep a pristine copy of the full (SSL) config so we can restore it without git —
+# rsync/tarball deploys have no .git to check out from.
+FULL_BACKUP="${FULL}.full.bak"
+cp "${FULL}" "${FULL_BACKUP}"
 cp "${BOOTSTRAP}" "${LIVE}"
 # Compose already mounts ./nginx/riigiluup.conf; overwrite it with the
 # bootstrap contents for the duration of the challenge.
 cp "${BOOTSTRAP}" "${FULL}"
 
-# Ensure the stack is up (or start it if not).
-docker compose -f docker-compose.prod.yml up -d nginx api web db
+# Ensure the stack is up. Recreate nginx so it re-mounts the current file inode
+# (a bind-mounted file replaced by cp/sed is invisible to a running container).
+docker compose -f docker-compose.prod.yml up -d api web db
+docker compose -f docker-compose.prod.yml up -d --force-recreate nginx
 
-echo "2) Reloading nginx with bootstrap config…"
-docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
-
-echo "3) Requesting certificate from Let's Encrypt…"
+echo "2) Requesting certificate from Let's Encrypt (apex + www)…"
 docker compose -f docker-compose.prod.yml run --rm --entrypoint sh certbot -c "\
   certbot certonly --webroot -w /var/www/certbot \
-    -d ${DOMAIN} \
-    --email ${EMAIL} --agree-tos --non-interactive"
+    -d ${DOMAIN} -d www.${DOMAIN} \
+    --email ${EMAIL} --agree-tos --non-interactive --expand"
 
-echo "4) Restoring full SSL nginx config…"
-git -C "${DEPLOY_DIR}/.." checkout -- "deploy/nginx/riigiluup.conf" 2>/dev/null || {
-  echo "  (git not available or repo not clean — regenerating riigiluup.conf from LIVE checkpoint)"
-  cp "${LIVE}" "${FULL}"
-  echo "  MANUAL STEP REQUIRED: riigiluup.conf currently holds bootstrap content."
-  echo "  Restore the full SSL version from your source tree, then run:"
-  echo "  docker compose -f docker-compose.prod.yml exec nginx nginx -s reload"
-  exit 0
-}
-sed -i "s/RIIGILUUP_DOMAIN/${DOMAIN}/g" "${FULL}"
-docker compose -f docker-compose.prod.yml exec nginx nginx -s reload
+echo "3) Restoring the full SSL nginx config and reloading…"
+cp "${FULL_BACKUP}" "${FULL}"
+# Recreate (not reload) so the container picks up the restored file inode.
+docker compose -f docker-compose.prod.yml up -d --force-recreate nginx
 
-echo "Done. HTTPS should be live at https://${DOMAIN}/"
+echo "Done. HTTPS should be live at https://${DOMAIN}/ and https://www.${DOMAIN}/"
