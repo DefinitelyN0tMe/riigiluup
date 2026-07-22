@@ -5,6 +5,7 @@ import { fetchProfile } from "../api/politicians";
 import { resolveMediaUrl } from "../api/client";
 import { fetchPoliticianVotes } from "../api/votes";
 import { fetchPoliticianLegislation } from "../api/legislation";
+import LoadFailed from "../components/LoadFailed";
 import MetricCard from "../components/MetricCard";
 import CommitteeChip from "../components/CommitteeChip";
 import FactionBadge from "../components/FactionBadge";
@@ -40,11 +41,6 @@ function ActivityStat({ value, label, hint }: { value: number; label: string; hi
   );
 }
 
-function LoadFailed() {
-  const { t } = useTranslation();
-  return <p className="text-sm text-hot-deep" role="alert">{t("profile.loadFailed")}</p>;
-}
-
 function VotingHistory({ slug }: { slug: string }) {
   const { t } = useTranslation();
   const { data, isLoading, error } = useQuery({
@@ -52,7 +48,7 @@ function VotingHistory({ slug }: { slug: string }) {
     queryFn: () => fetchPoliticianVotes(slug, 0, 20),
   });
   if (isLoading) return <p className="text-sm text-slate-500">{t("profile.loadingVotes")}</p>;
-  if (error) return <LoadFailed />;
+  if (error) return <LoadFailed error={error} />;
   if (!data || data.items.length === 0)
     return <p className="text-sm text-slate-500">{t("profile.noVotes")}</p>;
   return (
@@ -84,7 +80,7 @@ function MpTopicRadarSection({ slug }: { slug: string }) {
     queryFn: () => fetchMpTopicRadar(slug, 8),
   });
   if (isLoading) return <p className="text-sm text-muted font-mono tracking-[0.06em]">{t("viz.loading")}</p>;
-  if (error) return <LoadFailed />;
+  if (error) return <LoadFailed error={error} />;
   if (!data) return null;
   return <MpTopicRadar data={data} />;
 }
@@ -96,7 +92,7 @@ function DeviationsCalendarSection({ slug }: { slug: string }) {
     queryFn: () => fetchMpDeviationsTimeline(slug, 12),
   });
   if (isLoading) return <p className="text-sm text-muted font-mono tracking-[0.06em]">{t("viz.loading")}</p>;
-  if (error) return <LoadFailed />;
+  if (error) return <LoadFailed error={error} />;
   if (!data) return null;
   return <DeviationsCalendar data={data} />;
 }
@@ -108,7 +104,7 @@ function SimilarPeersSection({ slug }: { slug: string }) {
     queryFn: () => fetchMpSimilarPeers(slug, 5),
   });
   if (isLoading) return <p className="text-sm text-muted font-mono tracking-[0.06em]">{t("viz.loading")}</p>;
-  if (error) return <LoadFailed />;
+  if (error) return <LoadFailed error={error} />;
   if (!data) return null;
   return <SimilarPeers data={data} currentSlug={slug} />;
 }
@@ -120,7 +116,7 @@ function BillsSponsored({ slug }: { slug: string }) {
     queryFn: () => fetchPoliticianLegislation(slug, 0, 10),
   });
   if (isLoading) return <p className="text-sm text-slate-500">{t("profile.loadingBills")}</p>;
-  if (error) return <LoadFailed />;
+  if (error) return <LoadFailed error={error} />;
   if (!data || data.totalSponsored === 0)
     return <p className="text-sm text-slate-500">{t("profile.noBills")}</p>;
   return (
@@ -154,7 +150,7 @@ export default function PoliticianProfilePage() {
   });
 
   if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
-  if (error) return <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>;
+  if (error) return <LoadFailed error={error} className="text-red-600" />;
   if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
 
   return (
@@ -169,7 +165,7 @@ export default function PoliticianProfilePage() {
         {resolveMediaUrl(data.photoUrl) ? (
           <img
             src={resolveMediaUrl(data.photoUrl)}
-            alt=""
+            alt={data.fullName}
             className="w-24 h-24 rounded-full object-cover bg-slate-100"
           />
         ) : (

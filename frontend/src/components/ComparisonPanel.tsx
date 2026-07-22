@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchComparison } from "../api/comparisons";
 import { resolveMediaUrl } from "../api/client";
+import LoadFailed from "./LoadFailed";
 import AgreementBar from "./AgreementBar";
 import DisagreementsTimeline from "./analytics/DisagreementsTimeline";
 
@@ -29,16 +30,16 @@ export default function ComparisonPanel({
   });
 
   if (isLoading) return <p className="text-slate-500" role="status">{t("compare.computing")}</p>;
-  if (error) return <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>;
+  if (error) return <LoadFailed error={error} className="text-red-600" />;
   if (!data) return null;
 
   return (
     <div className="space-y-6">
       <section aria-label="Header" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[data.left, data.right].map((side, idx) => (
-          <div key={idx} className="border border-slate-200 rounded-lg p-4 flex items-start gap-3 bg-white">
+        {[data.left, data.right].map((side) => (
+          <div key={side.slug} className="border border-slate-200 rounded-lg p-4 flex items-start gap-3 bg-white">
             {resolveMediaUrl(side.photoUrl) ? (
-              <img src={resolveMediaUrl(side.photoUrl)} alt=""
+              <img src={resolveMediaUrl(side.photoUrl)} alt={side.fullName}
                    className="w-16 h-16 rounded-full object-cover bg-slate-100" />
             ) : (
               <div className="w-16 h-16 rounded-full bg-slate-100" />

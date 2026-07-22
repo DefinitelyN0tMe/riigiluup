@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { fetchCommittees, type CommitteeListItem } from "../api/committees";
+import LoadFailed from "../components/LoadFailed";
 
 function CommitteeCard({ c }: { c: CommitteeListItem }) {
   const { t } = useTranslation();
@@ -44,11 +45,7 @@ export default function CommitteesPage() {
           {t("common.loading")}
         </p>
       )}
-      {error && (
-        <p className="mt-2 text-hot-deep font-mono text-sm" role="alert">
-          {t("common.failedToLoad")} {(error as Error).message}
-        </p>
-      )}
+      {error && <LoadFailed error={error} className="mt-2 text-hot-deep font-mono text-sm" />}
 
       {data && (
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 list-none p-0">

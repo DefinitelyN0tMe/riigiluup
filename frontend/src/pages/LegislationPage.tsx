@@ -6,6 +6,7 @@ import { fetchLegislation } from "../api/legislation";
 import LegislationRow from "../components/LegislationRow";
 import DataFreshnessBadge from "../components/DataFreshnessBadge";
 import SearchInput from "../components/SearchInput";
+import LoadFailed from "../components/LoadFailed";
 
 const PHASE_CODES = ["", "SUBMITTED", "IN_COMMITTEE", "IN_READINGS", "ADOPTED", "REJECTED", "WITHDRAWN", "OTHER"] as const;
 
@@ -131,7 +132,7 @@ export default function LegislationPage() {
       )}
 
       {isLoading && <p className="text-muted font-mono text-sm tracking-[0.06em]" role="status">{t("common.loading")}</p>}
-      {error && <p className="text-hot-deep font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
+      {error && <LoadFailed error={error} className="text-hot-deep font-mono text-sm" />}
 
       {data && (
         <>

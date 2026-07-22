@@ -7,6 +7,7 @@ import PoliticianCard from "../components/PoliticianCard";
 import SearchInput from "../components/SearchInput";
 import DataFreshnessBadge from "../components/DataFreshnessBadge";
 import ComparisonPanel from "../components/ComparisonPanel";
+import LoadFailed from "../components/LoadFailed";
 
 export default function PoliticiansPage() {
   const { t } = useTranslation();
@@ -172,7 +173,7 @@ export default function PoliticiansPage() {
       )}
 
       {isLoading && !data && <p className="text-muted font-mono text-sm tracking-[0.06em]" role="status">{t("common.loading")}</p>}
-      {error && <p className="text-hot-deep font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
+      {error && <LoadFailed error={error} className="text-hot-deep font-mono text-sm" />}
 
       {data && (
         <>

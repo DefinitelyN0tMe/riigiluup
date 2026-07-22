@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchInitiative } from "../api/initiatives";
 import { ApiError } from "../api/client";
+import { useLoadErrorMessage } from "../lib/useLoadErrorMessage";
 import { formatDate } from "../lib/formatDate";
 
 const NO_DATA_DEFAULT = "No data from the source";
@@ -63,6 +64,7 @@ export default function InitiativeDetailPage() {
     queryFn: () => fetchInitiative(id!),
     enabled: !!id,
   });
+  const loadErrorMessage = useLoadErrorMessage(error);
 
   const containerCls = "max-w-[820px] mx-auto px-5 sm:px-8 py-10 sm:py-14";
 
@@ -84,7 +86,7 @@ export default function InitiativeDetailPage() {
           {notFound ? "404" : t("common.failedToLoad")}
         </p>
         <h1 role={notFound ? "status" : "alert"} className="font-display font-bold text-2xl mb-6">
-          {notFound ? t("common.notFound") : `${t("common.failedToLoad")} ${(error as Error).message}`}
+          {notFound ? t("common.notFound") : loadErrorMessage}
         </h1>
         <Link
           to="/initiatives"

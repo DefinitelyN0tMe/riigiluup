@@ -234,7 +234,7 @@ function MpMiniCard({ p, invert = false }: { p: Politician; invert?: boolean }) 
           {partyShort}
         </div>
         {photoSrc ? (
-          <img src={photoSrc} alt="" loading="lazy" className="w-11 h-11 rounded-full object-cover shrink-0" />
+          <img src={photoSrc} alt={p.fullName} loading="lazy" className="w-11 h-11 rounded-full object-cover shrink-0" />
         ) : (
           <div className="w-11 h-11 rounded-full grid place-items-center font-bold text-[15px] shrink-0 text-white"
                style={{ backgroundColor: color }}>

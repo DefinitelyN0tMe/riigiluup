@@ -37,6 +37,8 @@ const TITLE_KEYS: Array<[string, string]> = [
   ["/votes", "nav.votes"],
   ["/legislation", "nav.bills"],
   ["/initiatives", "nav.initiatives"],
+  ["/committees", "nav.committees"],
+  ["/speeches", "nav.speeches"],
   ["/analytics", "nav.analytics"],
   ["/compare", "nav.compare"],
   ["/methodology", "footer.methodology"],

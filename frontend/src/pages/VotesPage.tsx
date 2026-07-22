@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { fetchVotes } from "../api/votes";
 import VoteRow from "../components/VoteRow";
 import DataFreshnessBadge from "../components/DataFreshnessBadge";
+import LoadFailed from "../components/LoadFailed";
 
 const TYPE_CODES = ["", "OPEN", "ATTENDANCE_CHECK", "SECRET", "OTHER"] as const;
 const DOW_LABELS_KEY = ["viz.timing.d1","viz.timing.d2","viz.timing.d3","viz.timing.d4","viz.timing.d5","viz.timing.d6","viz.timing.d7"];
@@ -138,7 +139,7 @@ export default function VotesPage() {
       )}
 
       {isLoading && <p className="text-muted font-mono text-sm tracking-[0.06em]" role="status">{t("common.loading")}</p>}
-      {error && <p className="text-hot-deep font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
+      {error && <LoadFailed error={error} className="text-hot-deep font-mono text-sm" />}
 
       {data && (
         <>

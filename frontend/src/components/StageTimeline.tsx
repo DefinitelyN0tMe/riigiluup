@@ -7,7 +7,7 @@ export default function StageTimeline({ stages }: { stages: LegislationStage[] }
   if (stages.length === 0) return <p className="text-sm text-slate-500">{t("legislation.noStages")}</p>;
   return (
     <ol className="relative border-l border-slate-200 pl-4 space-y-3">
-      {stages.map((s, idx) => {
+      {stages.map((s) => {
         const when = s.occurredAt ? formatDate(s.occurredAt) : "—";
         const readingLabel = s.readingCode
           ? t(`reading.${s.readingCode}` as const, { defaultValue: s.readingCode })
@@ -16,7 +16,7 @@ export default function StageTimeline({ stages }: { stages: LegislationStage[] }
           ? t(`stageStatus.${s.statusCode}` as const, { defaultValue: s.statusCode })
           : "";
         return (
-          <li key={idx} className="text-sm">
+          <li key={s.sequence} className="text-sm">
             <span className="absolute -left-1.5 mt-1 w-3 h-3 bg-estonia rounded-full" />
             <div className="text-ink font-medium">
               {readingLabel}

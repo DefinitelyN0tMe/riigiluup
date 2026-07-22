@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { fetchLegislationDetail } from "../api/legislation";
 import { fetchInitiativesByBill } from "../api/initiatives";
 import StageTimeline from "../components/StageTimeline";
+import LoadFailed from "../components/LoadFailed";
 import TopicChip from "../components/TopicChip";
 import { formatDate } from "../lib/formatDate";
 
@@ -22,7 +23,7 @@ export default function LegislationDetailPage() {
   });
 
   if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
-  if (error) return <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>;
+  if (error) return <LoadFailed error={error} className="text-red-600" />;
   if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
 
   const phaseLabel = t(`phase.${data.phase}` as const, { defaultValue: data.phase });

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import { fetchSpeeches } from "../api/speeches";
 import SearchInput from "../components/SearchInput";
+import LoadFailed from "../components/LoadFailed";
 import { formatDateTime } from "../lib/formatDate";
 
 /**
@@ -90,7 +91,7 @@ export default function SpeechesPage() {
       )}
 
       {isLoading && !data && <p className="mt-6 text-muted font-mono text-sm" role="status">{t("common.loading")}</p>}
-      {error && <p className="mt-6 text-hot-deep font-mono text-sm" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>}
+      {error && <LoadFailed error={error} className="mt-6 text-hot-deep font-mono text-sm" />}
 
       {data && data.items.length === 0 && (
         <p className="mt-8 text-muted font-serif italic">{t("speeches.empty")}</p>

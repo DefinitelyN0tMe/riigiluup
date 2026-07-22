@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchVoteDetail } from "../api/votes";
 import VoteResultBar from "../components/VoteResultBar";
+import LoadFailed from "../components/LoadFailed";
 import VoteDefectorsPanel from "../components/analytics/VoteDefectorsPanel";
 import { formatDateTime } from "../lib/formatDate";
 
@@ -26,7 +27,7 @@ export default function VoteDetailPage() {
   });
 
   if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
-  if (error) return <p className="text-red-600" role="alert">{t("common.failedToLoad")} {(error as Error).message}</p>;
+  if (error) return <LoadFailed error={error} className="text-red-600" />;
   if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
 
   const when = formatDateTime(data.startedAt);

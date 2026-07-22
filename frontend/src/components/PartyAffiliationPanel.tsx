@@ -46,8 +46,8 @@ export default function PartyAffiliationPanel({
         </div>
         {memberships.length ? (
           <ol className="flex flex-col gap-2 list-none p-0">
-            {memberships.map((m, i) => (
-              <li key={i} className="flex items-baseline gap-3">
+            {memberships.map((m) => (
+              <li key={`${m.partyQid}-${m.startDate ?? "unknown"}`} className="flex items-baseline gap-3">
                 <span className="font-mono text-[11px] text-muted tracking-[0.04em] shrink-0 w-28">
                   {periodLabel(m)}
                 </span>

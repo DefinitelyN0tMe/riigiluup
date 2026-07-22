@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import { fetchInitiatives, type InitiativeListItem } from "../api/initiatives";
 import SearchInput from "../components/SearchInput";
+import LoadFailed from "../components/LoadFailed";
 import { formatDate } from "../lib/formatDate";
 
 const SIGNATURE_THRESHOLD = 1000;
@@ -278,11 +279,7 @@ export default function InitiativesPage() {
           {t("common.loading")}
         </p>
       )}
-      {error && (
-        <p className="mt-2 text-hot-deep font-mono text-sm" role="alert">
-          {t("common.failedToLoad")} {(error as Error).message}
-        </p>
-      )}
+      {error && <LoadFailed error={error} className="mt-2 text-hot-deep font-mono text-sm" />}
 
       {data && data.items.length === 0 && <p className="mt-8 text-muted font-serif italic">{t("initiatives.empty")}</p>}
 

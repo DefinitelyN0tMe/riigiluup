@@ -6,6 +6,7 @@ import {
   fetchMpSimilarity, fetchPartyFinance, fetchResponseLatency, fetchTopicTreemap, fetchVoteTiming, fetchNightVotes,
 } from "../api/analytics";
 import { fetchInitiativeFunnel } from "../api/initiatives";
+import { ApiError } from "../api/client";
 import SectionHead from "../components/SectionHead";
 import InitiativeFunnel from "../components/InitiativeFunnel";
 import FactionHeatmap from "../components/analytics/FactionHeatmap";
@@ -31,7 +32,8 @@ function Loading() {
 }
 function Failed({ err }: { err: unknown }) {
   const { t } = useTranslation();
-  return <div className="text-hot-deep font-mono text-sm py-6">{t("viz.loadFailed")} {(err as Error).message}</div>;
+  const message = err instanceof ApiError ? t(err.i18nKey) : `${t("viz.loadFailed")} ${(err as Error).message}`;
+  return <div className="text-hot-deep font-mono text-sm py-6" role="alert">{message}</div>;
 }
 function Section({
   index, kicker, title, children, note,

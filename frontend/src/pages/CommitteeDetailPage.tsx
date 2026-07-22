@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchCommittee } from "../api/committees";
 import { ApiError } from "../api/client";
+import { useLoadErrorMessage } from "../lib/useLoadErrorMessage";
 import { formatDate } from "../lib/formatDate";
 
 export default function CommitteeDetailPage() {
@@ -13,6 +14,7 @@ export default function CommitteeDetailPage() {
     queryFn: () => fetchCommittee(externalId!),
     enabled: !!externalId,
   });
+  const loadErrorMessage = useLoadErrorMessage(error);
 
   const containerCls = "max-w-[900px] mx-auto px-5 sm:px-8 py-10 sm:py-14";
 
@@ -34,7 +36,7 @@ export default function CommitteeDetailPage() {
           {notFound ? "404" : t("common.failedToLoad")}
         </p>
         <h1 role={notFound ? "status" : "alert"} className="font-display font-bold text-2xl mb-6">
-          {notFound ? t("committees.notFound") : `${t("common.failedToLoad")} ${error ? (error as Error).message : ""}`}
+          {notFound ? t("committees.notFound") : loadErrorMessage}
         </h1>
         <Link
           to="/committees"
