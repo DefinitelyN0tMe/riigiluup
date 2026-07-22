@@ -48,10 +48,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    prometheus:
-      access: unrestricted
+        # Defence in depth: inside the docker network actuator is reachable without auth,
+        # so only health is exposed by default. An instance that is actually scraped can
+        # opt back in via MANAGEMENT_ENDPOINTS_INCLUDE=health,prometheus.
+        include: ${MANAGEMENT_ENDPOINTS_INCLUDE:health}
   metrics:
     tags:
       application: riigiluup

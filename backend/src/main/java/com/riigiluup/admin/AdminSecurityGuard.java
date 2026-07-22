@@ -23,13 +23,16 @@ public class AdminSecurityGuard {
 
     private final String adminPassword;
     private final String googleClientId;
+    private final String dbPassword;
     private final Environment env;
 
     public AdminSecurityGuard(@Value("${riigiluup.admin.password:}") String adminPassword,
                               @Value("${GOOGLE_OAUTH_CLIENT_ID:}") String googleClientId,
+                              @Value("${spring.datasource.password:}") String dbPassword,
                               Environment env) {
         this.adminPassword = adminPassword;
         this.googleClientId = googleClientId;
+        this.dbPassword = dbPassword;
         this.env = env;
     }
 
@@ -49,6 +52,15 @@ public class AdminSecurityGuard {
                     "Refusing to start in the 'prod' profile with a Basic-only admin panel: "
                     + "Google OIDC (GOOGLE_OAUTH_CLIENT_ID / GOOGLE_OAUTH_CLIENT_SECRET) must be "
                     + "configured for prod deploys.");
+        }
+        if (profiles.contains("prod")) {
+            String db = dbPassword == null ? "" : dbPassword.toLowerCase(Locale.ROOT);
+            // "riigiluup" is the dev-compose default, "change-me*" the .env example value.
+            if (db.isBlank() || db.equals("riigiluup") || db.startsWith("change-me")) {
+                throw new IllegalStateException(
+                        "Refusing to start in the 'prod' profile with a default/blank database "
+                        + "password: set a generated POSTGRES_PASSWORD in the deploy .env.");
+            }
         }
         if (!oidc && weakPassword) {
             throw new IllegalStateException(

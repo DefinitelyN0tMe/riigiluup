@@ -58,12 +58,14 @@ class HistoricalBackfillOrchestratorTest {
     private final VoteBillLinker voteBillLinker = mock(VoteBillLinker.class);
     private final SponsorRelinker sponsorRelinker = mock(SponsorRelinker.class);
     private final RtLinker rtLinker = mock(RtLinker.class);
+    private final com.riigiluup.common.AnalyticsCacheEvictor cacheEvictor =
+            mock(com.riigiluup.common.AnalyticsCacheEvictor.class);
 
     private final HistoricalBackfillOrchestrator orchestrator = new HistoricalBackfillOrchestrator(
             runRepo, memberImporter, usergroupImporter, detailImporter, electionResultsImporter,
             wikidataImporter, legislationImporter, voteImporter, speechImporter,
             governmentQuestionImporter, rahvaalgatusImporter, partyFinanceImporter,
-            memberActivityImporter, voteBillLinker, sponsorRelinker, rtLinker);
+            memberActivityImporter, voteBillLinker, sponsorRelinker, rtLinker, cacheEvictor);
 
     private static ImportRunLog ok(int upserted) {
         return ImportRunLog.builder().status("SUCCESS").recordsUpserted(upserted).build();

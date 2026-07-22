@@ -1,5 +1,6 @@
 package com.riigiluup.ingestion.schedule;
 
+import com.riigiluup.common.AnalyticsCacheEvictor;
 import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberImporter;
@@ -30,6 +31,7 @@ public class DailyRefreshJob {
     private final LegislativeItemImporter legislationImporter;
     private final VoteBillLinker voteBillLinker;
     private final SpeechImporter speechImporter;
+    private final AnalyticsCacheEvictor cacheEvictor;
 
     /** Guards against a slow run still executing when the next 6-hourly trigger fires. */
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -50,6 +52,7 @@ public class DailyRefreshJob {
             LocalDate today = LocalDate.now(TALLINN);
             voteImporter.runWindow(today.minusDays(7), today);
             voteBillLinker.linkAll();
+            cacheEvictor.evictAll();
             log.info("Votes refresh finished");
         } catch (Exception e) {
             log.error("Votes refresh failed", e);
@@ -82,6 +85,7 @@ public class DailyRefreshJob {
             // 7-day speech window: stenograms publish next day and get edited for a few
             // days after, so re-upserting a week keeps texts converged with the source.
             speechImporter.runWindow(today.minusDays(7), today);
+            cacheEvictor.evictAll();
             log.info("Daily refresh finished");
         } catch (Exception e) {
             log.error("Daily refresh failed", e);

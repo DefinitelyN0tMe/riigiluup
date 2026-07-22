@@ -1,6 +1,7 @@
 package com.riigiluup.admin;
 
 import com.riigiluup.activity.MemberActivityImporter;
+import com.riigiluup.common.AnalyticsCacheEvictor;
 import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.finance.PartyFinanceImporter;
 import com.riigiluup.ingestion.rahvaalgatus.RahvaalgatusImporter;
@@ -80,6 +81,8 @@ public class HistoricalBackfillOrchestrator {
     private static final int WINDOW_DAYS = 30;
     /** Breathing-room sleep between windows in milliseconds. */
     private static final long INTER_WINDOW_SLEEP_MS = 100L;
+    /** Cooldown before the single retry of a failed one-shot step (lets a hot 429 budget drain). */
+    private static final long STEP_RETRY_DELAY_MS = 90_000L;
     /** Fail-fast threshold — abort the whole run if this many windows fail back-to-back. */
     private static final int MAX_CONSECUTIVE_WINDOW_FAILURES = 5;
     /** RT-link drain: candidates per batch, and a hard cap on batches as a runaway backstop. */
@@ -102,6 +105,7 @@ public class HistoricalBackfillOrchestrator {
     private final VoteBillLinker voteBillLinker;
     private final SponsorRelinker sponsorRelinker;
     private final RtLinker rtLinker;
+    private final AnalyticsCacheEvictor cacheEvictor;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "historical-backfill");
@@ -281,6 +285,7 @@ public class HistoricalBackfillOrchestrator {
         run.setPhase("completed");
         run.setEndedAt(Instant.now());
         saveQuietly(run);
+        cacheEvictor.evictAll(); // dashboards should reflect the fresh data, not the 30-min-old cache
         log.info("historical backfill {} COMPLETED kinds={} counts={}", runId, kinds, counts);
     }
 
@@ -303,9 +308,27 @@ public class HistoricalBackfillOrchestrator {
         saveQuietly(run);
 
         try {
-            int n = step.run();
+            int n;
+            try {
+                n = step.run();
+            } catch (Exception first) {
+                // One retry after a cooldown: a single transient upstream error (a stray 429
+                // right after startup has twice cost the whole GROUPS step) should not lose a
+                // full step's data for the entire run.
+                log.warn("backfill {} step {} failed ({}), retrying once in {}s",
+                        runId, label, first.toString(), STEP_RETRY_DELAY_MS / 1000);
+                Thread.sleep(STEP_RETRY_DELAY_MS);
+                BackfillRun current = runRepo.findById(runId).orElse(null);
+                if (current == null || STATUS_CANCELLED.equals(current.getStatus())) throw first;
+                n = step.run();
+            }
             counts.put(label, n);
             log.info("backfill {} step {}: {}", runId, label, n);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            log.error("backfill {} step {} interrupted during retry wait", runId, label);
+            counts.put(label, -1);
+            mutate(runId, r -> r.setErrorMessage(label + ": interrupted"));
         } catch (Exception e) {
             log.error("backfill {} step {} failed: {}", runId, label, e.toString());
             counts.put(label, -1); // -1 marks a failed step in step_counts

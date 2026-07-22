@@ -13,9 +13,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class AdminSecurityGuardTest {
 
     private static AdminSecurityGuard guard(String password, String googleClientId, String... profiles) {
+        return guardWithDb(password, googleClientId, "a-generated-db-password", profiles);
+    }
+
+    private static AdminSecurityGuard guardWithDb(String password, String googleClientId,
+                                                  String dbPassword, String... profiles) {
         MockEnvironment env = new MockEnvironment();
         env.setActiveProfiles(profiles);
-        return new AdminSecurityGuard(password, googleClientId, env);
+        return new AdminSecurityGuard(password, googleClientId, dbPassword, env);
     }
 
     @Test
@@ -52,6 +57,22 @@ class AdminSecurityGuardTest {
     @Test
     void prod_with_oidc_configured_starts() {
         assertThatCode(() -> guard("s3cret-enough", "client-id.apps.googleusercontent.com", "prod").verify())
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void prod_with_default_or_blank_db_password_refuses_to_start() {
+        String oidc = "client-id.apps.googleusercontent.com";
+        for (String bad : new String[]{"riigiluup", "change-me-strong", ""}) {
+            assertThatThrownBy(() -> guardWithDb("s3cret-enough", oidc, bad, "prod").verify())
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("database");
+        }
+    }
+
+    @Test
+    void non_prod_profiles_do_not_check_the_db_password() {
+        assertThatCode(() -> guardWithDb("s3cret-enough", "", "riigiluup", "staging").verify())
                 .doesNotThrowAnyException();
     }
 }
