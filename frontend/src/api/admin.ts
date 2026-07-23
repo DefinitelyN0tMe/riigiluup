@@ -1,4 +1,4 @@
-import type { AdminStatus } from "../types";
+import type { AdminAnalytics, AdminStatus } from "../types";
 
 const BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -30,6 +30,12 @@ async function adminFetch(path: string, init: RequestInit = {}) {
 
 export async function fetchAdminStatus(): Promise<AdminStatus> {
   const res = await adminFetch("/api/v1/admin/status");
+  return res.json();
+}
+
+/** Visitor analytics from the self-hosted Umami, proxied through the admin API. */
+export async function fetchAdminAnalytics(range: "24h" | "7d" | "30d"): Promise<AdminAnalytics> {
+  const res = await adminFetch(`/api/v1/admin/analytics/summary?range=${range}`);
   return res.json();
 }
 

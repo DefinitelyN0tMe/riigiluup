@@ -949,6 +949,22 @@
   },
   "admin": {
     "title": "Admin",
+    "analytics": {
+      "title": "Analüütika",
+      "subtitle": "Privaatne Umami statistika — ilma küpsiste ja isikuandmeteta.",
+      "range": { "24h": "24 t", "7d": "7 p", "30d": "30 p" },
+      "activeNow": "Praegu saidil",
+      "visitors": "Külastajad",
+      "visits": "Külastused",
+      "pageviews": "Vaatamised",
+      "bounceRate": "Põrkemäär",
+      "avgVisit": "Keskm. külastus",
+      "topPages": "Top lehed",
+      "topReferrers": "Top allikad",
+      "notConfigured": "Analüütika pole seadistatud.",
+      "fetchError": "Andmete laadimine ebaõnnestus",
+      "chartAria": "Vaatamiste ja külastuste graafik ajas"
+    },
     "username": "Kasutajanimi",
     "password": "Parool",
     "signIn": "Logi sisse",

@@ -311,6 +311,24 @@ export type PoliticianLegislationResponse = {
   items: PageResponse<LegislationListItem>;
 };
 
+export type AdminAnalyticsMetric = { value: number; prev: number };
+export type AdminAnalyticsPoint = { t: string; pageviews: number; sessions: number };
+export type AdminAnalyticsItem = { label: string; count: number };
+export type AdminAnalytics = {
+  configured: boolean;
+  error: string | null;
+  range: string | null;
+  pageviews: AdminAnalyticsMetric | null;
+  visitors: AdminAnalyticsMetric | null;
+  visits: AdminAnalyticsMetric | null;
+  bounceRate: number | null;      // 0..1
+  avgVisitSeconds: number | null;
+  activeVisitors: number;
+  series: AdminAnalyticsPoint[];
+  topPages: AdminAnalyticsItem[];
+  topReferrers: AdminAnalyticsItem[];
+};
+
 export type AdminStatus = {
   jobs: Array<{
     sourceName: string;

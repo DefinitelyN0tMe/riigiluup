@@ -40,6 +40,12 @@ services:
       RIIGILUUP_ADMIN_ALLOWED_EMAILS: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      # Read-only access to the internal Umami instance so the admin panel can show analytics
+      # without exposing the Umami dashboard publicly. Blank password/id = analytics disabled.
+      UMAMI_INTERNAL_URL: http://umami:3000
+      UMAMI_ADMIN_USERNAME: ${UMAMI_ADMIN_USERNAME:-admin}
+      UMAMI_ADMIN_PASSWORD: ${UMAMI_ADMIN_PASSWORD}
+      UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70 -XX:+UseZGC -XX:+ZGenerational"
     depends_on:

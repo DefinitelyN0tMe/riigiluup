@@ -9,6 +9,7 @@ import {
   type BackfillRunStatus,
 } from "../api/admin";
 import AdminAffiliationsSection from "../components/admin/AdminAffiliationsSection";
+import AdminAnalyticsSection from "../components/admin/AdminAnalyticsSection";
 import AdminInitiativeLinksSection from "../components/admin/AdminInitiativeLinksSection";
 import type { AdminStatus } from "../types";
 import { formatDateTime } from "../lib/formatDate";
@@ -142,6 +143,8 @@ export default function AdminPage() {
       </div>
 
       {error && <p className="text-red-600 text-sm" role="alert">{error}</p>}
+
+      <AdminAnalyticsSection onUnauthorized={() => setAuthState("unauthorized")} />
 
       <section aria-label="Counts">
         <h2 className="text-lg font-semibold text-ink mb-2">{t("admin.domainCounts")}</h2>

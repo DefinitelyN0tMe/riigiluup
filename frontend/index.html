@@ -26,8 +26,9 @@
     <meta name="twitter:image" content="https://riigiluup.ee/logo.png" />
     <title>Riigiluup — Riigikogu läbipaistvus</title>
     <!-- Privacy-first, cookieless, self-hosted analytics (Umami). Collects no personal data;
-         honours the browser Do-Not-Track signal. Served from our own analytics subdomain. -->
-    <script defer src="https://analytics.riigiluup.ee/script.js"
+         honours the browser Do-Not-Track signal. Same-origin: nginx proxies /stats.js and the
+         /api/send beacon to the internal Umami container, which is never publicly exposed. -->
+    <script defer src="/stats.js"
             data-website-id="87e1c2f9-e581-4a4e-bb63-df1c0c5d3916"
             data-domains="riigiluup.ee"
             data-do-not-track="true"></script>

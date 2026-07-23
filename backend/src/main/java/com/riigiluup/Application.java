@@ -1,5 +1,6 @@
 package com.riigiluup;
 
+import com.riigiluup.analytics.umami.UmamiProperties;
 import com.riigiluup.ingestion.rahvaalgatus.RahvaalgatusProperties;
 import com.riigiluup.ingestion.riigikogu.RiigikoguProperties;
 import org.springframework.boot.SpringApplication;
@@ -8,7 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableConfigurationProperties({RiigikoguProperties.class, RahvaalgatusProperties.class})
+@EnableConfigurationProperties({RiigikoguProperties.class, RahvaalgatusProperties.class, UmamiProperties.class})
 @EnableScheduling
 public class Application {
     public static void main(String[] args) {

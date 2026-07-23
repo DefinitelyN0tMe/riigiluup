@@ -121,6 +121,14 @@ riigiluup:
     rate-limit-per-second: 1
   rahvaalgatus:
     base-url: https://rahvaalgatus.ee
+  umami:
+    # Self-hosted analytics, reachable only inside the Docker network. The admin panel reads
+    # stats through the backend (see AdminAnalyticsController), so Umami needs no public origin.
+    # Blank password/website-id (the dev default) = analytics disabled, endpoint returns configured:false.
+    base-url: ${UMAMI_INTERNAL_URL:http://umami:3000}
+    username: ${UMAMI_ADMIN_USERNAME:admin}
+    password: ${UMAMI_ADMIN_PASSWORD:}
+    website-id: ${UMAMI_WEBSITE_ID:}
   wikidata:
     # Wikidata QIDs of Estonian parliamentary parties (+ direct predecessors). Soft allow-list:
     # a P102 membership whose party QID is outside this set is still imported, but logged WARN so

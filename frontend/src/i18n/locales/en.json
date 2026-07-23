@@ -949,6 +949,22 @@
   },
   "admin": {
     "title": "Admin",
+    "analytics": {
+      "title": "Analytics",
+      "subtitle": "Private Umami stats — no cookies, no personal data.",
+      "range": { "24h": "24h", "7d": "7d", "30d": "30d" },
+      "activeNow": "Active now",
+      "visitors": "Visitors",
+      "visits": "Visits",
+      "pageviews": "Pageviews",
+      "bounceRate": "Bounce rate",
+      "avgVisit": "Avg. visit",
+      "topPages": "Top pages",
+      "topReferrers": "Top referrers",
+      "notConfigured": "Analytics is not configured.",
+      "fetchError": "Failed to load data",
+      "chartAria": "Pageviews and visits over time"
+    },
     "username": "Username",
     "password": "Password",
     "signIn": "Sign in",
