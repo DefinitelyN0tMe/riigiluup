@@ -40,12 +40,16 @@ public record AdminAnalyticsDto(
     }
 
     public static AdminAnalyticsDto from(String range, JsonNode stats, JsonNode pv,
-                                         JsonNode urls, JsonNode referrers, int active) {
-        Metric pageviews = metric(stats, "pageviews");
-        Metric visitors = metric(stats, "visitors");
-        Metric visits = metric(stats, "visits");
-        long bounces = value(stats, "bounces");
-        long totaltime = value(stats, "totaltime");
+                                         JsonNode pages, JsonNode referrers, int active) {
+        // This Umami build returns flat totals plus a sibling "comparison" object holding the
+        // previous-period values; older builds nested {"value":n,"prev":m} per field. num()
+        // tolerates both, and prev is read from comparison when present.
+        JsonNode comparison = stats == null ? null : stats.get("comparison");
+        Metric pageviews = metric(stats, comparison, "pageviews");
+        Metric visitors = metric(stats, comparison, "visitors");
+        Metric visits = metric(stats, comparison, "visits");
+        long bounces = num(stats, "bounces");
+        long totaltime = num(stats, "totaltime");
 
         Double bounceRate = visits.value() > 0 ? (double) bounces / visits.value() : null;
         // Umami totaltime is seconds spent across non-bounced visits.
@@ -56,20 +60,19 @@ public record AdminAnalyticsDto(
                 true, null, range,
                 pageviews, visitors, visits,
                 bounceRate, avgVisit, active,
-                series(pv), items(urls), items(referrers));
+                series(pv), items(pages), items(referrers));
     }
 
-    /** A stats field is either {"value":n,"prev":m} (Umami v2) or a bare number. */
-    private static Metric metric(JsonNode stats, String field) {
-        if (stats == null) return new Metric(0, 0);
-        JsonNode n = stats.get(field);
-        if (n == null) return new Metric(0, 0);
-        if (n.isObject()) return new Metric(n.path("value").asLong(0), n.path("prev").asLong(0));
-        return new Metric(n.asLong(0), 0);
+    private static Metric metric(JsonNode stats, JsonNode comparison, String field) {
+        return new Metric(num(stats, field), num(comparison, field));
     }
 
-    private static long value(JsonNode stats, String field) {
-        return metric(stats, field).value();
+    /** Reads a numeric stats field, tolerating both a bare number and a {"value":n} object. */
+    private static long num(JsonNode node, String field) {
+        if (node == null) return 0;
+        JsonNode f = node.get(field);
+        if (f == null) return 0;
+        return f.isObject() ? f.path("value").asLong(0) : f.asLong(0);
     }
 
     private static List<Point> series(JsonNode pv) {

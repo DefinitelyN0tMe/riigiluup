@@ -41,7 +41,7 @@ public class AdminAnalyticsController {
                     range,
                     umami.stats(start, now),
                     umami.pageviews(start, now, unit, "Europe/Tallinn"),
-                    umami.metrics(start, now, "url", 10),
+                    umami.metrics(start, now, "path", 10),      // "path" (this Umami build); older builds used "url"
                     umami.metrics(start, now, "referrer", 10),
                     umami.activeVisitors());
         } catch (Exception e) {

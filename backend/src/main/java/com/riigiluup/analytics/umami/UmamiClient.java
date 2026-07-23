@@ -6,10 +6,11 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriBuilder;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Thin read-only client for the Umami REST API (v2), talking to the internal
@@ -17,6 +18,10 @@ import java.util.Map;
  * the bearer token, re-logging in transparently on a 401 (tokens can expire). All calls
  * are GETs against a single website id; responses are returned as raw {@link JsonNode}
  * and shaped into the admin DTO by the controller.
+ *
+ * <p>URIs are built with the {@link UriBuilder} lambda form so query values (notably the
+ * {@code timezone} "Europe/Tallinn") are encoded exactly once — pre-encoding the string
+ * ourselves led to double-encoding ("%252F") and an "Invalid timezone" 400 from Umami.
  */
 @Component
 public class UmamiClient {
@@ -55,42 +60,46 @@ public class UmamiClient {
         return token;
     }
 
-    private JsonNode get(String uri) {
+    private JsonNode get(Function<UriBuilder, URI> uriFn) {
         if (token == null) login();
         try {
-            return doGet(uri);
+            return doGet(uriFn);
         } catch (HttpClientErrorException.Unauthorized e) {
             login();            // token expired — one retry with a fresh token
-            return doGet(uri);
+            return doGet(uriFn);
         }
     }
 
-    private JsonNode doGet(String uri) {
-        return rest.get().uri(uri)
+    private JsonNode doGet(Function<UriBuilder, URI> uriFn) {
+        return rest.get().uri(uriFn)
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .body(JsonNode.class);
     }
 
     public JsonNode stats(long startAt, long endAt) {
-        return get("/api/websites/%s/stats?startAt=%d&endAt=%d"
-                .formatted(props.websiteId(), startAt, endAt));
+        return get(b -> b.path("/api/websites/{id}/stats")
+                .queryParam("startAt", startAt).queryParam("endAt", endAt)
+                .build(props.websiteId()));
     }
 
     public JsonNode pageviews(long startAt, long endAt, String unit, String timezone) {
-        return get("/api/websites/%s/pageviews?startAt=%d&endAt=%d&unit=%s&timezone=%s"
-                .formatted(props.websiteId(), startAt, endAt, unit,
-                        URLEncoder.encode(timezone, StandardCharsets.UTF_8)));
+        return get(b -> b.path("/api/websites/{id}/pageviews")
+                .queryParam("startAt", startAt).queryParam("endAt", endAt)
+                .queryParam("unit", unit).queryParam("timezone", timezone)
+                .build(props.websiteId()));
     }
 
     public JsonNode metrics(long startAt, long endAt, String type, int limit) {
-        return get("/api/websites/%s/metrics?startAt=%d&endAt=%d&type=%s&limit=%d"
-                .formatted(props.websiteId(), startAt, endAt, type, limit));
+        return get(b -> b.path("/api/websites/{id}/metrics")
+                .queryParam("startAt", startAt).queryParam("endAt", endAt)
+                .queryParam("type", type).queryParam("limit", limit)
+                .build(props.websiteId()));
     }
 
     /** Visitors seen in the last few minutes. Handles both the array and object shapes. */
     public int activeVisitors() {
-        JsonNode n = get("/api/websites/%s/active".formatted(props.websiteId()));
+        JsonNode n = get(b -> b.path("/api/websites/{id}/active").build(props.websiteId()));
         if (n == null) return 0;
         if (n.isArray()) return n.isEmpty() ? 0 : n.get(0).path("x").asInt(0);
         return n.path("visitors").asInt(0);
