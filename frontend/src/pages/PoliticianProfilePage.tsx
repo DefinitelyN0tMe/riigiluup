@@ -291,10 +291,22 @@ export default function PoliticianProfilePage() {
               </div>
             )}
           </div>
+          {data.election.mandateType === "SUBSTITUTE" && (
+            <p className="mt-4 text-[13px] leading-snug text-ink-2 border-l-2 border-rule pl-3">
+              {t("profile.election.substituteNote")}
+            </p>
+          )}
           <a href={data.election.sourceUrl} target="_blank" rel="noreferrer noopener"
              className="inline-block mt-4 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
             {t("profile.election.source")} ↗
           </a>
+        </section>
+      )}
+
+      {!data.election && data.active && (
+        <section aria-label={t("profile.election.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-2">{t("profile.election.title")}</h2>
+          <p className="text-[14px] leading-snug text-ink-2">{t("profile.election.substituteUnknown")}</p>
         </section>
       )}
 

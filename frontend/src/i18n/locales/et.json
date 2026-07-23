@@ -718,8 +718,11 @@
       "mandate": {
         "PERSONAL": "Isikumandaat",
         "DISTRICT": "Ringkonnamandaat",
-        "COMPENSATION": "Kompensatsioonimandaat"
-      }
+        "COMPENSATION": "Kompensatsioonimandaat",
+        "SUBSTITUTE": "Asendusliige"
+      },
+      "substituteNote": "Sisenes Riigikokku asendusliikmena: kandideeris 2023, kuid ei osutunud otse valituks — asus lahkunud liikme (ministriks saanud või mandaadist loobunu) kohale.",
+      "substituteUnknown": "Asendusliige — ei sisenenud Riigikokku 2023. aasta otsevalimise teel."
     },
     "activity": {
       "title": "Aktiivsus parlamendis",

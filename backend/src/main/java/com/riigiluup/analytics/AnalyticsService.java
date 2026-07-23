@@ -259,6 +259,8 @@ public class AnalyticsService {
             if (!m.isActive()) continue;
             ElectionResult e = byExt.get(m.getExternalId());
             if (e == null) continue;
+            // Substitutes weren't directly elected; this board ranks by election personal votes, so skip them.
+            if (com.riigiluup.election.ElectionResultsImporter.SUBSTITUTE_MANDATE.equals(e.getMandateType())) continue;
             Group faction = m.getFactionExternalId() != null ? factionByExt.get(m.getFactionExternalId()) : null;
             String factionShort = faction != null ? shortenFactionName(faction.getName())
                     : shortenFactionName(m.getFactionName());

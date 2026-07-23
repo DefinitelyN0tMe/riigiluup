@@ -718,8 +718,11 @@
       "mandate": {
         "PERSONAL": "Personal mandate",
         "DISTRICT": "District mandate",
-        "COMPENSATION": "Compensation mandate"
-      }
+        "COMPENSATION": "Compensation mandate",
+        "SUBSTITUTE": "Substitute member"
+      },
+      "substituteNote": "Entered the Riigikogu as a substitute: ran in 2023 but was not directly elected — took the seat of a departed member (who became a minister or gave up the mandate).",
+      "substituteUnknown": "Substitute member — did not enter the Riigikogu through direct election in 2023."
     },
     "activity": {
       "title": "Activity in parliament",

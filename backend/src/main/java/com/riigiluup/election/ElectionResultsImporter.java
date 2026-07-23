@@ -12,11 +12,14 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Imports the RK_2023 election results and attaches each currently seated MP's
@@ -86,32 +89,78 @@ public class ElectionResultsImporter {
         return matched;
     }
 
+    /** Substitute members (asendusliige) enter mid-term when an elected MP resigns/becomes a
+     *  minister; they ran but were not directly elected, so they carry this pseudo mandate type. */
+    static final String SUBSTITUTE_MANDATE = "SUBSTITUTE";
+
     private int replaceAll(List<ElectionCandidateDto> candidates) {
-        Map<String, PlenaryMember> byName = activeWinsNameIndex(memberRepo.findAll());
+        List<PlenaryMember> members = memberRepo.findAll();
+        Map<String, PlenaryMember> exact = activeWinsNameIndex(members);
+        // Fallback index by surname so a compound/abbreviated forename ("Kalev" vs the source's
+        // "Grigore-Kalev") can still be reconciled by first-name token overlap.
+        Map<String, List<PlenaryMember>> bySurname = new HashMap<>();
+        for (PlenaryMember m : members) {
+            bySurname.computeIfAbsent(norm(m.getLastName()), k -> new ArrayList<>()).add(m);
+        }
 
         repo.deleteByElectionCode(ELECTION_CODE); // full refresh — immutable source, keeps this idempotent
         Instant now = Instant.now();
-        int matched = 0, electedTotal = 0, unmatched = 0;
-        for (ElectionCandidateDto c : candidates) {
-            if (!c.elected()) continue;
-            electedTotal++;
-            PlenaryMember m = byName.get(nameKey(c.forename(), c.surname()));
-            if (m == null) { unmatched++; continue; }
-            repo.save(ElectionResult.builder()
-                    .memberExternalId(m.getExternalId())
-                    .electionCode(ELECTION_CODE)
-                    .personalVotes(c.votes())
-                    .mandateType(c.mandateType())
-                    .districtNumber(c.districtNumber())
-                    .partyName(c.partyName())
-                    .ballotNumber(c.registrationNumber())
-                    .importedAt(now)
-                    .build());
-            matched++;
+        Set<String> claimed = new HashSet<>();    // one row per member; the elected pass wins
+        int elected = 0, substitutes = 0;
+
+        // Two passes so a directly-elected mandate always beats a same-surname substitute record.
+        for (boolean electedPass : new boolean[]{true, false}) {
+            for (ElectionCandidateDto c : candidates) {
+                if (c.elected() != electedPass) continue;
+                PlenaryMember m = matchMember(c, exact, bySurname);
+                if (m == null) continue;
+                // A losing candidate matters only if they are currently seated (i.e. a substitute).
+                if (!c.elected() && !m.isActive()) continue;
+                if (!claimed.add(m.getExternalId())) continue;
+                repo.save(ElectionResult.builder()
+                        .memberExternalId(m.getExternalId())
+                        .electionCode(ELECTION_CODE)
+                        .personalVotes(c.votes())
+                        .mandateType(c.elected() ? c.mandateType() : SUBSTITUTE_MANDATE)
+                        .districtNumber(c.districtNumber())
+                        .partyName(c.partyName())
+                        .ballotNumber(c.registrationNumber())
+                        .importedAt(now)
+                        .build());
+                if (c.elected()) elected++; else substitutes++;
+            }
         }
-        log.info("Election import {}: {} elected candidates, {} matched to seated MPs, {} unmatched (elected but not currently in the member table)",
-                ELECTION_CODE, electedTotal, matched, unmatched);
-        return matched;
+        log.info("Election import {}: {} elected + {} seated substitutes matched to members",
+                ELECTION_CODE, elected, substitutes);
+        return elected + substitutes;
+    }
+
+    /** Exact name match, else surname + first-name token overlap when unambiguous (one member). */
+    static PlenaryMember matchMember(ElectionCandidateDto c,
+                                     Map<String, PlenaryMember> exact,
+                                     Map<String, List<PlenaryMember>> bySurname) {
+        PlenaryMember m = exact.get(nameKey(c.forename(), c.surname()));
+        if (m != null) return m;
+        List<PlenaryMember> sameSurname = bySurname.get(norm(c.surname()));
+        if (sameSurname == null) return null;
+        Set<String> candTokens = tokens(c.forename());
+        List<PlenaryMember> hits = sameSurname.stream()
+                .filter(pm -> !Collections.disjoint(tokens(pm.getFirstName()), candTokens))
+                .toList();
+        return hits.size() == 1 ? hits.get(0) : null;
+    }
+
+    private static Set<String> tokens(String name) {
+        Set<String> out = new HashSet<>();
+        if (name == null) return out;
+        for (String p : name.replace('-', ' ').trim().toLowerCase(Locale.ROOT).split("\\s+")) {
+            if (!p.isEmpty()) out.add(p);
+        }
+        return out;
+    }
+
+    private static String norm(String s) {
+        return s == null ? "" : s.trim().toLowerCase(Locale.ROOT);
     }
 
     /**
