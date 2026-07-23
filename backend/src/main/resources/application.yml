@@ -25,6 +25,9 @@ spring:
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
+      # Batch lazy to-one/collection loads so e.g. the votes list resolves bill titles
+      # for a whole page in one IN-query instead of N per-row selects.
+      hibernate.default_batch_fetch_size: 100
   flyway:
     enabled: true
     baseline-on-migrate: true

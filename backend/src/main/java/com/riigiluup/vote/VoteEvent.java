@@ -70,9 +70,6 @@ public class VoteEvent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "legislative_item_id")
-    // Batch lazy loads so the votes list (native richSearch can't @EntityGraph) resolves
-    // bill titles for a whole page in one IN-query instead of N per-row selects.
-    @org.hibernate.annotations.BatchSize(size = 200)
     private com.riigiluup.legislation.LegislativeItem legislativeItem;
 
     @Column(name = "imported_at", nullable = false)
