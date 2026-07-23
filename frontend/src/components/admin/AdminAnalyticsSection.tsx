@@ -42,11 +42,45 @@ function StatTile({ label, value, delta, accent }: {
   );
 }
 
+/** Umami returns only buckets that have events; zero-fill the whole window so a single
+ *  active day/hour renders as one bar among many rather than one full-width block. */
+function fillBuckets(data: AdminAnalytics["series"], range: Range): AdminAnalytics["series"] {
+  const now = new Date();
+  const keys: { key: string; iso: string }[] = [];
+  const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  const hourKey = (d: Date) => `${dayKey(d)}-${d.getHours()}`;
+  if (range === "24h") {
+    for (let i = 23; i >= 0; i--) {
+      const d = new Date(now); d.setMinutes(0, 0, 0); d.setHours(d.getHours() - i);
+      keys.push({ key: hourKey(d), iso: d.toISOString() });
+    }
+  } else {
+    const days = range === "30d" ? 30 : 7;
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i);
+      keys.push({ key: dayKey(d), iso: d.toISOString() });
+    }
+  }
+  const agg = new Map<string, { pv: number; s: number }>();
+  for (const p of data) {
+    const d = new Date(p.t.includes("T") ? p.t : p.t.replace(" ", "T"));
+    if (isNaN(d.getTime())) continue;
+    const k = range === "24h" ? hourKey(d) : dayKey(d);
+    const cur = agg.get(k) ?? { pv: 0, s: 0 };
+    cur.pv += p.pageviews; cur.s += p.sessions;
+    agg.set(k, cur);
+  }
+  return keys.map(({ key, iso }) => ({
+    t: iso, pageviews: agg.get(key)?.pv ?? 0, sessions: agg.get(key)?.s ?? 0,
+  }));
+}
+
 /** Bars = pageviews, overlaid line = visits (sessions). One shared count axis. */
-function TrendChart({ data, range }: { data: AdminAnalytics["series"]; range: Range }) {
+function TrendChart({ data: raw, range }: { data: AdminAnalytics["series"]; range: Range }) {
   const { t } = useTranslation();
   const [hover, setHover] = useState<number | null>(null);
-  if (!data.length) return <div className="text-muted font-mono text-sm py-8 text-center">{t("viz.noData")}</div>;
+  const data = useMemo(() => fillBuckets(raw, range), [raw, range]);
+  if (!raw.length) return <div className="text-muted font-mono text-sm py-8 text-center">{t("viz.noData")}</div>;
 
   const W = 720, H = 200, padL = 8, padR = 8, padT = 16, padB = 22;
   const iw = W - padL - padR, ih = H - padT - padB;

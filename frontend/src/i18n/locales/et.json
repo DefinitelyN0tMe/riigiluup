@@ -1285,8 +1285,10 @@
   "privacy": {
     "title": "Privaatsus",
     "aboutVisitorsHeading": "Mida Riigiluup salvestab külastajate kohta",
-    "aboutVisitors": "Midagi teie isikuga seotut. Sisselogimist pole, jälitusküpsiseid pole, analüütikaplatvormi pole, reklaami pole.",
+    "aboutVisitors": "Midagi teie isikuga seotut. Sisselogimist pole, jälitusküpsiseid pole, reklaami pole ega kolmandate osapoolte jälgijaid. Analüütika on ainult meie enda, privaatne: ilma küpsiste ja isikuandmeteta (täpsemalt allpool).",
     "logs": "Nginxi pöördproxy kirjutab tavapäraseid HTTP-juurdepääsu logisid (IP-aadress, päringu URL, kasutajaagent, ajatempel) töötluse eesmärkidel. Logisid säilitatakse kuni 30 päeva ja seejärel rotateeritakse.",
+    "analyticsHeading": "Analüütika",
+    "analyticsBody": "Külastatavuse mõistmiseks kasutame Umamit — avatud lähtekoodiga analüütikat, mis töötab meie enda serveris. See ei kasuta küpsiseid ega jälgi teid saitide vahel. IP-aadressi ei salvestata — seda kasutatakse üksnes hetkeliselt, et lugeda unikaalseid külastusi ja tuvastada riik. Kogutakse ainult anonüümseid koondnäitajaid: külastatud lehed, viitaja, brauseri ja seadme tüüp, riik ja keel. Andmed ei lahku kunagi meie serverist ega jagata kolmandatele osapooltele. Kui teie brauser saadab Do Not Track signaali, siis teie külastusi ei arvestata üldse.",
     "aboutMpsHeading": "Mida Riigiluup saadikute kohta avaldab",
     "aboutMps": "Ainult seda, mis on juba Riigikogu kaudu avalik: nimi, erakond, fraktsioon, valimisringkond, komisjonide liikmelisus, hääletused, kõnede arv ja saadiku enda või Riigikogu kantselei hallatav elulugu.",
     "notPublishedLine": "Ei avaldata:",

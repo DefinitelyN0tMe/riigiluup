@@ -1285,8 +1285,10 @@
   "privacy": {
     "title": "Privacy",
     "aboutVisitorsHeading": "What Riigiluup stores about visitors",
-    "aboutVisitors": "Nothing linked to your identity. There is no login, no cookies for tracking, no analytics platform, no advertising.",
+    "aboutVisitors": "Nothing linked to your identity. There is no login, no tracking cookies, no advertising and no third-party trackers. Analytics is our own, privacy-first: no cookies and no personal data (details below).",
     "logs": "The Nginx reverse proxy writes standard HTTP access logs (IP address, request URL, user-agent, timestamp) for operational reasons. Logs are retained for up to 30 days and then rotated out.",
+    "analyticsHeading": "Analytics",
+    "analyticsBody": "To understand traffic we use Umami — open-source analytics running on our own server. It sets no cookies and does not track you across sites. Your IP address is not stored — it is used only momentarily to count unique visits and derive a country. Only anonymous aggregates are collected: pages visited, referrer, browser and device type, country and language. The data never leaves our server and is never shared with third parties. If your browser sends the Do Not Track signal, your visits are not counted at all.",
     "aboutMpsHeading": "What Riigiluup publishes about MPs",
     "aboutMps": "Only what is already a matter of public record via the Riigikogu: name, party, faction, electoral district, committee memberships, votes, speeches count, and the biography maintained by the MP or the Riigikogu chancellery.",
     "notPublishedLine": "Not published:",

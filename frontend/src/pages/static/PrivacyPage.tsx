@@ -8,6 +8,8 @@ export default function PrivacyPage() {
       <h2>{t("privacy.aboutVisitorsHeading")}</h2>
       <p>{t("privacy.aboutVisitors")}</p>
       <p>{t("privacy.logs")}</p>
+      <h2>{t("privacy.analyticsHeading")}</h2>
+      <p>{t("privacy.analyticsBody")}</p>
       <h2>{t("privacy.aboutMpsHeading")}</h2>
       <p>{t("privacy.aboutMps")}</p>
       <p>{t("privacy.notPublishedLine")}</p>
