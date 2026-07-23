@@ -37,9 +37,10 @@ function Hero({ syncedAt }: { syncedAt: string | null }) {
   return (
     <section className="relative bg-blue text-white overflow-hidden isolate px-5 sm:px-8 md:px-10 pt-8 sm:pt-12 pb-12 sm:pb-16 md:pb-20">
       <div className="grain" />
+      {/* Faint background numeral = the 101 seats of the Riigikogu (chamber size). */}
       <div aria-hidden className="hidden sm:block absolute right-[-40px] sm:right-[-60px] top-4 font-serif italic font-light leading-[0.8] tracking-[-0.05em] text-white/[0.05] pointer-events-none select-none z-0"
            style={{ fontSize: "clamp(280px, 40vw, 620px)" }}>
-        104
+        101
       </div>
       <div aria-hidden className="hidden md:block absolute right-[-160px] bottom-[-260px] w-[720px] h-[720px] border border-white/16 rounded-full z-[1] pointer-events-none">
         <div className="absolute inset-[60px] border border-dashed border-white/12 rounded-full" />
