@@ -61,7 +61,11 @@ public class RiigikoguClient {
 
     /** Nanos of the last outbound request; -1 = never. Guarded via synchronized on {@link #throttle()}. */
     private long lastRequestNanos = -1L;
-    private static final long MIN_INTERVAL_NANOS = 1_050_000_000L; // 1.05 s = ~0.95 rps, safely under Riigikogu's 1 rps
+    // 1.6 s ≈ 0.62 rps. Measured 2026-07-23: api.riigikogu.ee 429s bursts even at ~1 rps spacing
+    // (a list call followed 1.05 s later by the first detail call reliably tripped it and failed the
+    // whole 6-hourly refresh), while ≥2 s spacing was consistently clean. 1.6 s keeps real margin;
+    // a transient 429 that still slips through is now retried with backoff (see application.yml).
+    private static final long MIN_INTERVAL_NANOS = 1_600_000_000L;
 
     /**
      * Deficit-based single-token throttle, called at the top of every network method so that

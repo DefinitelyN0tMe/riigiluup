@@ -68,17 +68,19 @@ resilience4j:
     instances:
       riigikogu:
         maxAttempts: 3
-        waitDuration: 1s
+        waitDuration: 2s
         enableExponentialBackoff: true
         exponentialBackoffMultiplier: 2.0
         retryExceptions:
           - org.springframework.web.client.HttpServerErrorException
           - org.springframework.web.client.ResourceAccessException
           - java.io.IOException
-        # NOTE: HttpClientErrorException$TooManyRequests intentionally NOT retried.
-        # Retrying on 429 during a batch backfill turns one failure into 3 API hits
-        # in 7 seconds, which typically extends nginx's rolling window and keeps us
-        # rate-limited longer. Better to skip the item (log WARN) and continue.
+          # 429 (rate limited) IS now retried, with backoff (2s → 4s between attempts, on top of the
+          # client's 1.6s throttle). Measured 2026-07-23: the source 429s bursts even near 1 rps, and
+          # a single 429 on a detail call was failing the entire 6-hourly votes refresh. Retrying with
+          # a real wait *spaces requests out* rather than hammering, so the earlier "amplifies load"
+          # concern doesn't apply — and 429s are now rare given the widened throttle.
+          - org.springframework.web.client.HttpClientErrorException$TooManyRequests
         retryOnResultPredicate: com.riigiluup.ingestion.riigikogu.Retry429Predicate
   circuitbreaker:
     instances:
