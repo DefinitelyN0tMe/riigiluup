@@ -7,5 +7,6 @@ public record DataStatusDto(
         String jobName,
         Instant lastRunAt,
         String lastRunStatus,
-        int lastRunRecords
+        int lastRunRecords,
+        String cadence   // "DAILY" | "SIX_HOURLY" — drives the freshness badge's cadence label
 ) {}

@@ -950,7 +950,11 @@
     "lastSync": "Viimane sünkroonimine:",
     "recordsCount_one": "{{count}} kirje",
     "recordsCount_other": "{{count}} kirjet",
-    "cadence": "iga 6h"
+    "cadence": {
+      "SIX_HOURLY": "iga 6 t",
+      "DAILY": "iga päev, ~04:30",
+      "GENERIC": "ajakava järgi"
+    }
   },
   "admin": {
     "title": "Admin",

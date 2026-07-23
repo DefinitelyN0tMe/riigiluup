@@ -89,7 +89,7 @@ export default function LegislationPage() {
           <h1 className="font-display font-bold h-display-lg">
             {t("legislation.title")}
           </h1>
-          <DataFreshnessBadge />
+          <DataFreshnessBadge job="legislation.window-refresh" />
         </div>
       </div>
 

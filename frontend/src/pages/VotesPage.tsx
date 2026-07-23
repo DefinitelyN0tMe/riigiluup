@@ -107,7 +107,7 @@ export default function VotesPage() {
           <h1 className="font-display font-bold h-display-lg">
             {t("votes.title")}
           </h1>
-          <DataFreshnessBadge />
+          <DataFreshnessBadge job="votes.window-refresh" />
         </div>
       </div>
 

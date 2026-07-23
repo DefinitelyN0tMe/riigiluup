@@ -950,7 +950,11 @@
     "lastSync": "Last sync:",
     "recordsCount_one": "{{count}} record",
     "recordsCount_other": "{{count}} records",
-    "cadence": "every 6h"
+    "cadence": {
+      "SIX_HOURLY": "every 6h",
+      "DAILY": "daily, ~04:30",
+      "GENERIC": "on schedule"
+    }
   },
   "admin": {
     "title": "Admin",

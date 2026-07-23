@@ -101,7 +101,7 @@ export default function PoliticiansPage() {
           <h1 className="font-display font-bold h-display-lg">
             {t("politicians.title")}
           </h1>
-          <DataFreshnessBadge />
+          <DataFreshnessBadge job="plenary-members.full-refresh" />
         </div>
       </div>
 

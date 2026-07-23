@@ -992,7 +992,11 @@
     "recordsCount_few": "{{count}} записи",
     "recordsCount_many": "{{count}} записей",
     "recordsCount_other": "{{count}} записи",
-    "cadence": "каждые 6ч"
+    "cadence": {
+      "SIX_HOURLY": "каждые 6 ч",
+      "DAILY": "ежедневно, ~04:30",
+      "GENERIC": "по расписанию"
+    }
   },
   "admin": {
     "title": "Админка",

@@ -26,6 +26,7 @@ export type DataStatus = {
   lastRunAt: string | null;
   lastRunStatus: string;
   lastRunRecords: number;
+  cadence: "DAILY" | "SIX_HOURLY" | string;
 };
 
 export type Faction = { externalId: string; name: string };
