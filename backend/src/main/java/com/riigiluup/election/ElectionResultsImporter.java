@@ -91,7 +91,7 @@ public class ElectionResultsImporter {
 
     /** Substitute members (asendusliige) enter mid-term when an elected MP resigns/becomes a
      *  minister; they ran but were not directly elected, so they carry this pseudo mandate type. */
-    static final String SUBSTITUTE_MANDATE = "SUBSTITUTE";
+    public static final String SUBSTITUTE_MANDATE = "SUBSTITUTE";
 
     private int replaceAll(List<ElectionCandidateDto> candidates) {
         List<PlenaryMember> members = memberRepo.findAll();
