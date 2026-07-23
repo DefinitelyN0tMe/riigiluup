@@ -58,7 +58,8 @@ services:
       - api
 
   # Privacy-first analytics (no cookies, no personal data, self-hosted). Reuses the
-  # existing Postgres (separate `umami` database) and is served under /stats via nginx.
+  # existing Postgres (separate `umami` database) and is served on its own origin,
+  # analytics.<domain>, via nginx (the prebuilt image only serves from the root path).
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
     restart: unless-stopped
@@ -72,7 +73,6 @@ services:
       DATABASE_TYPE: postgresql
       DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD}@db:5432/umami
       APP_SECRET: ${UMAMI_APP_SECRET}
-      BASE_PATH: /stats
     depends_on:
       db:
         condition: service_healthy
