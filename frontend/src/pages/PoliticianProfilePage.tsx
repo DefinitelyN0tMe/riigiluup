@@ -437,9 +437,9 @@ export default function PoliticianProfilePage() {
                           <span className="text-slate-500 block text-xs">{when}</span>
                         </span>
                         <span className="shrink-0 text-xs text-slate-500 text-right">
-                          {t("profile.mpChoice")}: <span className="font-medium text-ink">{d.memberChoice ?? "—"}</span>
+                          {t("profile.mpChoice")}: <span className="font-medium text-ink">{d.memberChoice ? t(`choice.${d.memberChoice}`, { defaultValue: d.memberChoice }) : "—"}</span>
                           <br />
-                          {t("profile.factionChoice")}: <span className="font-medium text-ink">{d.factionMajorityChoice ?? "—"}</span>
+                          {t("profile.factionChoice")}: <span className="font-medium text-ink">{d.factionMajorityChoice ? t(`choice.${d.factionMajorityChoice}`, { defaultValue: d.factionMajorityChoice }) : "—"}</span>
                         </span>
                       </li>
                     );
