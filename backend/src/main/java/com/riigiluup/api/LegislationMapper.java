@@ -71,7 +71,9 @@ public class LegislationMapper {
                         v.getId(), v.getVotingNumber(),
                         v.getType() == null ? null : v.getType().name(),
                         v.getDescription(), v.getStartedAt(),
-                        v.getResultInFavor(), v.getResultAgainst(), v.getResultAbstained())).toList()
+                        // Real abstentions (neutral); resultAbstained is an overlapping source
+                        // total (did-not-vote + absent) — see frontend lib/voteTally.
+                        v.getResultInFavor(), v.getResultAgainst(), v.getResultNeutral())).toList()
         );
     }
 

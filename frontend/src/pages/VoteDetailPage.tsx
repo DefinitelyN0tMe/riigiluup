@@ -6,6 +6,7 @@ import VoteResultBar from "../components/VoteResultBar";
 import LoadFailed from "../components/LoadFailed";
 import VoteDefectorsPanel from "../components/analytics/VoteDefectorsPanel";
 import { formatDateTime } from "../lib/formatDate";
+import { voteTally } from "../lib/voteTally";
 
 const CHOICE_CLASS: Record<string, string> = {
   FOR: "text-estonia",
@@ -33,7 +34,8 @@ export default function VoteDetailPage() {
   const when = formatDateTime(data.startedAt);
   const typeLabel = t(`voteType.${data.type}` as const, { defaultValue: data.type });
 
-  const total = data.resultInFavor + data.resultAgainst + data.resultAbstained + data.resultPresent + data.resultAbsent;
+  const tally = voteTally(data);
+  const total = tally.inFavor + tally.against + tally.abstained + tally.didNotVote + tally.absent;
   const quorum = 51;
   const margin = data.resultInFavor - data.resultAgainst;
   const marginPct = total ? (margin / total) * 100 : 0;
@@ -73,13 +75,7 @@ export default function VoteDetailPage() {
 
       <section aria-label={t("a11y.result")} className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 items-start">
         <div>
-          <VoteResultBar
-            inFavor={data.resultInFavor}
-            against={data.resultAgainst}
-            abstained={data.resultAbstained}
-            didNotVote={data.resultPresent}
-            absent={data.resultAbsent}
-          />
+          <VoteResultBar {...tally} />
         </div>
         {data.type === "OPEN" && total > 0 && (
           <div className={`p-5 rounded-[20px] border ${tight ? "border-hot bg-hot/5" : "border-rule bg-white"}`}>

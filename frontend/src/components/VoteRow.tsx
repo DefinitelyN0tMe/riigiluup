@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { VoteListItem } from "../types";
 import VoteResultBar from "./VoteResultBar";
 import { formatDateTime } from "../lib/formatDate";
+import { voteTally } from "../lib/voteTally";
 
 const SHORT_TYPE_KEY: Record<VoteListItem["type"], string> = {
   OPEN: "voteType.OPEN",
@@ -33,13 +34,7 @@ export default function VoteRow({ v }: { v: VoteListItem }) {
         </div>
         <span className="font-mono text-[11px] font-bold text-blue shrink-0">#{v.votingNumber ?? "—"}</span>
       </div>
-      <VoteResultBar
-        inFavor={v.resultInFavor}
-        against={v.resultAgainst}
-        abstained={v.resultAbstained}
-        didNotVote={v.resultPresent}
-        absent={v.resultAbsent}
-      />
+      <VoteResultBar {...voteTally(v)} />
     </Link>
   );
 }

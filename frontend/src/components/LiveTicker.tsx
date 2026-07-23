@@ -8,7 +8,9 @@ type TickerItem = { id: string; title: string; result: string; up: boolean };
 
 function toTickerItem(v: VoteListItem): TickerItem {
   const id = v.votingNumber != null ? `#${v.votingNumber}` : `#${v.externalId}`;
-  const result = `${v.resultInFavor} / ${v.resultAgainst} / ${v.resultAbstained}`;
+  // for / against / abstained — use the real abstentions (resultNeutral); resultAbstained is an
+  // overlapping source total (did-not-vote + absent), see lib/voteTally.
+  const result = `${v.resultInFavor} / ${v.resultAgainst} / ${v.resultNeutral}`;
   return {
     id,
     title: v.description ?? "—",

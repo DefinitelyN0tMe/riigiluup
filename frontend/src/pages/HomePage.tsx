@@ -8,6 +8,7 @@ import { fetchLegislation } from "../api/legislation";
 import { fetchHomeSummary } from "../api/home";
 import { resolveMediaUrl } from "../api/client";
 import { formatDateTime } from "../lib/formatDate";
+import { voteTally } from "../lib/voteTally";
 import Sparkline from "../components/Sparkline";
 import PartyDonut from "../components/PartyDonut";
 import SectionHead from "../components/SectionHead";
@@ -182,7 +183,8 @@ function isLiveVote(v: VoteListItem): boolean {
 }
 function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
   const { t } = useTranslation();
-  const total = v.resultInFavor + v.resultAgainst + v.resultAbstained + v.resultPresent + v.resultAbsent;
+  const tally = voteTally(v);
+  const total = tally.inFavor + tally.against + tally.abstained + tally.didNotVote + tally.absent;
   const pct = (n: number) => (total ? (n / total) * 100 : 0);
   const when = v.startedAt ? formatDateTime(v.startedAt, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
   const typeLabel = live
@@ -211,18 +213,18 @@ function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
       </div>
       <div className="flex flex-col gap-2">
         <div className="relative flex h-3.5 rounded-lg overflow-hidden bg-[#F1F0EA]">
-          {v.resultInFavor > 0 && <div className="bg-blue" style={{ width: `${pct(v.resultInFavor)}%` }} />}
-          {v.resultAgainst > 0 && <div className="bg-hot" style={{ width: `${pct(v.resultAgainst)}%` }} />}
-          {v.resultAbstained > 0 && <div className="bg-ink" style={{ width: `${pct(v.resultAbstained)}%` }} />}
-          {v.resultPresent > 0 && <div className="bg-blue-deep" style={{ width: `${pct(v.resultPresent)}%` }} />}
-          {v.resultAbsent > 0 && <div className="bg-[#D8D6CB]" style={{ width: `${pct(v.resultAbsent)}%` }} />}
+          {tally.inFavor > 0 && <div className="bg-blue" style={{ width: `${pct(tally.inFavor)}%` }} />}
+          {tally.against > 0 && <div className="bg-hot" style={{ width: `${pct(tally.against)}%` }} />}
+          {tally.abstained > 0 && <div className="bg-ink" style={{ width: `${pct(tally.abstained)}%` }} />}
+          {tally.didNotVote > 0 && <div className="bg-blue-deep" style={{ width: `${pct(tally.didNotVote)}%` }} />}
+          {tally.absent > 0 && <div className="bg-[#D8D6CB]" style={{ width: `${pct(tally.absent)}%` }} />}
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3 justify-between font-mono text-[10px] tracking-[0.06em] text-muted">
-          {v.resultInFavor > 0 && <span><b className="text-ink font-bold mr-1">{v.resultInFavor}</b>{t("viz.highlights.for")}</span>}
-          {v.resultAgainst > 0 && <span><b className="text-ink font-bold mr-1">{v.resultAgainst}</b>{t("viz.highlights.against")}</span>}
-          {v.resultAbstained > 0 && <span><b className="text-ink font-bold mr-1">{v.resultAbstained}</b>{t("choice.ABSTAINED").toLowerCase()}</span>}
-          {v.resultPresent > 0 && <span><b className="text-ink font-bold mr-1">{v.resultPresent}</b>{t("choice.PRESENT").toLowerCase()}</span>}
-          {v.resultAbsent > 0 && <span><b className="text-ink font-bold mr-1">{v.resultAbsent}</b>{t("choice.ABSENT").toLowerCase()}</span>}
+          {tally.inFavor > 0 && <span><b className="text-ink font-bold mr-1">{tally.inFavor}</b>{t("viz.highlights.for")}</span>}
+          {tally.against > 0 && <span><b className="text-ink font-bold mr-1">{tally.against}</b>{t("viz.highlights.against")}</span>}
+          {tally.abstained > 0 && <span><b className="text-ink font-bold mr-1">{tally.abstained}</b>{t("choice.ABSTAINED").toLowerCase()}</span>}
+          {tally.didNotVote > 0 && <span><b className="text-ink font-bold mr-1">{tally.didNotVote}</b>{t("choice.DID_NOT_VOTE").toLowerCase()}</span>}
+          {tally.absent > 0 && <span><b className="text-ink font-bold mr-1">{tally.absent}</b>{t("choice.ABSENT").toLowerCase()}</span>}
         </div>
       </div>
       <div className="md:justify-self-end">
