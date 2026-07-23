@@ -74,10 +74,12 @@
       "billsHint": "menetluses",
       "syncLabel": "SÜNK",
       "syncHint": "viimasest",
-      "delta1": "↑ 100% osalus 5 istungil",
-      "delta2": "↑ +142 sel nädalal",
-      "delta3": "↓ 6 menetlusest välja",
-      "delta4": "↺ järgmine sünk 00:14"
+      "mpsDelta": "↑ {{count}} fraktsiooni",
+      "votesDelta": "↑ +{{count}} sel nädalal",
+      "votesDeltaQuiet": "○ sel nädalal uusi pole",
+      "billsDelta": "↳ {{count}} menetluses",
+      "nextSync": "↺ järgmine sünk {{time}}",
+      "nextSyncUnknown": "↺ sünk ajakava järgi"
     },
     "nowVoting": {
       "kicker": "Möödunud istung · 01. juuni 2026",

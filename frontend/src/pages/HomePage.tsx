@@ -5,13 +5,14 @@ import { useTranslation } from "react-i18next";
 import { fetchPoliticians, fetchDataStatus, fetchFactions } from "../api/politicians";
 import { fetchVotes } from "../api/votes";
 import { fetchLegislation } from "../api/legislation";
+import { fetchHomeSummary } from "../api/home";
 import { resolveMediaUrl } from "../api/client";
 import { formatDateTime } from "../lib/formatDate";
 import Sparkline from "../components/Sparkline";
 import PartyDonut from "../components/PartyDonut";
 import SectionHead from "../components/SectionHead";
 import MarqueeStrip from "../components/MarqueeStrip";
-import type { Politician, VoteListItem } from "../types";
+import type { HomeSummary, Politician, VoteListItem } from "../types";
 
 const PARTY_COLOR: Record<string, string> = {
   "Eesti Reformierakonna fraktsioon": "#0072CE",
@@ -111,26 +112,61 @@ function StatTile({
     </Link>
   );
 }
-function StatsStrip({ mpTotal, voteTotal, billTotal }: { mpTotal?: number; voteTotal?: number; billTotal?: number }) {
+/** Time elapsed since the last sync, as a number + unit (matches the tile's "6h" styling). */
+function sinceSync(iso?: string | null): { n: number; unit: string } | null {
+  if (!iso) return null;
+  const ms = Date.now() - new Date(iso).getTime();
+  if (isNaN(ms)) return null;
+  const c = Math.max(0, ms);
+  const h = Math.floor(c / 3_600_000);
+  if (h < 1) return { n: Math.max(1, Math.floor(c / 60_000)), unit: "m" };
+  if (h < 48) return { n: h, unit: "h" };
+  return { n: Math.floor(h / 24), unit: "d" };
+}
+const tallinnHM = new Intl.DateTimeFormat("et-EE", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Tallinn" });
+
+function StatsStrip({ mpTotal, voteTotal, billTotal, summary, factionCount }: {
+  mpTotal?: number; voteTotal?: number; billTotal?: number;
+  summary?: HomeSummary; factionCount?: number;
+}) {
   const { t } = useTranslation();
-  const spark1 = [24,20,26,18,22,14,20,10,15,8,14,6,12,4,10,6,3,7];
-  const spark2 = [12,15,10,18,14,20,16,22,18,14,20,12,16,10,14,12];
-  const spark3 = [20,14,22,10,18,12,20,6,18,4,20,10,14,6,10,4,8];
+  // Placeholder sparklines shown only until the live series arrives (avoids layout shift).
+  const loadSpark1 = [24,20,26,18,22,14,20,10,15,8,14,6,12,4,10,6,3,7];
+  const loadSpark2 = [12,15,10,18,14,20,16,22,18,14,20,12,16,10,14,12];
+
+  const since = sinceSync(summary?.lastSyncAt);
+  const nextSyncLabel = summary
+    ? (summary.nextSyncAt
+        ? t("homePage.stats.nextSync", { time: tallinnHM.format(new Date(summary.nextSyncAt)) })
+        : t("homePage.stats.nextSyncUnknown"))
+    : "";
+  const votesDelta = summary
+    ? (summary.votesThisWeek > 0
+        ? t("homePage.stats.votesDelta", { count: summary.votesThisWeek })
+        : t("homePage.stats.votesDeltaQuiet"))
+    : "";
+  const billsDelta = summary ? t("homePage.stats.billsDelta", { count: summary.billsInProgress }) : "";
+  const mpsDelta = factionCount ? t("homePage.stats.mpsDelta", { count: factionCount }) : "";
+  const votesSpark = summary?.votesPerDay?.length ? summary.votesPerDay : loadSpark1;
+  const billsSpark = summary?.billsPerWeek?.length ? summary.billsPerWeek : loadSpark2;
+
   return (
     <section className="bg-ink text-white px-5 sm:px-8 md:px-10 py-8 sm:py-10 md:py-11 border-b border-white/[0.06] relative overflow-hidden">
       <div aria-hidden className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:25%_100%] hidden sm:block" />
       <div className="relative grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
         <StatTile to="/politicians" label={t("homePage.stats.mpsLabel")} hint={t("homePage.stats.mpsHint")}
-                  value={mpTotal ?? "—"} delta={t("homePage.stats.delta1")} />
+                  value={mpTotal ?? "—"} delta={mpsDelta} />
         <StatTile to="/votes" label={t("homePage.stats.votesLabel")} hint={t("homePage.stats.votesHint")}
                   value={voteTotal ?? "—"}
-                  spark={spark1} sparkFilled delta={t("homePage.stats.delta2")} />
+                  spark={votesSpark} sparkFilled delta={votesDelta} />
         <StatTile to="/legislation" label={t("homePage.stats.billsLabel")} hint={t("homePage.stats.billsHint")}
-                  value={billTotal ?? "—"} spark={spark2} delta={t("homePage.stats.delta3")} deltaTone="hot" />
+                  value={billTotal ?? "—"} spark={billsSpark} delta={billsDelta} deltaTone="hot" />
         <StatTile to="/data-status" label={t("homePage.stats.syncLabel")} hint={t("homePage.stats.syncHint")}
-                  value={<><span className="text-blue-glow font-bold not-italic">6</span>
-                          <span className="font-serif italic font-light text-blue-glow text-[30px] sm:text-[38px] ml-1">h</span></>}
-                  spark={spark3} delta={t("homePage.stats.delta4")} deltaTone="muted" />
+                  value={since
+                    ? <><span className="text-blue-glow font-bold not-italic">{since.n}</span>
+                        <span className="font-serif italic font-light text-blue-glow text-[30px] sm:text-[38px] ml-1">{since.unit}</span></>
+                    : <span className="text-blue-glow">—</span>}
+                  spark={votesSpark} delta={nextSyncLabel} deltaTone="muted" />
       </div>
     </section>
   );
@@ -309,6 +345,7 @@ export default function HomePage() {
     queryFn: () => fetchLegislation({ page: 0, size: 1 }),
   });
   const factions = useQuery({ queryKey: ["factions"], queryFn: fetchFactions });
+  const homeSummary = useQuery({ queryKey: ["home-summary"], queryFn: fetchHomeSummary });
 
   const first = status.data?.[0];
   const syncedAt = first?.lastRunAt
@@ -343,6 +380,8 @@ export default function HomePage() {
         mpTotal={politicians.data?.totalElements}
         voteTotal={votes.data?.totalElements}
         billTotal={legislation.data?.totalElements}
+        summary={homeSummary.data}
+        factionCount={factions.data?.length}
       />
       <MarqueeStrip />
 

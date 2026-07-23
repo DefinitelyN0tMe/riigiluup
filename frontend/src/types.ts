@@ -311,6 +311,15 @@ export type PoliticianLegislationResponse = {
   items: PageResponse<LegislationListItem>;
 };
 
+export type HomeSummary = {
+  lastSyncAt: string | null;
+  nextSyncAt: string | null;
+  votesThisWeek: number;
+  billsInProgress: number;
+  votesPerDay: number[];
+  billsPerWeek: number[];
+};
+
 export type AdminAnalyticsMetric = { value: number; prev: number };
 export type AdminAnalyticsPoint = { t: string; pageviews: number; sessions: number };
 export type AdminAnalyticsItem = { label: string; count: number };

@@ -6,12 +6,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface LegislativeItemRepository extends JpaRepository<LegislativeItem, UUID> {
 
     Optional<LegislativeItem> findBySourceNameAndExternalId(String sourceName, String externalId);
+
+    /** Bills still under proceeding (not yet adopted/rejected/withdrawn) — homepage "in progress" delta. */
+    long countByPhaseIn(Collection<LegislationPhase> phases);
 
     /**
      * Adopted laws (SE only — Riigikogu decisions publish in RT III with a different id

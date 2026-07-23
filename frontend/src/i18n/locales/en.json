@@ -74,10 +74,12 @@
       "billsHint": "in progress",
       "syncLabel": "SYNC",
       "syncHint": "since last",
-      "delta1": "↑ 100% attendance in 5 sittings",
-      "delta2": "↑ +142 this week",
-      "delta3": "↓ 6 withdrawn from process",
-      "delta4": "↺ next sync 00:14"
+      "mpsDelta": "↑ {{count}} factions",
+      "votesDelta": "↑ +{{count}} this week",
+      "votesDeltaQuiet": "○ none new this week",
+      "billsDelta": "↳ {{count}} in progress",
+      "nextSync": "↺ next sync {{time}}",
+      "nextSyncUnknown": "↺ sync on schedule"
     },
     "nowVoting": {
       "kicker": "Last sitting · 01 June 2026",

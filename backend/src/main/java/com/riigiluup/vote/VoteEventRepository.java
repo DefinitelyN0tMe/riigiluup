@@ -15,6 +15,9 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
 
     Optional<VoteEvent> findBySourceNameAndExternalId(String sourceName, String externalId);
 
+    /** Vote events since a given instant — drives the homepage "+N this week" delta. */
+    long countByStartedAtAfter(Instant startedAt);
+
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "legislativeItem")
     @Query("""
         select v from VoteEvent v
