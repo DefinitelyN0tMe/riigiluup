@@ -15,6 +15,7 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
 
     Optional<VoteEvent> findBySourceNameAndExternalId(String sourceName, String externalId);
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "legislativeItem")
     @Query("""
         select v from VoteEvent v
         where (cast(:from as instant) is null or v.startedAt >= :from)

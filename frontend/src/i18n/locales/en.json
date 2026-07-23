@@ -1051,6 +1051,8 @@
     "intro": "Riigiluup is a public, open-source tool that makes the work of the Estonian Riigikogu easier to follow. It aggregates the parliament's own open data — MPs, roll-call votes, and bills — and presents it as neutral profiles, timelines, comparisons, and analytics. It covers the current Riigikogu (2023–2027), with roll-call voting records reaching back to 2019, and every figure links back to the official Riigikogu source.",
     "editorial": "Editorial stance",
     "editorialBody": "The service does not assign ideological labels, moral scores, or rankings — it is a mirror, not an interpreter. It reports factual counts and rates and lets you draw your own conclusions. Where a metric could be misread, we document the formula, what is included, what is excluded, and the known limitations; a figure is never framed as good or bad, only described and linked back so you can check it against the original Riigikogu form.",
+    "funding": "Independence and funding",
+    "fundingBody": "Riigiluup is built and run by one person — its founder — with their own money and time. There is no party, company, grant, or interest group behind it. It is a civic initiative, not a business or a political project. If the funding model ever changes, we will update this section.",
     "whatPublic": "What is public here",
     "list": {
       "members": "Member profiles, faction, committees, electoral district.",

@@ -11,6 +11,7 @@ public record VoteListItemDto(
         String typeSourceCode,
         String description,
         String sittingTitle,
+        String billTitle,
         Instant startedAt,
         int resultInFavor,
         int resultAgainst,

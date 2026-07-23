@@ -21,6 +21,7 @@ public class VoteDetailMapper {
                 v.getTypeSourceCode(),
                 v.getDescription(),
                 v.getSittingTitle(),
+                v.getLegislativeItem() == null ? null : v.getLegislativeItem().getTitle(),
                 v.getStartedAt(),
                 v.getResultInFavor(), v.getResultAgainst(), v.getResultAbstained(),
                 v.getResultNeutral(), v.getResultPresent(), v.getResultAbsent(),

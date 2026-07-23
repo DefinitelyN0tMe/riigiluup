@@ -35,7 +35,7 @@ export default function DisciplineBreakers({ data }: { data: Data }) {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col items-end gap-1 min-w-0">
+              <div className="col-start-2 md:col-start-auto flex flex-col items-end gap-1 min-w-0">
                 <div className="flex items-baseline gap-1.5">
                   <span className="font-display font-bold text-[22px] sm:text-[26px] leading-none tracking-[-0.03em] text-hot">
                     {(it.deviationRate * 100).toFixed(1)}

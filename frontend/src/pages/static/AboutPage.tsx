@@ -9,6 +9,8 @@ export default function AboutPage() {
       <p>{t("about.intro")}</p>
       <h2>{t("about.editorial")}</h2>
       <p>{t("about.editorialBody")}</p>
+      <h2>{t("about.funding")}</h2>
+      <p>{t("about.fundingBody")}</p>
       <h2>{t("about.whatPublic")}</h2>
       <ul>
         <li>{t("about.list.members")}</li>

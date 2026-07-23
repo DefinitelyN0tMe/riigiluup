@@ -135,6 +135,7 @@ export type VoteListItem = {
   typeSourceCode: string | null;
   description: string | null;
   sittingTitle: string | null;
+  billTitle: string | null;
   startedAt: string | null;
   resultInFavor: number;
   resultAgainst: number;

@@ -23,10 +23,11 @@ export default function VoteRow({ v }: { v: VoteListItem }) {
     >
       <div className="flex justify-between items-start gap-3 mb-3">
         <div className="min-w-0">
-          <h2 className="font-display font-bold text-[16px] sm:text-[18px] leading-[1.2] tracking-[-0.02em]">
-            {v.description ?? t("common.noDescription")}
+          <h2 className="font-display font-bold text-[16px] sm:text-[18px] leading-[1.2] tracking-[-0.02em] line-clamp-2">
+            {v.billTitle ?? v.description ?? t("common.noDescription")}
           </h2>
           <p className="font-mono text-[11px] text-muted mt-1 tracking-[0.04em]">
+            {v.billTitle && v.description ? `${v.description} · ` : ""}
             {t(SHORT_TYPE_KEY[v.type], { defaultValue: v.type })} · {when}
           </p>
         </div>

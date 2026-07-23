@@ -1051,6 +1051,8 @@
     "intro": "Riigiluup on avalik, avatud lähtekoodiga tööriist, mis muudab Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi enda avaandmed — saadikud, nimelised hääletused ja eelnõud — ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Kaetud on praegune Riigikogu koosseis (2023–2027) ning nimeliste hääletuste ajalugu ulatub 2019. aastani; iga näitaja viitab ametlikule Riigikogu allikale.",
     "editorial": "Toimetuse hoiak",
     "editorialBody": "Teenus ei omista ideoloogilisi silte, moraalseid hindeid ega edetabeleid — see on peegel, mitte tõlgendaja. See esitab faktilisi arve ja suhtarve ning jätab järeldused teile. Kui näitajat võib valesti mõista, kirjeldame valemit, mis on arvestatud, mis välja jäetud ja teadaolevad piirangud; arvu ei esitata kunagi hea ega halvana — üksnes kirjeldatakse ja lingitakse, et saaksite selle Riigikogu algvormiga võrrelda.",
+    "funding": "Sõltumatus ja rahastus",
+    "fundingBody": "Riigiluubi on loonud ja seda haldab üks inimene — asutaja — oma isiklike vahendite ja ajaga. Projekti taga ei ole ühtki erakonda, ettevõtet, granti ega huvirühma. Tegu on kodanikualgatusega, mitte äri- ega poliitilise projektiga. Kui rahastusmudel peaks kunagi muutuma, uuendame seda osa.",
     "whatPublic": "Mis on siin avalik",
     "list": {
       "members": "Saadikute profiilid, fraktsioon, komisjonid, valimisringkond.",

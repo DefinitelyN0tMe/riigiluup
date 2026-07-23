@@ -37,6 +37,7 @@ public class VoteController {
     private final VoteDetailMapper mapper;
 
     @GetMapping
+    @Transactional(readOnly = true) // keep the session open so the mapper can read each row's bill title
     public PageResponse<VoteListItemDto> list(
             @RequestParam(required = false) LocalDate from,
             @RequestParam(required = false) LocalDate to,
