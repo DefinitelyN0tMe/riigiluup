@@ -173,6 +173,13 @@ function StatsStrip({ mpTotal, voteTotal, billTotal, summary, factionCount }: {
 }
 
 /* ============ VOTE CARD ============ */
+/** "Live" only for a genuinely fresh open vote — within ~8h (covers up to 6h sync lag during a
+ *  sitting) and never during recess, where the newest vote can be weeks old. */
+function isLiveVote(v: VoteListItem): boolean {
+  if (v.type !== "OPEN" || !v.startedAt) return false;
+  const ageMs = Date.now() - new Date(v.startedAt).getTime();
+  return ageMs >= 0 && ageMs < 8 * 3_600_000;
+}
 function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
   const { t } = useTranslation();
   const total = v.resultInFavor + v.resultAgainst + v.resultAbstained + v.resultPresent + v.resultAbsent;
@@ -193,10 +200,11 @@ function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
         </span>
       </div>
       <div className="min-w-0">
-        <h3 className="font-display font-bold text-[18px] sm:text-[20px] md:text-[22px] leading-[1.18] tracking-[-0.02em] mb-1.5 truncate md:whitespace-normal md:overflow-visible">
-          {v.description ?? "—"}
+        <h3 className="font-display font-bold text-[18px] sm:text-[20px] md:text-[22px] leading-[1.18] tracking-[-0.02em] mb-1.5 truncate md:whitespace-normal md:line-clamp-2 md:overflow-visible">
+          {v.billTitle ?? v.description ?? t("common.noDescription")}
         </h3>
         <div className="font-mono text-[10px] sm:text-[11px] text-muted tracking-[0.04em] flex flex-wrap gap-2 sm:gap-3">
+          {v.billTitle && v.description && <span className="text-ink-2">{v.description}</span>}
           <span>{when}</span>
           {v.sittingTitle && <span>· {v.sittingTitle}</span>}
         </div>
@@ -396,7 +404,7 @@ export default function HomePage() {
         {!votes.isLoading && voteItems.length === 0 && <p className="text-muted">{t("homePage.nowVoting.empty")}</p>}
         <div className="flex flex-col gap-3 sm:gap-4">
           {voteItems.map((v, i) => (
-            <VoteRowCard key={v.id} v={v} live={i === 0 && v.type === "OPEN"} />
+            <VoteRowCard key={v.id} v={v} live={i === 0 && isLiveVote(v)} />
           ))}
         </div>
       </section>
