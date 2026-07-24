@@ -22,4 +22,15 @@ public class PhotoUrlRewriter {
         if (uuid.isBlank()) return storedUrl;
         return "/api/v1/files/" + uuid;
     }
+
+    /** The bare Riigikogu file UUID from a stored photo URL, or null if it isn't a file URL. */
+    public String fileUuid(String storedUrl) {
+        if (storedUrl == null || storedUrl.isBlank()) return null;
+        int start = storedUrl.indexOf(FILES_SEGMENT);
+        if (start < 0) return null;
+        String tail = storedUrl.substring(start + FILES_SEGMENT.length());
+        int slash = tail.indexOf('/');
+        String uuid = slash < 0 ? tail : tail.substring(0, slash);
+        return uuid.isBlank() ? null : uuid;
+    }
 }

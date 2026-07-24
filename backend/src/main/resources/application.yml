@@ -131,6 +131,12 @@ riigiluup:
     username: ${UMAMI_ADMIN_USERNAME:admin}
     password: ${UMAMI_ADMIN_PASSWORD:}
     website-id: ${UMAMI_WEBSITE_ID:}
+  files:
+    # Persistent on-disk cache for proxied Riigikogu files (MP portraits). Content is immutable, so
+    # it survives restarts and stops a redeploy from re-fetching every photo behind the source's
+    # ~1 req/s throttle. Empty = in-memory only (dev default); prod sets FILES_CACHE_DIR to a volume.
+    cache-dir: ${FILES_CACHE_DIR:}
+    warm-on-startup: ${FILES_WARM_ON_STARTUP:true}
   wikidata:
     # Wikidata QIDs of Estonian parliamentary parties (+ direct predecessors). Soft allow-list:
     # a P102 membership whose party QID is outside this set is still imported, but logged WARN so

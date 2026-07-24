@@ -46,8 +46,12 @@ services:
       UMAMI_ADMIN_USERNAME: ${UMAMI_ADMIN_USERNAME:-admin}
       UMAMI_ADMIN_PASSWORD: ${UMAMI_ADMIN_PASSWORD}
       UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID}
+      # Persistent disk cache for proxied MP portraits — survives redeploys (see FileProxyController).
+      FILES_CACHE_DIR: /var/cache/riigiluup/files
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70 -XX:+UseZGC -XX:+ZGenerational"
+    volumes:
+      - files_cache:/var/cache/riigiluup/files
     depends_on:
       db:
         condition: service_healthy
@@ -123,3 +127,4 @@ volumes:
   db_data:
   letsencrypt:
   certbot_webroot:
+  files_cache:
