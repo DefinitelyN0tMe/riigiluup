@@ -21,6 +21,16 @@ services:
       timeout: 5s
       retries: 10
 
+  # One-shot: make the files_cache volume writable by api's non-root user (uid 100/gid 101 in the
+  # backend image) before api starts, so the persistent disk photo cache can actually be written.
+  # Idempotent — runs on every `up`, so fresh deploys work without a manual chown.
+  files-cache-init:
+    image: alpine:3.20
+    command: sh -c "chown -R 100:101 /cache"
+    restart: "no"
+    volumes:
+      - files_cache:/cache
+
   api:
     build: ../backend
     restart: unless-stopped
@@ -55,6 +65,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      files-cache-init:
+        condition: service_completed_successfully
 
   web:
     build: ../frontend
