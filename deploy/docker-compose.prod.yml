@@ -35,6 +35,9 @@ services:
     build: ../backend
     restart: unless-stopped
     mem_limit: 1536m
+    labels:
+      # Watched by the autoheal sidecar — it issues `docker restart` if the healthcheck goes 'unhealthy'.
+      autoheal: "true"
     logging:
       driver: json-file
       options:
@@ -146,6 +149,28 @@ services:
     volumes:
       - letsencrypt:/etc/letsencrypt
       - certbot_webroot:/var/www/certbot
+
+  # Watches only containers labelled autoheal=true (currently just api) and runs `docker restart`
+  # when Docker marks them 'unhealthy'. Fills the gap Compose leaves: restart: unless-stopped only
+  # reacts to a crash/exit, not to a process that is alive but wedged (api replying DOWN to its
+  # healthcheck). Needs the Docker socket to issue restarts — that grants Docker-daemon control, so
+  # it is scoped by label and nothing else. The api start_period already prevents boot-time flapping.
+  autoheal:
+    image: willfarrell/autoheal:1.2.0
+    restart: unless-stopped
+    mem_limit: 32m
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal      # only containers with autoheal=true
+      AUTOHEAL_INTERVAL: 10                    # check health every 10s
+      AUTOHEAL_START_PERIOD: 0                 # per-container start_period gates boot already
+      AUTOHEAL_DEFAULT_STOP_TIMEOUT: 20        # graceful stop window (matches api's shutdown)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   db_data:
