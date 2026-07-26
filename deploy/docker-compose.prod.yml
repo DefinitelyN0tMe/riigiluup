@@ -86,7 +86,8 @@ services:
         max-size: "20m"
         max-file: "5"
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
   # Privacy-first analytics (no cookies, no personal data, self-hosted). Reuses the
   # existing Postgres (separate `umami` database) and is served on its own origin,
@@ -128,8 +129,10 @@ services:
       - letsencrypt:/etc/letsencrypt
       - certbot_webroot:/var/www/certbot
     depends_on:
-      - api
-      - web
+      api:
+        condition: service_healthy
+      web:
+        condition: service_started
 
   certbot:
     image: certbot/certbot:latest
