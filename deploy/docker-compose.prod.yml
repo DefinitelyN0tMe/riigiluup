@@ -62,6 +62,15 @@ services:
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70 -XX:+UseZGC -XX:+ZGenerational"
     volumes:
       - files_cache:/var/cache/riigiluup/files
+    healthcheck:
+      # Only /health is exposed (see application.yml MANAGEMENT_ENDPOINTS_INCLUDE). busybox wget
+      # ships in the JRE-alpine runtime; grep guards against a 503 body (Actuator reports DOWN as 503).
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"' || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      # Boot takes ~30 s and the photo-cache warm runs right after; don't flag unhealthy meanwhile.
+      start_period: 90s
     depends_on:
       db:
         condition: service_healthy
