@@ -11,6 +11,9 @@ export type SpeechItem = {
   /** Search hits are wrapped in [[ ]] delimiters; render via <Excerpt/>, never innerHTML. */
   excerpt: string;
   sourceUrl: string;
+  /** The bill (eelnõu) this speech debated, if the agenda item named one. */
+  billId: string | null;
+  billCode: string | null;
 };
 
 export type SpeechPage = {

@@ -70,9 +70,22 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
                         THEN left(s.text, 320)
                         ELSE ts_headline('simple', s.text, plainto_tsquery('simple', cast(:q AS text)),
                                          'MaxFragments=2, MaxWords=30, MinWords=10, StartSel=[[, StopSel=]]')
-                   END AS excerpt
+                   END AS excerpt,
+                   blink.bid AS billId,
+                   blink.bmark AS billMark,
+                   blink.btype AS billDraftType
             FROM speech s
             LEFT JOIN plenary_member pm ON pm.id = s.plenary_member_id
+            LEFT JOIN LATERAL (
+                   SELECT cast(li.id AS text) AS bid, li.mark AS bmark, li.draft_type_code AS btype
+                   FROM speech_bill_link sbl
+                   JOIN legislative_item li
+                     ON li.mark = sbl.mark AND li.draft_type_code = sbl.draft_type_code
+                    AND li.membership = s.membership
+                   WHERE sbl.speech_id = s.id
+                   ORDER BY li.mark
+                   LIMIT 1
+            ) blink ON true
             WHERE (cast(:q AS text) IS NULL OR cast(:q AS text) = ''
                    OR s.tsv @@ plainto_tsquery('simple', cast(:q AS text)))
               AND (cast(:slug AS text) IS NULL OR pm.slug = cast(:slug AS text))
@@ -100,14 +113,14 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
                        AND l.draft_type_code = cast(:billDraftType AS text)))
               AND (cast(:billMembership AS int) IS NULL OR s.membership = cast(:billMembership AS int))
             """)
-    Page<SpeechSearchRow> search(@Param("q") String q,
-                                 @Param("slug") String slug,
-                                 @Param("fromTs") Instant fromTs,
-                                 @Param("toTs") Instant toTs,
-                                 @Param("billMark") Integer billMark,
-                                 @Param("billDraftType") String billDraftType,
-                                 @Param("billMembership") Integer billMembership,
-                                 Pageable pageable);
+    Page<SpeechListRow> search(@Param("q") String q,
+                               @Param("slug") String slug,
+                               @Param("fromTs") Instant fromTs,
+                               @Param("toTs") Instant toTs,
+                               @Param("billMark") Integer billMark,
+                               @Param("billDraftType") String billDraftType,
+                               @Param("billMembership") Integer billMembership,
+                               Pageable pageable);
 
     interface SpeechSearchRow {
         Long getId();
@@ -119,5 +132,12 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
         String getMemberSlug();
         String getMemberName();
         String getExcerpt();
+    }
+
+    /** Search rows also carry the primary linked bill (if any) so each speech links back to it. */
+    interface SpeechListRow extends SpeechSearchRow {
+        String getBillId();
+        Integer getBillMark();
+        String getBillDraftType();
     }
 }

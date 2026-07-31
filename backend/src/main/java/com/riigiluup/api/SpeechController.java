@@ -3,7 +3,7 @@ package com.riigiluup.api;
 import com.riigiluup.legislation.LegislativeItem;
 import com.riigiluup.legislation.LegislativeItemRepository;
 import com.riigiluup.speech.SpeechRepository;
-import com.riigiluup.speech.SpeechRepository.SpeechSearchRow;
+import com.riigiluup.speech.SpeechRepository.SpeechListRow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,7 +38,8 @@ public class SpeechController {
 
     public record SpeechItem(Long id, String speakerRaw, String memberSlug, String memberName,
                              Instant spokenAt, String sittingTitle, String agendaItemTitle,
-                             String excerpt, String sourceUrl) {}
+                             String excerpt, String sourceUrl,
+                             String billId, String billCode) {}
 
     public record SpeechPage(List<SpeechItem> items, int page, int totalPages, long totalElements) {}
 
@@ -77,13 +78,16 @@ public class SpeechController {
             }
         }
 
-        Page<SpeechSearchRow> result = speechRepo.search(
+        Page<SpeechListRow> result = speechRepo.search(
                 query, slug, fromTs, toTs, billMark, billDraftType, billMembership, pageable);
         return new SpeechPage(
                 result.getContent().stream().map(r -> new SpeechItem(
                         r.getId(), r.getSpeakerRaw(), r.getMemberSlug(), r.getMemberName(),
                         r.getSpokenAt(), r.getSittingTitle(), r.getAgendaItemTitle(),
-                        r.getExcerpt(), r.getSourceUrl())).toList(),
+                        r.getExcerpt(), r.getSourceUrl(),
+                        r.getBillId(),
+                        r.getBillMark() != null && r.getBillDraftType() != null
+                                ? r.getBillMark() + " " + r.getBillDraftType() : null)).toList(),
                 result.getNumber(), result.getTotalPages(), result.getTotalElements());
     }
 }

@@ -147,6 +147,14 @@ export default function SpeechesPage() {
                   {s.agendaItemTitle}
                 </div>
               )}
+              {s.billId && s.billCode && (
+                <Link
+                  to={`/legislation/${encodeURIComponent(s.billId)}`}
+                  className="inline-flex items-center gap-1 mb-2 font-mono text-[11px] text-blue tracking-[0.06em] border border-blue/40 rounded-full px-2.5 py-0.5 hover:bg-blue/10 transition-colors"
+                >
+                  {t("speeches.billLink", { code: s.billCode })}
+                </Link>
+              )}
               <Excerpt text={s.excerpt} />
               <a href={s.sourceUrl} target="_blank" rel="noreferrer noopener"
                  className="inline-block mt-2 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
