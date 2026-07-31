@@ -118,6 +118,23 @@ Committee memberships (`GROUPS`/`DETAILS`) usually import on the first pass; the
 orchestrator now retries a step once after a 90 s cooldown if it hits a transient
 429, so a stray rate-limit no longer costs the whole step.
 
+### Electoral footprint & speech-to-bill links (automatic)
+
+The **Valimised** section on MP profiles (RK/EP/KOV campaigns from
+opendata.valimised.ee) and the **Arutelu ja stenogrammid** section on bill pages
+load themselves on the **first boot** after this build deploys: a self-gating
+startup task builds the speech-to-bill links for existing speeches and imports the
+EP/KOV footprint, then no-ops on later boots. New sittings link on ingest, so no
+recurring action is needed. If you want to trigger them by hand (e.g. after adding
+a newly published election), the admin endpoints are:
+
+```bash
+curl -u beta:<beta-pass> -u admin:<admin-pass> -X POST \
+  "https://riigiluup.ee/api/v1/admin/import/elections"
+curl -u beta:<beta-pass> -u admin:<admin-pass> -X POST \
+  "https://riigiluup.ee/api/v1/admin/import/link-speeches-to-bills"
+```
+
 ## 8. Test, then go public
 
 1. Verify every section on the live domain over HTTPS.
