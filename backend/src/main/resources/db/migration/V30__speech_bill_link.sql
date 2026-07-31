@@ -11,23 +11,23 @@
 -- simply inert. Undercoverage (a debate under a non-standard title) is acceptable — a false
 -- link is not, and this method never produces one.
 
+-- The membership backfill below is a one-off bulk UPDATE over the whole speech table; on a
+-- populated database it can exceed the app connection's statement_timeout. Disable the timeout
+-- for this migration transaction only (SET LOCAL is scoped to it) so the backfill can complete.
+SET LOCAL statement_timeout = '0';
+
 ALTER TABLE speech ADD COLUMN membership INTEGER;
 
--- Backfill membership from the sitting date (Riigikogu composition boundaries). Ongoing
--- imports set it straight from the verbatim feed; this covers rows already ingested.
-UPDATE speech SET membership = 15
-    WHERE membership IS NULL AND spoken_at >= TIMESTAMPTZ '2023-04-17 00:00:00+03';
-UPDATE speech SET membership = 14
-    WHERE membership IS NULL
-      AND spoken_at >= TIMESTAMPTZ '2019-04-04 00:00:00+03'
-      AND spoken_at <  TIMESTAMPTZ '2023-04-17 00:00:00+03';
-UPDATE speech SET membership = 13
-    WHERE membership IS NULL
-      AND spoken_at >= TIMESTAMPTZ '2015-03-30 00:00:00+02'
-      AND spoken_at <  TIMESTAMPTZ '2019-04-04 00:00:00+03';
-UPDATE speech SET membership = 12
-    WHERE membership IS NULL
-      AND spoken_at <  TIMESTAMPTZ '2015-03-30 00:00:00+02';
+-- Backfill membership from the sitting date (Riigikogu composition boundaries), in a single
+-- pass. Ongoing imports set it straight from the verbatim feed; this covers rows already
+-- ingested so the bill<->debate join can match them.
+UPDATE speech SET membership = CASE
+        WHEN spoken_at >= TIMESTAMPTZ '2023-04-17 00:00:00+03' THEN 15
+        WHEN spoken_at >= TIMESTAMPTZ '2019-04-04 00:00:00+03' THEN 14
+        WHEN spoken_at >= TIMESTAMPTZ '2015-03-30 00:00:00+02' THEN 13
+        ELSE 12
+    END
+    WHERE membership IS NULL;
 
 CREATE INDEX ix_speech_membership ON speech (membership);
 

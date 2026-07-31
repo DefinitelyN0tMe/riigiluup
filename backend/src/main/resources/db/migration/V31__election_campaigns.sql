@@ -5,6 +5,9 @@
 -- (a name unique in both the MP roster and the election); ambiguous names are left out
 -- rather than guessed. Historical/immutable per election, still upserted by code.
 
+-- Small table (RK seats only so far), but keep the same guard as V30 for consistency.
+SET LOCAL statement_timeout = '0';
+
 ALTER TABLE mp_election_result ADD COLUMN elected BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE mp_election_result ALTER COLUMN mandate_type DROP NOT NULL;
 
