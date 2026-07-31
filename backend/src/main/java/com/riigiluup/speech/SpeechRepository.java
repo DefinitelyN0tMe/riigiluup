@@ -78,6 +78,11 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
               AND (cast(:slug AS text) IS NULL OR pm.slug = cast(:slug AS text))
               AND (cast(:fromTs AS timestamptz) IS NULL OR s.spoken_at >= cast(:fromTs AS timestamptz))
               AND (cast(:toTs AS timestamptz) IS NULL OR s.spoken_at < cast(:toTs AS timestamptz))
+              AND (cast(:billMark AS int) IS NULL OR EXISTS (
+                     SELECT 1 FROM speech_bill_link l
+                     WHERE l.speech_id = s.id AND l.mark = cast(:billMark AS int)
+                       AND l.draft_type_code = cast(:billDraftType AS text)))
+              AND (cast(:billMembership AS int) IS NULL OR s.membership = cast(:billMembership AS int))
             ORDER BY s.spoken_at DESC, s.id DESC
             """,
             countQuery = """
@@ -89,11 +94,19 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
               AND (cast(:slug AS text) IS NULL OR pm.slug = cast(:slug AS text))
               AND (cast(:fromTs AS timestamptz) IS NULL OR s.spoken_at >= cast(:fromTs AS timestamptz))
               AND (cast(:toTs AS timestamptz) IS NULL OR s.spoken_at < cast(:toTs AS timestamptz))
+              AND (cast(:billMark AS int) IS NULL OR EXISTS (
+                     SELECT 1 FROM speech_bill_link l
+                     WHERE l.speech_id = s.id AND l.mark = cast(:billMark AS int)
+                       AND l.draft_type_code = cast(:billDraftType AS text)))
+              AND (cast(:billMembership AS int) IS NULL OR s.membership = cast(:billMembership AS int))
             """)
     Page<SpeechSearchRow> search(@Param("q") String q,
                                  @Param("slug") String slug,
                                  @Param("fromTs") Instant fromTs,
                                  @Param("toTs") Instant toTs,
+                                 @Param("billMark") Integer billMark,
+                                 @Param("billDraftType") String billDraftType,
+                                 @Param("billMembership") Integer billMembership,
                                  Pageable pageable);
 
     interface SpeechSearchRow {

@@ -1,5 +1,7 @@
 package com.riigiluup.api;
 
+import com.riigiluup.legislation.LegislativeItem;
+import com.riigiluup.legislation.LegislativeItemRepository;
 import com.riigiluup.speech.SpeechRepository;
 import com.riigiluup.speech.SpeechRepository.SpeechSearchRow;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class SpeechController {
     private static final int MAX_PAGE_SIZE = 50;
 
     private final SpeechRepository speechRepo;
+    private final LegislativeItemRepository legislativeItemRepo;
 
     public record SpeechItem(Long id, String speakerRaw, String memberSlug, String memberName,
                              Instant spokenAt, String sittingTitle, String agendaItemTitle,
@@ -46,6 +49,7 @@ public class SpeechController {
             @RequestParam(required = false) String member,
             @RequestParam(required = false) LocalDate from,
             @RequestParam(required = false) LocalDate to,
+            @RequestParam(required = false) java.util.UUID billId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
@@ -57,7 +61,24 @@ public class SpeechController {
         PageRequest pageable = PageRequest.of(
                 Math.min(Math.max(0, page), 10_000), Math.min(Math.max(1, size), MAX_PAGE_SIZE));
 
-        Page<SpeechSearchRow> result = speechRepo.search(query, slug, fromTs, toTs, pageable);
+        // Bill filter: resolve the eelnõu to its draft code + composition so we can match the
+        // speech_bill_link rows. A billId that resolves to nothing yields an impossible mark,
+        // i.e. an empty page, rather than silently ignoring the filter.
+        Integer billMark = null, billMembership = null;
+        String billDraftType = null;
+        if (billId != null) {
+            LegislativeItem bill = legislativeItemRepo.findById(billId).orElse(null);
+            if (bill == null || bill.getMark() == null || bill.getDraftTypeCode() == null) {
+                billMark = -1; // no bill has a negative mark -> no speeches match
+            } else {
+                billMark = bill.getMark();
+                billDraftType = bill.getDraftTypeCode();
+                billMembership = bill.getMembership();
+            }
+        }
+
+        Page<SpeechSearchRow> result = speechRepo.search(
+                query, slug, fromTs, toTs, billMark, billDraftType, billMembership, pageable);
         return new SpeechPage(
                 result.getContent().stream().map(r -> new SpeechItem(
                         r.getId(), r.getSpeakerRaw(), r.getMemberSlug(), r.getMemberName(),

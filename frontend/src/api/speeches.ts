@@ -25,6 +25,7 @@ export function fetchSpeeches(params: {
   member?: string;
   from?: string;
   to?: string;
+  billId?: string;
   page?: number;
   size?: number;
 }): Promise<SpeechPage> {
@@ -33,6 +34,7 @@ export function fetchSpeeches(params: {
   if (params.member) sp.set("member", params.member);
   if (params.from) sp.set("from", params.from);
   if (params.to) sp.set("to", params.to);
+  if (params.billId) sp.set("billId", params.billId);
   if (params.page) sp.set("page", String(params.page));
   if (params.size) sp.set("size", String(params.size));
   const qs = sp.toString();

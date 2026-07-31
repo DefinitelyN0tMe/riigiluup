@@ -32,6 +32,8 @@ export default function SpeechesPage() {
   const q = sp.get("q") ?? "";
   const member = sp.get("member") ?? "";
   const memberName = sp.get("memberName") ?? "";
+  const billId = sp.get("billId") ?? "";
+  const billCode = sp.get("billCode") ?? "";
   const page = sp.get("page") ? Number(sp.get("page")) : 0;
 
   function updateParams(next: Record<string, string | number | undefined | null>) {
@@ -44,8 +46,14 @@ export default function SpeechesPage() {
   }
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["speeches", q, member, page],
-    queryFn: () => fetchSpeeches({ q: q || undefined, member: member || undefined, page, size: 20 }),
+    queryKey: ["speeches", q, member, billId, page],
+    queryFn: () => fetchSpeeches({
+      q: q || undefined,
+      member: member || undefined,
+      billId: billId || undefined,
+      page,
+      size: 20,
+    }),
     placeholderData: (prev) => prev,
   });
 
@@ -70,17 +78,30 @@ export default function SpeechesPage() {
         ariaLabel={t("speeches.searchPlaceholder")}
       />
 
-      {member && (
-        <div className="mt-3 flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 bg-ink text-white rounded-full px-3 py-1 font-mono text-[11px] tracking-[0.08em] uppercase">
-            {t("speeches.filterMember")}: {memberName || member}
-            <button
-              type="button"
-              onClick={() => updateParams({ member: undefined, memberName: undefined, page: undefined })}
-              aria-label={t("speeches.clearMember")}
-              className="font-bold hover:text-hot"
-            >×</button>
-          </span>
+      {(member || billId) && (
+        <div className="mt-3 flex items-center gap-2 flex-wrap">
+          {member && (
+            <span className="inline-flex items-center gap-2 bg-ink text-white rounded-full px-3 py-1 font-mono text-[11px] tracking-[0.08em] uppercase">
+              {t("speeches.filterMember")}: {memberName || member}
+              <button
+                type="button"
+                onClick={() => updateParams({ member: undefined, memberName: undefined, page: undefined })}
+                aria-label={t("speeches.clearMember")}
+                className="font-bold hover:text-hot"
+              >×</button>
+            </span>
+          )}
+          {billId && (
+            <span className="inline-flex items-center gap-2 bg-blue text-white rounded-full px-3 py-1 font-mono text-[11px] tracking-[0.08em] uppercase">
+              {t("speeches.filterBill")}: {billCode || t("speeches.filterBillFallback")}
+              <button
+                type="button"
+                onClick={() => updateParams({ billId: undefined, billCode: undefined, page: undefined })}
+                aria-label={t("speeches.clearBill")}
+                className="font-bold hover:text-hot"
+              >×</button>
+            </span>
+          )}
         </div>
       )}
 
