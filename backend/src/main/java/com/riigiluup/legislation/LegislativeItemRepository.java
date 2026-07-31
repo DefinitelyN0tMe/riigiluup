@@ -53,7 +53,8 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
     @Query(value = """
         SELECT i.* FROM legislative_item i
         WHERE (cast(:q AS text) IS NULL
-                OR LOWER(i.title) LIKE LOWER(CONCAT('%', cast(:q AS text), '%')))
+                OR LOWER(i.title) LIKE LOWER(CONCAT('%', cast(:q AS text), '%'))
+                OR cast(i.mark AS text) = cast(:q AS text))
           AND (cast(:phase AS text) IS NULL OR i.phase = cast(:phase AS text))
           AND (cast(:membership AS integer) IS NULL OR i.membership = cast(:membership AS integer))
           AND (cast(:topicEdid AS integer) IS NULL OR EXISTS (
@@ -73,7 +74,8 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
         countQuery = """
         SELECT COUNT(*) FROM legislative_item i
         WHERE (cast(:q AS text) IS NULL
-                OR LOWER(i.title) LIKE LOWER(CONCAT('%', cast(:q AS text), '%')))
+                OR LOWER(i.title) LIKE LOWER(CONCAT('%', cast(:q AS text), '%'))
+                OR cast(i.mark AS text) = cast(:q AS text))
           AND (cast(:phase AS text) IS NULL OR i.phase = cast(:phase AS text))
           AND (cast(:membership AS integer) IS NULL OR i.membership = cast(:membership AS integer))
           AND (cast(:topicEdid AS integer) IS NULL OR EXISTS (
