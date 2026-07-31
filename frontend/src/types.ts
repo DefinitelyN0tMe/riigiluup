@@ -99,6 +99,7 @@ export type PoliticianProfile = {
   sourceUrl: string;
   externalAffiliations: ExternalAffiliation[];
   election?: ElectionInfo | null;
+  elections: Campaign[];
   activity?: ActivityInfo | null;
   education?: string | null;
   positions?: string | null;
@@ -114,6 +115,18 @@ export type ElectionInfo = {
   electionCode: string;
   personalVotes: number;
   mandateType: "PERSONAL" | "DISTRICT" | "COMPENSATION" | string;
+  districtNumber: number | null;
+  partyName: string | null;
+  ballotNumber: number | null;
+  sourceUrl: string;
+};
+export type Campaign = {
+  electionCode: string;
+  electionType: "RK" | "EP" | "KOV" | string;
+  year: number;
+  elected: boolean;
+  personalVotes: number;
+  mandateType: "PERSONAL" | "DISTRICT" | "COMPENSATION" | "SUBSTITUTE" | string | null;
   districtNumber: number | null;
   partyName: string | null;
   ballotNumber: number | null;

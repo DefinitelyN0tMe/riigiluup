@@ -122,12 +122,14 @@ public class AdminIngestionController {
     }
 
     /**
-     * One-shot import of RK_2023 election results from opendata.valimised.ee,
-     * matched to seated MPs by name. Immutable data — idempotent upsert.
+     * Import the MP electoral footprint from opendata.valimised.ee: the RK_2023 seat plus the
+     * EP/KOV campaigns, matched to MPs by name. Immutable data — idempotent upsert per election.
      */
     @PostMapping("/elections")
     public Map<String, Object> runElectionResultsImport() {
-        return Map.of("matched", electionResultsImporter.importRk2023());
+        int rk = electionResultsImporter.importRk2023();
+        Map<String, Integer> campaigns = electionResultsImporter.importCampaigns();
+        return Map.of("RK_2023", rk, "campaigns", campaigns);
     }
 
     /**

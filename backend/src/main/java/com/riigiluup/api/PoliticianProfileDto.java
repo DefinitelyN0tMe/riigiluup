@@ -36,6 +36,7 @@ public record PoliticianProfileDto(
         String sourceUrl,
         List<ExternalAffiliationDto> externalAffiliations,
         ElectionInfo election,
+        List<CampaignInfo> elections,
         ActivityInfo activity,
         String education,
         String positions,
@@ -46,6 +47,22 @@ public record PoliticianProfileDto(
             String electionCode,
             int personalVotes,
             String mandateType,
+            Integer districtNumber,
+            String partyName,
+            Integer ballotNumber,
+            String sourceUrl
+    ) {}
+    /**
+     * One campaign in the MP's electoral footprint (RK / EP / KOV), elected or not. Matched by
+     * name from opendata.valimised.ee (CC BY 4.0); only high-confidence matches are present.
+     */
+    public record CampaignInfo(
+            String electionCode,
+            String electionType,   // RK | EP | KOV
+            int year,
+            boolean elected,
+            int personalVotes,
+            String mandateType,    // null when not elected
             Integer districtNumber,
             String partyName,
             Integer ballotNumber,

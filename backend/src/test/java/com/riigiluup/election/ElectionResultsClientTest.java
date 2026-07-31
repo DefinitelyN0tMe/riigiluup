@@ -49,7 +49,7 @@ class ElectionResultsClientTest {
 
     @Test
     void parses_every_candidate_with_party_and_district() {
-        List<ElectionCandidateDto> all = ElectionResultsClient.parse(XML.getBytes(StandardCharsets.UTF_8));
+        List<ElectionCandidateDto> all = ElectionResultsClient.parse(XML.getBytes(StandardCharsets.UTF_8), "RK_2023");
 
         assertThat(all).hasSize(2);
         assertThat(all).allSatisfy(c -> {
@@ -61,7 +61,7 @@ class ElectionResultsClientTest {
     @Test
     void marks_elected_flag_and_reads_mandate_type_only_for_elected() {
         List<ElectionCandidateDto> elected = ElectionResultsClient
-                .parse(XML.getBytes(StandardCharsets.UTF_8)).stream()
+                .parse(XML.getBytes(StandardCharsets.UTF_8), "RK_2023").stream()
                 .filter(ElectionCandidateDto::elected)
                 .toList();
 
@@ -77,12 +77,61 @@ class ElectionResultsClientTest {
     @Test
     void non_elected_candidate_has_no_mandate_type() {
         ElectionCandidateDto raag = ElectionResultsClient
-                .parse(XML.getBytes(StandardCharsets.UTF_8)).stream()
+                .parse(XML.getBytes(StandardCharsets.UTF_8), "RK_2023").stream()
                 .filter(c -> c.surname().equals("RAAG"))
                 .findFirst().orElseThrow();
 
         assertThat(raag.elected()).isFalse();
         assertThat(raag.mandateType()).isNull();
         assertThat(raag.votes()).isEqualTo(1131);
+    }
+
+    // EP feeds nest independents under <independentCandidate> (no enclosing <party>).
+    private static final String EP_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <OutputReport xmlns="https://opendata.valimised.ee/schemas/election-result/ep/v2/">
+              <data>
+                <electionResult>
+                  <votesAndMandates>
+                    <party>
+                      <name>Some Party</name>
+                      <code>SP</code>
+                      <candidates>
+                        <candidate>
+                          <forename>AIVO</forename><surname>PETERSON</surname>
+                          <registrationNumber>101</registrationNumber>
+                          <votes>11503</votes><elected>false</elected>
+                        </candidate>
+                      </candidates>
+                    </party>
+                    <independentCandidate>
+                      <candidate>
+                        <forename>INDREK</forename><surname>TARAND</surname>
+                        <registrationNumber>901</registrationNumber>
+                        <votes>25000</votes><elected>true</elected>
+                      </candidate>
+                    </independentCandidate>
+                  </votesAndMandates>
+                </electionResult>
+              </data>
+            </OutputReport>
+            """;
+
+    @Test
+    void parses_independent_candidates_with_no_party() {
+        List<ElectionCandidateDto> all = ElectionResultsClient
+                .parse(EP_XML.getBytes(StandardCharsets.UTF_8), "EP_2024");
+
+        assertThat(all).hasSize(2);
+        ElectionCandidateDto indep = all.stream()
+                .filter(c -> c.surname().equals("TARAND")).findFirst().orElseThrow();
+        assertThat(indep.partyName()).isNull();
+        assertThat(indep.partyCode()).isNull();
+        assertThat(indep.elected()).isTrue();
+        assertThat(indep.votes()).isEqualTo(25000);
+
+        ElectionCandidateDto party = all.stream()
+                .filter(c -> c.surname().equals("PETERSON")).findFirst().orElseThrow();
+        assertThat(party.partyName()).isEqualTo("Some Party");
     }
 }

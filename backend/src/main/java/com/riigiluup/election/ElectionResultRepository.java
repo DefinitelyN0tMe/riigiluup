@@ -5,13 +5,17 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ElectionResultRepository extends JpaRepository<ElectionResult, UUID> {
 
-    /** Most recent election result for a member (there is currently only RK_2023). */
+    /** The RK seat result — how the MP won their current seat. */
     Optional<ElectionResult> findFirstByMemberExternalIdOrderByElectionCodeDesc(String memberExternalId);
+
+    /** Every matched campaign of a member (RK / EP / KOV); ordered for display in the mapper. */
+    List<ElectionResult> findByMemberExternalId(String memberExternalId);
 
     /**
      * Bulk delete so the rows are removed immediately, before the fresh inserts flush —

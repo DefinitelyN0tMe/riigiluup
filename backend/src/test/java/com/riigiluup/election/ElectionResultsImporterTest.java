@@ -81,4 +81,46 @@ class ElectionResultsImporterTest {
         assertThat(idx.get(ElectionResultsImporter.nameKey("Kaja", "Kallas")).getExternalId()).isEqualTo("A");
         assertThat(idx.get(ElectionResultsImporter.nameKey("Jüri", "Ratas")).getExternalId()).isEqualTo("B");
     }
+
+    private static ElectionCandidateDto cand(String first, String last, boolean elected) {
+        return new ElectionCandidateDto(first, last, 100, 1, elected ? "PERSONAL" : null,
+                "Party", "P", 10, elected);
+    }
+
+    @Test
+    void campaign_match_keeps_only_names_unique_on_both_sides() {
+        List<PlenaryMember> roster = List.of(
+                member("KAJA", "Kaja", "Kallas", true),
+                member("JYRI", "Jüri", "Ratas", true));
+        List<ElectionCandidateDto> candidates = List.of(
+                cand("Kaja", "Kallas", true),   // unique both sides -> matched
+                cand("Keegi", "Tundmatu", false)); // not an MP -> ignored
+
+        List<ElectionResultsImporter.CampaignMatch> matches =
+                ElectionResultsImporter.matchCampaign(roster, candidates);
+
+        assertThat(matches).hasSize(1);
+        assertThat(matches.get(0).member().getExternalId()).isEqualTo("KAJA");
+        assertThat(matches.get(0).candidate().surname()).isEqualTo("Kallas");
+    }
+
+    @Test
+    void campaign_match_skips_a_name_shared_by_two_candidates() {
+        List<PlenaryMember> roster = List.of(member("MP", "Jaan", "Tamm", true));
+        List<ElectionCandidateDto> candidates = List.of(
+                cand("Jaan", "Tamm", false),
+                cand("Jaan", "Tamm", true)); // two same-name candidates -> cannot disambiguate
+
+        assertThat(ElectionResultsImporter.matchCampaign(roster, candidates)).isEmpty();
+    }
+
+    @Test
+    void campaign_match_skips_a_name_shared_by_two_roster_members() {
+        List<PlenaryMember> roster = List.of(
+                member("A", "Jaan", "Tamm", true),
+                member("B", "Jaan", "Tamm", false));
+        List<ElectionCandidateDto> candidates = List.of(cand("Jaan", "Tamm", true));
+
+        assertThat(ElectionResultsImporter.matchCampaign(roster, candidates)).isEmpty();
+    }
 }

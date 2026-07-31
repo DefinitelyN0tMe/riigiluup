@@ -710,11 +710,22 @@
       "seniorityHint": "Days of parliamentary service reported by Riigikogu"
     },
     "election": {
-      "title": "How this seat was won",
-      "personalVotes": "Personal votes (2023)",
+      "title": "Elections",
+      "personalVotes": "Personal votes",
       "mandateType": "Mandate",
-      "ranAs": "Ran with",
+      "ranAs": "List",
       "source": "Official election result",
+      "matchNote": "Candidacies at published elections (Riigikogu, European Parliament, municipal). Matched by name; source: State Electoral Office, opendata.valimised.ee (CC BY 4.0).",
+      "type": {
+        "RK": "Riigikogu",
+        "EP": "European Parliament",
+        "KOV": "Local elections"
+      },
+      "result": {
+        "elected": "Elected",
+        "notElected": "Not elected",
+        "substitute": "Substitute member"
+      },
       "mandate": {
         "PERSONAL": "Personal mandate",
         "DISTRICT": "District mandate",

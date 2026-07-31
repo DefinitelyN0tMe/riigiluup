@@ -260,50 +260,56 @@ export default function PoliticianProfilePage() {
         />
       </section>
 
-      {data.election && (
+      {data.elections.length > 0 && (
         <section aria-label={t("profile.election.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
-          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-4">
+          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
             {t("profile.election.title")}
           </h2>
-          <div className="flex flex-wrap gap-x-10 gap-y-4">
-            <div>
-              <div className="font-display font-bold text-[32px] leading-none tracking-[-0.03em] text-ink">
-                {data.election.personalVotes.toLocaleString(i18n.resolvedLanguage)}
-              </div>
-              <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">
-                {t("profile.election.personalVotes")}
-              </div>
-            </div>
-            <div>
-              <div className="font-display font-bold text-[20px] leading-tight text-ink">
-                {t(`profile.election.mandate.${data.election.mandateType}`, data.election.mandateType)}
-              </div>
-              <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">
-                {t("profile.election.mandateType")}
-              </div>
-            </div>
-            {data.election.partyName && (
-              <div>
-                <div className="text-[15px] text-ink leading-tight">{data.election.partyName}</div>
-                <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1.5">
-                  {t("profile.election.ranAs")}
-                </div>
-              </div>
-            )}
-          </div>
-          {data.election.mandateType === "SUBSTITUTE" && (
-            <p className="mt-4 text-[13px] leading-snug text-ink-2 border-l-2 border-rule pl-3">
-              {t("profile.election.substituteNote")}
-            </p>
-          )}
-          <a href={data.election.sourceUrl} target="_blank" rel="noreferrer noopener"
-             className="inline-block mt-4 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
-            {t("profile.election.source")} ↗
-          </a>
+          <p className="text-[13px] leading-snug text-ink-2 mb-4">{t("profile.election.matchNote")}</p>
+          <ul className="flex flex-col divide-y divide-rule border border-rule rounded-[16px] overflow-hidden">
+            {data.elections.map((c) => {
+              const resultKey = c.mandateType === "SUBSTITUTE"
+                ? "substitute"
+                : (c.elected ? "elected" : "notElected");
+              return (
+                <li key={c.electionCode} className="p-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                      <span className="font-display font-bold text-[16px] tracking-[-0.015em] text-ink">
+                        {t(`profile.election.type.${c.electionType}`, { defaultValue: c.electionType })} {c.year}
+                      </span>
+                      <span className={`font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded ${
+                        c.elected ? "bg-blue/10 text-blue" : "bg-rule/40 text-muted"}`}>
+                        {t(`profile.election.result.${resultKey}`)}
+                      </span>
+                    </div>
+                    {c.partyName && (
+                      <div className="text-[13px] text-ink-2 leading-tight mt-1">
+                        {t("profile.election.ranAs")}: {c.partyName}
+                      </div>
+                    )}
+                    <a href={c.sourceUrl} target="_blank" rel="noreferrer noopener"
+                       aria-label={`${t("profile.election.source")} (${t("a11y.opensNewTab")})`}
+                       className="inline-block mt-1.5 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
+                      {t("profile.election.source")} ↗
+                    </a>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="font-display font-bold text-[24px] leading-none tracking-[-0.03em] text-ink">
+                      {c.personalVotes.toLocaleString(i18n.resolvedLanguage)}
+                    </div>
+                    <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1">
+                      {t("profile.election.personalVotes")}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       )}
 
-      {!data.election && data.active && (
+      {data.elections.length === 0 && data.active && (
         <section aria-label={t("profile.election.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
           <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-2">{t("profile.election.title")}</h2>
           <p className="text-[14px] leading-snug text-ink-2">{t("profile.election.substituteUnknown")}</p>

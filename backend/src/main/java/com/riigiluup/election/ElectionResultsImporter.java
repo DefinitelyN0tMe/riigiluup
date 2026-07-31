@@ -89,6 +89,121 @@ public class ElectionResultsImporter {
         return matched;
     }
 
+    /** The electoral-footprint layer: other published elections matched to current MPs by name. */
+    public static final List<String> CAMPAIGN_CODES = List.of("EP_2024", "KOV_2021", "KOV_2025");
+
+    /**
+     * Imports the electoral footprint (EP / KOV campaigns) for current MPs. Each code is a
+     * separate immutable election; a failure on one does not abort the others. Returns the
+     * matched-row count per code.
+     */
+    public Map<String, Integer> importCampaigns() {
+        Map<String, Integer> result = new HashMap<>();
+        for (String code : CAMPAIGN_CODES) {
+            try {
+                result.put(code, importCampaign(code));
+            } catch (Exception e) {
+                log.warn("campaign import {} failed: {}", code, e.toString());
+                result.put(code, -1); // -1 signals a failed code, distinct from 0 matches
+            }
+        }
+        return result;
+    }
+
+    /**
+     * One election as a footprint layer: a current MP gets a row only when their full name is
+     * unique in the roster AND matches exactly one candidate of that name in the election
+     * (elected or not). Ambiguous names — a roster collision or several same-name candidates —
+     * are skipped rather than guessed, since the feed carries no birth date to disambiguate.
+     * Immutable source, so this is an idempotent full refresh per code.
+     */
+    public int importCampaign(String code) {
+        ImportRunLog run = runLogRepo.save(ImportRunLog.builder()
+                .sourceName(SOURCE_NAME)
+                .jobName("elections." + code.toLowerCase(Locale.ROOT) + "-import")
+                .startedAt(Instant.now())
+                .status("RUNNING")
+                .build());
+        int seen = 0;
+        int matched = 0;
+        try {
+            List<ElectionCandidateDto> candidates = client.fetchResults(code); // network, outside tx
+            seen = candidates.size();
+            if (candidates.isEmpty()) {
+                throw new IllegalStateException(code + " source returned zero candidates; existing rows kept");
+            }
+            matched = tx.execute(status -> replaceCampaign(code, candidates));
+            run.setStatus("SUCCESS");
+        } catch (Exception e) {
+            run.setStatus("FAILED");
+            run.setErrorMessage(e.getMessage());
+            throw e;
+        } finally {
+            run.setRecordsSeen(seen);
+            run.setRecordsUpserted(matched);
+            run.setFinishedAt(Instant.now());
+            runLogRepo.save(run);
+        }
+        return matched;
+    }
+
+    private int replaceCampaign(String code, List<ElectionCandidateDto> candidates) {
+        List<CampaignMatch> matches = matchCampaign(memberRepo.findAll(), candidates);
+        repo.deleteByElectionCode(code); // full refresh — immutable source, keeps this idempotent
+        Instant now = Instant.now();
+        for (CampaignMatch match : matches) {
+            PlenaryMember m = match.member();
+            ElectionCandidateDto c = match.candidate();
+            repo.save(ElectionResult.builder()
+                    .memberExternalId(m.getExternalId())
+                    .electionCode(code)
+                    .elected(c.elected())
+                    .personalVotes(c.votes())
+                    .mandateType(c.elected() ? c.mandateType() : null)
+                    .districtNumber(c.districtNumber())
+                    .partyName(c.partyName())
+                    .ballotNumber(c.registrationNumber())
+                    .importedAt(now)
+                    .build());
+        }
+        log.info("Campaign import {}: {} MPs matched", code, matches.size());
+        return matches.size();
+    }
+
+    /** A confident MP-to-candidate pairing for a campaign import. */
+    public record CampaignMatch(PlenaryMember member, ElectionCandidateDto candidate) {}
+
+    /**
+     * High-confidence name matches between the MP roster and an election's candidates: a pairing
+     * is kept only when the full name is unique on BOTH sides (one roster member, one candidate).
+     * A shared name — a roster collision or several same-name candidates — is dropped rather than
+     * guessed, because the feed has no birth date to disambiguate. No surname-only fallback here,
+     * unlike the RK seat import: the KOV candidate pool is large and a loose match would risk
+     * attributing a namesake's candidacy to an MP.
+     */
+    static List<CampaignMatch> matchCampaign(List<PlenaryMember> members,
+                                             List<ElectionCandidateDto> candidates) {
+        Map<String, List<PlenaryMember>> rosterByName = new HashMap<>();
+        for (PlenaryMember m : members) {
+            rosterByName.computeIfAbsent(nameKey(m.getFirstName(), m.getLastName()), k -> new ArrayList<>())
+                    .add(m);
+        }
+        Map<String, List<ElectionCandidateDto>> candByName = new HashMap<>();
+        for (ElectionCandidateDto c : candidates) {
+            if (c.surname() == null || c.surname().isBlank()) continue;
+            candByName.computeIfAbsent(nameKey(c.forename(), c.surname()), k -> new ArrayList<>())
+                    .add(c);
+        }
+        List<CampaignMatch> out = new ArrayList<>();
+        for (Map.Entry<String, List<PlenaryMember>> entry : rosterByName.entrySet()) {
+            if (entry.getValue().size() != 1) continue;      // ambiguous roster name -> skip
+            List<ElectionCandidateDto> hits = candByName.get(entry.getKey());
+            if (hits == null || hits.size() != 1) continue;  // absent or ambiguous in election -> skip
+            out.add(new CampaignMatch(entry.getValue().get(0), hits.get(0)));
+        }
+        return out;
+    }
+
     /** Substitute members (asendusliige) enter mid-term when an elected MP resigns/becomes a
      *  minister; they ran but were not directly elected, so they carry this pseudo mandate type. */
     public static final String SUBSTITUTE_MANDATE = "SUBSTITUTE";
@@ -120,6 +235,7 @@ public class ElectionResultsImporter {
                 repo.save(ElectionResult.builder()
                         .memberExternalId(m.getExternalId())
                         .electionCode(ELECTION_CODE)
+                        .elected(c.elected())
                         .personalVotes(c.votes())
                         .mandateType(c.elected() ? c.mandateType() : SUBSTITUTE_MANDATE)
                         .districtNumber(c.districtNumber())

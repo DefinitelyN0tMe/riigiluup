@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fetches and parses the Riigikogu 2023 election RESULTS.xml from the State
+ * Fetches and parses an election RESULTS.xml (RK / EP / KOV) from the State
  * Electoral Office open-data portal (opendata.valimised.ee, CC BY 4.0).
  *
  * <p>Structure (default namespace, parsed namespace-unaware):
@@ -23,17 +23,27 @@ import java.util.List;
 @Component
 public class ElectionResultsClient {
 
-    private static final String RESULTS_URL = "https://opendata.valimised.ee/api/RK_2023/RESULTS.xml";
+    private static final String RESULTS_URL_TEMPLATE =
+            "https://opendata.valimised.ee/api/%s/RESULTS.xml";
 
     private final RestClient rest = RestClient.builder().build();
 
-    public List<ElectionCandidateDto> fetchRk2023Results() {
-        byte[] xml = rest.get().uri(RESULTS_URL).retrieve().body(byte[].class);
-        if (xml == null) throw new IllegalStateException("Empty RESULTS.xml from opendata.valimised.ee");
-        return parse(xml);
+    /** Candidates of any published election (RK / EP / KOV) by its code, e.g. "EP_2024". */
+    public List<ElectionCandidateDto> fetchResults(String electionCode) {
+        String url = String.format(RESULTS_URL_TEMPLATE, electionCode);
+        byte[] xml = rest.get().uri(url).retrieve().body(byte[].class);
+        if (xml == null) {
+            throw new IllegalStateException(
+                    "Empty RESULTS.xml from opendata.valimised.ee for " + electionCode);
+        }
+        return parse(xml, electionCode);
     }
 
-    static List<ElectionCandidateDto> parse(byte[] xml) {
+    public List<ElectionCandidateDto> fetchRk2023Results() {
+        return fetchResults("RK_2023");
+    }
+
+    static List<ElectionCandidateDto> parse(byte[] xml, String electionCode) {
         try {
             DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
             f.setNamespaceAware(false);
@@ -43,31 +53,38 @@ public class ElectionResultsClient {
             var doc = f.newDocumentBuilder().parse(new ByteArrayInputStream(xml));
 
             List<ElectionCandidateDto> out = new ArrayList<>();
-            NodeList parties = doc.getElementsByTagName("party");
-            for (int i = 0; i < parties.getLength(); i++) {
-                Element party = (Element) parties.item(i);
-                String partyName = childText(party, "name");
-                String partyCode = childText(party, "code");
-                NodeList candidates = party.getElementsByTagName("candidate");
-                for (int j = 0; j < candidates.getLength(); j++) {
-                    Element c = (Element) candidates.item(j);
-                    boolean elected = "true".equalsIgnoreCase(childText(c, "elected"));
-                    out.add(new ElectionCandidateDto(
-                            childText(c, "forename"),
-                            childText(c, "surname"),
-                            parseInt(childText(c, "votes")),
-                            parseIntObj(childText(c, "districtNumber")),
-                            childText(c, "mandateType"),
-                            partyName,
-                            partyCode,
-                            parseIntObj(childText(c, "registrationNumber")),
-                            elected));
-                }
+            // Iterate every candidate directly so party-list and independent candidates are both
+            // covered; the party (if any) is resolved from the candidate's ancestor chain.
+            NodeList candidates = doc.getElementsByTagName("candidate");
+            for (int i = 0; i < candidates.getLength(); i++) {
+                Element c = (Element) candidates.item(i);
+                Element party = enclosingParty(c);
+                boolean elected = "true".equalsIgnoreCase(childText(c, "elected"));
+                out.add(new ElectionCandidateDto(
+                        childText(c, "forename"),
+                        childText(c, "surname"),
+                        parseInt(childText(c, "votes")),
+                        parseIntObj(childText(c, "districtNumber")),
+                        childText(c, "mandateType"),
+                        party == null ? null : childText(party, "name"),
+                        party == null ? null : childText(party, "code"),
+                        parseIntObj(childText(c, "registrationNumber")),
+                        elected));
             }
             return out;
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to parse RK_2023 RESULTS.xml", e);
+            throw new IllegalStateException("Failed to parse RESULTS.xml for " + electionCode, e);
         }
+    }
+
+    /** Nearest {@code <party>} ancestor of a candidate, or null (e.g. an independent candidate). */
+    private static Element enclosingParty(Element candidate) {
+        for (var n = candidate.getParentNode(); n instanceof Element e; n = n.getParentNode()) {
+            String tag = e.getTagName();
+            if ("party".equals(tag)) return e;
+            if ("independentCandidate".equals(tag)) return null;
+        }
+        return null;
     }
 
     /** First descendant element with the given tag; party/candidate tag sets don't overlap. */

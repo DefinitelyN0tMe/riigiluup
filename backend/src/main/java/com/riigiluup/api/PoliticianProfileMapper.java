@@ -5,6 +5,7 @@ import com.riigiluup.alignment.VoteFactionAlignment;
 import com.riigiluup.alignment.VoteFactionAlignmentRepository;
 import com.riigiluup.activity.MemberActivityRepository;
 import com.riigiluup.common.PhotoUrlRewriter;
+import com.riigiluup.election.ElectionResult;
 import com.riigiluup.election.ElectionResultRepository;
 import com.riigiluup.group.GroupMembership;
 import com.riigiluup.group.GroupType;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -128,6 +130,14 @@ public class PoliticianProfileMapper {
                         "https://rk2023.valimised.ee/et/election-result"))
                 .orElse(null);
 
+        // The full electoral footprint (RK / EP / KOV), newest campaign first.
+        List<PoliticianProfileDto.CampaignInfo> elections = electionResults
+                .findByMemberExternalId(m.getExternalId()).stream()
+                .map(PoliticianProfileMapper::toCampaign)
+                .sorted(Comparator.comparingInt(PoliticianProfileDto.CampaignInfo::year).reversed()
+                        .thenComparing(PoliticianProfileDto.CampaignInfo::electionType))
+                .toList();
+
         PoliticianProfileDto.ActivityInfo activity = memberActivity
                 .findById(m.getExternalId())
                 .map(a -> new PoliticianProfileDto.ActivityInfo(
@@ -164,6 +174,7 @@ public class PoliticianProfileMapper {
                 "https://api.riigikogu.ee/api/plenary-members/" + m.getExternalId(),
                 external,
                 election,
+                elections,
                 activity,
                 m.getEducation(),
                 m.getPositions(),
@@ -204,6 +215,24 @@ public class PoliticianProfileMapper {
                 .collect(Collectors.toMap(
                         a -> a.getVoteEvent().getId() + "|" + a.getFactionExternalId(),
                         Function.identity(), (a, b) -> a));
+    }
+
+    /** Maps a stored campaign row to the DTO, deriving type/year and the results-site link. */
+    private static PoliticianProfileDto.CampaignInfo toCampaign(ElectionResult er) {
+        String code = er.getElectionCode();
+        String[] parts = code.split("_", 2);
+        String type = parts[0];
+        int year = parts.length > 1 ? parseYear(parts[1]) : 0;
+        return new PoliticianProfileDto.CampaignInfo(
+                code, type, year, er.isElected(), er.getPersonalVotes(), er.getMandateType(),
+                er.getDistrictNumber(), er.getPartyName(), er.getBallotNumber(),
+                // e.g. RK_2023 -> https://rk2023.valimised.ee (the official results site).
+                "https://" + type.toLowerCase(java.util.Locale.ROOT) + year + ".valimised.ee");
+    }
+
+    private static int parseYear(String s) {
+        try { return Integer.parseInt(s.trim()); }
+        catch (NumberFormatException e) { return 0; }
     }
 
     private PoliticianProfileDto.Deviation toDeviationDto(

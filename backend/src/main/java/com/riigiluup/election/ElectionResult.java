@@ -7,9 +7,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * How a currently seated MP won their seat at a Riigikogu election — personal vote
- * count, mandate type and electoral district. Sourced from the State Electoral
- * Office open data (opendata.valimised.ee, CC BY 4.0), matched to the MP by name.
+ * One campaign of a current MP at a published election (RK / EP / KOV) — personal votes,
+ * whether they were elected, mandate type (when elected), party and district. Sourced from
+ * the State Electoral Office open data (opendata.valimised.ee, CC BY 4.0), matched to the MP
+ * by name; only high-confidence (name unique on both sides) matches are stored.
  */
 @Entity
 @Table(name = "mp_election_result")
@@ -22,15 +23,19 @@ public class ElectionResult {
     @Column(name = "member_external_id", nullable = false, length = 64)
     private String memberExternalId;
 
-    /** e.g. "RK_2023" (Riigikogu election 2023). */
+    /** e.g. "RK_2023", "EP_2024", "KOV_2021" (type_year). */
     @Column(name = "election_code", nullable = false, length = 32)
     private String electionCode;
+
+    /** Whether the candidate won a seat at this election (false for a losing or substitute run). */
+    @Column(name = "elected", nullable = false)
+    private boolean elected;
 
     @Column(name = "personal_votes", nullable = false)
     private int personalVotes;
 
-    /** PERSONAL | DISTRICT | COMPENSATION. */
-    @Column(name = "mandate_type", nullable = false, length = 32)
+    /** PERSONAL | DISTRICT | COMPENSATION | SUBSTITUTE; null when not elected. */
+    @Column(name = "mandate_type", length = 32)
     private String mandateType;
 
     @Column(name = "district_number")

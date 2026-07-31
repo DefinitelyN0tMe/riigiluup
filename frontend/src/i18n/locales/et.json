@@ -710,11 +710,22 @@
       "seniorityHint": "Riigikogu andmetel parlamenditeenistuse päevad"
     },
     "election": {
-      "title": "Kuidas mandaat saadi",
-      "personalVotes": "Isiklikke hääli (2023)",
+      "title": "Valimised",
+      "personalVotes": "Isiklikke hääli",
       "mandateType": "Mandaat",
-      "ranAs": "Kandideeris nimekirjas",
+      "ranAs": "Nimekiri",
       "source": "Ametlik valimistulemus",
+      "matchNote": "Osalemine avaldatud valimistel (Riigikogu, Euroopa Parlament, kohalikud). Sobitatud nime järgi; allikas: Riigi Valimisteenistus, opendata.valimised.ee (CC BY 4.0).",
+      "type": {
+        "RK": "Riigikogu",
+        "EP": "Euroopa Parlament",
+        "KOV": "Kohalikud valimised"
+      },
+      "result": {
+        "elected": "Valitud",
+        "notElected": "Ei osutunud valituks",
+        "substitute": "Asendusliige"
+      },
       "mandate": {
         "PERSONAL": "Isikumandaat",
         "DISTRICT": "Ringkonnamandaat",
