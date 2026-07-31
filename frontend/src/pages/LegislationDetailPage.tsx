@@ -182,9 +182,16 @@ export default function LegislationDetailPage() {
               </Link>
             </>
           ) : (
-            <p className="text-sm text-slate-600 border-l-2 border-slate-200 pl-3">
-              {t("legislation.debatesNotFound")}
-            </p>
+            <div
+              role="note"
+              className="flex items-start gap-2.5 rounded-md border border-amber/50 bg-amber/10 px-4 py-3"
+            >
+              <span aria-hidden="true" className="text-base leading-none mt-0.5">⚠️</span>
+              <div>
+                <p className="text-sm font-semibold text-ink">{t("legislation.debatesNotFoundLead")}</p>
+                <p className="text-xs text-slate-600 mt-1 leading-snug">{t("legislation.debatesNotFound")}</p>
+              </div>
+            </div>
           )}
         </section>
       )}
