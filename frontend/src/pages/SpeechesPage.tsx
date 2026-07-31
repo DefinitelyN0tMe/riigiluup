@@ -1,7 +1,10 @@
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import { fetchSpeeches } from "../api/speeches";
+import { fetchLegislation } from "../api/legislation";
+import type { LegislationListItem } from "../types";
 import SearchInput from "../components/SearchInput";
 import LoadFailed from "../components/LoadFailed";
 import { formatDateTime } from "../lib/formatDate";
@@ -76,6 +79,10 @@ export default function SpeechesPage() {
         }}
         placeholder={t("speeches.searchPlaceholder")}
         ariaLabel={t("speeches.searchPlaceholder")}
+      />
+
+      <BillFilter
+        onSelect={(id, code) => updateParams({ billId: id, billCode: code, page: undefined })}
       />
 
       {(member || billId) && (
@@ -173,6 +180,70 @@ export default function SpeechesPage() {
       <p className="mt-8 font-mono text-[10px] tracking-[0.1em] uppercase text-muted max-w-[80ch]">
         {t("speeches.searchNote")}
       </p>
+    </div>
+  );
+}
+
+/**
+ * Bill filter with autocomplete — type a bill's title or number, pick one, and the speeches
+ * list is filtered to that eelnõu (via billId). Mirrors the MP autocomplete pattern: debounced
+ * lookup against the legislation search, suggestions in a dropdown.
+ */
+function BillFilter({ onSelect }: { onSelect: (billId: string, billCode: string) => void }) {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState("");
+  const [suggest, setSuggest] = useState<LegislationListItem[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (query.trim().length < 2) { setSuggest([]); return; }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetchLegislation({ q: query.trim(), size: 8 });
+        if (!cancelled) { setSuggest(res.items); setOpen(true); }
+      } catch { /* ignore */ }
+    }, 200);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [query]);
+
+  const codeOf = (b: LegislationListItem) =>
+    b.mark != null && b.draftTypeCode ? `${b.mark} ${b.draftTypeCode}` : (b.title ?? "");
+
+  return (
+    <div className="relative mt-3">
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => suggest.length > 0 && setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder={t("speeches.billFilterPlaceholder")}
+        aria-label={t("speeches.billFilterPlaceholder")}
+        className="w-full sm:max-w-[560px] bg-white border border-rule rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue"
+      />
+      {open && suggest.length > 0 && (
+        <ul className="absolute z-20 mt-1 w-full sm:max-w-[560px] bg-white border border-rule rounded-2xl shadow-lg overflow-hidden max-h-80 overflow-y-auto">
+          {suggest.map((b) => (
+            <li key={b.id}>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  onSelect(b.id, codeOf(b));
+                  setQuery(""); setSuggest([]); setOpen(false);
+                }}
+                className="w-full text-left px-4 py-2.5 hover:bg-off transition-colors"
+              >
+                <span className="font-mono text-[11px] text-blue tracking-[0.06em]">
+                  {b.mark != null && b.draftTypeCode ? `${b.mark} ${b.draftTypeCode}` : "—"}
+                </span>
+                <span className="block text-sm text-ink truncate">{b.title}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

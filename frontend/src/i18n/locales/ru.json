@@ -138,6 +138,7 @@
     "filterMember": "Депутат",
     "clearMember": "Сбросить фильтр по депутату",
     "filterBill": "По закону",
+    "billFilterPlaceholder": "Фильтр по закону: введите название или номер…",
     "filterBillFallback": "закон",
     "clearBill": "Сбросить фильтр по закону",
     "results_one": "{{count}} выступление",

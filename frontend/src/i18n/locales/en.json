@@ -138,6 +138,7 @@
     "filterMember": "MP",
     "clearMember": "Clear MP filter",
     "filterBill": "By bill",
+    "billFilterPlaceholder": "Filter by bill: type a title or number…",
     "filterBillFallback": "bill",
     "clearBill": "Clear bill filter",
     "results_one": "{{count}} speech",

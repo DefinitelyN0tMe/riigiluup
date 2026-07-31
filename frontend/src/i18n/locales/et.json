@@ -138,6 +138,7 @@
     "filterMember": "Saadik",
     "clearMember": "Eemalda saadiku filter",
     "filterBill": "Eelnõu",
+    "billFilterPlaceholder": "Filtreeri eelnõu järgi: sisesta pealkiri või number…",
     "filterBillFallback": "eelnõu",
     "clearBill": "Eemalda eelnõu filter",
     "results_one": "{{count}} sõnavõtt",
