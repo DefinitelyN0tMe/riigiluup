@@ -122,8 +122,13 @@ public class PoliticianProfileMapper {
                 .map(this::toExternalDto)
                 .toList();
 
-        PoliticianProfileDto.ElectionInfo election = electionResults
-                .findFirstByMemberExternalIdOrderByElectionCodeDesc(m.getExternalId())
+        List<ElectionResult> allCampaigns = electionResults.findByMemberExternalId(m.getExternalId());
+
+        // The seat block stays exactly as before: the Riigikogu (RK) result, i.e. how the MP
+        // won their seat. Other elections (EP/KOV) are surfaced separately as a footprint list.
+        PoliticianProfileDto.ElectionInfo election = allCampaigns.stream()
+                .filter(er -> er.getElectionCode() != null && er.getElectionCode().startsWith("RK_"))
+                .findFirst()
                 .map(er -> new PoliticianProfileDto.ElectionInfo(
                         er.getElectionCode(), er.getPersonalVotes(), er.getMandateType(),
                         er.getDistrictNumber(), er.getPartyName(), er.getBallotNumber(),
@@ -131,8 +136,7 @@ public class PoliticianProfileMapper {
                 .orElse(null);
 
         // The full electoral footprint (RK / EP / KOV), newest campaign first.
-        List<PoliticianProfileDto.CampaignInfo> elections = electionResults
-                .findByMemberExternalId(m.getExternalId()).stream()
+        List<PoliticianProfileDto.CampaignInfo> elections = allCampaigns.stream()
                 .map(PoliticianProfileMapper::toCampaign)
                 .sorted(Comparator.comparingInt(PoliticianProfileDto.CampaignInfo::year).reversed()
                         .thenComparing(PoliticianProfileDto.CampaignInfo::electionType))

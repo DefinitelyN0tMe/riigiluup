@@ -57,10 +57,19 @@ class PlenaryMemberRepositoryIntegrationTest extends AbstractIntegrationTest {
                 .extracting(PlenaryMember::getLastName)
                 .containsExactly("Aavik", "Bergen");
 
+        // active = null -> no active filter (both active and inactive members)
         Page<PlenaryMember> all = repo.searchByFaction(
-                null, null, false,
+                null, null, null,
                 PageRequest.of(0, 10, Sort.by("lastName")));
         assertThat(all.getTotalElements()).isEqualTo(3);
+
+        // active = false -> former members only (the inactive one)
+        Page<PlenaryMember> former = repo.searchByFaction(
+                null, null, false,
+                PageRequest.of(0, 10, Sort.by("lastName")));
+        assertThat(former.getContent())
+                .extracting(PlenaryMember::getLastName)
+                .containsExactly("Colt");
     }
 
     @Test

@@ -52,7 +52,7 @@ class PoliticiansControllerIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     void list_can_include_inactive_members() throws Exception {
-        mockMvc.perform(get("/api/v1/politicians").param("activeOnly", "false"))
+        mockMvc.perform(get("/api/v1/politicians").param("status", "all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements", equalTo(3)));
     }

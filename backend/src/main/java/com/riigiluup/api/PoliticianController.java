@@ -24,12 +24,19 @@ public class PoliticianController {
     public PageResponse<PoliticianDto> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String faction,
-            @RequestParam(defaultValue = "true") boolean activeOnly,
+            // current = sitting MPs (default, the site's primary view); former = left the
+            // composition (ministers / resigned); all = both.
+            @RequestParam(defaultValue = "current") String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size
     ) {
+        Boolean active = switch (status) {
+            case "former" -> Boolean.FALSE;
+            case "all" -> null;
+            default -> Boolean.TRUE; // "current"
+        };
         Page<PlenaryMember> p = repo.searchByFaction(
-                q, faction, activeOnly,
+                q, faction, active,
                 PageRequest.of(Math.min(Math.max(0, page), 10_000), Math.min(size, 100),
                         Sort.by("lastName", "firstName"))
         );

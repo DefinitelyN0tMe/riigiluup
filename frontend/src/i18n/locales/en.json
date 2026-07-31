@@ -678,6 +678,11 @@
     "title": "Members of the Riigikogu",
     "searchPlaceholder": "Search by name…",
     "allFactions": "All factions",
+    "status": {
+      "label": "Filter by status",
+      "current": "Current",
+      "former": "Former"
+    },
     "factionOption": "{{name}} ({{count}})",
     "showing": "Showing {{shown}} of {{total}} MPs.",
     "backAll": "← All MPs",
@@ -710,22 +715,11 @@
       "seniorityHint": "Days of parliamentary service reported by Riigikogu"
     },
     "election": {
-      "title": "Elections",
-      "personalVotes": "Personal votes",
+      "title": "How this seat was won",
+      "personalVotes": "Personal votes (2023)",
       "mandateType": "Mandate",
-      "ranAs": "List",
+      "ranAs": "Ran with",
       "source": "Official election result",
-      "matchNote": "Candidacies at published elections (Riigikogu, European Parliament, municipal). Matched by name; source: State Electoral Office, opendata.valimised.ee (CC BY 4.0).",
-      "type": {
-        "RK": "Riigikogu",
-        "EP": "European Parliament",
-        "KOV": "Local elections"
-      },
-      "result": {
-        "elected": "Elected",
-        "notElected": "Not elected",
-        "substitute": "Substitute member"
-      },
       "mandate": {
         "PERSONAL": "Personal mandate",
         "DISTRICT": "District mandate",
@@ -734,6 +728,22 @@
       },
       "substituteNote": "Entered the Riigikogu as a substitute: ran in 2023 but was not directly elected — took the seat of a departed member (who became a minister or gave up the mandate).",
       "substituteUnknown": "Substitute member — did not enter the Riigikogu through direct election in 2023."
+    },
+    "otherElections": {
+      "title": "Participation in other elections",
+      "matchNote": "Candidacies at other published elections (European Parliament, municipal). Matched by name; source: State Electoral Office, opendata.valimised.ee (CC BY 4.0).",
+      "personalVotes": "Personal votes",
+      "ranAs": "List",
+      "source": "Official election result",
+      "type": {
+        "RK": "Riigikogu",
+        "EP": "European Parliament",
+        "KOV": "Local elections"
+      },
+      "result": {
+        "elected": "Elected",
+        "notElected": "Not elected"
+      }
     },
     "activity": {
       "title": "Activity in parliament",

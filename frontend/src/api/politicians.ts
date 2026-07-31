@@ -4,14 +4,14 @@ import type { DataStatus, FactionOption, PageResponse, Politician, PoliticianPro
 export function fetchPoliticians(params: {
   q?: string;
   faction?: string;
-  activeOnly?: boolean;
+  status?: "current" | "former" | "all";
   page?: number;
   size?: number;
 }) {
   const query = new URLSearchParams();
   if (params.q) query.set("q", params.q);
   if (params.faction) query.set("faction", params.faction);
-  if (params.activeOnly !== undefined) query.set("activeOnly", String(params.activeOnly));
+  if (params.status) query.set("status", params.status);
   if (params.page !== undefined) query.set("page", String(params.page));
   if (params.size !== undefined) query.set("size", String(params.size));
   const suffix = query.toString() ? `?${query.toString()}` : "";

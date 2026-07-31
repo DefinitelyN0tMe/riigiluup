@@ -678,6 +678,11 @@
     "title": "Riigikogu liikmed",
     "searchPlaceholder": "Otsi nime järgi…",
     "allFactions": "Kõik fraktsioonid",
+    "status": {
+      "label": "Staatuse filter",
+      "current": "Praegused",
+      "former": "Endised"
+    },
     "factionOption": "{{name}} ({{count}})",
     "showing": "Kuvatud {{shown}} / {{total}} saadikut.",
     "backAll": "← Kõik saadikud",
@@ -710,22 +715,11 @@
       "seniorityHint": "Riigikogu andmetel parlamenditeenistuse päevad"
     },
     "election": {
-      "title": "Valimised",
-      "personalVotes": "Isiklikke hääli",
+      "title": "Kuidas mandaat saadi",
+      "personalVotes": "Isiklikke hääli (2023)",
       "mandateType": "Mandaat",
-      "ranAs": "Nimekiri",
+      "ranAs": "Kandideeris nimekirjas",
       "source": "Ametlik valimistulemus",
-      "matchNote": "Osalemine avaldatud valimistel (Riigikogu, Euroopa Parlament, kohalikud). Sobitatud nime järgi; allikas: Riigi Valimisteenistus, opendata.valimised.ee (CC BY 4.0).",
-      "type": {
-        "RK": "Riigikogu",
-        "EP": "Euroopa Parlament",
-        "KOV": "Kohalikud valimised"
-      },
-      "result": {
-        "elected": "Valitud",
-        "notElected": "Ei osutunud valituks",
-        "substitute": "Asendusliige"
-      },
       "mandate": {
         "PERSONAL": "Isikumandaat",
         "DISTRICT": "Ringkonnamandaat",
@@ -734,6 +728,22 @@
       },
       "substituteNote": "Sisenes Riigikokku asendusliikmena: kandideeris 2023, kuid ei osutunud otse valituks — asus lahkunud liikme (ministriks saanud või mandaadist loobunu) kohale.",
       "substituteUnknown": "Asendusliige — ei sisenenud Riigikokku 2023. aasta otsevalimise teel."
+    },
+    "otherElections": {
+      "title": "Osalemine teistel valimistel",
+      "matchNote": "Kandideerimised teistel avaldatud valimistel (Euroopa Parlament, kohalikud). Sobitatud nime järgi; allikas: Riigi Valimisteenistus, opendata.valimised.ee (CC BY 4.0).",
+      "personalVotes": "Isiklikke hääli",
+      "ranAs": "Nimekiri",
+      "source": "Ametlik valimistulemus",
+      "type": {
+        "RK": "Riigikogu",
+        "EP": "Euroopa Parlament",
+        "KOV": "Kohalikud valimised"
+      },
+      "result": {
+        "elected": "Valitud",
+        "notElected": "Ei osutunud valituks"
+      }
     },
     "activity": {
       "title": "Aktiivsus parlamendis",

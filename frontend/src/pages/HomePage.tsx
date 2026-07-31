@@ -345,7 +345,7 @@ export default function HomePage() {
   const status = useQuery({ queryKey: ["data-status"], queryFn: fetchDataStatus });
   const politicians = useQuery({
     queryKey: ["politicians-home"],
-    queryFn: () => fetchPoliticians({ activeOnly: true, page: 0, size: 6 }),
+    queryFn: () => fetchPoliticians({ status: "current", page: 0, size: 6 }),
   });
   const votes = useQuery({
     queryKey: ["votes-home"],

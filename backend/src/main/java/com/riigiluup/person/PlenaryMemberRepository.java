@@ -24,14 +24,14 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
 
     @Query("""
         select m from PlenaryMember m
-        where (:activeOnly = false or m.active = true)
+        where (:active is null or m.active = :active)
           and (:q is null or lower(m.fullName) like lower(concat('%', cast(:q as string), '%')))
           and (:faction is null or m.factionExternalId = cast(:faction as string))
         """)
     Page<PlenaryMember> searchByFaction(
             @Param("q") String q,
             @Param("faction") String faction,
-            @Param("activeOnly") boolean activeOnly,
+            @Param("active") Boolean active,
             Pageable pageable
     );
 

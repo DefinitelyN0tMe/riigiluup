@@ -58,7 +58,7 @@ export default function AdminAffiliationsSection({
     let cancelled = false;
     const t = setTimeout(async () => {
       try {
-        const page = await fetchPoliticians({ q: mpQuery, activeOnly: true, page: 0, size: 8 });
+        const page = await fetchPoliticians({ q: mpQuery, status: "current", page: 0, size: 8 });
         if (!cancelled) setMpSuggest(page.items);
       } catch { /* ignore */ }
     }, 200);

@@ -15,6 +15,7 @@ export default function PoliticiansPage() {
 
   const q = sp.get("q") ?? "";
   const faction = sp.get("faction") ?? "";
+  const status = (sp.get("status") as "current" | "former" | null) ?? "current";
   const page = sp.get("page") ? Number(sp.get("page")) : 0;
   const compareLeft = sp.get("compareLeft");
   const compareRight = sp.get("compareRight");
@@ -63,14 +64,14 @@ export default function PoliticiansPage() {
   const factions = useQuery({ queryKey: ["factions"], queryFn: fetchFactions });
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["politicians", q, faction, page],
+    queryKey: ["politicians", q, faction, status, page],
     queryFn: () =>
       fetchPoliticians({
         q: q || undefined,
         faction: faction || undefined,
         page,
         size: 52,
-        activeOnly: true,
+        status,
       }),
     placeholderData: (previous) => previous,
   });
@@ -126,6 +127,22 @@ export default function PoliticiansPage() {
             </option>
           ))}
         </select>
+
+        <div className="inline-flex rounded-full border border-rule bg-white p-0.5" role="group"
+             aria-label={t("politicians.status.label")}>
+          {(["current", "former"] as const).map((s) => (
+            <button
+              key={s}
+              type="button"
+              aria-pressed={status === s}
+              onClick={() => updateParams({ status: s === "current" ? undefined : s, page: undefined })}
+              className={`px-3.5 py-2 text-sm font-medium rounded-full transition-colors ${
+                status === s ? "bg-blue text-white" : "text-ink-2 hover:text-ink"}`}
+            >
+              {t(`politicians.status.${s}`)}
+            </button>
+          ))}
+        </div>
       </div>
 
       {chips.length > 0 && (
