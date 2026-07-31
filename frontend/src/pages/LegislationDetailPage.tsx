@@ -161,23 +161,31 @@ export default function LegislationDetailPage() {
         </section>
       )}
 
-      {speechesQuery.data && speechesQuery.data.totalElements > 0 && (
+      {speechesQuery.data && (
         <section aria-label={t("legislation.debatesTitle")}>
           <h2 className="text-lg font-semibold text-ink mb-1">
             {t("legislation.debatesTitle")}
           </h2>
-          <p className="text-xs text-slate-500 mb-3">{t("legislation.debatesNote")}</p>
-          <Link
-            to={`/speeches?billId=${encodeURIComponent(id!)}${
-              data.mark != null && data.draftTypeCode
-                ? `&billCode=${encodeURIComponent(`${data.mark} ${data.draftTypeCode}`)}`
-                : ""
-            }`}
-            className="inline-flex items-center gap-2 rounded-md border border-estonia/40 bg-estonia/5 px-4 py-2.5 text-sm font-medium text-estonia hover:bg-estonia/10 transition-colors"
-          >
-            {t("legislation.debatesLink", { count: speechesQuery.data.totalElements })}
-            <span aria-hidden="true">→</span>
-          </Link>
+          {speechesQuery.data.totalElements > 0 ? (
+            <>
+              <p className="text-xs text-slate-500 mb-3">{t("legislation.debatesNote")}</p>
+              <Link
+                to={`/speeches?billId=${encodeURIComponent(id!)}${
+                  data.mark != null && data.draftTypeCode
+                    ? `&billCode=${encodeURIComponent(`${data.mark} ${data.draftTypeCode}`)}`
+                    : ""
+                }`}
+                className="inline-flex items-center gap-2 rounded-md border border-estonia/40 bg-estonia/5 px-4 py-2.5 text-sm font-medium text-estonia hover:bg-estonia/10 transition-colors"
+              >
+                {t("legislation.debatesLink", { count: speechesQuery.data.totalElements })}
+                <span aria-hidden="true">→</span>
+              </Link>
+            </>
+          ) : (
+            <p className="text-sm text-slate-600 border-l-2 border-slate-200 pl-3">
+              {t("legislation.debatesNotFound")}
+            </p>
+          )}
         </section>
       )}
     </div>

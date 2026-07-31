@@ -820,6 +820,7 @@
     "debatesTitle": "Debate and stenograms",
     "debatesNote": "Linked by the draft code in the agenda item (e.g. 644 SE). Browse them on the Speeches tab, filtered to this bill.",
     "debatesLink": "View speeches on this bill ({{count}})",
+    "debatesNotFound": "No linked stenogram found. Speeches are linked to a bill by the draft code (e.g. 737 SE) in the agenda-item title — if the debate ran under a non-standard title without the code, or the bill has not been debated in the chamber yet, no link is available.",
     "introduction": "Introduction",
     "sponsors": "Sponsors ({{count}})",
     "timeline": "Legislative timeline",
