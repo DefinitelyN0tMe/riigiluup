@@ -791,6 +791,8 @@
     "rtPublication": "Riigi Teataja",
     "rtCurrent": "Kehtiv redaktsioon",
     "votesTitle": "Nimelised hääletused eelnõu üle",
+    "debatesTitle": "Arutelu ja stenogrammid",
+    "debatesNote": "Seotud päevakorrapunkti eelnõu koodi (nt 644 SE) järgi. Täistekst avaneb stenogrammis.",
     "introduction": "Sissejuhatus",
     "sponsors": "Algatajad ({{count}})",
     "timeline": "Menetluse ajajoon",

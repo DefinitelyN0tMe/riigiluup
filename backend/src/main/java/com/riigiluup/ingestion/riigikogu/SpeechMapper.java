@@ -23,7 +23,9 @@ public class SpeechMapper {
             String sittingTitle,
             String sittingLink,
             String agendaItemTitle,
-            String text
+            String text,
+            /** Riigikogu composition from the verbatim record; may be null on old sittings. */
+            Integer membership
     ) {}
 
     public List<FlatSpeech> flatten(VerbatimDto verbatim) {
@@ -41,7 +43,8 @@ public class SpeechMapper {
                         verbatim.title(),
                         verbatim.link(),
                         plainText(item.title()),
-                        e.text()
+                        e.text(),
+                        verbatim.membership()
                 ));
             }
         }

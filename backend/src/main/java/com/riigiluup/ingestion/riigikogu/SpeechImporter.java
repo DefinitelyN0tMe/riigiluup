@@ -3,6 +3,8 @@ package com.riigiluup.ingestion.riigikogu;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.person.PlenaryMemberRepository;
 import com.riigiluup.speech.Speech;
+import com.riigiluup.speech.SpeechBillLink;
+import com.riigiluup.speech.SpeechBillLinkRepository;
 import com.riigiluup.speech.SpeechRepository;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class SpeechImporter {
     private final RiigikoguClient client;
     private final SpeechMapper mapper;
     private final SpeechRepository speechRepo;
+    private final SpeechBillLinkRepository linkRepo;
     private final PlenaryMemberRepository memberRepo;
     private final ImportRunLogRepository runLogRepo;
     private final TransactionTemplate tx;
@@ -42,6 +45,7 @@ public class SpeechImporter {
             RiigikoguClient client,
             SpeechMapper mapper,
             SpeechRepository speechRepo,
+            SpeechBillLinkRepository linkRepo,
             PlenaryMemberRepository memberRepo,
             ImportRunLogRepository runLogRepo,
             PlatformTransactionManager txManager
@@ -49,6 +53,7 @@ public class SpeechImporter {
         this.client = client;
         this.mapper = mapper;
         this.speechRepo = speechRepo;
+        this.linkRepo = linkRepo;
         this.memberRepo = memberRepo;
         this.runLogRepo = runLogRepo;
         this.tx = new TransactionTemplate(txManager);
@@ -134,9 +139,14 @@ public class SpeechImporter {
 
     private void replaceSitting(String sittingLink, List<SpeechMapper.FlatSpeech> speeches,
                                 Roster roster) {
+        // Links go with their speeches: the FK cascade removes them on this bulk delete.
         speechRepo.deleteBySourceNameAndSourceUrl(client.sourceName(), sittingLink);
         for (SpeechMapper.FlatSpeech f : speeches) {
-            speechRepo.save(Speech.builder()
+            Integer membership = f.membership() != null
+                    ? f.membership()
+                    : RiigikoguComposition.at(f.spokenAt() == null ? null
+                            : f.spokenAt().atZone(java.time.ZoneOffset.UTC).toLocalDate());
+            Speech saved = speechRepo.save(Speech.builder()
                     .sourceName(client.sourceName())
                     .speakerUuid(f.speakerUuid())
                     .plenaryMember(resolveSpeaker(f, roster))
@@ -144,10 +154,18 @@ public class SpeechImporter {
                     .spokenAt(f.spokenAt())
                     .sittingTitle(f.sittingTitle())
                     .agendaItemTitle(f.agendaItemTitle())
+                    .membership(membership)
                     .text(f.text())
                     .sourceUrl(f.sittingLink())
                     .importedAt(Instant.now())
                     .build());
+            for (AgendaDraftRef ref : AgendaDraftRef.parse(f.agendaItemTitle())) {
+                linkRepo.save(SpeechBillLink.builder()
+                        .speechId(saved.getId())
+                        .mark(ref.mark())
+                        .draftTypeCode(ref.typeCode())
+                        .build());
+            }
         }
     }
 }

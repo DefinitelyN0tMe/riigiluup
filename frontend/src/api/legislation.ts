@@ -1,5 +1,6 @@
 import { apiGet } from "./client";
 import type {
+  BillSpeech,
   LegislationDetail,
   LegislationListItem,
   PageResponse,
@@ -33,6 +34,10 @@ export function fetchLegislation(params: {
 
 export function fetchLegislationDetail(id: string) {
   return apiGet<LegislationDetail>(`/api/v1/legislation/${encodeURIComponent(id)}`);
+}
+
+export function fetchBillSpeeches(id: string) {
+  return apiGet<BillSpeech[]>(`/api/v1/legislation/${encodeURIComponent(id)}/speeches`);
 }
 
 export function fetchPoliticianLegislation(slug: string, page = 0, size = 20) {

@@ -46,6 +46,10 @@ public class Speech {
     @Column(name = "agenda_item_title", length = 1024)
     private String agendaItemTitle;
 
+    /** Riigikogu composition (koosseis) of the sitting; the join key to a bill's membership. */
+    @Column(name = "membership")
+    private Integer membership;
+
     @Column(columnDefinition = "text", nullable = false)
     private String text;
 

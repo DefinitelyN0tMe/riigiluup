@@ -791,6 +791,8 @@
     "rtPublication": "Riigi Teataja",
     "rtCurrent": "Text in force",
     "votesTitle": "Roll-call votes on this bill",
+    "debatesTitle": "Debate and stenograms",
+    "debatesNote": "Linked by the draft code in the agenda item (e.g. 644 SE). Full text opens in the stenogram.",
     "introduction": "Introduction",
     "sponsors": "Sponsors ({{count}})",
     "timeline": "Legislative timeline",

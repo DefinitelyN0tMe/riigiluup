@@ -1,12 +1,13 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { fetchLegislationDetail } from "../api/legislation";
+import { fetchBillSpeeches, fetchLegislationDetail } from "../api/legislation";
 import { fetchInitiativesByBill } from "../api/initiatives";
 import StageTimeline from "../components/StageTimeline";
 import LoadFailed from "../components/LoadFailed";
 import TopicChip from "../components/TopicChip";
-import { formatDate } from "../lib/formatDate";
+import { formatDate, formatDateTime } from "../lib/formatDate";
+import type { BillSpeech } from "../types";
 
 export default function LegislationDetailPage() {
   const { t } = useTranslation();
@@ -19,6 +20,11 @@ export default function LegislationDetailPage() {
   const initiativesQuery = useQuery({
     queryKey: ["legislation-initiatives", id],
     queryFn: () => fetchInitiativesByBill(id!),
+    enabled: !!id,
+  });
+  const speechesQuery = useQuery({
+    queryKey: ["legislation-speeches", id],
+    queryFn: () => fetchBillSpeeches(id!),
     enabled: !!id,
   });
 
@@ -154,6 +160,66 @@ export default function LegislationDetailPage() {
           </ul>
         </section>
       )}
+
+      {speechesQuery.data && speechesQuery.data.length > 0 && (
+        <section aria-label={t("legislation.debatesTitle")}>
+          <h2 className="text-lg font-semibold text-ink mb-1">
+            {t("legislation.debatesTitle")}
+          </h2>
+          <p className="text-xs text-slate-500 mb-3">{t("legislation.debatesNote")}</p>
+          <div className="space-y-5">
+            {groupByAgenda(speechesQuery.data).map((group) => (
+              <div key={group.title} className="border border-slate-200 rounded-md overflow-hidden">
+                <div className="bg-off px-3 py-2 font-mono text-[10px] tracking-[0.1em] uppercase text-muted">
+                  {group.title}
+                </div>
+                <ul className="divide-y divide-slate-200">
+                  {group.speeches.map((s) => (
+                    <li key={s.id} className="p-3">
+                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1">
+                        {s.memberSlug ? (
+                          <Link to={`/politicians/${encodeURIComponent(s.memberSlug)}`}
+                                className="text-sm font-semibold text-blue hover:underline">
+                            {s.memberName ?? s.speaker}
+                          </Link>
+                        ) : (
+                          <span className="text-sm font-semibold text-ink">{s.speaker}</span>
+                        )}
+                        <span className="font-mono text-[11px] text-muted tracking-[0.06em]">
+                          {formatDateTime(s.spokenAt)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-700 line-clamp-3">{s.excerpt}</p>
+                      <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer"
+                         aria-label={`${t("speeches.openStenogram")} (${t("a11y.opensNewTab")})`}
+                         className="inline-block mt-1.5 font-mono text-[11px] text-estonia hover:underline">
+                        {t("speeches.openStenogram")} ↗
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
+}
+
+/** Group a bill's speeches by agenda-item title (i.e. by reading), preserving first-seen order. */
+function groupByAgenda(speeches: BillSpeech[]): { title: string; speeches: BillSpeech[] }[] {
+  const groups: { title: string; speeches: BillSpeech[] }[] = [];
+  const byTitle = new Map<string, BillSpeech[]>();
+  for (const s of speeches) {
+    const title = s.agendaItemTitle ?? "";
+    let bucket = byTitle.get(title);
+    if (!bucket) {
+      bucket = [];
+      byTitle.set(title, bucket);
+      groups.push({ title, speeches: bucket });
+    }
+    bucket.push(s);
+  }
+  return groups;
 }

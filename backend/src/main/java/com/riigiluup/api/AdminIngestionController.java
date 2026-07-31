@@ -9,6 +9,7 @@ import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberImporter;
 import com.riigiluup.ingestion.riigikogu.UsergroupImporter;
+import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
 import com.riigiluup.ingestion.riigikogu.SponsorRelinker;
 import com.riigiluup.ingestion.riigikogu.VoteBillLinker;
 import com.riigiluup.ingestion.riigikogu.VoteEventImporter;
@@ -36,6 +37,7 @@ public class AdminIngestionController {
     private final VoteBillLinker voteBillLinker;
     private final WikidataImporter wikidataImporter;
     private final SponsorRelinker sponsorRelinker;
+    private final SpeechBillLinker speechBillLinker;
     private final ElectionResultsImporter electionResultsImporter;
     private final MemberActivityImporter memberActivityImporter;
     private final PartyFinanceImporter partyFinanceImporter;
@@ -108,6 +110,15 @@ public class AdminIngestionController {
     @PostMapping("/relink-sponsors")
     public Map<String, Object> relinkSponsors() {
         return Map.of("relinked", sponsorRelinker.relinkOrphanSponsors());
+    }
+
+    /**
+     * Rebuild speech -> bill links from agenda-item titles for speeches already ingested.
+     * Idempotent full rebuild; ongoing speech imports write these links per sitting.
+     */
+    @PostMapping("/link-speeches-to-bills")
+    public Map<String, Object> linkSpeechesToBills() {
+        return speechBillLinker.linkAll();
     }
 
     /**

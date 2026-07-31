@@ -7,11 +7,48 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.List;
 
 public interface SpeechRepository extends JpaRepository<Speech, Long> {
 
     /** Per-sitting replace on re-import — the source has no per-event natural key. */
     long deleteBySourceNameAndSourceUrl(String sourceName, String sourceUrl);
+
+    /**
+     * All speeches debating a given bill, resolved via speech_bill_link on the draft code and
+     * matched to the bill's composition. Ordered chronologically so the frontend can group them
+     * by reading. Excerpt is the speech opening (the full text lives behind source_url).
+     */
+    @Query(nativeQuery = true, value = """
+            SELECT s.id AS id,
+                   s.speaker_raw AS speakerRaw,
+                   s.spoken_at AS spokenAt,
+                   s.sitting_title AS sittingTitle,
+                   s.agenda_item_title AS agendaItemTitle,
+                   s.source_url AS sourceUrl,
+                   pm.slug AS memberSlug,
+                   pm.full_name AS memberName,
+                   left(s.text, 320) AS excerpt
+            FROM speech s
+            JOIN speech_bill_link l ON l.speech_id = s.id
+            LEFT JOIN plenary_member pm ON pm.id = s.plenary_member_id
+            WHERE l.mark = :mark
+              AND l.draft_type_code = cast(:draftTypeCode AS text)
+              AND (cast(:membership AS int) IS NULL OR s.membership = cast(:membership AS int))
+            ORDER BY s.spoken_at ASC, s.id ASC
+            """)
+    List<SpeechSearchRow> findForBill(@Param("mark") int mark,
+                                      @Param("draftTypeCode") String draftTypeCode,
+                                      @Param("membership") Integer membership);
+
+    /** Lightweight (id, agenda title) projection for the link backfill — avoids loading text. */
+    @Query("SELECT s.id AS id, s.agendaItemTitle AS agendaItemTitle FROM Speech s")
+    List<SpeechAgendaRow> findAllAgendaTitles();
+
+    interface SpeechAgendaRow {
+        Long getId();
+        String getAgendaItemTitle();
+    }
 
     /**
      * Full-text search over speech texts. 'simple' config — PostgreSQL has no Estonian

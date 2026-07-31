@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,6 +33,7 @@ public class LegislationController {
     private final LegislativeSponsorshipRepository sponsorshipRepo;
     private final LegislativeItemTopicRepository itemTopicRepo;
     private final com.riigiluup.vote.VoteEventRepository voteEventRepo;
+    private final com.riigiluup.speech.SpeechRepository speechRepo;
     private final LegislationMapper mapper;
 
     @GetMapping
@@ -68,5 +70,24 @@ public class LegislationController {
                 sponsorshipRepo.findByLegislativeItem(item),
                 itemTopicRepo.findByLegislativeItem(item),
                 voteEventRepo.findByLegislativeItemOrderByStartedAtAsc(item)));
+    }
+
+    /**
+     * Stenogram speeches debating this bill, resolved from agenda-item draft codes (see
+     * {@code AgendaDraftRef}). Returns an empty list when the bill has no draft code or no
+     * matched debate — never a guessed link.
+     */
+    @GetMapping("/{id}/speeches")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<BillSpeechDto>> speeches(@PathVariable UUID id) {
+        LegislativeItem item = itemRepo.findById(id).orElse(null);
+        if (item == null) return ResponseEntity.notFound().build();
+        if (item.getMark() == null || item.getDraftTypeCode() == null) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<BillSpeechDto> speeches = speechRepo
+                .findForBill(item.getMark(), item.getDraftTypeCode(), item.getMembership())
+                .stream().map(BillSpeechDto::from).toList();
+        return ResponseEntity.ok(speeches);
     }
 }
