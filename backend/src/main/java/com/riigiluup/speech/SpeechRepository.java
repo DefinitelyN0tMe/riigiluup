@@ -40,7 +40,7 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
                    pm.slug AS memberSlug,
                    pm.full_name AS memberName,
                    CASE WHEN cast(:q AS text) IS NULL OR cast(:q AS text) = ''
-                        THEN left(s.text, 320)
+                        THEN s.text
                         ELSE ts_headline('simple', s.text, plainto_tsquery('simple', cast(:q AS text)),
                                          'MaxFragments=2, MaxWords=30, MinWords=10, StartSel=[[, StopSel=]]')
                    END AS excerpt,
@@ -69,7 +69,12 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
                      WHERE l.speech_id = s.id AND l.mark = cast(:billMark AS int)
                        AND l.draft_type_code = cast(:billDraftType AS text)))
               AND (cast(:billMembership AS int) IS NULL OR s.membership = cast(:billMembership AS int))
-            ORDER BY s.spoken_at DESC, s.id DESC
+            -- When filtered to a bill, read the debate chronologically (top to bottom); otherwise
+            -- the general feed shows the newest speeches first.
+            ORDER BY
+                CASE WHEN cast(:billMark AS int) IS NOT NULL THEN s.spoken_at END ASC,
+                CASE WHEN cast(:billMark AS int) IS NULL     THEN s.spoken_at END DESC,
+                s.id ASC
             """,
             countQuery = """
             SELECT count(*)

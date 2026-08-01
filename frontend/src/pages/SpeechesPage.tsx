@@ -55,7 +55,8 @@ export default function SpeechesPage() {
       member: member || undefined,
       billId: billId || undefined,
       page,
-      size: 20,
+      // Reading a whole debate (bill filter, no search) → larger pages, fewer clicks.
+      size: billId && !q ? 50 : 20,
     }),
     placeholderData: (prev) => prev,
   });
@@ -155,7 +156,9 @@ export default function SpeechesPage() {
                   {t("speeches.billLink", { code: s.billCode })}
                 </Link>
               )}
-              <Excerpt text={s.excerpt} />
+              {q
+                ? <Excerpt text={s.excerpt} />
+                : <p className="font-serif text-[15px] leading-relaxed text-ink-2 whitespace-pre-line">{s.excerpt}</p>}
               <a href={s.sourceUrl} target="_blank" rel="noreferrer noopener"
                  className="inline-block mt-2 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
                 {t("speeches.openStenogram")} ↗
