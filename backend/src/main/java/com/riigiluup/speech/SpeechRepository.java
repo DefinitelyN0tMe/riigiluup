@@ -28,7 +28,10 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
      * stemmer, so matching is exact-wordform (documented in methodology). Excerpts are
      * built server-side: ts_headline marks hits with [[ ]] delimiters that the frontend
      * converts to elements itself (never raw HTML into the DOM). Null-safe casts follow
-     * the project convention for optional filters.
+     * the project convention for optional filters. Ordering is chronological (oldest first)
+     * when filtered to a bill, so a debate reads top to bottom; newest-first otherwise.
+     * NB: no SQL line comments inside the query — Hibernate appends the LIMIT clause and a
+     * trailing "--" comment would swallow its bind parameter.
      */
     @Query(nativeQuery = true, value = """
             SELECT s.id AS id,
@@ -69,8 +72,6 @@ public interface SpeechRepository extends JpaRepository<Speech, Long> {
                      WHERE l.speech_id = s.id AND l.mark = cast(:billMark AS int)
                        AND l.draft_type_code = cast(:billDraftType AS text)))
               AND (cast(:billMembership AS int) IS NULL OR s.membership = cast(:billMembership AS int))
-            -- When filtered to a bill, read the debate chronologically (top to bottom); otherwise
-            -- the general feed shows the newest speeches first.
             ORDER BY
                 CASE WHEN cast(:billMark AS int) IS NOT NULL THEN s.spoken_at END ASC,
                 CASE WHEN cast(:billMark AS int) IS NULL     THEN s.spoken_at END DESC,
