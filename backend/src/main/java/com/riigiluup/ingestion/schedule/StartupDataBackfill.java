@@ -58,13 +58,17 @@ public class StartupDataBackfill {
     }
 
     private void loadCampaignsIfNeeded() {
-        try {
-            if (electionRepo.countByElectionCodeIn(ElectionResultsImporter.CAMPAIGN_CODES) == 0) {
-                log.info("Startup backfill: importing EP/KOV electoral footprint");
-                electionResultsImporter.importCampaigns();
+        // Gate per code, not all-or-nothing: a code that failed or was unpublished at an earlier
+        // boot is retried on the next boot, independent of the codes that already loaded.
+        for (String code : ElectionResultsImporter.CAMPAIGN_CODES) {
+            try {
+                if (electionRepo.countByElectionCode(code) == 0) {
+                    log.info("Startup backfill: importing election {}", code);
+                    electionResultsImporter.importCampaign(code);
+                }
+            } catch (Exception e) {
+                log.warn("Startup campaign import {} failed (retries next boot): {}", code, e.toString());
             }
-        } catch (Exception e) {
-            log.warn("Startup campaign import failed (retries next boot): {}", e.toString());
         }
     }
 }

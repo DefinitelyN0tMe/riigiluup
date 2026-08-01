@@ -312,14 +312,14 @@ export default function PoliticianProfilePage() {
       )}
 
       {/* Added feature — participation in other elections (EP / KOV), complementary to the seat. */}
-      {data.elections.some((e) => e.electionType !== "RK") && (
+      {(data.elections ?? []).some((e) => e.electionType !== "RK") && (
         <section aria-label={t("profile.otherElections.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
           <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
             {t("profile.otherElections.title")}
           </h2>
           <p className="text-[13px] leading-snug text-ink-2 mb-4">{t("profile.otherElections.matchNote")}</p>
           <ul className="flex flex-col divide-y divide-rule border border-rule rounded-[16px] overflow-hidden">
-            {data.elections.filter((e) => e.electionType !== "RK").map((c) => (
+            {(data.elections ?? []).filter((e) => e.electionType !== "RK").map((c) => (
               <li key={c.electionCode} className="p-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">

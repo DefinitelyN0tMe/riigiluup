@@ -54,7 +54,7 @@ class FileProxyControllerTest {
     void loader_throws_busy_when_no_permit_available() {
         RiigikoguClient client = mock(RiigikoguClient.class);
         // Zero permits → tryAcquire always fails → busy, upstream never called.
-        FileProxyController.Loader loader = new FileProxyController.Loader(client, 0, 20);
+        FileProxyController.Loader loader = new FileProxyController.Loader(client, 0, 20, "");
         assertThatThrownBy(() -> loader.load(VALID_UUID))
                 .isInstanceOf(FileProxyController.UpstreamBusyException.class);
         verifyNoInteractions(client);
@@ -65,14 +65,14 @@ class FileProxyControllerTest {
         RiigikoguClient client = mock(RiigikoguClient.class);
         byte[] payload = {1, 2, 3};
         when(client.fetchFileBytes(VALID_UUID)).thenReturn(payload);
-        FileProxyController.Loader loader = new FileProxyController.Loader(client, 4, 1000);
+        FileProxyController.Loader loader = new FileProxyController.Loader(client, 4, 1000, "");
         assertThat(loader.load(VALID_UUID)).isEqualTo(payload);
     }
 
     @Test
     void empty_upstream_throws_so_it_is_not_cached() {
         RiigikoguClient client = mock(RiigikoguClient.class);
-        FileProxyController.Loader loader = new FileProxyController.Loader(client, 4, 1000);
+        FileProxyController.Loader loader = new FileProxyController.Loader(client, 4, 1000, "");
         for (byte[] empty : new byte[][]{null, new byte[0]}) {
             when(client.fetchFileBytes(VALID_UUID)).thenReturn(empty);
             assertThatThrownBy(() -> loader.load(VALID_UUID))
@@ -114,7 +114,7 @@ class FileProxyControllerTest {
     static class LoaderTestConfig {
         @Bean
         FileProxyController.Loader loader(RiigikoguClient client) {
-            return new FileProxyController.Loader(client, 4, 1000);
+            return new FileProxyController.Loader(client, 4, 1000, "");
         }
     }
 }

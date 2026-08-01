@@ -373,14 +373,3 @@ export type AdminStatus = {
   generatedAt: string;
 };
 
-export type BillSpeech = {
-  id: number;
-  speaker: string;
-  memberSlug: string | null;
-  memberName: string | null;
-  spokenAt: string;
-  sittingTitle: string | null;
-  agendaItemTitle: string | null;
-  sourceUrl: string;
-  excerpt: string;
-};
