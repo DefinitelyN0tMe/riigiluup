@@ -1,4 +1,23 @@
-# Private beta — keep the whole site out of every index. The nginx auth gate already returns
-# 401 to crawlers; this is belt-and-suspenders. Restore Allow: / (+ sitemap) when going public.
+# Private beta. The nginx auth gate returns 401 to everyone except a whitelist of social-media
+# link-preview crawlers, so real search engines cannot read the site regardless of this file.
+# We explicitly ALLOW those preview crawlers here so shared links render a card during the beta;
+# everyone else stays Disallow. Restore a plain "User-agent: * / Allow: /" (+ sitemap) at launch.
+User-agent: TelegramBot
+User-agent: Twitterbot
+User-agent: facebookexternalhit
+User-agent: Facebot
+User-agent: WhatsApp
+User-agent: Slackbot
+User-agent: Slack-ImgProxy
+User-agent: Discordbot
+User-agent: LinkedInBot
+User-agent: SkypeUriPreview
+User-agent: vkShare
+User-agent: Mastodon
+User-agent: Pinterest
+User-agent: redditbot
+User-agent: SignalBot
+Allow: /
+
 User-agent: *
 Disallow: /
