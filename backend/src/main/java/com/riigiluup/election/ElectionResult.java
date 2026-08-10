@@ -41,6 +41,17 @@ public class ElectionResult {
     @Column(name = "district_number")
     private Integer districtNumber;
 
+    /** Named district (used for historical rows, whose district numbering is not stable). */
+    @Column(name = "district_name", length = 256)
+    private String districtName;
+
+    /**
+     * True for a pre-2023 Riigikogu candidacy from Martin Mölder's compiled historical dataset
+     * (shown in a separate, attributed block); false for the open-data footprint (RK_2023/EP/KOV).
+     */
+    @Column(name = "historical", nullable = false)
+    private boolean historical;
+
     /** Party the MP ran for at the election (may differ from their current faction). */
     @Column(name = "party_name", length = 256)
     private String partyName;

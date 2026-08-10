@@ -750,6 +750,13 @@
         "notElected": "Ei osutunud valituks"
       }
     },
+    "electionHistory": {
+      "title": "Valimisajalugu (Riigikogu kuni 2023)",
+      "lead": "Varasemad Riigikogu kandideerimised, sobitatud sünniaja järgi.",
+      "district": "Ringkond",
+      "credit": "Andmed: Martin Mölder,",
+      "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
+    },
     "activity": {
       "title": "Aktiivsus parlamendis",
       "speeches": "Sõnavõtud",
@@ -992,7 +999,11 @@
     "analytics": {
       "title": "Analüütika",
       "subtitle": "Privaatne Umami statistika — ilma küpsiste ja isikuandmeteta.",
-      "range": { "24h": "24 t", "7d": "7 p", "30d": "30 p" },
+      "range": {
+        "24h": "24 t",
+        "7d": "7 p",
+        "30d": "30 p"
+      },
       "activeNow": "Praegu saidil",
       "visitors": "Külastajad",
       "visits": "Külastused",

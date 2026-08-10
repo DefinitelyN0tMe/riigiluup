@@ -2,6 +2,7 @@ package com.riigiluup.ingestion.schedule;
 
 import com.riigiluup.election.ElectionResultRepository;
 import com.riigiluup.election.ElectionResultsImporter;
+import com.riigiluup.election.HistoricalElectionImporter;
 import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
 import com.riigiluup.speech.SpeechBillLinkRepository;
 import com.riigiluup.speech.SpeechRepository;
@@ -33,6 +34,7 @@ public class StartupDataBackfill {
     private final SpeechBillLinker speechBillLinker;
     private final ElectionResultRepository electionRepo;
     private final ElectionResultsImporter electionResultsImporter;
+    private final HistoricalElectionImporter historicalElectionImporter;
 
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
@@ -44,6 +46,7 @@ public class StartupDataBackfill {
     private void backfillOnce() {
         linkSpeechesIfNeeded();
         loadCampaignsIfNeeded();
+        loadHistoricalIfNeeded();
     }
 
     private void linkSpeechesIfNeeded() {
@@ -69,6 +72,17 @@ public class StartupDataBackfill {
             } catch (Exception e) {
                 log.warn("Startup campaign import {} failed (retries next boot): {}", code, e.toString());
             }
+        }
+    }
+
+    private void loadHistoricalIfNeeded() {
+        try {
+            if (electionRepo.countByHistoricalTrue() == 0) {
+                log.info("Startup backfill: importing pre-2023 historical electoral history (Mölder dataset)");
+                historicalElectionImporter.importHistorical();
+            }
+        } catch (Exception e) {
+            log.warn("Startup historical election import failed (retries next boot): {}", e.toString());
         }
     }
 }

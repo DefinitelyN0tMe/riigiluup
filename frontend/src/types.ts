@@ -131,6 +131,8 @@ export type Campaign = {
   partyName: string | null;
   ballotNumber: number | null;
   sourceUrl: string;
+  historical: boolean;
+  districtName: string | null;
 };
 export type ActivityInfo = {
   speeches: number;

@@ -750,6 +750,13 @@
         "notElected": "Not elected"
       }
     },
+    "electionHistory": {
+      "title": "Electoral history (Riigikogu before 2023)",
+      "lead": "Earlier Riigikogu candidacies, matched by date of birth.",
+      "district": "District",
+      "credit": "Data: Martin Mölder,",
+      "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
+    },
     "activity": {
       "title": "Activity in parliament",
       "speeches": "Speeches",
@@ -992,7 +999,11 @@
     "analytics": {
       "title": "Analytics",
       "subtitle": "Private Umami stats — no cookies, no personal data.",
-      "range": { "24h": "24h", "7d": "7d", "30d": "30d" },
+      "range": {
+        "24h": "24h",
+        "7d": "7d",
+        "30d": "30d"
+      },
       "activeNow": "Active now",
       "visitors": "Visitors",
       "visits": "Visits",

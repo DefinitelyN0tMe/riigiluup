@@ -127,7 +127,8 @@ public class PoliticianProfileMapper {
         // The seat block stays exactly as before: the Riigikogu (RK) result, i.e. how the MP
         // won their seat. Other elections (EP/KOV) are surfaced separately as a footprint list.
         PoliticianProfileDto.ElectionInfo election = allCampaigns.stream()
-                .filter(er -> er.getElectionCode() != null && er.getElectionCode().startsWith("RK_"))
+                .filter(er -> !er.isHistorical()
+                        && er.getElectionCode() != null && er.getElectionCode().startsWith("RK_"))
                 .findFirst()
                 .map(er -> new PoliticianProfileDto.ElectionInfo(
                         er.getElectionCode(), er.getPersonalVotes(), er.getMandateType(),
@@ -227,11 +228,15 @@ public class PoliticianProfileMapper {
         String[] parts = code.split("_", 2);
         String type = parts[0];
         int year = parts.length > 1 ? parseYear(parts[1]) : 0;
+        // Historical (Mölder) rows point to eestipoliitika.ee (his data site); open-data rows to
+        // the official results site, e.g. RK_2023 -> https://rk2023.valimised.ee.
+        String sourceUrl = er.isHistorical()
+                ? "https://www.eestipoliitika.ee"
+                : "https://" + type.toLowerCase(java.util.Locale.ROOT) + year + ".valimised.ee";
         return new PoliticianProfileDto.CampaignInfo(
                 code, type, year, er.isElected(), er.getPersonalVotes(), er.getMandateType(),
-                er.getDistrictNumber(), er.getPartyName(), er.getBallotNumber(),
-                // e.g. RK_2023 -> https://rk2023.valimised.ee (the official results site).
-                "https://" + type.toLowerCase(java.util.Locale.ROOT) + year + ".valimised.ee");
+                er.getDistrictNumber(), er.getPartyName(), er.getBallotNumber(), sourceUrl,
+                er.isHistorical(), er.getDistrictName());
     }
 
     private static int parseYear(String s) {

@@ -39,6 +39,7 @@ public class AdminIngestionController {
     private final SponsorRelinker sponsorRelinker;
     private final SpeechBillLinker speechBillLinker;
     private final ElectionResultsImporter electionResultsImporter;
+    private final com.riigiluup.election.HistoricalElectionImporter historicalElectionImporter;
     private final MemberActivityImporter memberActivityImporter;
     private final PartyFinanceImporter partyFinanceImporter;
     private final com.riigiluup.ingestion.riigikogu.GovernmentQuestionImporter governmentQuestionImporter;
@@ -130,6 +131,16 @@ public class AdminIngestionController {
         int rk = electionResultsImporter.importRk2023();
         Map<String, Integer> campaigns = electionResultsImporter.importCampaigns();
         return Map.of("RK_2023", rk, "campaigns", campaigns);
+    }
+
+    /**
+     * Import the pre-2023 Riigikogu electoral history for current MPs from Martin Mölder's
+     * compiled dataset (bundled, 1992-2019). Matched by birth date + surname token; idempotent
+     * full replace of the historical rows.
+     */
+    @PostMapping("/elections-historical")
+    public Map<String, Object> runHistoricalElectionImport() {
+        return Map.of("historicalRows", historicalElectionImporter.importHistorical());
     }
 
     /**

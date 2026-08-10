@@ -66,7 +66,9 @@ public record PoliticianProfileDto(
             Integer districtNumber,
             String partyName,
             Integer ballotNumber,
-            String sourceUrl
+            String sourceUrl,
+            boolean historical,    // true for the pre-2023 RK history (Mölder dataset)
+            String districtName    // named district, set for historical rows
     ) {}
     /** A party-membership period from Wikidata P102. Distinct from faction and electoral list. */
     public record PartyMembership(String partyLabel, String partyQid,

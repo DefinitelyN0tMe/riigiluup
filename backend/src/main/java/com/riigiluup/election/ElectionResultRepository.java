@@ -16,6 +16,14 @@ public interface ElectionResultRepository extends JpaRepository<ElectionResult, 
     /** Rows for one election code — used to gate the per-code startup campaign load. */
     long countByElectionCode(String electionCode);
 
+    /** Historical (Mölder-sourced, pre-2023) rows — used to gate the startup historical load. */
+    long countByHistoricalTrue();
+
+    /** Idempotent full-replace for the historical layer. */
+    @Modifying
+    @Query("delete from ElectionResult e where e.historical = true")
+    void deleteAllHistorical();
+
     /**
      * Bulk delete so the rows are removed immediately, before the fresh inserts flush —
      * a derived deleteBy loads entities and Hibernate would order the new inserts ahead of

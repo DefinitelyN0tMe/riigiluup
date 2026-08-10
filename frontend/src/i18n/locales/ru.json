@@ -768,6 +768,13 @@
         "notElected": "Не избран(-а)"
       }
     },
+    "electionHistory": {
+      "title": "История выборов (Рийгикогу до 2023)",
+      "lead": "Прежние кандидатуры в Рийгикогу, сопоставлены по дате рождения.",
+      "district": "Округ",
+      "credit": "Данные: Martin Mölder,",
+      "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
+    },
     "activity": {
       "title": "Активность в парламенте",
       "speeches": "Выступления",
@@ -1034,7 +1041,11 @@
     "analytics": {
       "title": "Аналитика",
       "subtitle": "Приватная статистика Umami — без cookies и персональных данных.",
-      "range": { "24h": "24 ч", "7d": "7 дн", "30d": "30 дн" },
+      "range": {
+        "24h": "24 ч",
+        "7d": "7 дн",
+        "30d": "30 дн"
+      },
       "activeNow": "Сейчас на сайте",
       "visitors": "Посетители",
       "visits": "Визиты",

@@ -312,14 +312,14 @@ export default function PoliticianProfilePage() {
       )}
 
       {/* Added feature — participation in other elections (EP / KOV), complementary to the seat. */}
-      {(data.elections ?? []).some((e) => e.electionType !== "RK") && (
+      {(data.elections ?? []).some((e) => e.electionType !== "RK" && !e.historical) && (
         <section aria-label={t("profile.otherElections.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
           <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
             {t("profile.otherElections.title")}
           </h2>
           <p className="text-[13px] leading-snug text-ink-2 mb-4">{t("profile.otherElections.matchNote")}</p>
           <ul className="flex flex-col divide-y divide-rule border border-rule rounded-[16px] overflow-hidden">
-            {(data.elections ?? []).filter((e) => e.electionType !== "RK").map((c) => (
+            {(data.elections ?? []).filter((e) => e.electionType !== "RK" && !e.historical).map((c) => (
               <li key={c.electionCode} className="p-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
@@ -353,6 +353,57 @@ export default function PoliticianProfilePage() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {/* Pre-2023 Riigikogu electoral history — Mölder dataset, attributed, matched by birth date. */}
+      {(data.elections ?? []).some((e) => e.historical) && (
+        <section aria-label={t("profile.electionHistory.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
+            {t("profile.electionHistory.title")}
+          </h2>
+          <p className="text-[13px] leading-snug text-ink-2 mb-4">{t("profile.electionHistory.lead")}</p>
+          <ul className="flex flex-col divide-y divide-rule border border-rule rounded-[16px] overflow-hidden">
+            {(data.elections ?? []).filter((e) => e.historical).slice().sort((a, b) => b.year - a.year).map((c) => (
+              <li key={c.electionCode} className="p-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                    <span className="font-display font-bold text-[16px] tracking-[-0.015em] text-ink">
+                      {t("profile.otherElections.type.RK")} {c.year}
+                    </span>
+                    <span className={`font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded ${
+                      c.elected ? "bg-blue/10 text-blue" : "bg-rule/40 text-muted"}`}>
+                      {t(`profile.otherElections.result.${c.elected ? "elected" : "notElected"}`)}
+                    </span>
+                  </div>
+                  {c.districtName && (
+                    <div className="text-[13px] text-ink-2 leading-tight mt-1">
+                      {t("profile.electionHistory.district")}: {c.districtName}
+                    </div>
+                  )}
+                  {c.partyName && (
+                    <div className="text-[13px] text-ink-2 leading-tight mt-0.5">
+                      {t("profile.otherElections.ranAs")}: {c.partyName}
+                    </div>
+                  )}
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="font-display font-bold text-[24px] leading-none tracking-[-0.03em] text-ink">
+                    {c.personalVotes.toLocaleString(i18n.resolvedLanguage)}
+                  </div>
+                  <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1">
+                    {t("profile.otherElections.personalVotes")}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[12px] leading-snug text-muted mt-3">
+            {t("profile.electionHistory.credit")}{" "}
+            <a href="https://www.eestipoliitika.ee" target="_blank" rel="noreferrer noopener"
+               className="text-blue border-b border-blue">eestipoliitika.ee</a>
+          </p>
+          <p className="text-[11px] leading-snug text-muted mt-1.5">{t("profile.electionHistory.grantNote")}</p>
         </section>
       )}
 
