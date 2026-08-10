@@ -1065,6 +1065,7 @@
       "usergroups": "Usergroups (fractions + committees)",
       "plenaryMemberDetails": "MP details (photo + committees)",
       "elections": "Election results (RK 2023)",
+      "electionsHistorical": "Electoral history (RK before 2023, Mölder)",
       "wikidata": "Wikidata (parties + education + bio)",
       "votes": "Votes (last 90 days)",
       "recomputeAlignments": "Recompute faction alignments",

@@ -105,17 +105,24 @@ public class HistoricalElectionImporter {
             byBirth.computeIfAbsent(m.getDateOfBirth(), k -> new ArrayList<>()).add(m);
         }
 
-        // Keep the best (max-votes) candidacy per (member, year); dedupes any repeated ballot rows.
+        // One row per (member, year); if the dataset repeats a member in a year, prefer the
+        // elected candidacy, then the higher vote count, so a duplicate ballot row can never
+        // downgrade an "elected" year to "not elected".
         Map<String, ElectionResult> best = new HashMap<>();
+        Instant now = Instant.now();
         for (Candidacy c : rows) {
             List<PlenaryMember> members = byBirth.get(c.birth());
             if (members == null) continue;
             for (PlenaryMember m : members) {
+                // Surname token overlap AND a forename token/initial match. The birth date already
+                // makes a wrong pairing unlikely; the forename check guards the residual case of a
+                // different person who happens to share a birth date and a surname token.
                 if (!overlaps(memberTokens(m), c.tokens())) continue;
+                if (!forenameMatches(m.getFirstName(), c.name())) continue;
                 String code = "RK_" + c.year();
                 String key = m.getExternalId() + "|" + code;
                 ElectionResult existing = best.get(key);
-                if (existing != null && existing.getPersonalVotes() >= c.votes()) continue;
+                if (existing != null && !isBetter(c, existing)) continue;
                 best.put(key, ElectionResult.builder()
                         .memberExternalId(m.getExternalId())
                         .electionCode(code)
@@ -127,16 +134,58 @@ public class HistoricalElectionImporter {
                         .partyName(c.party())
                         .ballotNumber(null)
                         .historical(true)
-                        .importedAt(Instant.now())
+                        .importedAt(now)
                         .build());
             }
         }
 
+        // Never wipe the layer when nothing matched (empty/DOB-less roster): keep the existing rows
+        // and fail the run, mirroring the open-data importers' "empty source" guard.
+        if (best.isEmpty()) {
+            throw new IllegalStateException(
+                    "historical import matched zero MPs (roster empty or without birth dates); existing rows kept");
+        }
         repo.deleteAllHistorical();
         repo.saveAll(best.values());
         log.info("Historical election import: {} candidacies -> {} rows for current MPs",
                 rows.size(), best.size());
         return best.size();
+    }
+
+    /** Prefer an elected candidacy, then a higher vote count, when a (member, year) repeats. */
+    private static boolean isBetter(Candidacy c, ElectionResult existing) {
+        if (c.elected() != existing.isElected()) return c.elected();
+        return c.votes() > existing.getPersonalVotes();
+    }
+
+    /**
+     * A forename match between the roster forename and the candidate's display name: either a
+     * shared forename token (handles compound forenames like "Grigore-Kalev" vs "Kalev") or a
+     * shared first initial. Surname changes never touch the forename, so this stays permissive
+     * for real matches while ruling out a same-birth-date, same-surname stranger.
+     */
+    private static boolean forenameMatches(String memberFirstName, String candidateName) {
+        Set<String> memberFore = tokenize(memberFirstName);
+        Set<String> candFore = forenameTokens(candidateName);
+        if (candFore.isEmpty() || memberFore.isEmpty()) return true; // no forename info -> don't block
+        if (!java.util.Collections.disjoint(memberFore, candFore)) return true;
+        char mi = firstChar(memberFore);
+        for (String t : candFore) if (!t.isEmpty() && t.charAt(0) == mi) return true;
+        return false;
+    }
+
+    /** Forename tokens = every token of a full name except the last (the surname). */
+    private static Set<String> forenameTokens(String fullName) {
+        if (fullName == null) return Set.of();
+        String[] parts = fullName.trim().toLowerCase(Locale.ROOT).split("[-\\s]+");
+        Set<String> out = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) if (!parts[i].isEmpty()) out.add(parts[i]);
+        return out;
+    }
+
+    private static char firstChar(Set<String> tokens) {
+        for (String t : tokens) if (!t.isEmpty()) return t.charAt(0);
+        return '\0';
     }
 
     private static Set<String> memberTokens(PlenaryMember m) {

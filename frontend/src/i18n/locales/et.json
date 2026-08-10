@@ -1065,6 +1065,7 @@
       "usergroups": "Kasutajarühmad (fraktsioonid + komisjonid)",
       "plenaryMemberDetails": "Saadikute detailid (foto + komisjonid)",
       "elections": "Valimistulemused (RK 2023)",
+      "electionsHistorical": "Valimisajalugu (RK kuni 2023, Mölder)",
       "wikidata": "Wikidata (erakonnad + haridus + bio)",
       "votes": "Hääletused (viimased 90 päeva)",
       "recomputeAlignments": "Arvuta fraktsioonikuuluvus uuesti",

@@ -248,7 +248,10 @@ public class AnalyticsService {
      * ============================================================ */
     @Cacheable("analytics-elections")
     public AnalyticsDto.ElectionBoard elections() {
-        Map<String, ElectionResult> byExt = electionResultRepo.findAll().stream()
+        // This board is strictly the RK_2023 seat result. A member now has several election rows
+        // (the EP/KOV footprint and the pre-2023 historical layer), so scope the query to RK_2023,
+        // which is unique per member — keeping the ranking on how sitting MPs won their current seat.
+        Map<String, ElectionResult> byExt = electionResultRepo.findByElectionCode("RK_2023").stream()
                 .collect(Collectors.toMap(ElectionResult::getMemberExternalId, e -> e, (a, b) -> a));
         Map<String, Group> factionByExt = activeFactions().stream()
                 .collect(Collectors.toMap(Group::getExternalId, g -> g, (a, b) -> a));

@@ -19,6 +19,7 @@ const IMPORT_JOBS = [
   { path: "/api/v1/admin/import/usergroups", labelKey: "admin.jobs.usergroups" },
   { path: "/api/v1/admin/import/plenary-member-details", labelKey: "admin.jobs.plenaryMemberDetails" },
   { path: "/api/v1/admin/import/elections", labelKey: "admin.jobs.elections" },
+  { path: "/api/v1/admin/import/elections-historical", labelKey: "admin.jobs.electionsHistorical" },
   { path: "/api/v1/admin/import/wikidata", labelKey: "admin.jobs.wikidata" },
   { path: "/api/v1/admin/import/votes", labelKey: "admin.jobs.votes" },
   { path: "/api/v1/admin/import/recompute-alignments", labelKey: "admin.jobs.recomputeAlignments" },

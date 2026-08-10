@@ -13,6 +13,9 @@ public interface ElectionResultRepository extends JpaRepository<ElectionResult, 
     /** Every matched campaign of a member (RK / EP / KOV); ordered for display in the mapper. */
     List<ElectionResult> findByMemberExternalId(String memberExternalId);
 
+    /** Rows for one election code — e.g. the RK_2023 board, without loading the whole table. */
+    List<ElectionResult> findByElectionCode(String electionCode);
+
     /** Rows for one election code — used to gate the per-code startup campaign load. */
     long countByElectionCode(String electionCode);
 

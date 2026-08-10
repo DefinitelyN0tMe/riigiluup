@@ -1107,6 +1107,7 @@
       "usergroups": "Группы (фракции + комиссии)",
       "plenaryMemberDetails": "Детали депутатов (фото + комиссии)",
       "elections": "Результаты выборов (RK 2023)",
+      "electionsHistorical": "История выборов (RK до 2023, Mölder)",
       "wikidata": "Wikidata (партии + образование + био)",
       "votes": "Голосования (последние 90 дней)",
       "recomputeAlignments": "Пересчитать соответствие фракциям",
