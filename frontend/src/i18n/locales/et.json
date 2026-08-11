@@ -757,6 +757,11 @@
       "credit": "Andmed: Martin Mölder,",
       "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
     },
+    "factionHistory": {
+      "title": "Fraktsioonide ajalugu",
+      "lead": "Kuulumine Riigikogu fraktsioonidesse ajas.",
+      "present": "praegu"
+    },
     "activity": {
       "title": "Aktiivsus parlamendis",
       "speeches": "Sõnavõtud",

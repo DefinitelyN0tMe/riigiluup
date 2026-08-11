@@ -3,7 +3,9 @@ package com.riigiluup.ingestion.schedule;
 import com.riigiluup.election.ElectionResultRepository;
 import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.election.HistoricalElectionImporter;
+import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
+import com.riigiluup.person.MpFactionMembershipRepository;
 import com.riigiluup.speech.SpeechBillLinkRepository;
 import com.riigiluup.speech.SpeechRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,8 @@ public class StartupDataBackfill {
     private final ElectionResultRepository electionRepo;
     private final ElectionResultsImporter electionResultsImporter;
     private final HistoricalElectionImporter historicalElectionImporter;
+    private final MpFactionMembershipRepository factionHistoryRepo;
+    private final PlenaryMemberDetailImporter detailImporter;
 
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
@@ -47,6 +51,20 @@ public class StartupDataBackfill {
         linkSpeechesIfNeeded();
         loadCampaignsIfNeeded();
         loadHistoricalIfNeeded();
+        loadFactionHistoryIfNeeded();
+    }
+
+    private void loadFactionHistoryIfNeeded() {
+        try {
+            if (factionHistoryRepo.count() == 0) {
+                log.info("Startup backfill: forcing a detail refresh to backfill MP faction history");
+                // force=true bypasses the 7-day freshness window so every member's timeline is
+                // populated now (and any just-happened faction change is picked up immediately).
+                detailImporter.runOnce(true);
+            }
+        } catch (Exception e) {
+            log.warn("Startup faction-history backfill failed (retries next boot): {}", e.toString());
+        }
     }
 
     private void linkSpeechesIfNeeded() {

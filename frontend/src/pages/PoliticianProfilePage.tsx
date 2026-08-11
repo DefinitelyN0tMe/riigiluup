@@ -556,6 +556,38 @@ export default function PoliticianProfilePage() {
         />
       </div>
 
+      {/* Faction (parliamentary group) timeline — shown only when there is a real move between
+          factions (e.g. an MP left their party), not for a member who never changed group. */}
+      {(data.factionHistory ?? []).length >= 2 && (
+        <section aria-label={t("profile.factionHistory.title")} className="mb-6 border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+          <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
+            {t("profile.factionHistory.title")}
+          </h2>
+          <p className="text-[13px] leading-snug text-ink-2 mb-4">{t("profile.factionHistory.lead")}</p>
+          <ul className="flex flex-col divide-y divide-rule border border-rule rounded-[16px] overflow-hidden">
+            {(data.factionHistory ?? []).slice().reverse().map((f, i) => {
+              const current = !f.endDate;
+              return (
+                <li key={`${f.factionExternalId}-${f.startDate}-${i}`} className="p-4 flex items-center gap-3">
+                  <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${current ? "bg-blue" : "bg-rule"}`} aria-hidden />
+                  <div className="min-w-0 flex-1">
+                    <span className="font-medium text-ink text-[15px] leading-tight">{f.factionName}</span>
+                    {current && (
+                      <span className="ml-2 font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-blue/10 text-blue align-middle">
+                        {t("profile.factionHistory.present")}
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-mono text-[11px] text-muted shrink-0 text-right leading-tight">
+                    {f.startDate ? formatDate(f.startDate) : "?"} — {f.endDate ? formatDate(f.endDate) : t("profile.factionHistory.present")}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
       {data.externalAffiliations && data.externalAffiliations.length > 0 && (
         <AffiliationTimeline items={data.externalAffiliations} />
       )}

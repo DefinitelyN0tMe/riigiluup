@@ -40,7 +40,8 @@ public record PoliticianProfileDto(
         ActivityInfo activity,
         String education,
         String positions,
-        List<PartyMembership> partyMemberships
+        List<PartyMembership> partyMemberships,
+        List<FactionPeriod> factionHistory
 ) {
     /** How the MP won their seat (from opendata.valimised.ee); null if not matched. */
     public record ElectionInfo(
@@ -73,6 +74,9 @@ public record PoliticianProfileDto(
     /** A party-membership period from Wikidata P102. Distinct from faction and electoral list. */
     public record PartyMembership(String partyLabel, String partyQid,
                                   LocalDate startDate, LocalDate endDate) {}
+    /** A faction (parliamentary group) period from the Riigikogu API — the in-parliament group. */
+    public record FactionPeriod(String factionName, String factionExternalId,
+                                LocalDate startDate, LocalDate endDate) {}
     /** Parliamentary activity over the term (from Riigikogu API); null if not yet computed. */
     public record ActivityInfo(
             int speeches,

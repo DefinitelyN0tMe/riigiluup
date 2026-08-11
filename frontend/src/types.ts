@@ -104,10 +104,17 @@ export type PoliticianProfile = {
   education?: string | null;
   positions?: string | null;
   partyMemberships: PartyMembership[];
+  factionHistory: FactionPeriod[];
 };
 export type PartyMembership = {
   partyLabel: string;
   partyQid: string;
+  startDate: string | null;
+  endDate: string | null;
+};
+export type FactionPeriod = {
+  factionName: string;
+  factionExternalId: string;
   startDate: string | null;
   endDate: string | null;
 };

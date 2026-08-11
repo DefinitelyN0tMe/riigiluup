@@ -775,6 +775,11 @@
       "credit": "Данные: Martin Mölder,",
       "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
     },
+    "factionHistory": {
+      "title": "История фракций",
+      "lead": "Принадлежность к фракциям Рийгикогу во времени.",
+      "present": "сейчас"
+    },
     "activity": {
       "title": "Активность в парламенте",
       "speeches": "Выступления",

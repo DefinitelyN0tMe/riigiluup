@@ -56,9 +56,14 @@ public class AdminIngestionController {
         return usergroupImporter.runOnce();
     }
 
+    /**
+     * Refresh MP detail (bio, photo, committees, faction) + faction history. {@code force=true}
+     * bypasses the 7-day freshness window to pick up a just-happened change (e.g. a faction
+     * departure) or to rebuild the faction-history timeline immediately.
+     */
     @PostMapping("/plenary-member-details")
-    public ImportRunLog runDetailImport() {
-        return detailImporter.runOnce();
+    public ImportRunLog runDetailImport(@RequestParam(defaultValue = "false") boolean force) {
+        return detailImporter.runOnce(force);
     }
 
     @PostMapping("/votes")

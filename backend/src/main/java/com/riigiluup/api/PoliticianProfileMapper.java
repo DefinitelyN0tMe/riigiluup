@@ -44,6 +44,7 @@ public class PoliticianProfileMapper {
     private final IndividualVoteRepository individualVoteRepo;
     private final ElectionResultRepository electionResults;
     private final MpPartyMembershipRepository partyMembershipRepo;
+    private final com.riigiluup.person.MpFactionMembershipRepository factionHistoryRepo;
     private final MemberActivityRepository memberActivity;
 
     public PoliticianProfileDto toDto(PlenaryMember m, List<GroupMembership> memberships) {
@@ -156,6 +157,15 @@ public class PoliticianProfileMapper {
                         pm.getPartyLabel(), pm.getPartyQid(), pm.getStartDate(), pm.getEndDate()))
                 .toList();
 
+        // Drop the short "unaffiliated" gaps at term formation (a couple of days before factions
+        // register) so the timeline shows real moves, not noise; a genuine departure is open-ended.
+        List<PoliticianProfileDto.FactionPeriod> factionHistory = factionHistoryRepo
+                .findByMemberExternalIdOrderByStartDateAsc(m.getExternalId()).stream()
+                .filter(f -> !isTransientUnaffiliated(f))
+                .map(f -> new PoliticianProfileDto.FactionPeriod(
+                        f.getFactionName(), f.getFactionExternalId(), f.getStartDate(), f.getEndDate()))
+                .toList();
+
         return new PoliticianProfileDto(
                 m.getId(), m.getSlug(),
                 m.getFullName(), m.getFirstName(), m.getLastName(),
@@ -183,7 +193,8 @@ public class PoliticianProfileMapper {
                 activity,
                 m.getEducation(),
                 m.getPositions(),
-                partyMemberships
+                partyMemberships,
+                factionHistory
         );
     }
 
@@ -237,6 +248,14 @@ public class PoliticianProfileMapper {
                 code, type, year, er.isElected(), er.getPersonalVotes(), er.getMandateType(),
                 er.getDistrictNumber(), er.getPartyName(), er.getBallotNumber(), sourceUrl,
                 er.isHistorical(), er.getDistrictName());
+    }
+
+    /** A brief (&lt; 30 day) closed "unaffiliated" span — the term-formation gap, not a real move. */
+    private static boolean isTransientUnaffiliated(com.riigiluup.person.MpFactionMembership f) {
+        String name = f.getFactionName();
+        if (name == null || !name.toLowerCase(java.util.Locale.ROOT).contains("mittekuuluv")) return false;
+        if (f.getStartDate() == null || f.getEndDate() == null) return false; // current/open span -> keep
+        return java.time.temporal.ChronoUnit.DAYS.between(f.getStartDate(), f.getEndDate()) < 30;
     }
 
     private static int parseYear(String s) {

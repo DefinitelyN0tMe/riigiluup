@@ -757,6 +757,11 @@
       "credit": "Data: Martin Mölder,",
       "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
     },
+    "factionHistory": {
+      "title": "Faction history",
+      "lead": "Parliamentary group membership over time.",
+      "present": "present"
+    },
     "activity": {
       "title": "Activity in parliament",
       "speeches": "Speeches",
