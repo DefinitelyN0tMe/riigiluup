@@ -58,10 +58,23 @@ function VotingHistory({ slug }: { slug: string }) {
         return (
           <li key={v.voteEventId} className="flex justify-between items-center p-3 text-sm gap-3">
             <span className="min-w-0">
-              <Link to={`/votes/${v.voteEventId}`} className="hover:underline text-ink">
-                {v.description ?? t("common.noDescription")}
-              </Link>
-              <span className="text-slate-500 block text-xs">{when}</span>
+              {v.billTitle ? (
+                <Link to={`/legislation/${encodeURIComponent(v.billId ?? "")}`} className="hover:underline text-ink font-medium">
+                  {v.billTitle}
+                </Link>
+              ) : (
+                <Link to={`/votes/${v.voteEventId}`} className="hover:underline text-ink">
+                  {v.description ?? t("common.noDescription")}
+                </Link>
+              )}
+              <span className="text-slate-500 block text-xs">
+                {v.billTitle && (
+                  <Link to={`/votes/${v.voteEventId}`} className="hover:underline">
+                    {v.billMark ? `${v.billMark} · ` : ""}{v.description ?? t("common.noDescription")}
+                  </Link>
+                )}
+                {v.billTitle && when ? " · " : ""}{when}
+              </span>
             </span>
             <span className="shrink-0 font-medium">
               {t(`choice.${v.choice}` as const, { defaultValue: v.choice })}
@@ -528,10 +541,23 @@ export default function PoliticianProfilePage() {
                     return (
                       <li key={d.voteEventId} className="p-3 text-sm flex justify-between items-start gap-3">
                         <span className="min-w-0">
-                          <Link to={`/votes/${d.voteEventId}`} className="hover:underline text-ink">
-                            {d.voteEventDescription ?? t("common.noDescription")}
-                          </Link>
-                          <span className="text-slate-500 block text-xs">{when}</span>
+                          {d.billTitle ? (
+                            <Link to={`/legislation/${encodeURIComponent(d.billId ?? "")}`} className="hover:underline text-ink font-medium">
+                              {d.billTitle}
+                            </Link>
+                          ) : (
+                            <Link to={`/votes/${d.voteEventId}`} className="hover:underline text-ink">
+                              {d.voteEventDescription ?? t("common.noDescription")}
+                            </Link>
+                          )}
+                          <span className="text-slate-500 block text-xs">
+                            {d.billTitle && (
+                              <Link to={`/votes/${d.voteEventId}`} className="hover:underline">
+                                {d.billMark ? `${d.billMark} · ` : ""}{d.voteEventDescription ?? t("common.noDescription")}
+                              </Link>
+                            )}
+                            {d.billTitle && when ? " · " : ""}{when}
+                          </span>
                         </span>
                         <span className="shrink-0 text-xs text-slate-500 text-right">
                           {t("profile.mpChoice")}: <span className="font-medium text-ink">{d.memberChoice ? t(`choice.${d.memberChoice}`, { defaultValue: d.memberChoice }) : "—"}</span>

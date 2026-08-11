@@ -215,6 +215,9 @@ export type PoliticianVote = {
   startedAt: string | null;
   choice: VoteIndividual["choice"];
   choiceSourceCode: string | null;
+  billId: string | null;
+  billTitle: string | null;
+  billMark: string | null;
 };
 
 export type ComparisonSide = {
@@ -266,6 +269,9 @@ export type GroupAlignmentDto = {
     startedAt: string | null;
     memberChoice: string | null;
     factionMajorityChoice: string | null;
+    billId: string | null;
+    billTitle: string | null;
+    billMark: string | null;
   }>;
   methodologyNote: string;
 };

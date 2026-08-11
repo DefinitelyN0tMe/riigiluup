@@ -57,10 +57,14 @@ public class GroupAlignmentService {
      * Returned newest-first, limited to {@code limit}.
      */
     public List<IndividualVote> recentDeviations(PlenaryMember member, int limit) {
+        // Fetch the linked bill (to-one) so the profile can name what was voted on, not just the
+        // procedural step. left join fetch keeps procedural votes (no bill) in the result.
         String jpql = """
             select iv from IndividualVote iv
+            join fetch iv.voteEvent ve
+            left join fetch ve.legislativeItem
             join VoteFactionAlignment a
-              on a.voteEvent = iv.voteEvent
+              on a.voteEvent = ve
              and a.factionExternalId = iv.factionExternalId
             where iv.plenaryMember = :member
               and a.hasClearMajority = true
@@ -69,7 +73,7 @@ public class GroupAlignmentService {
                   com.riigiluup.vote.VoteChoice.AGAINST,
                   com.riigiluup.vote.VoteChoice.ABSTAINED)
               and iv.choice <> a.majorityChoice
-            order by iv.voteEvent.startedAt desc
+            order by ve.startedAt desc
             """;
         return em.createQuery(jpql, IndividualVote.class)
                 .setParameter("member", member)

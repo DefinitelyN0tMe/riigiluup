@@ -102,7 +102,10 @@ public record PoliticianProfileDto(
             String voteType,
             String startedAt,
             String memberChoice,
-            String factionMajorityChoice
+            String factionMajorityChoice,
+            UUID billId,        // linked bill (legislative item), null for procedural votes
+            String billTitle,   // the bill's name, so the row shows what was voted on
+            String billMark     // e.g. "644 SE"
     ) {}
     public record ExternalAffiliationDto(
             String organization,

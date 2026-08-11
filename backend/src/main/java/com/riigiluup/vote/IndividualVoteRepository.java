@@ -78,6 +78,7 @@ public interface IndividualVoteRepository extends JpaRepository<IndividualVote, 
     @Query("""
         select iv from IndividualVote iv
         join fetch iv.voteEvent ve
+        left join fetch ve.legislativeItem
         where iv.plenaryMember = :member
         order by ve.startedAt desc, ve.id desc
         """)

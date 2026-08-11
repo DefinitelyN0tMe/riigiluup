@@ -270,13 +270,25 @@ public class PoliticianProfileMapper {
                 : alignments.get(ev.getId() + "|" + iv.getFactionExternalId());
         String majority = alignment == null || alignment.getMajorityChoice() == null
                 ? null : alignment.getMajorityChoice().name();
+        com.riigiluup.legislation.LegislativeItem bill = ev == null ? null : ev.getLegislativeItem();
         return new PoliticianProfileDto.Deviation(
                 ev == null ? null : ev.getId(),
                 ev == null ? null : ev.getDescription(),
                 ev == null || ev.getType() == null ? null : ev.getType().name(),
                 ev == null || ev.getStartedAt() == null ? null : ev.getStartedAt().toString(),
                 iv.getChoice() == null ? null : iv.getChoice().name(),
-                majority
+                majority,
+                bill == null ? null : bill.getId(),
+                bill == null ? null : bill.getTitle(),
+                billMark(bill)
         );
+    }
+
+    /** "644 SE" from a bill's mark + draft type; null when there is no linked bill. */
+    static String billMark(com.riigiluup.legislation.LegislativeItem bill) {
+        if (bill == null || bill.getMark() == null) return null;
+        String type = bill.getDraftTypeCode();
+        return type == null || type.isBlank() ? String.valueOf(bill.getMark())
+                : bill.getMark() + " " + type;
     }
 }

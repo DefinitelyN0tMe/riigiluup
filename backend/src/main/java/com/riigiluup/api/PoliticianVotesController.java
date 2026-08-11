@@ -50,10 +50,14 @@ public class PoliticianVotesController {
             String type,
             Instant startedAt,
             String choice,
-            String choiceSourceCode
+            String choiceSourceCode,
+            UUID billId,        // linked bill (legislative item), null for procedural votes
+            String billTitle,   // the bill's name, so the row shows what was voted on
+            String billMark     // e.g. "644 SE"
     ) {
         static Item of(IndividualVote iv) {
             var ev = iv.getVoteEvent();
+            var bill = ev == null ? null : ev.getLegislativeItem();
             return new Item(
                     ev == null ? null : ev.getId(),
                     ev == null ? null : ev.getExternalId(),
@@ -61,7 +65,10 @@ public class PoliticianVotesController {
                     ev == null || ev.getType() == null ? null : ev.getType().name(),
                     ev == null ? null : ev.getStartedAt(),
                     iv.getChoice() == null ? "UNKNOWN" : iv.getChoice().name(),
-                    iv.getChoiceSourceCode()
+                    iv.getChoiceSourceCode(),
+                    bill == null ? null : bill.getId(),
+                    bill == null ? null : bill.getTitle(),
+                    PoliticianProfileMapper.billMark(bill)
             );
         }
     }
