@@ -39,8 +39,20 @@ export default function Layout() {
       if (el) el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
       raf = 0;
     };
+    // When the pointer is over anything clickable, zoom the loupe and reveal a "+" so it reads as
+    // "there is more to inspect here" — an on-brand affordance that the target is a link/control.
+    const INTERACTIVE = 'a[href], button:not(:disabled), [role="button"]:not([aria-disabled="true"]), input:not([type="hidden"]):not(:disabled), select:not(:disabled), textarea:not(:disabled), label, summary, [data-clickable]';
+    const over = (e: MouseEvent) => {
+      const t = e.target;
+      el.classList.toggle("is-link", t instanceof Element && !!t.closest(INTERACTIVE));
+    };
     window.addEventListener("mousemove", move, { passive: true });
-    return () => { window.removeEventListener("mousemove", move); cancelAnimationFrame(raf); };
+    window.addEventListener("mouseover", over, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseover", over);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   const navItems = [
@@ -70,6 +82,11 @@ export default function Layout() {
         <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <circle cx="17" cy="17" r="9" />
           <line x1="23.5" y1="23.5" x2="32" y2="32" />
+          {/* "+" inside the glass, revealed over clickable targets (see .is-link in styles.css) */}
+          <g className="loupe-plus">
+            <line x1="17" y1="13" x2="17" y2="21" />
+            <line x1="13" y1="17" x2="21" y2="17" />
+          </g>
         </svg>
       </div>
 
