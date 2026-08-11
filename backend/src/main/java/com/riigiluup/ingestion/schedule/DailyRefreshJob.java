@@ -62,9 +62,9 @@ public class DailyRefreshJob {
     }
 
     /**
-     * Members, committees and legislation once a day — these change slowly. With legislation
-     * detail change-detection and member-detail freshness gating, this no longer re-downloads the
-     * whole bill catalogue or all 101 member details on every run.
+     * Members, committees and legislation once a day. Legislation uses change-detection so the whole
+     * bill catalogue is not re-downloaded; member detail IS force-refreshed daily (see below) so
+     * faction/committee moves surface next-day, since the list feed carries no faction to diff on.
      */
     @Scheduled(cron = "${riigiluup.schedule.daily-refresh-cron}",
                zone = "${riigiluup.schedule.daily-refresh-zone}")
@@ -77,7 +77,12 @@ public class DailyRefreshJob {
         try {
             usergroupImporter.runOnce();
             memberImporter.runOnce();
-            detailImporter.runOnce();
+            // Force a full detail refresh daily (not the 7-day freshness-gated path): the
+            // /api/plenary-members list feed carries no faction, so member detail is the only
+            // source of faction, committee role and the faction-history timeline. Refreshing it
+            // every day means a faction departure/switch or committee change shows up the next
+            // day rather than up to a week later. ~101 throttled calls, a couple of minutes.
+            detailImporter.runOnce(true);
             LocalDate today = LocalDate.now(TALLINN);
             voteImporter.runWindow(today.minusDays(7), today);
             legislationImporter.runWindow(today.minusDays(7), today);
