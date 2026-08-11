@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchPoliticians, fetchDataStatus, fetchFactions } from "../api/politicians";
 import { fetchVotes } from "../api/votes";
@@ -26,6 +26,15 @@ const PARTY_COLOR: Record<string, string> = {
 function partyColor(name?: string | null) {
   if (!name) return "#0072CE";
   return PARTY_COLOR[name] ?? "#0072CE";
+}
+
+/** Deterministic rank for (slug, seed): a stable per-seed shuffle key (FNV-1a style). */
+function seededRank(slug: string, seed: number): number {
+  let h = (seed ^ 0x811c9dc5) >>> 0;
+  for (let i = 0; i < slug.length; i++) {
+    h = Math.imul(h ^ slug.charCodeAt(i), 0x01000193);
+  }
+  return h >>> 0;
 }
 function initials(p?: { firstName?: string; lastName?: string }) {
   return `${p?.firstName?.[0] ?? ""}${p?.lastName?.[0] ?? ""}`.toUpperCase();
@@ -343,9 +352,11 @@ function SplitLegit() {
 export default function HomePage() {
   const { t } = useTranslation();
   const status = useQuery({ queryKey: ["data-status"], queryFn: fetchDataStatus });
+  // Pull a wide pool of sitting MPs so the homepage can show a fresh random six each visit,
+  // instead of always the same first six of the default order (size is capped at 100 server-side).
   const politicians = useQuery({
     queryKey: ["politicians-home"],
-    queryFn: () => fetchPoliticians({ status: "current", page: 0, size: 6 }),
+    queryFn: () => fetchPoliticians({ status: "current", page: 0, size: 100 }),
   });
   const votes = useQuery({
     queryKey: ["votes-home"],
@@ -363,9 +374,17 @@ export default function HomePage() {
     ? formatDateTime(first.lastRunAt, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
     : null;
 
-  const mps = politicians.data?.items ?? [];
-  const feat = mps[0] ?? null;
-  const rest = mps.slice(1, 6);
+  // One random seed per mount → a different six on each visit, but stable within a visit (a
+  // background refetch won't reshuffle the cards mid-view, since the order is derived from the seed).
+  const [shuffleSeed] = useState(() => Math.floor(Math.random() * 0x7fffffff));
+  const mpItems = politicians.data?.items;
+  const picked = useMemo(() => {
+    return [...(mpItems ?? [])]
+      .sort((a, b) => seededRank(a.slug, shuffleSeed) - seededRank(b.slug, shuffleSeed))
+      .slice(0, 6);
+  }, [mpItems, shuffleSeed]);
+  const feat = picked[0] ?? null;
+  const rest = picked.slice(1, 6);
 
   const voteItems = votes.data?.items ?? [];
 
