@@ -855,7 +855,10 @@
     "noStages": "No stages recorded.",
     "noName": "(no name)",
     "relatedInitiatives_one": "Related citizen initiative",
-    "relatedInitiatives_other": "Related citizen initiatives"
+    "relatedInitiatives_other": "Related citizen initiatives",
+    "amendmentsTitle": "Amendments",
+    "amendmentsNote": "Amendment proposals submitted to the bill. The title names the proposer (faction or MP); the file opens the amendment text.",
+    "amendmentsFile": "Amendment file"
   },
   "committees": {
     "title": "Committees",

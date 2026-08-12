@@ -161,6 +161,34 @@ export default function LegislationDetailPage() {
         </section>
       )}
 
+      {(data.amendments ?? []).length > 0 && (
+        <section aria-label={t("legislation.amendmentsTitle")}>
+          <h2 className="text-lg font-semibold text-ink mb-1">{t("legislation.amendmentsTitle")}</h2>
+          <p className="text-xs text-slate-500 mb-3 max-w-[72ch]">{t("legislation.amendmentsNote")}</p>
+          <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
+            {data.amendments.map((a, idx) => (
+              <li key={a.externalId ?? idx} className="p-3">
+                <p className="text-sm text-ink leading-snug">{a.title}</p>
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 font-mono text-[11px] tracking-[0.06em] text-muted">
+                  {a.reference && <span>{a.reference}</span>}
+                  {a.fileUrl && (
+                    <a
+                      href={a.fileUrl}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={`${t("legislation.amendmentsFile")} (${t("a11y.opensNewTab")})`}
+                      className="text-estonia hover:underline"
+                    >
+                      {t("legislation.amendmentsFile")} ↗
+                    </a>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {speechesQuery.data && (
         <section aria-label={t("legislation.debatesTitle")}>
           <h2 className="text-lg font-semibold text-ink mb-1">

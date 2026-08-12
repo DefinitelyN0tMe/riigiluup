@@ -32,7 +32,8 @@ public class LegislationMapper {
             List<LegislativeStage> stages,
             List<LegislativeSponsorship> sponsors,
             List<LegislativeItemTopic> topics,
-            List<com.riigiluup.vote.VoteEvent> votes
+            List<com.riigiluup.vote.VoteEvent> votes,
+            List<com.riigiluup.legislation.BillAmendment> amendments
     ) {
         return new LegislationDetailDto(
                 i.getId(),
@@ -73,8 +74,19 @@ public class LegislationMapper {
                         v.getDescription(), v.getStartedAt(),
                         // Real abstentions (neutral); resultAbstained is an overlapping source
                         // total (did-not-vote + absent) — see frontend lib/voteTally.
-                        v.getResultInFavor(), v.getResultAgainst(), v.getResultNeutral())).toList()
+                        v.getResultInFavor(), v.getResultAgainst(), v.getResultNeutral())).toList(),
+                amendments.stream().map(a -> new LegislationDetailDto.AmendmentDto(
+                        a.getExternalId(),
+                        a.getTitle(),
+                        a.getReference(),
+                        a.getFileUuid() == null ? null : fileDownloadUrl(a.getFileUuid()),
+                        a.getFileName())).toList()
         );
+    }
+
+    /** Public Riigikogu file download for an amendment document (docx/pdf). */
+    private static String fileDownloadUrl(String fileUuid) {
+        return "https://api.riigikogu.ee/api/files/" + fileUuid + "/download";
     }
 
     private static String sourceUrl(String uuid) {

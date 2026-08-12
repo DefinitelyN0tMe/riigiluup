@@ -17,6 +17,10 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
     /** Bills still under proceeding (not yet adopted/rejected/withdrawn) — homepage "in progress" delta. */
     long countByPhaseIn(Collection<LegislationPhase> phases);
 
+    /** Ids of bills in the given phases — used to force an amendments detail-fetch for active bills. */
+    @Query("select i.id from LegislativeItem i where i.phase in :phases")
+    java.util.List<UUID> findIdsByPhaseIn(@Param("phases") Collection<LegislationPhase> phases);
+
     /**
      * Adopted laws (SE only — Riigikogu decisions publish in RT III with a different id
      * scheme) not yet linked to Riigi Teataja, with their publication date taken from the

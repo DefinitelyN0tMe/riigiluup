@@ -350,6 +350,15 @@ export type LegislationDetail = LegislationListItem & {
   rtActId: number | null;
   rtPublished: string | null;
   votes: BillVote[];
+  amendments: BillAmendmentItem[];
+};
+
+export type BillAmendmentItem = {
+  externalId: string | null;
+  title: string;
+  reference: string | null;
+  fileUrl: string | null;
+  fileName: string | null;
 };
 
 export type BillVote = {

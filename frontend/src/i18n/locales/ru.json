@@ -877,7 +877,10 @@
     "relatedInitiatives_one": "Связанная гражданская инициатива",
     "relatedInitiatives_few": "Связанные гражданские инициативы",
     "relatedInitiatives_many": "Связанные гражданские инициативы",
-    "relatedInitiatives_other": "Связанные гражданские инициативы"
+    "relatedInitiatives_other": "Связанные гражданские инициативы",
+    "amendmentsTitle": "Поправки",
+    "amendmentsNote": "Поправки, внесённые к законопроекту. В заголовке указан автор поправки (фракция или депутат); файл открывает текст поправки.",
+    "amendmentsFile": "Файл поправки"
   },
   "committees": {
     "title": "Комиссии",

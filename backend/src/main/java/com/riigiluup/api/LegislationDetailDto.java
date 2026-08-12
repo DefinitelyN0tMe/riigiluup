@@ -30,8 +30,19 @@ public record LegislationDetailDto(
         String riigikoguPageUrl,
         Long rtActId,
         LocalDate rtPublished,
-        List<BillVoteDto> votes
+        List<BillVoteDto> votes,
+        List<AmendmentDto> amendments
 ) {
+    /** An amendment proposal (muudatusettepanek). {@code title} names the proposer; fileUrl is the
+     *  public amendment document (may be null). */
+    public record AmendmentDto(
+            String externalId,
+            String title,
+            String reference,
+            String fileUrl,
+            String fileName
+    ) {}
+
     public record StageDto(
             String readingCode,
             String statusCode,

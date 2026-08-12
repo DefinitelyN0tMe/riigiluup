@@ -21,10 +21,20 @@ public record DraftDetailDto(
         DraftListDto.LeadingCommittee leadingCommittee,
         List<Initiator> initiators,
         List<Descriptor> descriptors,
-        List<Reading> readings
+        List<Reading> readings,
+        List<Amendment> amendments
 ) {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Initiator(String uuid, String name, String type, Boolean active) {}
+
+    /** An amendment proposal (muudatusettepanek); {@code title} names the proposer + bill. */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record Amendment(String uuid, String reference, String title, String documentType,
+                            List<FileRef> files) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record FileRef(String uuid, String fileName, String fileExtension,
+                          String accessRestrictionType) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Descriptor(Integer edid, String text) {}

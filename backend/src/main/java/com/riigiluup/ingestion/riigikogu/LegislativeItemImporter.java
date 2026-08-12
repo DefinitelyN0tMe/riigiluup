@@ -45,6 +45,7 @@ public class LegislativeItemImporter {
     private final ObjectMapper json;
     private final LegislativeItemRepository itemRepo;
     private final LegislativeStageRepository stageRepo;
+    private final com.riigiluup.legislation.BillAmendmentRepository amendmentRepo;
     private final LegislativeSponsorshipRepository sponsorshipRepo;
     private final TopicRepository topicRepo;
     private final LegislativeItemTopicRepository itemTopicRepo;
@@ -62,6 +63,7 @@ public class LegislativeItemImporter {
             ObjectMapper json,
             LegislativeItemRepository itemRepo,
             LegislativeStageRepository stageRepo,
+            com.riigiluup.legislation.BillAmendmentRepository amendmentRepo,
             LegislativeSponsorshipRepository sponsorshipRepo,
             TopicRepository topicRepo,
             LegislativeItemTopicRepository itemTopicRepo,
@@ -78,6 +80,7 @@ public class LegislativeItemImporter {
         this.json = json;
         this.itemRepo = itemRepo;
         this.stageRepo = stageRepo;
+        this.amendmentRepo = amendmentRepo;
         this.sponsorshipRepo = sponsorshipRepo;
         this.topicRepo = topicRepo;
         this.itemTopicRepo = itemTopicRepo;
@@ -250,6 +253,71 @@ public class LegislativeItemImporter {
         reconcileStages(existing, detail);
         reconcileSponsorships(existing, detail);
         reconcileTopics(existing, detail);
+        reconcileAmendments(existing, detail);
+    }
+
+    /**
+     * One-time backfill of amendments for bills still in proceeding. The daily change-detection path
+     * skips the detail fetch for bills whose stage/status is unchanged, so already-active bills need
+     * one forced detail fetch to populate their amendments. Bounded to in-proceeding phases (where
+     * amendments are actually proposed); concluded bills fill in as the daily window re-touches them.
+     * Runs one throttled detail call per active bill, each in its own transaction.
+     */
+    public void backfillAmendmentsForActiveBills() {
+        java.util.List<java.util.UUID> ids = itemRepo.findIdsByPhaseIn(java.util.List.of(
+                com.riigiluup.legislation.LegislationPhase.SUBMITTED,
+                com.riigiluup.legislation.LegislationPhase.IN_COMMITTEE,
+                com.riigiluup.legislation.LegislationPhase.IN_READINGS));
+        log.info("amendment backfill: {} active bills to fetch", ids.size());
+        for (java.util.UUID id : ids) {
+            try {
+                tx.executeWithoutResult(status -> {
+                    LegislativeItem item = itemRepo.findById(id).orElse(null);
+                    if (item == null) return;
+                    DraftDetailDto detail = client.fetchDraftDetail(item.getExternalId());
+                    reconcileAmendments(item, detail);
+                });
+            } catch (Exception e) {
+                log.warn("amendment backfill failed for {}: {}", id, e.toString());
+            }
+        }
+    }
+
+    private void reconcileAmendments(LegislativeItem item, DraftDetailDto d) {
+        amendmentRepo.deleteByLegislativeItem(item);
+        if (d.amendments() == null) return;
+        int seq = 0;
+        for (DraftDetailDto.Amendment a : d.amendments()) {
+            if (a == null || a.title() == null || a.title().isBlank()) continue;
+            DraftDetailDto.FileRef file = firstPublicFile(a.files());
+            amendmentRepo.save(com.riigiluup.legislation.BillAmendment.builder()
+                    .legislativeItem(item)
+                    .externalId(a.uuid())
+                    .title(a.title())
+                    .reference(truncate(a.reference(), 160))
+                    .fileUuid(file == null ? null : file.uuid())
+                    .fileName(truncate(file == null ? null : file.fileName(), 512))
+                    .sequence(seq++)
+                    .importedAt(Instant.now())
+                    .build());
+        }
+    }
+
+    /** The first PUBLIC file of an amendment (the downloadable text), or null if none is public. */
+    private static DraftDetailDto.FileRef firstPublicFile(List<DraftDetailDto.FileRef> files) {
+        if (files == null) return null;
+        for (DraftDetailDto.FileRef f : files) {
+            if (f != null && f.uuid() != null
+                    && (f.accessRestrictionType() == null || "PUBLIC".equals(f.accessRestrictionType()))) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+    private static String truncate(String s, int max) {
+        if (s == null) return null;
+        return s.length() <= max ? s : s.substring(0, max);
     }
 
     private void reconcileStages(LegislativeItem item, DraftDetailDto d) {
@@ -336,7 +404,7 @@ public class LegislativeItemImporter {
                 e.uuid(), e.title(), null, e.mark(), e.membership(), e.draftTypeCode(),
                 e.activeDraftStage(), e.activeDraftStatus(), null,
                 e.initiated(), null, e.amendmentsDeadline(),
-                e.leadingCommittee(), List.of(), List.of(), List.of()
+                e.leadingCommittee(), List.of(), List.of(), List.of(), List.of()
         );
     }
 

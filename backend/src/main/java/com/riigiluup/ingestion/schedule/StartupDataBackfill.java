@@ -3,8 +3,10 @@ package com.riigiluup.ingestion.schedule;
 import com.riigiluup.election.ElectionResultRepository;
 import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.election.HistoricalElectionImporter;
+import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
+import com.riigiluup.legislation.BillAmendmentRepository;
 import com.riigiluup.group.GroupMembershipRepository;
 import com.riigiluup.group.GroupType;
 import com.riigiluup.person.MpFactionMembershipRepository;
@@ -43,6 +45,8 @@ public class StartupDataBackfill {
     private final MpFactionMembershipRepository factionHistoryRepo;
     private final MpPressActivityRepository pressRepo;
     private final GroupMembershipRepository groupMembershipRepo;
+    private final BillAmendmentRepository amendmentRepo;
+    private final LegislativeItemImporter legislationImporter;
     private final PlenaryMemberDetailImporter detailImporter;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -59,6 +63,18 @@ public class StartupDataBackfill {
         loadFactionHistoryIfNeeded();
         loadPressActivityIfNeeded();
         loadAuxGroupMembershipsIfNeeded();
+        loadAmendmentsIfNeeded();
+    }
+
+    private void loadAmendmentsIfNeeded() {
+        try {
+            if (amendmentRepo.count() == 0) {
+                log.info("Startup backfill: backfilling bill amendments for active bills");
+                legislationImporter.backfillAmendmentsForActiveBills();
+            }
+        } catch (Exception e) {
+            log.warn("Startup amendment backfill failed (retries next boot): {}", e.toString());
+        }
     }
 
     private void loadAuxGroupMembershipsIfNeeded() {

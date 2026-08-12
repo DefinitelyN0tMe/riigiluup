@@ -855,7 +855,10 @@
     "noStages": "Etappe pole registreeritud.",
     "noName": "(nimi puudub)",
     "relatedInitiatives_one": "Seotud kollektiivne pöördumine",
-    "relatedInitiatives_other": "Seotud kollektiivsed pöördumised"
+    "relatedInitiatives_other": "Seotud kollektiivsed pöördumised",
+    "amendmentsTitle": "Muudatusettepanekud",
+    "amendmentsNote": "Eelnõu kohta esitatud muudatusettepanekud. Pealkiri nimetab ettepaneku esitaja (fraktsioon või saadik); fail avab ettepaneku teksti.",
+    "amendmentsFile": "Ettepaneku fail"
   },
   "committees": {
     "title": "Komisjonid",
