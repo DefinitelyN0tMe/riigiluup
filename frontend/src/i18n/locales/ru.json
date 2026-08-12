@@ -795,6 +795,22 @@
       "support": "Группы поддержки",
       "delegations": "Делегации"
     },
+    "oversight": {
+      "title": "Контроль: вопросы министрам",
+      "lead": "Письменные вопросы и запросы (arupärimine) депутата к министрам - и был ли/когда дан ответ.",
+      "kind": {
+        "WRITTEN_QUESTION": "Письменный вопрос",
+        "INTERPELLATION": "Запрос (arupärimine)"
+      },
+      "answered": "Отвечено",
+      "answeredIn": "Ответ за {{count}} дн.",
+      "overdue": "Срок истёк",
+      "awaiting": "Ждёт ответа",
+      "toMinister": "адресат: {{name}}",
+      "showAll": "Показать все ({{count}})",
+      "showLess": "Свернуть",
+      "moreNote": "Всего {{total}} вопросов."
+    },
     "activity": {
       "title": "Активность в парламенте",
       "speeches": "Выступления",

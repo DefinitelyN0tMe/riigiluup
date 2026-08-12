@@ -110,6 +110,18 @@ export type PoliticianProfile = {
   friendshipGroups: CommitteeMembership[];
   supportGroups: CommitteeMembership[];
   delegations: CommitteeMembership[];
+  oversight: OversightItem[];
+  oversightTotal: number;
+};
+export type OversightItem = {
+  kind: "WRITTEN_QUESTION" | "INTERPELLATION" | string;
+  title: string;
+  addresseeName: string | null;
+  submittedOn: string | null;
+  answerDeadline: string | null;
+  answered: boolean;
+  respondentName: string | null;
+  respondedOn: string | null;
 };
 export type PressItem = {
   description: string;

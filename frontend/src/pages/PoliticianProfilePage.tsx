@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import type { PressItem, CommitteeMembership } from "../types";
+import type { PressItem, CommitteeMembership, OversightItem } from "../types";
 import { fetchProfile } from "../api/politicians";
 import { resolveMediaUrl } from "../api/client";
 import { fetchPoliticianVotes } from "../api/votes";
@@ -166,6 +166,76 @@ function AffiliationGroups({
           )
         )}
       </div>
+    </section>
+  );
+}
+
+function daysBetween(a: string, b: string): number | null {
+  const d1 = Date.parse(a);
+  const d2 = Date.parse(b);
+  if (Number.isNaN(d1) || Number.isNaN(d2)) return null;
+  return Math.round((d2 - d1) / 86_400_000);
+}
+
+/** Written questions and interpellations the MP put to a minister, with an answer-status signal. */
+function OversightSection({ items, total }: { items: OversightItem[]; total: number }) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const INITIAL = 8;
+  const shown = expanded ? items : items.slice(0, INITIAL);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  return (
+    <section aria-label={t("profile.oversight.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+      <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">{t("profile.oversight.title")}</h2>
+      <p className="text-[13px] leading-snug text-ink-2 mb-4 max-w-[72ch]">{t("profile.oversight.lead")}</p>
+      <ul className="flex flex-col divide-y divide-rule border border-rule rounded-[16px] overflow-hidden">
+        {shown.map((o, i) => {
+          const overdue = !o.answered && !!o.answerDeadline && o.answerDeadline < todayIso;
+          const rd = o.answered && o.submittedOn && o.respondedOn ? daysBetween(o.submittedOn, o.respondedOn) : null;
+          return (
+            <li key={i} className="p-4">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-1">
+                <span className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-paper border border-rule text-ink-2">
+                  {t(`profile.oversight.kind.${o.kind}`, { defaultValue: o.kind })}
+                </span>
+                {o.answered ? (
+                  <span className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-blue/10 text-blue">
+                    {rd != null ? t("profile.oversight.answeredIn", { count: rd }) : t("profile.oversight.answered")}
+                  </span>
+                ) : overdue ? (
+                  <span className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-hot/10 text-hot-deep">
+                    {t("profile.oversight.overdue")}
+                  </span>
+                ) : (
+                  <span className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-rule/40 text-muted">
+                    {t("profile.oversight.awaiting")}
+                  </span>
+                )}
+              </div>
+              <p className="text-ink font-medium text-[15px] leading-snug">{o.title}</p>
+              <div className="text-[12px] leading-snug text-muted mt-1">
+                {o.addresseeName && <span>{t("profile.oversight.toMinister", { name: o.addresseeName })}</span>}
+                {o.addresseeName && o.submittedOn ? " · " : ""}
+                {o.submittedOn && <span className="font-mono">{formatDate(o.submittedOn)}</span>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {items.length > INITIAL && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-3 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5"
+        >
+          {expanded ? t("profile.oversight.showLess") : t("profile.oversight.showAll", { count: items.length })}
+        </button>
+      )}
+      {total > items.length && (
+        <p className="text-[11px] leading-snug text-muted mt-3">
+          {t("profile.oversight.moreNote", { total })}
+        </p>
+      )}
     </section>
   );
 }
@@ -788,6 +858,10 @@ export default function PoliticianProfilePage() {
         support={data.supportGroups ?? []}
         delegations={data.delegations ?? []}
       />
+
+      {(data.oversight ?? []).length > 0 && (
+        <OversightSection items={data.oversight} total={data.oversightTotal ?? data.oversight.length} />
+      )}
 
       {data.slug && (
         <section aria-label={t("sections.recentVotes")}>

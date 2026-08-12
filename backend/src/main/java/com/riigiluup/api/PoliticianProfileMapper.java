@@ -46,7 +46,11 @@ public class PoliticianProfileMapper {
     private final MpPartyMembershipRepository partyMembershipRepo;
     private final com.riigiluup.person.MpFactionMembershipRepository factionHistoryRepo;
     private final com.riigiluup.person.MpPressActivityRepository pressRepo;
+    private final com.riigiluup.oversight.OversightItemRepository oversightRepo;
     private final MemberActivityRepository memberActivity;
+
+    /** Cap the oversight list sent to the client; the rest stay one click away on the official register. */
+    private static final int OVERSIGHT_LIMIT = 40;
 
     /** Cap the press list sent to the client; the rest stay one click away on the official profile. */
     private static final int PRESS_LIMIT = 40;
@@ -79,6 +83,19 @@ public class PoliticianProfileMapper {
         List<PoliticianProfileDto.GroupMembershipDto> friendshipGroups = groupsOfType(memberships, GroupType.BILATERAL_GROUP);
         List<PoliticianProfileDto.GroupMembershipDto> supportGroups = groupsOfType(memberships, GroupType.ASSOCIATION);
         List<PoliticianProfileDto.GroupMembershipDto> delegations = groupsOfType(memberships, GroupType.DELEGATION);
+
+        // Oversight: written questions and interpellations this MP put to a minister, newest first,
+        // capped so the payload stays small. Total reported separately for a "showing N of M" note.
+        List<com.riigiluup.oversight.OversightItem> oversightRows =
+                oversightRepo.findByEnquirer(m.getExternalId());
+        List<PoliticianProfileDto.OversightDto> oversight = oversightRows.stream()
+                .limit(OVERSIGHT_LIMIT)
+                .map(o -> new PoliticianProfileDto.OversightDto(
+                        o.getKind() == null ? null : o.getKind().name(),
+                        o.getTitle(), o.getAddresseeName(),
+                        o.getSubmittedOn(), o.getAnswerDeadline(),
+                        o.isAnswered(), o.getRespondentName(), o.getRespondedOn()))
+                .toList();
 
         LocalDate today = LocalDate.now();
         ParticipationStats participation = stats.participation(
@@ -219,7 +236,9 @@ public class PoliticianProfileMapper {
                 pressRows.size(),
                 friendshipGroups,
                 supportGroups,
-                delegations
+                delegations,
+                oversight,
+                oversightRows.size()
         );
     }
 

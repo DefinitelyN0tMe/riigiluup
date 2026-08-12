@@ -777,6 +777,22 @@
       "support": "Toetusrühmad",
       "delegations": "Delegatsioonid"
     },
+    "oversight": {
+      "title": "Järelevalve: küsimused ministritele",
+      "lead": "Saadiku kirjalikud küsimused ja arupärimised ministritele ning kas/millal neile vastati.",
+      "kind": {
+        "WRITTEN_QUESTION": "Kirjalik küsimus",
+        "INTERPELLATION": "Arupärimine"
+      },
+      "answered": "Vastatud",
+      "answeredIn": "Vastatud {{count}} päevaga",
+      "overdue": "Tähtaeg möödas",
+      "awaiting": "Ootab vastust",
+      "toMinister": "adressaat: {{name}}",
+      "showAll": "Näita kõiki ({{count}})",
+      "showLess": "Näita vähem",
+      "moreNote": "Kokku {{total}} küsimust."
+    },
     "activity": {
       "title": "Aktiivsus parlamendis",
       "speeches": "Sõnavõtud",

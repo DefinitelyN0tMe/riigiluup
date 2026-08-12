@@ -31,6 +31,7 @@ public class DailyRefreshJob {
     private final LegislativeItemImporter legislationImporter;
     private final VoteBillLinker voteBillLinker;
     private final SpeechImporter speechImporter;
+    private final com.riigiluup.oversight.OversightImporter oversightImporter;
     private final AnalyticsCacheEvictor cacheEvictor;
 
     /** Guards against a slow run still executing when the next 6-hourly trigger fires. */
@@ -90,6 +91,9 @@ public class DailyRefreshJob {
             // 7-day speech window: stenograms publish next day and get edited for a few
             // days after, so re-upserting a week keeps texts converged with the source.
             speechImporter.runWindow(today.minusDays(7), today);
+            // Oversight: pick up new written questions/interpellations and answers (incl. late replies
+            // to older questions). Cheap windowed re-scan of the document register.
+            oversightImporter.refreshRecent();
             cacheEvictor.evictAll();
             log.info("Daily refresh finished");
         } catch (Exception e) {

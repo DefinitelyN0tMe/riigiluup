@@ -777,6 +777,22 @@
       "support": "Support groups",
       "delegations": "Delegations"
     },
+    "oversight": {
+      "title": "Oversight: questions to ministers",
+      "lead": "The MP's written questions and interpellations to ministers - and whether/when they were answered.",
+      "kind": {
+        "WRITTEN_QUESTION": "Written question",
+        "INTERPELLATION": "Interpellation"
+      },
+      "answered": "Answered",
+      "answeredIn": "Answered in {{count}} days",
+      "overdue": "Overdue",
+      "awaiting": "Awaiting answer",
+      "toMinister": "to: {{name}}",
+      "showAll": "Show all ({{count}})",
+      "showLess": "Show less",
+      "moreNote": "{{total}} questions in total."
+    },
     "activity": {
       "title": "Activity in parliament",
       "speeches": "Speeches",

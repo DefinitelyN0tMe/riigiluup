@@ -46,8 +46,24 @@ public record PoliticianProfileDto(
         int pressTotal,
         List<GroupMembershipDto> friendshipGroups,
         List<GroupMembershipDto> supportGroups,
-        List<GroupMembershipDto> delegations
+        List<GroupMembershipDto> delegations,
+        List<OversightDto> oversight,
+        int oversightTotal
 ) {
+    /**
+     * A written question or interpellation the MP put to a minister, with whether/when it was
+     * answered. {@code kind} is WRITTEN_QUESTION | INTERPELLATION.
+     */
+    public record OversightDto(
+            String kind,
+            String title,
+            String addresseeName,
+            LocalDate submittedOn,
+            LocalDate answerDeadline,
+            boolean answered,
+            String respondentName,
+            LocalDate respondedOn
+    ) {}
     /**
      * One press-activity entry ("Ajakirjandustegevus") from the Riigikogu API. {@code url} points to
      * the external article (may be null); {@code description} is the title + publication(s) line.

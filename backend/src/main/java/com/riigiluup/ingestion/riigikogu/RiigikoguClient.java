@@ -59,6 +59,29 @@ public class RiigikoguClient {
                 .body(JsonNode.class);
     }
 
+    /** One page of the document register filtered by documentType (HAL: _embedded.content + page). */
+    public JsonNode fetchDocumentsPage(String documentType, int page, int size) {
+        throttle();
+        return rest.get()
+                .uri(b -> b.path("/api/documents")
+                        .queryParam("lang", "et")
+                        .queryParam("documentType", documentType)
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .build())
+                .retrieve()
+                .body(JsonNode.class);
+    }
+
+    /** Full document detail (enquirers/addressee/dates for questions; respondent/date for answers). */
+    public JsonNode fetchDocumentDetail(String uuid) {
+        throttle();
+        return rest.get()
+                .uri("/api/documents/{uuid}?lang=et", uuid)
+                .retrieve()
+                .body(JsonNode.class);
+    }
+
     /** Nanos of the last outbound request; -1 = never. Guarded via synchronized on {@link #throttle()}. */
     private long lastRequestNanos = -1L;
     // 1.6 s ≈ 0.62 rps. Measured 2026-07-23: api.riigikogu.ee 429s bursts even at ~1 rps spacing

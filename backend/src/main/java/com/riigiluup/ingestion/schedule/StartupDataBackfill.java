@@ -47,6 +47,7 @@ public class StartupDataBackfill {
     private final GroupMembershipRepository groupMembershipRepo;
     private final BillAmendmentRepository amendmentRepo;
     private final LegislativeItemImporter legislationImporter;
+    private final com.riigiluup.oversight.OversightImporter oversightImporter;
     private final PlenaryMemberDetailImporter detailImporter;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -64,6 +65,16 @@ public class StartupDataBackfill {
         loadPressActivityIfNeeded();
         loadAuxGroupMembershipsIfNeeded();
         loadAmendmentsIfNeeded();
+        loadOversightIfNeeded();
+    }
+
+    private void loadOversightIfNeeded() {
+        try {
+            // Self-gated on a SUCCESS run-log, so an interrupted backfill resumes next boot.
+            oversightImporter.backfillCurrentTermIfNeeded();
+        } catch (Exception e) {
+            log.warn("Startup oversight backfill failed (retries next boot): {}", e.toString());
+        }
     }
 
     private void loadAmendmentsIfNeeded() {
