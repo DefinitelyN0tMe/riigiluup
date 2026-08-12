@@ -105,6 +105,13 @@ export type PoliticianProfile = {
   positions?: string | null;
   partyMemberships: PartyMembership[];
   factionHistory: FactionPeriod[];
+  pressActivity: PressItem[];
+  pressTotal: number;
+};
+export type PressItem = {
+  description: string;
+  url: string | null;
+  date: string | null;
 };
 export type PartyMembership = {
   partyLabel: string;

@@ -762,6 +762,13 @@
       "lead": "Kuulumine Riigikogu fraktsioonidesse ajas.",
       "present": "praegu"
     },
+    "press": {
+      "title": "Ajakirjandustegevus",
+      "lead": "Meediakajastused ja artiklid; lingid viivad väljaande juurde, mitte Riigikogusse.",
+      "showAll": "Näita kõiki ({{count}})",
+      "showLess": "Näita vähem",
+      "moreOnOfficial": "Kokku {{total}} kajastust. Ülejäänud Riigikogu ametlikul profiilil:"
+    },
     "activity": {
       "title": "Aktiivsus parlamendis",
       "speeches": "Sõnavõtud",

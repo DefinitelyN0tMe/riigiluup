@@ -42,6 +42,7 @@ public class PlenaryMemberDetailImporter {
     private final SourceSnapshotRepository snapshotRepo;
     private final ImportRunLogRepository runLogRepo;
     private final com.riigiluup.person.MpFactionMembershipRepository factionHistoryRepo;
+    private final com.riigiluup.person.MpPressActivityRepository pressRepo;
     private final TransactionTemplate tx;
 
     /** Re-fetch a member's detail at most this often — committees/bio/faction change slowly. */
@@ -58,6 +59,7 @@ public class PlenaryMemberDetailImporter {
             SourceSnapshotRepository snapshotRepo,
             ImportRunLogRepository runLogRepo,
             com.riigiluup.person.MpFactionMembershipRepository factionHistoryRepo,
+            com.riigiluup.person.MpPressActivityRepository pressRepo,
             org.springframework.transaction.PlatformTransactionManager txManager
     ) {
         this.client = client;
@@ -69,6 +71,7 @@ public class PlenaryMemberDetailImporter {
         this.snapshotRepo = snapshotRepo;
         this.runLogRepo = runLogRepo;
         this.factionHistoryRepo = factionHistoryRepo;
+        this.pressRepo = pressRepo;
         this.tx = new TransactionTemplate(txManager);
     }
 
@@ -170,6 +173,7 @@ public class PlenaryMemberDetailImporter {
         memberRepo.save(member);
 
         writeFactionHistory(dto.uuid(), dto);
+        writePressActivity(dto.uuid(), dto);
         reconcileCommitteeMemberships(member, dto, snap);
         snap.setProcessingStatus(ProcessingStatus.PROCESSED);
     }
@@ -246,6 +250,37 @@ public class PlenaryMemberDetailImporter {
                     .build());
         }
         factionHistoryRepo.saveAll(rows.values());
+    }
+
+    /**
+     * Replace a member's press-activity list ("Ajakirjandustegevus") from the detail response. Each
+     * entry keeps its external article URL (which points to the outlet, not riigikogu.ee) so the
+     * profile can link straight to the article. Dedup on (description, url) to drop exact repeats.
+     */
+    private void writePressActivity(String memberExternalId, PlenaryMemberDetailDto dto) {
+        pressRepo.deleteByMemberExternalId(memberExternalId);
+        if (dto.press() == null || dto.press().isEmpty()) return;
+        Instant now = Instant.now();
+        java.util.Map<String, com.riigiluup.person.MpPressActivity> rows = new java.util.LinkedHashMap<>();
+        for (PlenaryMemberDetailDto.PressEntry p : dto.press()) {
+            if (p == null || p.description() == null || p.description().isBlank()) continue;
+            String url = truncate(p.url(), 1024);
+            rows.put(p.description() + "|" + (url == null ? "" : url),
+                    com.riigiluup.person.MpPressActivity.builder()
+                            .memberExternalId(memberExternalId)
+                            .description(p.description())
+                            .url(url)
+                            .publishedOn(parseDate(p.date()))
+                            .membershipNumber(p.membershipNumber())
+                            .importedAt(now)
+                            .build());
+        }
+        pressRepo.saveAll(rows.values());
+    }
+
+    private static String truncate(String s, int max) {
+        if (s == null) return null;
+        return s.length() <= max ? s : s.substring(0, max);
     }
 
     private static java.time.LocalDate parseDate(String iso) {

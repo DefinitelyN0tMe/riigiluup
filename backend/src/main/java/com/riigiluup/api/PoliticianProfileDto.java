@@ -41,8 +41,15 @@ public record PoliticianProfileDto(
         String education,
         String positions,
         List<PartyMembership> partyMemberships,
-        List<FactionPeriod> factionHistory
+        List<FactionPeriod> factionHistory,
+        List<PressItem> pressActivity,
+        int pressTotal
 ) {
+    /**
+     * One press-activity entry ("Ajakirjandustegevus") from the Riigikogu API. {@code url} points to
+     * the external article (may be null); {@code description} is the title + publication(s) line.
+     */
+    public record PressItem(String description, String url, LocalDate date) {}
     /** How the MP won their seat (from opendata.valimised.ee); null if not matched. */
     public record ElectionInfo(
             String electionCode,

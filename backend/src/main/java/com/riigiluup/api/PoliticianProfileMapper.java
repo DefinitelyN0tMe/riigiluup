@@ -45,7 +45,11 @@ public class PoliticianProfileMapper {
     private final ElectionResultRepository electionResults;
     private final MpPartyMembershipRepository partyMembershipRepo;
     private final com.riigiluup.person.MpFactionMembershipRepository factionHistoryRepo;
+    private final com.riigiluup.person.MpPressActivityRepository pressRepo;
     private final MemberActivityRepository memberActivity;
+
+    /** Cap the press list sent to the client; the rest stay one click away on the official profile. */
+    private static final int PRESS_LIMIT = 40;
 
     public PoliticianProfileDto toDto(PlenaryMember m, List<GroupMembership> memberships) {
         PoliticianProfileDto.Party party = factionLinks
@@ -166,6 +170,16 @@ public class PoliticianProfileMapper {
                         f.getFactionName(), f.getFactionExternalId(), f.getStartDate(), f.getEndDate()))
                 .toList();
 
+        // Press activity ("Ajakirjandustegevus"): newest first, capped so the payload stays small.
+        // Total is reported separately so the profile can say "showing N of M" and link to the rest.
+        List<com.riigiluup.person.MpPressActivity> pressRows = pressRepo
+                .findByMemberNewestFirst(m.getExternalId());
+        List<PoliticianProfileDto.PressItem> pressActivity = pressRows.stream()
+                .limit(PRESS_LIMIT)
+                .map(p -> new PoliticianProfileDto.PressItem(
+                        p.getDescription(), p.getUrl(), p.getPublishedOn()))
+                .toList();
+
         return new PoliticianProfileDto(
                 m.getId(), m.getSlug(),
                 m.getFullName(), m.getFirstName(), m.getLastName(),
@@ -194,7 +208,9 @@ public class PoliticianProfileMapper {
                 m.getEducation(),
                 m.getPositions(),
                 partyMemberships,
-                factionHistory
+                factionHistory,
+                pressActivity,
+                pressRows.size()
         );
     }
 

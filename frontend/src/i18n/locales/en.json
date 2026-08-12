@@ -762,6 +762,13 @@
       "lead": "Parliamentary group membership over time.",
       "present": "present"
     },
+    "press": {
+      "title": "Press activity",
+      "lead": "Press mentions and articles; links point to the publications themselves, not to Riigikogu.",
+      "showAll": "Show all ({{count}})",
+      "showLess": "Show less",
+      "moreOnOfficial": "{{total}} entries in total. The rest are on the official Riigikogu profile:"
+    },
     "activity": {
       "title": "Activity in parliament",
       "speeches": "Speeches",

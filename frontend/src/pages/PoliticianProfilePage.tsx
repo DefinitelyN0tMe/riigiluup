@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import type { PressItem } from "../types";
 import { fetchProfile } from "../api/politicians";
 import { resolveMediaUrl } from "../api/client";
 import { fetchPoliticianVotes } from "../api/votes";
@@ -38,6 +40,85 @@ function ActivityStat({ value, label, hint }: { value: number; label: string; hi
         {label}
       </div>
     </div>
+  );
+}
+
+/** Splits a press line "Title // Publication, date, page" into headline + source meta. */
+function splitPress(description: string): { headline: string; meta: string | null } {
+  const i = description.indexOf("//");
+  if (i < 0) return { headline: description.trim(), meta: null };
+  const headline = description.slice(0, i).trim();
+  const meta = description.slice(i + 2).trim();
+  return { headline: headline || description.trim(), meta: meta || null };
+}
+
+function PressActivitySection({
+  items,
+  total,
+  officialUrl,
+}: {
+  items: PressItem[];
+  total: number;
+  officialUrl: string | null;
+}) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const INITIAL = 8;
+  const shown = expanded ? items : items.slice(0, INITIAL);
+  return (
+    <section aria-label={t("profile.press.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+      <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">
+        {t("profile.press.title")}
+      </h2>
+      <p className="text-[13px] leading-snug text-ink-2 mb-4">{t("profile.press.lead")}</p>
+      <ul className="flex flex-col divide-y divide-rule border border-rule rounded-[16px] overflow-hidden">
+        {shown.map((p, i) => {
+          const { headline, meta } = splitPress(p.description);
+          const when = p.date ? formatDate(p.date) : null;
+          return (
+            <li key={`${i}-${p.url ?? headline}`} className="p-4">
+              {p.url ? (
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-ink font-medium text-[15px] leading-snug hover:underline"
+                >
+                  {headline}
+                  <span className="text-blue ml-1 align-baseline">↗</span>
+                </a>
+              ) : (
+                <span className="text-ink font-medium text-[15px] leading-snug">{headline}</span>
+              )}
+              <div className="text-[12px] leading-snug text-muted mt-1">
+                {meta}
+                {meta && when ? " · " : ""}
+                {when && <span className="font-mono">{when}</span>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {items.length > INITIAL && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-3 font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5"
+        >
+          {expanded ? t("profile.press.showLess") : t("profile.press.showAll", { count: items.length })}
+        </button>
+      )}
+      {total > items.length && (
+        <p className="text-[11px] leading-snug text-muted mt-3">
+          {t("profile.press.moreOnOfficial", { total })}{" "}
+          {officialUrl && (
+            <a href={officialUrl} target="_blank" rel="noreferrer noopener" className="text-blue border-b border-blue">
+              riigikogu.ee ↗
+            </a>
+          )}
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -442,6 +523,14 @@ export default function PoliticianProfilePage() {
             </a>
           </div>
         </section>
+      )}
+
+      {(data.pressActivity ?? []).length > 0 && (
+        <PressActivitySection
+          items={data.pressActivity}
+          total={data.pressTotal ?? data.pressActivity.length}
+          officialUrl={data.officialProfileUrl}
+        />
       )}
 
       {(data.education || data.positions) && (

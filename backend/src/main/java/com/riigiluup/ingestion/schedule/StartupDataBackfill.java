@@ -6,6 +6,7 @@ import com.riigiluup.election.HistoricalElectionImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
 import com.riigiluup.person.MpFactionMembershipRepository;
+import com.riigiluup.person.MpPressActivityRepository;
 import com.riigiluup.speech.SpeechBillLinkRepository;
 import com.riigiluup.speech.SpeechRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class StartupDataBackfill {
     private final ElectionResultsImporter electionResultsImporter;
     private final HistoricalElectionImporter historicalElectionImporter;
     private final MpFactionMembershipRepository factionHistoryRepo;
+    private final MpPressActivityRepository pressRepo;
     private final PlenaryMemberDetailImporter detailImporter;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -52,6 +54,20 @@ public class StartupDataBackfill {
         loadCampaignsIfNeeded();
         loadHistoricalIfNeeded();
         loadFactionHistoryIfNeeded();
+        loadPressActivityIfNeeded();
+    }
+
+    private void loadPressActivityIfNeeded() {
+        try {
+            if (pressRepo.count() == 0) {
+                log.info("Startup backfill: forcing a detail refresh to backfill MP press activity");
+                // Same forced detail path as faction history: press is written by the detail import,
+                // so one forced run on the first boot after this feature deploys populates it now.
+                detailImporter.runOnce(true);
+            }
+        } catch (Exception e) {
+            log.warn("Startup press-activity backfill failed (retries next boot): {}", e.toString());
+        }
     }
 
     private void loadFactionHistoryIfNeeded() {

@@ -77,7 +77,8 @@ class PlenaryMemberDetailMapperTest {
                 "id-1", "Jaak", "Aab", "Jaak Aab",
                 "jaak.aab@riigikogu.ee", "MALE", "1960-04-09", "<p>bio</p>", 3383,
                 photo("/api/files/p-1/download"),
-                List.of(past, current)
+                List.of(past, current),
+                List.of()
         );
 
         mapper.applyDetail(m, dto);
@@ -107,7 +108,8 @@ class PlenaryMemberDetailMapperTest {
         );
         PlenaryMemberDetailDto dto = new PlenaryMemberDetailDto(
                 "id-2", "A", "B", "A B", null, null, null, null, null, null,
-                List.of(current)
+                List.of(current),
+                List.of()
         );
 
         var open = mapper.currentTermCommittees(dto);
@@ -127,7 +129,8 @@ class PlenaryMemberDetailMapperTest {
         );
         PlenaryMemberDetailDto dto = new PlenaryMemberDetailDto(
                 "id-3", "A", "B", "A B", null, null, null, null, null, null,
-                List.of(past)
+                List.of(past),
+                List.of()
         );
         PlenaryMember m = blankMember("id-3", "a-b");
 
@@ -147,7 +150,7 @@ class PlenaryMemberDetailMapperTest {
                         + "<script>alert(1)</script>"
                         + "<a href=\"javascript:alert(1)\">link</a>"
                         + "<a href=\"https://riigikogu.ee\">ok</a>",
-                null, null, List.of()
+                null, null, List.of(), List.of()
         );
         PlenaryMember m = blankMember("id-5", "a-b-5");
 
@@ -164,7 +167,7 @@ class PlenaryMemberDetailMapperTest {
     @Test
     void null_biography_stays_null() {
         PlenaryMemberDetailDto dto = new PlenaryMemberDetailDto(
-                "id-6", "A", "B", "A B", null, null, null, null, null, null, List.of()
+                "id-6", "A", "B", "A B", null, null, null, null, null, null, List.of(), List.of()
         );
         PlenaryMember m = blankMember("id-6", "a-b-6");
 
@@ -177,7 +180,7 @@ class PlenaryMemberDetailMapperTest {
     void handles_missing_photo() {
         PlenaryMemberDetailDto dto = new PlenaryMemberDetailDto(
                 "id-4", "A", "B", "A B", null, null, null, null, null,
-                null, List.of()
+                null, List.of(), List.of()
         );
         PlenaryMember m = blankMember("id-4", "a-b-4");
 

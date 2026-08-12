@@ -22,8 +22,16 @@ public record PlenaryMemberDetailDto(
         String biography,
         Integer parliamentSeniority,
         Photo photo,
-        List<Membership> memberships
+        List<Membership> memberships,
+        List<PressEntry> press
 ) {
+    /**
+     * A press-activity entry: {@code description} is the free-text line (title + publication(s) +
+     * date), {@code url} points to the external article (may be null), {@code date} is ISO yyyy-MM-dd.
+     */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record PressEntry(Integer membershipNumber, String description, String url, String date) {}
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Photo(String uuid, String fileName, String fileExtension, Links _links) {
         @JsonIgnoreProperties(ignoreUnknown = true)
