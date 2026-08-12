@@ -107,11 +107,32 @@ export type PoliticianProfile = {
   factionHistory: FactionPeriod[];
   pressActivity: PressItem[];
   pressTotal: number;
+  friendshipGroups: CommitteeMembership[];
+  supportGroups: CommitteeMembership[];
+  delegations: CommitteeMembership[];
 };
 export type PressItem = {
   description: string;
   url: string | null;
   date: string | null;
+};
+export type GroupCategory = "FRIENDSHIP" | "SUPPORT" | "DELEGATION" | string;
+export type GroupDirectoryItem = {
+  externalId: string;
+  name: string;
+  category: GroupCategory;
+  memberCount: number;
+};
+export type GroupDirectoryMember = {
+  slug: string;
+  name: string;
+  factionName: string | null;
+};
+export type GroupDirectoryDetail = {
+  externalId: string;
+  name: string;
+  category: GroupCategory;
+  members: GroupDirectoryMember[];
 };
 export type PartyMembership = {
   partyLabel: string;

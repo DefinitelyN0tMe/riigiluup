@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import type { PressItem } from "../types";
+import type { PressItem, CommitteeMembership } from "../types";
 import { fetchProfile } from "../api/politicians";
 import { resolveMediaUrl } from "../api/client";
 import { fetchPoliticianVotes } from "../api/votes";
@@ -118,6 +118,54 @@ function PressActivitySection({
           )}
         </p>
       )}
+    </section>
+  );
+}
+
+/** Friendship groups, topic support groups and delegations as chip-links to the /groups directory. */
+function AffiliationGroups({
+  friendship,
+  support,
+  delegations,
+}: {
+  friendship: CommitteeMembership[];
+  support: CommitteeMembership[];
+  delegations: CommitteeMembership[];
+}) {
+  const { t } = useTranslation();
+  const rows: Array<{ key: string; items: CommitteeMembership[] }> = [
+    { key: "delegations", items: delegations },
+    { key: "friendship", items: friendship },
+    { key: "support", items: support },
+  ];
+  if (rows.every((r) => r.items.length === 0)) return null;
+  return (
+    <section aria-label={t("profile.affiliations.title")} className="border border-rule rounded-[22px] p-5 sm:p-6 bg-white">
+      <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-1">{t("profile.affiliations.title")}</h2>
+      <p className="text-[13px] leading-snug text-ink-2 mb-4 max-w-[72ch]">{t("profile.affiliations.lead")}</p>
+      <div className="flex flex-col gap-4">
+        {rows.map(({ key, items }) =>
+          items.length === 0 ? null : (
+            <div key={key}>
+              <h3 className="font-mono text-[11px] uppercase tracking-[0.1em] text-muted mb-2">
+                {t(`profile.affiliations.${key}`)}
+              </h3>
+              <ul className="flex flex-wrap gap-2">
+                {items.map((g) => (
+                  <li key={g.externalId}>
+                    <Link
+                      to={`/groups/${g.externalId}`}
+                      className="inline-block text-[13px] text-ink bg-paper border border-rule rounded-full px-3 py-1 hover:border-blue transition-colors"
+                    >
+                      {g.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        )}
+      </div>
     </section>
   );
 }
@@ -734,6 +782,12 @@ export default function PoliticianProfilePage() {
           </ul>
         </section>
       )}
+
+      <AffiliationGroups
+        friendship={data.friendshipGroups ?? []}
+        support={data.supportGroups ?? []}
+        delegations={data.delegations ?? []}
+      />
 
       {data.slug && (
         <section aria-label={t("sections.recentVotes")}>

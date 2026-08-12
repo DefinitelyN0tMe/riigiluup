@@ -74,6 +74,12 @@ public class PoliticianProfileMapper {
                         gm.isActive()))
                 .toList();
 
+        // Friendship groups (parlamendirühm), topic support groups (ühendus/toetusrühm) and
+        // international delegations — extra affiliations the Riigikogu site lists only as a flat tab.
+        List<PoliticianProfileDto.GroupMembershipDto> friendshipGroups = groupsOfType(memberships, GroupType.BILATERAL_GROUP);
+        List<PoliticianProfileDto.GroupMembershipDto> supportGroups = groupsOfType(memberships, GroupType.ASSOCIATION);
+        List<PoliticianProfileDto.GroupMembershipDto> delegations = groupsOfType(memberships, GroupType.DELEGATION);
+
         LocalDate today = LocalDate.now();
         ParticipationStats participation = stats.participation(
                 m.getExternalId(), StatisticsService.TERM_START, today);
@@ -210,8 +216,28 @@ public class PoliticianProfileMapper {
                 partyMemberships,
                 factionHistory,
                 pressActivity,
-                pressRows.size()
+                pressRows.size(),
+                friendshipGroups,
+                supportGroups,
+                delegations
         );
+    }
+
+    /** Active memberships of one group type, mapped to the profile's group DTO, ordered by name. */
+    private static List<PoliticianProfileDto.GroupMembershipDto> groupsOfType(
+            List<GroupMembership> memberships, GroupType type) {
+        return memberships.stream()
+                .filter(gm -> gm.getGroup() != null && gm.getGroup().getType() == type)
+                .sorted(Comparator.comparing(gm -> gm.getGroup().getName(),
+                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+                .map(gm -> new PoliticianProfileDto.GroupMembershipDto(
+                        gm.getGroup().getExternalId(),
+                        gm.getGroup().getName(),
+                        gm.getGroup().getShortName(),
+                        gm.getGroup().getColorHex(),
+                        gm.getRole().name(),
+                        gm.isActive()))
+                .toList();
     }
 
     /**

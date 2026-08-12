@@ -23,7 +23,10 @@ public record PlenaryMemberDetailDto(
         Integer parliamentSeniority,
         Photo photo,
         List<Membership> memberships,
-        List<PressEntry> press
+        List<PressEntry> press,
+        List<GroupLink> associations,          // topic/interest support groups (ühendus/toetusrühm)
+        List<GroupLink> parliamentaryGroups,   // bilateral friendship groups (parlamendirühm)
+        List<GroupLink> delegations            // international delegations (NATO PA, OSCE PA, ...)
 ) {
     /**
      * A press-activity entry: {@code description} is the free-text line (title + publication(s) +
@@ -31,6 +34,14 @@ public record PlenaryMemberDetailDto(
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record PressEntry(Integer membershipNumber, String description, String url, String date) {}
+
+    /**
+     * A lightweight reference to a usergroup an MP belongs to (friendship / support group /
+     * delegation). Only uuid + name + active are provided at this level; the group itself already
+     * exists as a {@code group} row (imported by the usergroups importer).
+     */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record GroupLink(String uuid, String name, Boolean active) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Photo(String uuid, String fileName, String fileExtension, Links _links) {

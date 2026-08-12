@@ -9,7 +9,8 @@
     "analytics": "Analytics",
     "initiatives": "Initiatives",
     "committees": "Committees",
-    "brand": "Riigiluup"
+    "brand": "Riigiluup",
+    "groups": "Groups"
   },
   "chrome": {
     "menuOpen": "Open menu",
@@ -769,6 +770,13 @@
       "showLess": "Show less",
       "moreOnOfficial": "{{total}} entries in total. The rest are on the official Riigikogu profile:"
     },
+    "affiliations": {
+      "title": "Groups & delegations",
+      "lead": "Parliamentary friendship groups, support groups and delegations the MP belongs to.",
+      "friendship": "Friendship groups",
+      "support": "Support groups",
+      "delegations": "Delegations"
+    },
     "activity": {
       "title": "Activity in parliament",
       "speeches": "Speeches",
@@ -1401,5 +1409,22 @@
     "wnd3": "Assign or remove \"activity scores\" — the site does not compute them.",
     "mailSubject": "Riigiluup correction",
     "mailTemplate": "Which record is wrong? (URL or ID)\n\nWhat is the correction?\n\nWhere can we verify (Riigikogu link or other official source)?\n\nYour name (optional):\n"
+  },
+  "groups": {
+    "title": "Groups & delegations",
+    "lede": "MPs' friendship groups, support groups and international delegations - and who belongs to them.",
+    "members": "Members: {{count}}",
+    "searchPlaceholder": "Search a group...",
+    "backToList": "Back to groups",
+    "category": {
+      "FRIENDSHIP": "Friendship groups",
+      "SUPPORT": "Support groups",
+      "DELEGATION": "Delegations"
+    },
+    "categoryLede": {
+      "FRIENDSHIP": "Bilateral friendship groups with other countries' parliaments.",
+      "SUPPORT": "Issue-based support groups backing public initiatives and interests.",
+      "DELEGATION": "Riigikogu's representation in international parliamentary assemblies."
+    }
   }
 }

@@ -21,6 +21,10 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
 
     long countByGroupAndActiveTrue(Group group);
 
+    /** Active memberships of a given group type across all MPs — used to gate the one-time backfill. */
+    @Query("select count(gm) from GroupMembership gm where gm.active = true and gm.group.type = :type")
+    long countActiveByType(@Param("type") GroupType type);
+
     @Query("""
         select gm from GroupMembership gm
         join fetch gm.plenaryMember

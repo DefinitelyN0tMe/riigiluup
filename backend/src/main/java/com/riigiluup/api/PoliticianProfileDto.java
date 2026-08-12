@@ -43,7 +43,10 @@ public record PoliticianProfileDto(
         List<PartyMembership> partyMemberships,
         List<FactionPeriod> factionHistory,
         List<PressItem> pressActivity,
-        int pressTotal
+        int pressTotal,
+        List<GroupMembershipDto> friendshipGroups,
+        List<GroupMembershipDto> supportGroups,
+        List<GroupMembershipDto> delegations
 ) {
     /**
      * One press-activity entry ("Ajakirjandustegevus") from the Riigikogu API. {@code url} points to

@@ -61,6 +61,7 @@ export default function Layout() {
     { to: "/votes", label: t("nav.votes"), end: false },
     { to: "/legislation", label: t("nav.bills"), end: false },
     { to: "/committees", label: t("nav.committees"), end: false },
+    { to: "/groups", label: t("nav.groups"), end: false },
     { to: "/initiatives", label: t("nav.initiatives"), end: false },
     { to: "/speeches", label: t("nav.speeches"), end: false },
     { to: "/analytics", label: t("nav.analytics"), end: false },

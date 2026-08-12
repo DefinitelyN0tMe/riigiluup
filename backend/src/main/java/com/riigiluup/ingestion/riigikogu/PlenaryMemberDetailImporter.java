@@ -5,6 +5,7 @@ import com.riigiluup.group.Group;
 import com.riigiluup.group.GroupMembership;
 import com.riigiluup.group.GroupMembershipRepository;
 import com.riigiluup.group.GroupRepository;
+import com.riigiluup.group.GroupType;
 import com.riigiluup.group.MembershipRole;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.person.PlenaryMemberRepository;
@@ -175,6 +176,7 @@ public class PlenaryMemberDetailImporter {
         writeFactionHistory(dto.uuid(), dto);
         writePressActivity(dto.uuid(), dto);
         reconcileCommitteeMemberships(member, dto, snap);
+        reconcileAuxiliaryGroups(member, dto, snap);
         snap.setProcessingStatus(ProcessingStatus.PROCESSED);
     }
 
@@ -211,9 +213,13 @@ public class PlenaryMemberDetailImporter {
             incoming.setUpdatedAt(Instant.now());
             membershipRepo.save(incoming);
         }
-        // Deactivate memberships not in the current detail response.
+        // Deactivate committee memberships not in the current detail response. Scoped to committee
+        // types so it never touches the friendship/support/delegation memberships that
+        // reconcileAuxiliaryGroups owns (those are reconciled and deactivated separately).
         for (GroupMembership existing : membershipRepo.findByPlenaryMemberAndActiveTrue(member)) {
             if (existing.getGroup() == null) continue;
+            GroupType tp = existing.getGroup().getType();
+            if (tp != GroupType.STANDING_COMMITTEE && tp != GroupType.SPECIAL_COMMITTEE) continue;
             String gid = existing.getGroup().getExternalId();
             if (!incomingGroupUuids.contains(gid)) {
                 existing.setActive(false);
@@ -221,6 +227,66 @@ public class PlenaryMemberDetailImporter {
                 membershipRepo.save(existing);
             }
         }
+    }
+
+    /**
+     * Reconcile the member's friendship groups (parlamendirühm), topic support groups (ühendus /
+     * toetusrühm) and international delegations from the detail arrays into the same group_membership
+     * table, reusing the group rows the usergroups importer already loaded. Deliberately separate from
+     * {@link #reconcileCommitteeMemberships}: committees keep their own reconciliation untouched, and
+     * each side deactivates only its own group types, so the two never fight over the active flag.
+     */
+    private void reconcileAuxiliaryGroups(PlenaryMember member, PlenaryMemberDetailDto dto, SourceSnapshot snap) {
+        Set<String> incoming = new HashSet<>();
+        List<List<PlenaryMemberDetailDto.GroupLink>> arrays = List.of(
+                nullToEmpty(dto.parliamentaryGroups()),
+                nullToEmpty(dto.associations()),
+                nullToEmpty(dto.delegations()));
+        for (List<PlenaryMemberDetailDto.GroupLink> arr : arrays) {
+            for (PlenaryMemberDetailDto.GroupLink gl : arr) {
+                if (gl == null || gl.uuid() == null || Boolean.FALSE.equals(gl.active())) continue;
+                incoming.add(gl.uuid());
+                Group group = groupRepo
+                        .findBySourceNameAndExternalId(client.sourceName(), gl.uuid())
+                        .orElse(null);
+                if (group == null) {
+                    log.debug("usergroup {} unknown, skipping aux membership — run usergroups importer first",
+                            gl.uuid());
+                    continue;
+                }
+                GroupMembership incomingMembership = membershipRepo
+                        .findByPlenaryMemberAndGroupAndStartDate(member, group, null)
+                        .orElseGet(() -> GroupMembership.builder()
+                                .plenaryMember(member)
+                                .group(group)
+                                .active(true)
+                                .importedAt(Instant.now())
+                                .updatedAt(Instant.now())
+                                .build());
+                incomingMembership.setRole(MembershipRole.MEMBER);
+                incomingMembership.setActive(true);
+                incomingMembership.setSourceSnapshot(snap);
+                incomingMembership.setUpdatedAt(Instant.now());
+                membershipRepo.save(incomingMembership);
+            }
+        }
+        // Deactivate aux memberships no longer present, scoped to the three aux types only.
+        for (GroupMembership existing : membershipRepo.findByPlenaryMemberAndActiveTrue(member)) {
+            if (existing.getGroup() == null) continue;
+            GroupType tp = existing.getGroup().getType();
+            if (tp != GroupType.ASSOCIATION && tp != GroupType.BILATERAL_GROUP && tp != GroupType.DELEGATION) {
+                continue;
+            }
+            if (!incoming.contains(existing.getGroup().getExternalId())) {
+                existing.setActive(false);
+                existing.setUpdatedAt(Instant.now());
+                membershipRepo.save(existing);
+            }
+        }
+    }
+
+    private static <T> List<T> nullToEmpty(List<T> l) {
+        return l == null ? List.of() : l;
     }
 
     /**

@@ -5,6 +5,8 @@ import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.election.HistoricalElectionImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
+import com.riigiluup.group.GroupMembershipRepository;
+import com.riigiluup.group.GroupType;
 import com.riigiluup.person.MpFactionMembershipRepository;
 import com.riigiluup.person.MpPressActivityRepository;
 import com.riigiluup.speech.SpeechBillLinkRepository;
@@ -40,6 +42,7 @@ public class StartupDataBackfill {
     private final HistoricalElectionImporter historicalElectionImporter;
     private final MpFactionMembershipRepository factionHistoryRepo;
     private final MpPressActivityRepository pressRepo;
+    private final GroupMembershipRepository groupMembershipRepo;
     private final PlenaryMemberDetailImporter detailImporter;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -55,6 +58,20 @@ public class StartupDataBackfill {
         loadHistoricalIfNeeded();
         loadFactionHistoryIfNeeded();
         loadPressActivityIfNeeded();
+        loadAuxGroupMembershipsIfNeeded();
+    }
+
+    private void loadAuxGroupMembershipsIfNeeded() {
+        try {
+            // Friendship/support/delegation memberships are written by the detail import alongside
+            // committees; backfill them once when none exist yet (first boot after this feature).
+            if (groupMembershipRepo.countActiveByType(GroupType.BILATERAL_GROUP) == 0) {
+                log.info("Startup backfill: forcing a detail refresh to backfill MP group memberships");
+                detailImporter.runOnce(true);
+            }
+        } catch (Exception e) {
+            log.warn("Startup group-membership backfill failed (retries next boot): {}", e.toString());
+        }
     }
 
     private void loadPressActivityIfNeeded() {

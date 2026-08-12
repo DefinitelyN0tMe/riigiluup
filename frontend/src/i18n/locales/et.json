@@ -9,7 +9,8 @@
     "analytics": "Analüütika",
     "initiatives": "Pöördumised",
     "committees": "Komisjonid",
-    "brand": "Riigiluup"
+    "brand": "Riigiluup",
+    "groups": "Rühmad"
   },
   "chrome": {
     "menuOpen": "Ava menüü",
@@ -769,6 +770,13 @@
       "showLess": "Näita vähem",
       "moreOnOfficial": "Kokku {{total}} kajastust. Ülejäänud Riigikogu ametlikul profiilil:"
     },
+    "affiliations": {
+      "title": "Rühmad ja delegatsioonid",
+      "lead": "Parlamendirühmad, toetusrühmad ja delegatsioonid, kuhu saadik kuulub.",
+      "friendship": "Parlamendirühmad",
+      "support": "Toetusrühmad",
+      "delegations": "Delegatsioonid"
+    },
     "activity": {
       "title": "Aktiivsus parlamendis",
       "speeches": "Sõnavõtud",
@@ -1401,5 +1409,22 @@
     "wnd3": "Ei omista ega eemalda \"aktiivsuse skoore\" — sait neid ei arvuta.",
     "mailSubject": "Riigiluup parandus",
     "mailTemplate": "Milline kirje on vale? (URL või ID)\n\nMis on parandus?\n\nKus saab kontrollida (Riigikogu link või muu ametlik allikas)?\n\nTeie nimi (valikuline):\n"
+  },
+  "groups": {
+    "title": "Rühmad ja delegatsioonid",
+    "lede": "Riigikogu liikmete parlamendirühmad, toetusrühmad ja delegatsioonid - ja kes neisse kuulub.",
+    "members": "Liikmeid: {{count}}",
+    "searchPlaceholder": "Otsi rühma...",
+    "backToList": "Tagasi rühmade juurde",
+    "category": {
+      "FRIENDSHIP": "Parlamendirühmad",
+      "SUPPORT": "Toetusrühmad",
+      "DELEGATION": "Delegatsioonid"
+    },
+    "categoryLede": {
+      "FRIENDSHIP": "Kahepoolsed sõprusrühmad teiste riikide parlamentidega.",
+      "SUPPORT": "Teemapõhised toetusrühmad ühiskondlike algatuste ja huvide toetuseks.",
+      "DELEGATION": "Riigikogu esindus rahvusvahelistes parlamentaarsetes kogudes."
+    }
   }
 }

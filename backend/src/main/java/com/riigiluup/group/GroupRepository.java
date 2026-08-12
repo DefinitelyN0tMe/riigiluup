@@ -10,4 +10,5 @@ public interface GroupRepository extends JpaRepository<Group, UUID> {
     Optional<Group> findBySourceNameAndExternalId(String sourceName, String externalId);
     List<Group> findByTypeAndActiveTrueOrderByName(GroupType type);
     Optional<Group> findByExternalIdAndTypeAndActiveTrue(String externalId, GroupType type);
+    Optional<Group> findByExternalIdAndActiveTrue(String externalId);
 }
