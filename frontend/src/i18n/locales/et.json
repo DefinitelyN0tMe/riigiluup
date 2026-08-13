@@ -904,7 +904,8 @@
     "group": {
       "STANDING": "Alatised komisjonid",
       "SPECIAL": "Eri- ja uurimiskomisjonid"
-    }
+    },
+    "specialNoBills": "Eri- ja uurimiskomisjonid ei juhi eelnõusid - nende ülesanne on parlamentaarne järelevalve ja uurimine, mitte seadusloome."
   },
   "initiatives": {
     "title": "Kollektiivsed pöördumised",

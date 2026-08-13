@@ -904,7 +904,8 @@
     "group": {
       "STANDING": "Standing committees",
       "SPECIAL": "Select & investigation committees"
-    }
+    },
+    "specialNoBills": "Select and investigation committees do not lead bills - their role is parliamentary oversight and investigation, not legislation."
   },
   "initiatives": {
     "title": "Citizen initiatives",

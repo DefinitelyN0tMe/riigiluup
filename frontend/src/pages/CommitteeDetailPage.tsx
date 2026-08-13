@@ -99,7 +99,9 @@ export default function CommitteeDetailPage() {
           {t("committees.section.ledBills")}
         </h2>
         {data.ledBills.total === 0 ? (
-          <p className="text-muted font-serif italic">{t("committees.noBills")}</p>
+          <p className="text-muted font-serif italic">
+            {data.kind === "SPECIAL" ? t("committees.specialNoBills") : t("committees.noBills")}
+          </p>
         ) : (
           <>
             <ul className="divide-y divide-rule border border-rule rounded-[16px] list-none p-0">
