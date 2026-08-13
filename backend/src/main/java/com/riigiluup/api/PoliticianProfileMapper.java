@@ -94,7 +94,9 @@ public class PoliticianProfileMapper {
                         o.getKind() == null ? null : o.getKind().name(),
                         o.getTitle(), o.getAddresseeName(),
                         o.getSubmittedOn(), o.getAnswerDeadline(),
-                        o.isAnswered(), o.getRespondentName(), o.getRespondedOn()))
+                        o.isAnswered(), o.getRespondentName(), o.getRespondedOn(),
+                        documentRegisterUrl(o.getExternalId()),
+                        o.isAnswered() ? documentRegisterUrl(o.getAnswerExternalId()) : null))
                 .toList();
 
         LocalDate today = LocalDate.now();
@@ -343,6 +345,12 @@ public class PoliticianProfileMapper {
                 bill == null ? null : bill.getTitle(),
                 billMark(bill)
         );
+    }
+
+    /** Public Riigikogu document-register page for a document uuid (question/answer); null if no id. */
+    private static String documentRegisterUrl(String documentUuid) {
+        return documentUuid == null ? null
+                : "https://www.riigikogu.ee/tegevus/dokumendiregister/dokument/" + documentUuid;
     }
 
     /** "644 SE" from a bill's mark + draft type; null when there is no linked bill. */

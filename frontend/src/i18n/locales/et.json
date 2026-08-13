@@ -768,7 +768,8 @@
       "lead": "Meediakajastused ja artiklid; lingid viivad väljaande juurde, mitte Riigikogusse.",
       "showAll": "Näita kõiki ({{count}})",
       "showLess": "Näita vähem",
-      "moreOnOfficial": "Kokku {{total}} kajastust. Ülejäänud Riigikogu ametlikul profiilil:"
+      "moreOnOfficial": "Kokku {{total}} kajastust. Ülejäänud Riigikogu ametlikul profiilil:",
+      "printOnly": "trükis, lingita"
     },
     "affiliations": {
       "title": "Rühmad ja delegatsioonid",
@@ -791,7 +792,9 @@
       "toMinister": "adressaat: {{name}}",
       "showAll": "Näita kõiki ({{count}})",
       "showLess": "Näita vähem",
-      "moreNote": "Kokku {{total}} küsimust."
+      "moreNote": "Kokku {{total}} küsimust.",
+      "readQuestion": "Loe küsimust",
+      "readAnswer": "Loe vastust"
     },
     "activity": {
       "title": "Aktiivsus parlamendis",

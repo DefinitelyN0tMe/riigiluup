@@ -122,6 +122,8 @@ export type OversightItem = {
   answered: boolean;
   respondentName: string | null;
   respondedOn: string | null;
+  questionUrl: string | null;
+  answerUrl: string | null;
 };
 export type PressItem = {
   description: string;

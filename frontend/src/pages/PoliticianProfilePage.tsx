@@ -88,7 +88,12 @@ function PressActivitySection({
                   <span className="text-blue ml-1 align-baseline">↗</span>
                 </a>
               ) : (
-                <span className="text-ink font-medium text-[15px] leading-snug">{headline}</span>
+                <span className="text-ink font-medium text-[15px] leading-snug">
+                  {headline}
+                  <span className="ml-2 font-mono text-[9px] tracking-[0.08em] uppercase px-1.5 py-0.5 rounded bg-rule/40 text-muted align-middle">
+                    {t("profile.press.printOnly")}
+                  </span>
+                </span>
               )}
               <div className="text-[12px] leading-snug text-muted mt-1">
                 {meta}
@@ -217,6 +222,18 @@ function OversightSection({ items, total }: { items: OversightItem[]; total: num
                 {o.addresseeName && <span>{t("profile.oversight.toMinister", { name: o.addresseeName })}</span>}
                 {o.addresseeName && o.submittedOn ? " · " : ""}
                 {o.submittedOn && <span className="font-mono">{formatDate(o.submittedOn)}</span>}
+              </div>
+              <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] tracking-[0.06em]">
+                {o.questionUrl && (
+                  <a href={o.questionUrl} target="_blank" rel="noreferrer noopener" className="text-blue border-b border-blue pb-0.5">
+                    {t("profile.oversight.readQuestion")} ↗
+                  </a>
+                )}
+                {o.answerUrl && (
+                  <a href={o.answerUrl} target="_blank" rel="noreferrer noopener" className="text-blue border-b border-blue pb-0.5">
+                    {t("profile.oversight.readAnswer")} ↗
+                  </a>
+                )}
               </div>
             </li>
           );

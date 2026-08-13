@@ -62,7 +62,9 @@ public record PoliticianProfileDto(
             LocalDate answerDeadline,
             boolean answered,
             String respondentName,
-            LocalDate respondedOn
+            LocalDate respondedOn,
+            String questionUrl,   // Riigikogu document-register page for the question
+            String answerUrl      // ...and for the answer, null until answered
     ) {}
     /**
      * One press-activity entry ("Ajakirjandustegevus") from the Riigikogu API. {@code url} points to

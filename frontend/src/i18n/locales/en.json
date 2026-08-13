@@ -768,7 +768,8 @@
       "lead": "Press mentions and articles; links point to the publications themselves, not to Riigikogu.",
       "showAll": "Show all ({{count}})",
       "showLess": "Show less",
-      "moreOnOfficial": "{{total}} entries in total. The rest are on the official Riigikogu profile:"
+      "moreOnOfficial": "{{total}} entries in total. The rest are on the official Riigikogu profile:",
+      "printOnly": "print, no link"
     },
     "affiliations": {
       "title": "Groups & delegations",
@@ -791,7 +792,9 @@
       "toMinister": "to: {{name}}",
       "showAll": "Show all ({{count}})",
       "showLess": "Show less",
-      "moreNote": "{{total}} questions in total."
+      "moreNote": "{{total}} questions in total.",
+      "readQuestion": "Read the question",
+      "readAnswer": "Read the answer"
     },
     "activity": {
       "title": "Activity in parliament",
