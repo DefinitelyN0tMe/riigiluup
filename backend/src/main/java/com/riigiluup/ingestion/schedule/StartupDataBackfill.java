@@ -178,9 +178,12 @@ public class StartupDataBackfill {
         try {
             if (!sponsorshipRepo.existsByPlenaryMemberIsNotNull()) {
                 int n = sponsorshipRepo.relinkMpSponsorships();
-                int c = sponsorshipRepo.relinkCommitteeSponsors();
-                log.info("Startup backfill: relinked {} MP and {} committee bill-sponsorships", n, c);
+                log.info("Startup backfill: relinked {} MP bill-sponsorships to their profiles", n);
             }
+            // Cheap + idempotent, so run it every boot rather than gating it behind the MP relink
+            // (which self-satisfies after its first run and would otherwise skip this).
+            int c = sponsorshipRepo.relinkCommitteeSponsors();
+            if (c > 0) log.info("Startup backfill: relinked {} committee bill-sponsorships", c);
         } catch (Exception e) {
             log.warn("Startup MP-sponsorship relink failed (retries next boot): {}", e.toString());
         }
