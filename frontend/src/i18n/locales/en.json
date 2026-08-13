@@ -991,28 +991,20 @@
     }
   },
   "compare": {
-    "disagreementsLede": "Chronological log of votes where the two MPs picked different comparable choices. Every row is one click from the original form.",
-    "title": "Compare two MPs",
-    "leftMp": "Left MP",
-    "rightMp": "Right MP",
-    "prompt": "Pick two MPs to see how they vote together.",
-    "computing": "Computing…",
-    "groupAlignmentLine": "Group alignment:",
-    "groupAlignmentCounts": "({{matches}}/{{eligible}})",
-    "voteAgreement": "Vote agreement",
-    "recentDisagreements": "Recent disagreements ({{count}})",
-    "noDisagreements": "No comparable disagreements in the current window.",
-    "left": "Left",
-    "right": "Right",
-    "addToTray": "Add to compare",
-    "removeFromTray": "Remove from compare",
-    "trayLabel": "Compare {{count}}/2",
-    "trayHint": "Tap ⊕ on any card to add.",
-    "trayAriaLabel": "Compare selection",
-    "clear": "Clear",
-    "removeChip": "Remove {{name}} from compare",
-    "inlineTitle": "Comparison",
-    "panelAriaLabel": "MP comparison"
+    "title": "Comparison",
+    "lede": "Compare two MPs or two parties by how they vote.",
+    "tab": {
+      "parties": "Parties",
+      "politicians": "MPs"
+    },
+    "agreement": "agreement",
+    "overlap": "{{same}} of {{total}} matched",
+    "disagreements": "Recent disagreements",
+    "noOverlap": "Not enough shared votes to compare.",
+    "pickParty": "Pick a party…",
+    "pickMp": "Pick an MP…",
+    "pickLeft": "First",
+    "pickRight": "Second"
   },
   "mpPicker": {
     "placeholder": "Type MP name…",

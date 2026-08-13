@@ -440,3 +440,20 @@ export type AdminStatus = {
   generatedAt: string;
 };
 
+
+export type FactionComparison = {
+  left: { externalId: string; name: string; seats: number };
+  right: { externalId: string; name: string; seats: number };
+  sameCount: number;
+  diffCount: number;
+  totalOverlap: number;
+  agreementRate: number | null;
+  recentDisagreements: {
+    voteEventId: string;
+    description: string | null;
+    startedAt: string | null;
+    leftChoice: string;
+    rightChoice: string;
+  }[];
+  methodologyNote: string;
+};

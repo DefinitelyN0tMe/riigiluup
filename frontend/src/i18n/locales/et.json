@@ -991,28 +991,20 @@
     }
   },
   "compare": {
-    "disagreementsLede": "Kronoloogiline logi hääletustest, kus need kaks saadikut valisid võrreldavatest võimalustest erinevalt. Iga rida on kliki kaugusel originaalvormist.",
-    "title": "Võrdle kahte saadikut",
-    "leftMp": "Vasak saadik",
-    "rightMp": "Parem saadik",
-    "prompt": "Vali kaks saadikut, et näha, kuidas nad hääletavad.",
-    "computing": "Arvutan…",
-    "groupAlignmentLine": "Rühmakuuluvus:",
-    "groupAlignmentCounts": "({{matches}}/{{eligible}})",
-    "voteAgreement": "Hääletuste kokkulangevus",
-    "recentDisagreements": "Hiljutised erimeelsused ({{count}})",
-    "noDisagreements": "Praeguses ajaaknas võrreldavaid erimeelsusi ei ole.",
-    "left": "Vasak",
-    "right": "Parem",
-    "addToTray": "Lisa võrdlusse",
-    "removeFromTray": "Eemalda võrdlusest",
-    "trayLabel": "Võrdlus {{count}}/2",
-    "trayHint": "Vajuta kaardil ⊕, et lisada.",
-    "trayAriaLabel": "Võrdluse valik",
-    "clear": "Tühjenda",
-    "removeChip": "Eemalda {{name}} võrdlusest",
-    "inlineTitle": "Võrdlus",
-    "panelAriaLabel": "Saadikute võrdlus"
+    "title": "Võrdlus",
+    "lede": "Võrdle kahte saadikut või kahte fraktsiooni nende hääletamise järgi.",
+    "tab": {
+      "parties": "Fraktsioonid",
+      "politicians": "Saadikud"
+    },
+    "agreement": "kokkulangevus",
+    "overlap": "{{same}} / {{total}} kattus",
+    "disagreements": "Hiljutised lahknemised",
+    "noOverlap": "Võrdluseks pole piisavalt ühiseid hääletusi.",
+    "pickParty": "Vali fraktsioon…",
+    "pickMp": "Vali saadik…",
+    "pickLeft": "Esimene",
+    "pickRight": "Teine"
   },
   "mpPicker": {
     "placeholder": "Sisesta saadiku nimi…",

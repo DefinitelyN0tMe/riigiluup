@@ -6,7 +6,7 @@ import HomePage from "./pages/HomePage";
 import PoliticiansPage from "./pages/PoliticiansPage";
 import VotesPage from "./pages/VotesPage";
 import LegislationPage from "./pages/LegislationPage";
-import ComparePage from "./pages/ComparePage";
+const ComparePage = lazy(() => import("./pages/ComparePage"));
 
 const PoliticianProfilePage = lazy(() => import("./pages/PoliticianProfilePage"));
 const VoteDetailPage = lazy(() => import("./pages/VoteDetailPage"));

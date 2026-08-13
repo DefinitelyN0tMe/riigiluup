@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer base {
+  /* Lock the palette to light. Telegram's in-app browser (and some Android webviews) force a dark
+     theme onto light pages, which broke our colours and even the Estonian flag. "only light" is the
+     strongest standard opt-out and stops the UA from applying its own dark treatment. */
+  :root { color-scheme: only light; }
   html, body, #root { height: 100%; }
   body {
     font-family: 'Bricolage Grotesque', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
