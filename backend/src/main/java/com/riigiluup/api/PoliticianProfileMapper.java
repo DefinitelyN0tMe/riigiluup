@@ -211,6 +211,7 @@ public class PoliticianProfileMapper {
                 photoUrlRewriter.toProxyPath(m.getPhotoUrl()), riigikoguMemberUrl(m),
                 m.getEmail(), m.getGender(), m.getDateOfBirth(),
                 m.getElectoralDistrict(),
+                m.getCurrentMandateStart(),
                 m.getParliamentSeniorityDays(),
                 m.isActive(),
                 m.getWikidataQid(),

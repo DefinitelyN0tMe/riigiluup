@@ -428,6 +428,13 @@ export default function PoliticianProfilePage() {
               {t("profile.electoralDistrict", { name: data.electoralDistrict })}
             </div>
           )}
+          {/* Shown only for MPs who took their seat mid-term (substitutes / by-election entrants):
+              their current mandate starts after the term opened on 2023-04-10. */}
+          {data.currentMandateStart && data.currentMandateStart > "2023-04-10" && (
+            <div className="text-sm text-slate-600 mt-1">
+              {t("profile.currentMandateFrom", { date: formatDate(data.currentMandateStart) })}
+            </div>
+          )}
           <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <a
               href={data.officialProfileUrl ?? undefined}

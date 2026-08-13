@@ -842,7 +842,8 @@
     "groupAlignmentDetail": "{{matches}} из {{eligible}} учитываемых голосований совпали с большинством фракции.",
     "recentDeviations": "Недавние отклонения",
     "mpChoice": "Депутат",
-    "factionChoice": "Фракция"
+    "factionChoice": "Фракция",
+    "currentMandateFrom": "В текущем составе с {{date}}"
   },
   "votes": {
     "title": "Недавние голосования",

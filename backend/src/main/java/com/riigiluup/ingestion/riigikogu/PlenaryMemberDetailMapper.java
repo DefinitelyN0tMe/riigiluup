@@ -26,8 +26,24 @@ public class PlenaryMemberDetailMapper {
 
         PlenaryMemberDetailDto.Membership current = currentTerm(dto);
         target.setElectoralDistrict(firstDistrictName(current));
+        target.setCurrentMandateStart(currentMandateStart(current));
         applyCurrentFaction(target, current);
         target.setUpdatedAt(Instant.now());
+    }
+
+    /**
+     * Start date of the MP's CURRENT (open-ended) mandate in this term. For someone who has served
+     * since the term opened this is the term start; for a substitute / by-election entrant it is when
+     * they actually took the seat mid-term. The latest endDate==null role item is the live mandate.
+     */
+    private static LocalDate currentMandateStart(PlenaryMemberDetailDto.Membership term) {
+        if (term == null || term.membershipRoleItems() == null) return null;
+        return term.membershipRoleItems().stream()
+                .filter(r -> r.endDate() == null)
+                .map(r -> parseDate(r.startDate()))
+                .filter(java.util.Objects::nonNull)
+                .max(LocalDate::compareTo)
+                .orElse(null);
     }
 
     /** Current-term (active) committee refs, or empty list if MP is not currently serving. */

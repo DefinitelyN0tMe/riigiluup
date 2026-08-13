@@ -824,7 +824,8 @@
     "groupAlignmentDetail": "{{matches}} of {{eligible}} eligible votes matched the faction majority.",
     "recentDeviations": "Recent deviations",
     "mpChoice": "MP",
-    "factionChoice": "Faction"
+    "factionChoice": "Faction",
+    "currentMandateFrom": "In the current composition since {{date}}"
   },
   "votes": {
     "title": "Recent votes",

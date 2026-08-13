@@ -52,6 +52,11 @@ public class PlenaryMember {
     @Column(name = "electoral_district", length = 256)
     private String electoralDistrict;
 
+    /** Start of the MP's current open-ended mandate this term; later than the term start for
+     *  substitutes / by-election entrants. Null if unknown. */
+    @Column(name = "current_mandate_start")
+    private LocalDate currentMandateStart;
+
     @Column(length = 16)
     private String gender;
 

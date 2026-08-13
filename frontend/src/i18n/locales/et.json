@@ -824,7 +824,8 @@
     "groupAlignmentDetail": "{{matches}} / {{eligible}} kvalifitseeruvat hääletust vastasid fraktsiooni enamuse valikule.",
     "recentDeviations": "Hiljutised kõrvalekalded",
     "mpChoice": "Saadik",
-    "factionChoice": "Fraktsioon"
+    "factionChoice": "Fraktsioon",
+    "currentMandateFrom": "Praeguses koosseisus alates {{date}}"
   },
   "votes": {
     "title": "Hiljutised hääletused",

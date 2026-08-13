@@ -82,6 +82,7 @@ export type PoliticianProfile = {
   gender: string | null;
   dateOfBirth: string | null;
   electoralDistrict: string | null;
+  currentMandateStart: string | null;
   parliamentSeniorityDays: number | null;
   active: boolean;
   wikidataQid: string | null;

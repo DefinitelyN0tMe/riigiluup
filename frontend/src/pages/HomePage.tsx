@@ -392,7 +392,9 @@ export default function HomePage() {
   const voteItems = votes.data?.items ?? [];
 
   const partyMeta = useMemo(() => {
-    const list = factions.data ?? [];
+    // Drop the "unaffiliated MPs" group first: it is not a party, and a blunt slice(0,6) over the
+    // alphabetical faction list was silently dropping a real party (SDE) to keep it.
+    const list = (factions.data ?? []).filter((f) => !/mittekuuluv/i.test(f.name));
     const coalitionNames = ["Reformierakond", "Eesti 200", "Sotsiaaldemokraatliku"];
     return list.slice(0, 6).map((f) => {
       const isCoalition = coalitionNames.some((n) => f.name.includes(n));

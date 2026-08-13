@@ -19,6 +19,7 @@ public record PoliticianProfileDto(
         String gender,
         LocalDate dateOfBirth,
         String electoralDistrict,
+        LocalDate currentMandateStart,
         Integer parliamentSeniorityDays,
         boolean active,
         String wikidataQid,

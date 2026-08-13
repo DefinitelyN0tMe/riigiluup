@@ -22,6 +22,9 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
 
     java.util.List<PlenaryMember> findByActiveTrueOrderByLastNameAscFirstNameAsc();
 
+    /** True once any member has a current-mandate-start value — gates the one-time populate. */
+    boolean existsByCurrentMandateStartIsNotNull();
+
     @Query("""
         select m from PlenaryMember m
         where (:active is null or m.active = :active)

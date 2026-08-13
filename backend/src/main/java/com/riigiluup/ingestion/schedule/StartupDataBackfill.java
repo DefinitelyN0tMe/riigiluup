@@ -55,6 +55,7 @@ public class StartupDataBackfill {
     private final LegislativeSponsorshipRepository sponsorshipRepo;
     private final LegislativeItemImporter legislationImporter;
     private final com.riigiluup.oversight.OversightImporter oversightImporter;
+    private final com.riigiluup.person.PlenaryMemberRepository memberRepo;
     private final WikidataImporter wikidataImporter;
     private final ImportRunLogRepository runLogRepo;
     private final PlenaryMemberDetailImporter detailImporter;
@@ -77,7 +78,21 @@ public class StartupDataBackfill {
         loadAuxGroupMembershipsIfNeeded();
         loadAmendmentsIfNeeded();
         loadOversightIfNeeded();
+        loadMandateStartIfNeeded();
         refreshWikidataIfStale();
+    }
+
+    private void loadMandateStartIfNeeded() {
+        try {
+            // The current-mandate-start column is new; force one detail refresh to populate it now
+            // rather than waiting for the next daily run (which keeps it fresh thereafter).
+            if (!memberRepo.existsByCurrentMandateStartIsNotNull()) {
+                log.info("Startup backfill: forcing a detail refresh to populate MP current-mandate-start");
+                detailImporter.runOnce(true);
+            }
+        } catch (Exception e) {
+            log.warn("Startup mandate-start backfill failed (retries next boot): {}", e.toString());
+        }
     }
 
     private void refreshWikidataIfStale() {
