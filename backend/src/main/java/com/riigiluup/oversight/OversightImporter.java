@@ -109,7 +109,7 @@ public class OversightImporter {
     private int ingestQuestions(String documentType, OversightItem.Kind kind, LocalDate stopBefore) {
         int upserted = 0;
         for (int page = 0; page < SAFETY_PAGES; page++) {
-            JsonNode resp = client.fetchDocumentsPage(documentType, page, PAGE_SIZE);
+            JsonNode resp = fetchPageWithRetry(documentType, page);
             List<JsonNode> content = contentOf(resp);
             if (content.isEmpty()) break;
             boolean reachedOld = false;
@@ -118,6 +118,8 @@ public class OversightImporter {
                 if (created != null && created.isBefore(stopBefore)) { reachedOld = true; continue; }
                 String uuid = text(entry, "uuid");
                 if (uuid == null) continue;
+                // Resume cheaply: a question we already stored never changes, so skip the detail fetch.
+                if (itemRepo.existsByExternalId(uuid)) continue;
                 try {
                     if (Boolean.TRUE.equals(tx.execute(status -> upsertQuestion(uuid, kind)))) upserted++;
                 } catch (Exception e) {
@@ -163,7 +165,7 @@ public class OversightImporter {
     private int ingestAnswers(String documentType, LocalDate stopBefore) {
         int linked = 0;
         for (int page = 0; page < SAFETY_PAGES; page++) {
-            JsonNode resp = client.fetchDocumentsPage(documentType, page, PAGE_SIZE);
+            JsonNode resp = fetchPageWithRetry(documentType, page);
             List<JsonNode> content = contentOf(resp);
             if (content.isEmpty()) break;
             boolean reachedOld = false;
@@ -172,6 +174,8 @@ public class OversightImporter {
                 if (created != null && created.isBefore(stopBefore)) { reachedOld = true; continue; }
                 String uuid = text(entry, "uuid");
                 if (uuid == null) continue;
+                // Resume cheaply: an answer already attached to its question can be skipped.
+                if (itemRepo.existsByAnswerExternalId(uuid)) continue;
                 try {
                     if (Boolean.TRUE.equals(tx.execute(status -> linkAnswer(uuid)))) linked++;
                 } catch (Exception e) {
@@ -181,6 +185,32 @@ public class OversightImporter {
             if (reachedOld || isLastPage(resp)) break;
         }
         return linked;
+    }
+
+    /**
+     * Fetch one register page, retrying a few times on a transient error (429/circuit-breaker/timeout)
+     * so a single blip does not fail the whole run. If it still fails the exception propagates and the
+     * run is marked FAILED — but because questions/answers we already have are skipped, the next run
+     * resumes cheaply from where this one stopped rather than re-fetching everything.
+     */
+    private JsonNode fetchPageWithRetry(String documentType, int page) {
+        RuntimeException last = null;
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            try {
+                return client.fetchDocumentsPage(documentType, page, PAGE_SIZE);
+            } catch (RuntimeException e) {
+                last = e;
+                log.warn("oversight page fetch {} p{} attempt {}/3 failed: {}",
+                        documentType, page, attempt, e.toString());
+                sleepQuietly(5000L * attempt);
+            }
+        }
+        throw last;
+    }
+
+    private static void sleepQuietly(long ms) {
+        try { Thread.sleep(ms); }
+        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
     private Boolean linkAnswer(String uuid) {

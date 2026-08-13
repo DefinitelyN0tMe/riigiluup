@@ -12,6 +12,11 @@ public interface OversightItemRepository extends JpaRepository<OversightItem, UU
 
     Optional<OversightItem> findByExternalId(String externalId);
 
+    /** Cheap existence checks so a resumed backfill skips questions/answers it already has. */
+    boolean existsByExternalId(String externalId);
+
+    boolean existsByAnswerExternalId(String answerExternalId);
+
     /** Newest unanswered-or-answered questions this MP (co-)put to a minister. */
     @Query("""
         select oi from OversightItem oi
