@@ -581,7 +581,8 @@
     "emDash": "—",
     "unaffiliated": "Unaffiliated",
     "noFaction": "No faction",
-    "language": "Language"
+    "language": "Language",
+    "noResults": "No results found."
   },
   "a11y": {
     "skipToContent": "Skip to content",
@@ -756,7 +757,7 @@
       "lead": "Earlier Riigikogu candidacies, matched by date of birth.",
       "district": "District",
       "credit": "Data: Martin Mölder,",
-      "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
+      "grantNote": "Data collection was carried out under the Postimees Foundation-funded grant »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36)."
     },
     "factionHistory": {
       "title": "Faction history",
@@ -1147,7 +1148,9 @@
       "link": "Link",
       "unlink": "Unlink",
       "confirmUnlink": "Unlink this bill? The public page will stop showing it."
-    }
+    },
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithGoogleHelp": "Sign in with your authorised Google account."
   },
   "notFound": {
     "kicker": "Page not found",

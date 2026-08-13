@@ -153,6 +153,10 @@ riigiluup:
     # now skips unchanged bills instead of re-downloading the whole catalogue every run.
     daily-refresh-cron: "0 30 4 * * *"
     daily-refresh-zone: "Europe/Tallinn"
+    # MP party memberships / Q-IDs / bio enrichment from Wikidata, every 2 days at 06:45. Wikidata is
+    # a separate source (its own SPARQL endpoint), so this never competes with the throttled Riigikogu
+    # client; 06:45 is well after the 04:30 daily refresh.
+    wikidata-refresh-cron: "0 45 6 */2 * *"
     # Re-fetch a member's detail (bio / committees / faction) at most this often.
     member-detail-max-age-days: 7
   admin:

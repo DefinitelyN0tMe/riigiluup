@@ -1,15 +1,36 @@
 package com.riigiluup.api;
 
+import com.riigiluup.group.GroupRepository;
 import com.riigiluup.legislation.LegislativeItem;
 import com.riigiluup.legislation.LegislativeItemTopic;
 import com.riigiluup.legislation.LegislativeSponsorship;
 import com.riigiluup.legislation.LegislativeStage;
+import com.riigiluup.legislation.SponsorKind;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class LegislationMapper {
+
+    private final GroupRepository groupRepo;
+
+    /**
+     * The externalId to link a sponsor's committee page to — kept only for COMMITTEE sponsors whose
+     * committee actually exists as a group (active or dissolved). Otherwise null, so the frontend
+     * renders plain text instead of a dead /committees/{id} link (a handful of legacy sponsors
+     * reference committee ids that no group row matches).
+     */
+    private String committeeLinkId(LegislativeSponsorship sp) {
+        String extId = sp.getExternalId();
+        if (sp.getSponsorKind() == SponsorKind.COMMITTEE && extId != null
+                && groupRepo.findFirstByExternalId(extId).isEmpty()) {
+            return null;
+        }
+        return extId;
+    }
 
     public LegislationListItemDto toListItem(LegislativeItem i) {
         return new LegislationListItemDto(
@@ -61,7 +82,7 @@ public class LegislationMapper {
                         sp.getDisplayName(),
                         sp.getPlenaryMember() == null ? null : sp.getPlenaryMember().getSlug(),
                         sp.getPlenaryMember() == null ? null : sp.getPlenaryMember().getFullName(),
-                        sp.getExternalId())).toList(),
+                        committeeLinkId(sp))).toList(),
                 topics.stream().map(it -> new LegislationDetailDto.TopicDto(
                         it.getTopic().getEdid(), it.getTopic().getText())).toList(),
                 sourceUrl(i.getExternalId()),

@@ -19,7 +19,7 @@ const STEP_TARGETS: Record<string, string> = {
  * and we surface both rather than smoothing them away.
  */
 export default function InitiativeFunnel({ data }: { data: FunnelData }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   if (!data.steps.length) return <div className="text-muted font-mono text-sm">{t("viz.noData")}</div>;
@@ -76,7 +76,7 @@ export default function InitiativeFunnel({ data }: { data: FunnelData }) {
                       {stepLabel}
                     </span>
                     <span className="font-mono text-[11px] text-muted whitespace-nowrap">
-                      <b className="font-display font-bold text-[16px] text-ink">{s.count.toLocaleString()}</b>
+                      <b className="font-display font-bold text-[16px] text-ink">{s.count.toLocaleString(i18n.resolvedLanguage)}</b>
                       {s.shareOfTargeted != null && <span className="ml-1.5">{s.shareOfTargeted.toFixed(1)}%</span>}
                     </span>
                   </div>

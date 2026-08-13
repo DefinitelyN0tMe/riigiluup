@@ -30,7 +30,7 @@ export default function GroupDetailPage() {
         <>
           <div className="mt-4 mb-6">
             <span className="font-mono text-[10px] tracking-[0.14em] uppercase px-2 py-0.5 rounded bg-blue/10 text-blue">
-              {t(`groups.category.${data.category}`)}
+              {t(`groups.category.${data.category}`, { defaultValue: data.category })}
             </span>
             <h1 className="font-display font-bold text-[30px] sm:text-[38px] tracking-[-0.03em] leading-[1.05] mt-3">
               {data.name}

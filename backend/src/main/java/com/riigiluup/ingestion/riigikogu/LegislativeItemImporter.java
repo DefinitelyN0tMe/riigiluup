@@ -285,6 +285,55 @@ public class LegislativeItemImporter {
         }
     }
 
+    private static final String JOB_AMEND_BACKFILL = "legislation.amendments-backfill";
+
+    /**
+     * One-time backfill of amendments for EVERY bill of a parliamentary term (not just in-proceeding
+     * ones), so adopted/rejected bills also show their amendment proposals. Self-gated on a SUCCESS
+     * run-log so an interrupted run resumes on the next boot; the daily active-bill refresh keeps
+     * in-proceeding bills current afterwards. One throttled detail call per bill, own tx each.
+     */
+    public void backfillTermAmendmentsIfNeeded(int membership) {
+        boolean done = runLogRepo
+                .findFirstBySourceNameAndJobNameOrderByStartedAtDesc(client.sourceName(), JOB_AMEND_BACKFILL)
+                .map(r -> "SUCCESS".equals(r.getStatus()))
+                .orElse(false);
+        if (done) {
+            log.info("amendments term backfill already completed — skipping");
+            return;
+        }
+        ImportRunLog run = runLogRepo.save(ImportRunLog.builder()
+                .sourceName(client.sourceName()).jobName(JOB_AMEND_BACKFILL)
+                .startedAt(Instant.now()).status("RUNNING").build());
+        int processed = 0;
+        try {
+            java.util.List<java.util.UUID> ids = itemRepo.findIdsByMembership(membership);
+            log.info("amendments term backfill: {} bills of term {}", ids.size(), membership);
+            for (java.util.UUID id : ids) {
+                try {
+                    tx.executeWithoutResult(status -> {
+                        LegislativeItem item = itemRepo.findById(id).orElse(null);
+                        if (item == null) return;
+                        DraftDetailDto detail = client.fetchDraftDetail(item.getExternalId());
+                        reconcileAmendments(item, detail);
+                    });
+                    processed++;
+                } catch (Exception e) {
+                    log.warn("amendments term backfill failed for {}: {}", id, e.toString());
+                }
+            }
+            run.setStatus("SUCCESS");
+        } catch (Exception e) {
+            log.error("amendments term backfill failed", e);
+            run.setStatus("FAILED");
+            run.setErrorMessage(e.getMessage());
+        } finally {
+            run.setRecordsUpserted(processed);
+            run.setFinishedAt(Instant.now());
+            runLogRepo.save(run);
+        }
+    }
+
     private void reconcileAmendments(LegislativeItem item, DraftDetailDto d) {
         // Guard the null detail BEFORE the delete: the backfill path passes the fetched detail
         // straight in, and a null/empty body would otherwise NPE after the rows were already deleted.

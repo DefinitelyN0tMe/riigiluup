@@ -53,10 +53,12 @@ public class CommitteeService {
                 .toList();
     }
 
-    /** Empty when the id is unknown, inactive, or not a committee (standing or select/investigation). */
+    /** Empty when the id is unknown or not a committee. Resolves dissolved committees too (active OR
+     *  inactive) so a bill initiated by a now-dissolved committee still opens a read-only page instead
+     *  of a 404; a dissolved committee simply shows no current members. */
     @Transactional(readOnly = true)
     public Optional<CommitteeDto.Detail> detail(String externalId) {
-        return groupRepo.findByExternalIdAndActiveTrue(externalId)
+        return groupRepo.findFirstByExternalId(externalId)
                 .filter(g -> g.getType() == GroupType.STANDING_COMMITTEE
                           || g.getType() == GroupType.SPECIAL_COMMITTEE)
                 .map(this::toDetail);

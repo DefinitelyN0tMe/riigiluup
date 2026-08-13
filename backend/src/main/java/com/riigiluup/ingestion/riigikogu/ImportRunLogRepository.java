@@ -12,6 +12,10 @@ public interface ImportRunLogRepository extends JpaRepository<ImportRunLog, UUID
             String sourceName, String jobName
     );
 
+    /** Latest successful run of a job — drives windowed refreshes that catch up from the last success
+     *  instead of a fixed offset, so a downtime longer than the window does not silently lose data. */
+    Optional<ImportRunLog> findFirstByJobNameAndStatusOrderByStartedAtDesc(String jobName, String status);
+
     /** Most recent successful (or partial) import finish time — drives the "last sync" stat. */
     @Query("select max(r.finishedAt) from ImportRunLog r where r.status in ('SUCCESS', 'PARTIAL')")
     Optional<Instant> findLastSuccessfulSyncAt();

@@ -3,10 +3,14 @@ package com.riigiluup.ingestion.schedule;
 import com.riigiluup.election.ElectionResultRepository;
 import com.riigiluup.election.ElectionResultsImporter;
 import com.riigiluup.election.HistoricalElectionImporter;
+import com.riigiluup.ingestion.riigikogu.ImportRunLogRepository;
 import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
+import com.riigiluup.ingestion.wikidata.WikidataImporter;
 import com.riigiluup.legislation.BillAmendmentRepository;
+import com.riigiluup.legislation.LegislationPhase;
+import com.riigiluup.legislation.LegislativeItemRepository;
 import com.riigiluup.legislation.LegislativeSponsorshipRepository;
 import com.riigiluup.group.GroupMembershipRepository;
 import com.riigiluup.group.GroupType;
@@ -47,9 +51,12 @@ public class StartupDataBackfill {
     private final MpPressActivityRepository pressRepo;
     private final GroupMembershipRepository groupMembershipRepo;
     private final BillAmendmentRepository amendmentRepo;
+    private final LegislativeItemRepository itemRepo;
     private final LegislativeSponsorshipRepository sponsorshipRepo;
     private final LegislativeItemImporter legislationImporter;
     private final com.riigiluup.oversight.OversightImporter oversightImporter;
+    private final WikidataImporter wikidataImporter;
+    private final ImportRunLogRepository runLogRepo;
     private final PlenaryMemberDetailImporter detailImporter;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -62,6 +69,7 @@ public class StartupDataBackfill {
     private void backfillOnce() {
         linkSpeechesIfNeeded();
         relinkMpSponsorshipsIfNeeded();
+        reclassifyBillPhasesIfNeeded();
         loadCampaignsIfNeeded();
         loadHistoricalIfNeeded();
         loadFactionHistoryIfNeeded();
@@ -69,6 +77,23 @@ public class StartupDataBackfill {
         loadAuxGroupMembershipsIfNeeded();
         loadAmendmentsIfNeeded();
         loadOversightIfNeeded();
+        refreshWikidataIfStale();
+    }
+
+    private void refreshWikidataIfStale() {
+        try {
+            java.time.Instant cutoff = java.time.Instant.now().minus(java.time.Duration.ofDays(2));
+            boolean fresh = runLogRepo
+                    .findFirstBySourceNameAndJobNameOrderByStartedAtDesc("wikidata", "wikidata.mp-crossref")
+                    .map(r -> r.getStartedAt() != null && r.getStartedAt().isAfter(cutoff))
+                    .orElse(false);
+            if (!fresh) {
+                log.info("Startup backfill: Wikidata data stale (>2 days), refreshing party memberships / Q-IDs");
+                wikidataImporter.runOnce();
+            }
+        } catch (Exception e) {
+            log.warn("Startup Wikidata refresh failed (retries next boot): {}", e.toString());
+        }
     }
 
     private void loadOversightIfNeeded() {
@@ -82,10 +107,9 @@ public class StartupDataBackfill {
 
     private void loadAmendmentsIfNeeded() {
         try {
-            if (amendmentRepo.count() == 0) {
-                log.info("Startup backfill: backfilling bill amendments for active bills");
-                legislationImporter.refreshActiveBillAmendments();
-            }
+            // Full current-term amendment backfill (adopted/rejected bills too), self-gated on a
+            // SUCCESS run-log so it resumes if interrupted. The daily job keeps active bills current.
+            legislationImporter.backfillTermAmendmentsIfNeeded(15);
         } catch (Exception e) {
             log.warn("Startup amendment backfill failed (retries next boot): {}", e.toString());
         }
@@ -130,11 +154,32 @@ public class StartupDataBackfill {
         }
     }
 
+    private void reclassifyBillPhasesIfNeeded() {
+        try {
+            // Gate on the fixed bug's residue: rejected bills (TAGASI_LYKATUD) still sitting in OTHER.
+            if (itemRepo.existsByActiveStageSourceCodeAndPhase("TAGASI_LYKATUD", LegislationPhase.OTHER)) {
+                int r = itemRepo.reclassifyPhase(LegislationPhase.REJECTED, java.util.List.of("TAGASI_LYKATUD"));
+                int s = itemRepo.reclassifyPhase(LegislationPhase.SUBMITTED,
+                        java.util.List.of("INITIATION", "MENETLUSSE_VOETUD"));
+                int w = itemRepo.reclassifyPhase(LegislationPhase.WITHDRAWN,
+                        java.util.List.of("LOPETATUD", "TAGASI_VOETUD",
+                                "TAGASI_VOETUD_TAISKOGUL_MENETLEMATA", "TAGASTATUD"));
+                int rd = itemRepo.reclassifyPhase(LegislationPhase.IN_READINGS,
+                        java.util.List.of("ESIMENE_LUGEMINE", "TEINE_LUGEMINE", "KOLMAS_LUGEMINE"));
+                log.info("Startup backfill: reclassified bill phases (rejected={}, submitted={}, withdrawn={}, readings={})",
+                        r, s, w, rd);
+            }
+        } catch (Exception e) {
+            log.warn("Startup phase reclassification failed (retries next boot): {}", e.toString());
+        }
+    }
+
     private void relinkMpSponsorshipsIfNeeded() {
         try {
             if (!sponsorshipRepo.existsByPlenaryMemberIsNotNull()) {
                 int n = sponsorshipRepo.relinkMpSponsorships();
-                log.info("Startup backfill: relinked {} MP bill-sponsorships to their profiles", n);
+                int c = sponsorshipRepo.relinkCommitteeSponsors();
+                log.info("Startup backfill: relinked {} MP and {} committee bill-sponsorships", n, c);
             }
         } catch (Exception e) {
             log.warn("Startup MP-sponsorship relink failed (retries next boot): {}", e.toString());

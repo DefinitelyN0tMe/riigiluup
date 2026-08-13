@@ -581,7 +581,8 @@
     "emDash": "—",
     "unaffiliated": "Fraktsioonita",
     "noFaction": "Fraktsioonita",
-    "language": "Keel"
+    "language": "Keel",
+    "noResults": "Tulemusi ei leitud."
   },
   "a11y": {
     "skipToContent": "Liigu sisu juurde",
@@ -1147,7 +1148,9 @@
       "link": "Seosta",
       "unlink": "Eemalda seos",
       "confirmUnlink": "Eemaldada see eelnõu seos? Muudatus on koheselt avalik."
-    }
+    },
+    "signInWithGoogle": "Logi sisse Google'iga",
+    "signInWithGoogleHelp": "Logi sisse volitatud Google'i kontoga."
   },
   "notFound": {
     "kicker": "Lehte ei leitud",

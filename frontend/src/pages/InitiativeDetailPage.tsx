@@ -11,7 +11,7 @@ const NO_DATA_DEFAULT = "No data from the source";
 
 /** Signature count against the legal threshold — same visual language as the list page's meter. */
 function SignatureMeter({ count, threshold }: { count: number; threshold: number }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const reached = count >= threshold;
   const pct = Math.min(100, (count / threshold) * 100);
   return (
@@ -27,8 +27,8 @@ function SignatureMeter({ count, threshold }: { count: number; threshold: number
         <span
           className={`font-mono text-[12px] font-bold tracking-[0.02em] whitespace-nowrap ${reached ? "text-live-deep" : "text-ink-2"}`}
         >
-          {count.toLocaleString()}
-          <span className="text-muted font-normal"> / {threshold.toLocaleString()}</span>
+          {count.toLocaleString(i18n.resolvedLanguage)}
+          <span className="text-muted font-normal"> / {threshold.toLocaleString(i18n.resolvedLanguage)}</span>
         </span>
       </div>
       <span className={`font-mono text-[10px] uppercase tracking-[0.1em] ${reached ? "text-live-deep" : "text-muted"}`}>

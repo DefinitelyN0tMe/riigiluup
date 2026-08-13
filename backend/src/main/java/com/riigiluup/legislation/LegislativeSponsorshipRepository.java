@@ -51,4 +51,18 @@ public interface LegislativeSponsorshipRepository
         WHERE ls.external_id = pm.external_id AND ls.plenary_member_id IS NULL
         """, nativeQuery = true)
     int relinkMpSponsorships();
+
+    /** Reclassify OTHER sponsorships whose external id is actually a committee group -> COMMITTEE, so
+     *  they render a link to the committee page. Idempotent. */
+    @org.springframework.transaction.annotation.Transactional
+    @Modifying
+    @Query(value = """
+        UPDATE legislative_sponsorship ls
+        SET sponsor_kind = 'COMMITTEE'
+        FROM "group" g
+        WHERE g.external_id = ls.external_id
+          AND g.type IN ('STANDING_COMMITTEE', 'SPECIAL_COMMITTEE')
+          AND ls.sponsor_kind = 'OTHER'
+        """, nativeQuery = true)
+    int relinkCommitteeSponsors();
 }

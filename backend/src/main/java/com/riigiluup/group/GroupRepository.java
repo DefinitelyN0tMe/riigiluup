@@ -11,4 +11,7 @@ public interface GroupRepository extends JpaRepository<Group, UUID> {
     List<Group> findByTypeAndActiveTrueOrderByName(GroupType type);
     Optional<Group> findByExternalIdAndTypeAndActiveTrue(String externalId, GroupType type);
     Optional<Group> findByExternalIdAndActiveTrue(String externalId);
+    /** Any group with this external id, active or dissolved — so a link to a now-dissolved committee
+     *  still resolves to a read-only historical page instead of a 404. */
+    Optional<Group> findFirstByExternalId(String externalId);
 }

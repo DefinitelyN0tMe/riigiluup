@@ -599,7 +599,8 @@
     "emDash": "—",
     "unaffiliated": "Вне фракции",
     "noFaction": "Без фракции",
-    "language": "Язык"
+    "language": "Язык",
+    "noResults": "Ничего не найдено."
   },
   "a11y": {
     "skipToContent": "Перейти к содержимому",
@@ -774,7 +775,7 @@
       "lead": "Прежние кандидатуры в Рийгикогу, сопоставлены по дате рождения.",
       "district": "Округ",
       "credit": "Данные: Martin Mölder,",
-      "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
+      "grantNote": "Сбор данных проводился в рамках гранта, финансируемого Фондом Postimees: »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36)."
     },
     "factionHistory": {
       "title": "История фракций",
@@ -1189,7 +1190,9 @@
       "link": "Связать",
       "unlink": "Отвязать",
       "confirmUnlink": "Отвязать этот законопроект? Изменение сразу станет публичным."
-    }
+    },
+    "signInWithGoogle": "Войти через Google",
+    "signInWithGoogleHelp": "Войдите через авторизованный аккаунт Google."
   },
   "notFound": {
     "kicker": "Страница не найдена",

@@ -46,7 +46,7 @@ function badgeClass(map: Record<string, string>, key: string | null): string {
 
 /** Signature count against the 1000-signature legal threshold, with a clear reached/not-reached indicator. */
 function SignatureMeter({ count }: { count: number | null }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const c = count ?? 0;
   const reached = c >= SIGNATURE_THRESHOLD;
   const pct = Math.min(100, (c / SIGNATURE_THRESHOLD) * 100);
@@ -62,8 +62,8 @@ function SignatureMeter({ count }: { count: number | null }) {
       <span
         className={`font-mono text-[12px] font-bold tracking-[0.02em] whitespace-nowrap ${reached ? "text-live-deep" : "text-ink-2"}`}
       >
-        {c.toLocaleString()}
-        <span className="text-muted font-normal"> / {SIGNATURE_THRESHOLD.toLocaleString()}</span>
+        {c.toLocaleString(i18n.resolvedLanguage)}
+        <span className="text-muted font-normal"> / {SIGNATURE_THRESHOLD.toLocaleString(i18n.resolvedLanguage)}</span>
       </span>
     </div>
   );

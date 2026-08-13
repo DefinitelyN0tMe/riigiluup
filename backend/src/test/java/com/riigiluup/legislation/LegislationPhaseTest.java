@@ -9,12 +9,16 @@ class LegislationPhaseTest {
     @Test
     void maps_common_stage_codes() {
         assertThat(LegislationPhase.fromStageCode("INITIATION")).isEqualTo(LegislationPhase.SUBMITTED);
+        // Source spells "taken into proceeding" as MENETLUSSE_VOETUD.
+        assertThat(LegislationPhase.fromStageCode("MENETLUSSE_VOETUD")).isEqualTo(LegislationPhase.SUBMITTED);
         assertThat(LegislationPhase.fromStageCode("ESIMENE_LUGEMINE")).isEqualTo(LegislationPhase.IN_READINGS);
         assertThat(LegislationPhase.fromStageCode("TEINE_LUGEMINE")).isEqualTo(LegislationPhase.IN_READINGS);
         assertThat(LegislationPhase.fromStageCode("KOLMAS_LUGEMINE")).isEqualTo(LegislationPhase.IN_READINGS);
         assertThat(LegislationPhase.fromStageCode("VASTU_VOETUD")).isEqualTo(LegislationPhase.ADOPTED);
-        assertThat(LegislationPhase.fromStageCode("TAGASI_LUKATUD")).isEqualTo(LegislationPhase.REJECTED);
+        // Source spells "rejected" TAGASI_LYKATUD (Y), not TAGASI_LUKATUD (U).
+        assertThat(LegislationPhase.fromStageCode("TAGASI_LYKATUD")).isEqualTo(LegislationPhase.REJECTED);
         assertThat(LegislationPhase.fromStageCode("LOPETATUD")).isEqualTo(LegislationPhase.WITHDRAWN);
+        assertThat(LegislationPhase.fromStageCode("TAGASTATUD")).isEqualTo(LegislationPhase.WITHDRAWN);
     }
 
     @Test

@@ -21,6 +21,22 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
     @Query("select i.id from LegislativeItem i where i.phase in :phases")
     java.util.List<UUID> findIdsByPhaseIn(@Param("phases") Collection<LegislationPhase> phases);
 
+    /** Ids of all bills of one parliamentary term — used for the one-time full-term amendment backfill. */
+    @Query("select i.id from LegislativeItem i where i.membership = :membership")
+    java.util.List<UUID> findIdsByMembership(@Param("membership") int membership);
+
+    /** True if any bill with this stage code is still bucketed in the given phase — gates the
+     *  one-time phase reclassification after a fromStageCode() mapping fix. */
+    boolean existsByActiveStageSourceCodeAndPhase(String activeStageSourceCode, LegislationPhase phase);
+
+    /** Reclassify stored phases for the given stage codes — used once after a mapping fix so existing
+     *  rows are corrected without re-fetching every draft. Small bulk update (no statement_timeout risk). */
+    @org.springframework.transaction.annotation.Transactional
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("update LegislativeItem i set i.phase = :phase "
+            + "where i.activeStageSourceCode in :codes and i.phase <> :phase")
+    int reclassifyPhase(@Param("phase") LegislationPhase phase, @Param("codes") Collection<String> codes);
+
     /**
      * Adopted laws (SE only — Riigikogu decisions publish in RT III with a different id
      * scheme) not yet linked to Riigi Teataja, with their publication date taken from the

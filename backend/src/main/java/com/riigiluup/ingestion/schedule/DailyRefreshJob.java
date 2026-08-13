@@ -32,7 +32,23 @@ public class DailyRefreshJob {
     private final VoteBillLinker voteBillLinker;
     private final SpeechImporter speechImporter;
     private final com.riigiluup.oversight.OversightImporter oversightImporter;
+    private final com.riigiluup.ingestion.riigikogu.ImportRunLogRepository runLogRepo;
     private final AnalyticsCacheEvictor cacheEvictor;
+
+    /**
+     * Window start for a windowed refresh: normally {@code today - defaultDays}, but if the last
+     * successful run of {@code jobName} was longer ago than that (downtime / failure), start from just
+     * before that last success so the gap is re-scanned — capped at {@code maxDays} to bound cost.
+     */
+    private LocalDate windowStart(String jobName, LocalDate today, int defaultDays, int maxDays) {
+        LocalDate def = today.minusDays(defaultDays);
+        LocalDate cap = today.minusDays(maxDays);
+        return runLogRepo.findFirstByJobNameAndStatusOrderByStartedAtDesc(jobName, "SUCCESS")
+                .map(r -> r.getFinishedAt() == null ? null : r.getFinishedAt().atZone(TALLINN).toLocalDate().minusDays(1))
+                .filter(d -> d != null && d.isBefore(def))   // only widen (older start), never narrow
+                .map(d -> d.isBefore(cap) ? cap : d)          // bound the catch-up window
+                .orElse(def);
+    }
 
     /** Guards against a slow run still executing when the next 6-hourly trigger fires. */
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -51,7 +67,7 @@ public class DailyRefreshJob {
         log.info("Votes refresh starting");
         try {
             LocalDate today = LocalDate.now(TALLINN);
-            voteImporter.runWindow(today.minusDays(7), today);
+            voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today);
             voteBillLinker.linkAll();
             cacheEvictor.evictAll();
             log.info("Votes refresh finished");
@@ -85,7 +101,7 @@ public class DailyRefreshJob {
             // day rather than up to a week later. ~101 throttled calls, a couple of minutes.
             detailImporter.runOnce(true);
             LocalDate today = LocalDate.now(TALLINN);
-            voteImporter.runWindow(today.minusDays(7), today);
+            voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today);
             legislationImporter.runWindow(today.minusDays(7), today);
             // A new amendment does not change a bill's stage, so the change-detection window above
             // skips it; refresh amendments for all active bills daily so new proposals surface next-day.
@@ -93,7 +109,7 @@ public class DailyRefreshJob {
             voteBillLinker.linkAll();
             // 7-day speech window: stenograms publish next day and get edited for a few
             // days after, so re-upserting a week keeps texts converged with the source.
-            speechImporter.runWindow(today.minusDays(7), today);
+            speechImporter.runWindow(windowStart("speeches.window-refresh", today, 7, 60), today);
             // Oversight: pick up new written questions/interpellations and answers (incl. late replies
             // to older questions). Cheap windowed re-scan of the document register.
             oversightImporter.refreshRecent();

@@ -146,6 +146,9 @@ export default function VotesPage() {
           <p className="font-mono text-[11px] tracking-[0.1em] uppercase text-muted mb-4 sm:mb-5" aria-live="polite" aria-atomic="true">
             {t("votes.showing", { shown: data.items.length, total: data.totalElements })}
           </p>
+          {data.items.length === 0 && (
+            <p className="font-serif italic text-[14px] text-ink-2 py-4">{t("common.noResults")}</p>
+          )}
           <ul className="grid grid-cols-1 gap-3 sm:gap-4 list-none p-0">
             {data.items.map((v) => (
               <li key={v.id}>

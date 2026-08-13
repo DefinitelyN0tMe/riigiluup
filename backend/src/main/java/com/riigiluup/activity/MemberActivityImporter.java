@@ -33,22 +33,38 @@ public class MemberActivityImporter {
     private final RiigikoguClient client;
     private final PlenaryMemberRepository memberRepo;
     private final MemberActivityRepository repo;
+    private final com.riigiluup.ingestion.riigikogu.ImportRunLogRepository runLogRepo;
 
     public MemberActivityImporter(RiigikoguClient client,
                                   PlenaryMemberRepository memberRepo,
-                                  MemberActivityRepository repo) {
+                                  MemberActivityRepository repo,
+                                  com.riigiluup.ingestion.riigikogu.ImportRunLogRepository runLogRepo) {
         this.client = client;
         this.memberRepo = memberRepo;
         this.repo = repo;
+        this.runLogRepo = runLogRepo;
     }
 
-    /** Weekly refresh — activity accrues slowly and the pass is a few hundred API calls. */
+    /** Weekly refresh — activity accrues slowly and the pass is a few hundred API calls. Records an
+     *  ImportRunLog so the job is visible in the job-history/monitoring table like the others. */
     @Scheduled(cron = "0 30 5 ? * SUN", zone = "Europe/Tallinn")
     public void scheduledCompute() {
+        com.riigiluup.ingestion.riigikogu.ImportRunLog run = runLogRepo.save(
+                com.riigiluup.ingestion.riigikogu.ImportRunLog.builder()
+                        .sourceName(client.sourceName()).jobName("member-activity.refresh")
+                        .startedAt(Instant.now()).status("RUNNING").build());
         try {
-            computeAll();
+            int n = computeAll();
+            run.setStatus("SUCCESS");
+            run.setRecordsUpserted(n);
+            run.setRecordsSeen(n);
         } catch (Exception e) {
             log.warn("Scheduled MP activity refresh failed", e);
+            run.setStatus("FAILED");
+            run.setErrorMessage(e.getMessage());
+        } finally {
+            run.setFinishedAt(Instant.now());
+            runLogRepo.save(run);
         }
     }
 
