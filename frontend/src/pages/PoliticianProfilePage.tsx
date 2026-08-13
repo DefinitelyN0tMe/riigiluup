@@ -123,6 +123,9 @@ function PressActivitySection({
           )}
         </p>
       )}
+      <p className="text-[11px] leading-snug text-muted mt-3 pt-3 border-t border-rule/60">
+        {t("profile.press.sourceNote")}
+      </p>
     </section>
   );
 }

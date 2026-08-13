@@ -769,7 +769,8 @@
       "showAll": "Näita kõiki ({{count}})",
       "showLess": "Näita vähem",
       "moreOnOfficial": "Kokku {{total}} kajastust. Ülejäänud Riigikogu ametlikul profiilil:",
-      "printOnly": "trükis, lingita"
+      "printOnly": "trükis, lingita",
+      "sourceNote": "Allikas: Riigikogu Ajakirjandustegevuse register. Kui mõni kajastus puudub või pole kõige värskem, siis seda pole (veel) ka Riigikogul - me kuvame andmed muutmata kujul."
     },
     "affiliations": {
       "title": "Rühmad ja delegatsioonid",

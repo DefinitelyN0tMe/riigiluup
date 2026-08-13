@@ -769,7 +769,8 @@
       "showAll": "Show all ({{count}})",
       "showLess": "Show less",
       "moreOnOfficial": "{{total}} entries in total. The rest are on the official Riigikogu profile:",
-      "printOnly": "print, no link"
+      "printOnly": "print, no link",
+      "sourceNote": "Source: the Riigikogu Ajakirjandustegevus register. If an entry is missing or not the latest, it is not (yet) in Riigikogu either - we show the data unchanged."
     },
     "affiliations": {
       "title": "Groups & delegations",
