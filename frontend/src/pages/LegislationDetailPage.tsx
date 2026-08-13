@@ -127,6 +127,10 @@ export default function LegislationDetailPage() {
                   <Link to={`/politicians/${s.memberSlug}`} className="hover:underline text-ink">
                     {s.memberFullName ?? s.displayName}
                   </Link>
+                ) : s.kind === "COMMITTEE" && s.externalId ? (
+                  <Link to={`/committees/${s.externalId}`} className="hover:underline text-ink">
+                    {s.displayName ?? t("legislation.noName")}
+                  </Link>
                 ) : (s.displayName ?? t("legislation.noName"))}
               </span>
               <span className="shrink-0 text-xs text-slate-500">

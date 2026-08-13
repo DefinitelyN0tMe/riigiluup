@@ -7,6 +7,7 @@ import com.riigiluup.ingestion.riigikogu.LegislativeItemImporter;
 import com.riigiluup.ingestion.riigikogu.PlenaryMemberDetailImporter;
 import com.riigiluup.ingestion.riigikogu.SpeechBillLinker;
 import com.riigiluup.legislation.BillAmendmentRepository;
+import com.riigiluup.legislation.LegislativeSponsorshipRepository;
 import com.riigiluup.group.GroupMembershipRepository;
 import com.riigiluup.group.GroupType;
 import com.riigiluup.person.MpFactionMembershipRepository;
@@ -46,6 +47,7 @@ public class StartupDataBackfill {
     private final MpPressActivityRepository pressRepo;
     private final GroupMembershipRepository groupMembershipRepo;
     private final BillAmendmentRepository amendmentRepo;
+    private final LegislativeSponsorshipRepository sponsorshipRepo;
     private final LegislativeItemImporter legislationImporter;
     private final com.riigiluup.oversight.OversightImporter oversightImporter;
     private final PlenaryMemberDetailImporter detailImporter;
@@ -59,6 +61,7 @@ public class StartupDataBackfill {
 
     private void backfillOnce() {
         linkSpeechesIfNeeded();
+        relinkMpSponsorshipsIfNeeded();
         loadCampaignsIfNeeded();
         loadHistoricalIfNeeded();
         loadFactionHistoryIfNeeded();
@@ -124,6 +127,17 @@ public class StartupDataBackfill {
             }
         } catch (Exception e) {
             log.warn("Startup faction-history backfill failed (retries next boot): {}", e.toString());
+        }
+    }
+
+    private void relinkMpSponsorshipsIfNeeded() {
+        try {
+            if (!sponsorshipRepo.existsByPlenaryMemberIsNotNull()) {
+                int n = sponsorshipRepo.relinkMpSponsorships();
+                log.info("Startup backfill: relinked {} MP bill-sponsorships to their profiles", n);
+            }
+        } catch (Exception e) {
+            log.warn("Startup MP-sponsorship relink failed (retries next boot): {}", e.toString());
         }
     }
 

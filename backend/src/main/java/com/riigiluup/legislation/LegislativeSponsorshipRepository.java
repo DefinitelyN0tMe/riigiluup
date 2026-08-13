@@ -31,4 +31,24 @@ public interface LegislativeSponsorshipRepository
             @Param("member") PlenaryMember member, Pageable pageable);
 
     long countByPlenaryMember(PlenaryMember member);
+
+    /** True once any sponsorship is linked to an MP — gates the one-time historical relink. */
+    boolean existsByPlenaryMemberIsNotNull();
+
+    /**
+     * Backfill fix: link the individual-MP bill initiators that were stored as OTHER (the draft API
+     * tags them type "user", which the classifier used to miss) to their plenary_member and set the
+     * PLENARY_MEMBER kind. Only rows whose external id is an actual MP match (faction/committee ids
+     * match the group table, not plenary_member), and only unlinked rows are touched, so it is safe
+     * and idempotent. Own transaction so it can run from the startup backfill thread.
+     */
+    @org.springframework.transaction.annotation.Transactional
+    @Modifying
+    @Query(value = """
+        UPDATE legislative_sponsorship ls
+        SET sponsor_kind = 'PLENARY_MEMBER', plenary_member_id = pm.id
+        FROM plenary_member pm
+        WHERE ls.external_id = pm.external_id AND ls.plenary_member_id IS NULL
+        """, nativeQuery = true)
+    int relinkMpSponsorships();
 }
