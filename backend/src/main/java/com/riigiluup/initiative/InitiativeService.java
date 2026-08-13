@@ -47,6 +47,7 @@ public class InitiativeService {
     private final InitiativeRepository repo;
     private final InitiativeCommitteeLinkRepository linkRepo;
     private final LegislativeItemRepository legislativeItemRepo;
+    private final com.riigiluup.group.GroupRepository groupRepo;
 
     /** Source page for one initiative — every fact on our pages links back to it. */
     public static String sourceUrl(String externalId) {
@@ -169,7 +170,12 @@ public class InitiativeService {
                         l.getCommitteeSlug(),
                         InitiativeCommittee.fromSlug(l.getCommitteeSlug())
                                 .map(InitiativeCommittee::committeeName).orElse(null),
-                        l.getGroupId()))
+                        l.getGroupId(),
+                        // Resolve the Riigikogu committee UUID so the chip can link to the committee
+                        // page rather than a filtered MP list. Few committees per initiative -> cheap.
+                        l.getGroupId() == null ? null
+                                : groupRepo.findById(l.getGroupId())
+                                        .map(com.riigiluup.group.Group::getExternalId).orElse(null)))
                 .toList();
     }
 

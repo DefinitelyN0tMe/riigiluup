@@ -4,6 +4,7 @@ export type CommitteeRef = {
   slug: string;
   name: string | null;
   groupId: string | null;
+  externalId: string | null;
 };
 
 export type InitiativeListItem = {

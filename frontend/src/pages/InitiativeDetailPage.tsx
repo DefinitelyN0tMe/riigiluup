@@ -192,8 +192,8 @@ export default function InitiativeDetailPage() {
                     key={c.slug}
                     className="font-mono text-[10px] tracking-[0.06em] uppercase border border-rule rounded-full px-2.5 py-1 bg-off text-ink-2"
                   >
-                    {c.groupId ? (
-                      <Link to={`/politicians?committee=${c.groupId}`} className="hover:underline hover:text-blue">
+                    {c.externalId ? (
+                      <Link to={`/committees/${c.externalId}`} className="hover:underline hover:text-blue">
                         {c.name ?? c.slug}
                       </Link>
                     ) : (

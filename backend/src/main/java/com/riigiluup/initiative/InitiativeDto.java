@@ -10,8 +10,9 @@ public final class InitiativeDto {
     private InitiativeDto() {
     }
 
-    /** One committee assignment; groupId is null when the slug has no active committee. */
-    public record CommitteeRef(String slug, String name, UUID groupId) {
+    /** One committee assignment; groupId/externalId are null when the slug has no active committee.
+     *  externalId is the Riigikogu committee UUID, for linking to /committees/{externalId}. */
+    public record CommitteeRef(String slug, String name, UUID groupId, String externalId) {
     }
 
     public record LinkedBill(UUID id, String title, String linkedBy, Instant linkedAt) {
