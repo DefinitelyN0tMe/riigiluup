@@ -1366,6 +1366,41 @@
       "suffix": " (Estonian Cooperation Assembly).",
       "what": "Riigiluup imports the CSV export of citizen initiatives, covering every phase from drafting and signature collection through to parliamentary and government proceedings.",
       "cadence": "Refreshed daily at 05:40 Europe/Tallinn."
+    },
+    "ep7": " — document register: written questions and interpellations to ministers (the Oversight section).",
+    "wikidata": {
+      "title": "Wikidata",
+      "pre": "MPs' party affiliation, Wikidata identifiers (Q-IDs) and biography enrichment come from ",
+      "suffix": " (open data, CC0).",
+      "cadence": "Refreshed every two days."
+    },
+    "riigiteataja": {
+      "title": "Riigi Teataja",
+      "pre": "Links to the official text of adopted laws point to ",
+      "suffix": " — Estonia's official electronic gazette of legal acts."
+    },
+    "elections": {
+      "title": "Election results",
+      "pre": "MPs' electoral footprint (Riigikogu, European Parliament and local elections) comes from the open data at ",
+      "suffix": "."
+    },
+    "molder": {
+      "title": "Historical election history (pre-2023)",
+      "pre": "MPs' Riigikogu candidacies 1992-2019 were provided by Martin Mölder (",
+      "suffix": "). Data collection was carried out under a Postimees Foundation grant (POST36)."
+    },
+    "partyfinance": {
+      "title": "Party finance",
+      "pre": "Party income data comes from the Political Parties Financing Surveillance Committee (ERJK), ",
+      "suffix": ".",
+      "cadence": "Refreshed monthly."
+    },
+    "notes": {
+      "title": "Notes",
+      "interpellations": "Interpellations are answered orally in the sitting, so they carry no answer status - unlike written questions.",
+      "amendments": "Bill amendments are loaded for the current term (the XV Riigikogu).",
+      "press": "\"Press activity\" is the Riigikogu Ajakirjandustegevus register shown unchanged; a missing entry means it is not (yet) in Riigikogu either.",
+      "party": "Party affiliation is derived from Wikidata and may be incomplete; the current party is always derived from the MP's faction."
     }
   },
   "dataStatus": {

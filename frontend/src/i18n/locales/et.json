@@ -1366,6 +1366,41 @@
       "suffix": ".",
       "what": "Riigiluup impordib kollektiivsete pöördumiste CSV-väljavõtte, mis katab kõik etapid — koostamisest ja allkirjade kogumisest kuni Riigikogu ja valitsuse menetluseni.",
       "cadence": "Värskendatakse iga päev kell 05:40 (Europe/Tallinn)."
+    },
+    "ep7": " — dokumendiregister: kirjalikud küsimused ja arupärimised ministritele (jaotis «Kontroll»).",
+    "wikidata": {
+      "title": "Wikidata",
+      "pre": "Saadikute erakondlik kuuluvus, Wikidata identifikaatorid (Q-ID) ja biograafia rikastus pärinevad allikast ",
+      "suffix": " (avaandmed, CC0).",
+      "cadence": "Uuendatakse iga kahe päeva tagant."
+    },
+    "riigiteataja": {
+      "title": "Riigi Teataja",
+      "pre": "Vastuvõetud seaduste ametlikule tekstile viitavad lingid suunavad väljaandesse ",
+      "suffix": " — Eesti õigusaktide ametlik elektrooniline väljaanne."
+    },
+    "elections": {
+      "title": "Valimistulemused",
+      "pre": "Saadikute valimisajalugu (Riigikogu, Euroopa Parlamendi ja kohalikud valimised) pärineb avaandmetest ",
+      "suffix": "."
+    },
+    "molder": {
+      "title": "Ajalooline valimisajalugu (kuni 2023)",
+      "pre": "Saadikute kandideerimised Riigikokku 1992-2019 on esitanud Martin Mölder (",
+      "suffix": "). Andmete kogumine toimus Postimehe Fondi grandi (POST36) raames."
+    },
+    "partyfinance": {
+      "title": "Erakondade rahastamine",
+      "pre": "Andmed erakondade laekumiste kohta pärinevad Erakondade Rahastamise Järelevalve Komisjonilt (ERJK), ",
+      "suffix": ".",
+      "cadence": "Uuendatakse kord kuus."
+    },
+    "notes": {
+      "title": "Märkused",
+      "interpellations": "Arupärimistele vastatakse suuliselt istungil, mistõttu neil ei kuvata vastuse staatust - erinevalt kirjalikest küsimustest.",
+      "amendments": "Muudatusettepanekud on laaditud käesoleva koosseisu (XV Riigikogu) kohta.",
+      "press": "«Ajakirjandustegevus» kuvatakse Riigikogu registrist muutmata kujul; kajastuse puudumine tähendab, et seda pole (veel) ka Riigikogul.",
+      "party": "Erakondlik kuuluvus pärineb Wikidatast ja võib olla puudulik; praegune erakond tuletatakse alati saadiku fraktsioonist."
     }
   },
   "dataStatus": {
