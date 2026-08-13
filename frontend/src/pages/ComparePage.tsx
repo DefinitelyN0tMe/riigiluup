@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { fetchFactions, fetchPoliticians } from "../api/politicians";
 import { fetchComparison, fetchFactionComparison } from "../api/comparisons";
 import { formatDate } from "../lib/formatDate";
@@ -129,12 +129,12 @@ function PartyCompare() {
   );
 }
 
-function PoliticianCompare() {
+function PoliticianCompare({ initLeft = "", initRight = "" }: { initLeft?: string; initRight?: string }) {
   const { t } = useTranslation();
   const list = useQuery({ queryKey: ["mp-all"], queryFn: () => fetchPoliticians({ status: "current", size: 200 }) });
   const mps = list.data?.items ?? [];
-  const [left, setLeft] = useState("");
-  const [right, setRight] = useState("");
+  const [left, setLeft] = useState(initLeft);
+  const [right, setRight] = useState(initRight);
   const cmp = useQuery({
     queryKey: ["mp-cmp", left, right],
     queryFn: () => fetchComparison(left, right),
@@ -179,7 +179,12 @@ function PoliticianCompare() {
 
 export default function ComparePage() {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<"parties" | "politicians">("parties");
+  const [sp] = useSearchParams();
+  // Legacy / cross-page entry: /compare?left={slug}&right={slug} (e.g. the "similar peers" links)
+  // opens straight into a ready MP comparison instead of a blank picker.
+  const initLeft = sp.get("left") ?? sp.get("compareLeft") ?? "";
+  const initRight = sp.get("right") ?? sp.get("compareRight") ?? "";
+  const [tab, setTab] = useState<"parties" | "politicians">(initLeft || initRight ? "politicians" : "parties");
   return (
     <div className="max-w-[860px] mx-auto px-5 sm:px-8 py-8 sm:py-10">
       <h1 className="font-display font-bold text-[34px] sm:text-[44px] tracking-[-0.03em] leading-none mb-2">
@@ -202,7 +207,7 @@ export default function ComparePage() {
         ))}
       </div>
 
-      {tab === "parties" ? <PartyCompare /> : <PoliticianCompare />}
+      {tab === "parties" ? <PartyCompare /> : <PoliticianCompare initLeft={initLeft} initRight={initRight} />}
     </div>
   );
 }
