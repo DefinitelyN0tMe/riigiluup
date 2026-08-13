@@ -41,15 +41,26 @@ export default function DisagreementsTimeline({
                 </div>
               </div>
               <div>
-                <Link to={`/votes/${encodeURIComponent(d.voteEventId)}`}
-                      className="font-display font-bold text-[18px] sm:text-[20px] tracking-[-0.02em] leading-snug hover:text-blue transition-colors">
-                  {d.voteEventDescription ?? t("common.noDescription")}
-                </Link>
-                {d.voteType && (
-                  <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1">
-                    {t(`voteType.${d.voteType}` as const, { defaultValue: d.voteType })}
-                  </div>
+                {d.billTitle ? (
+                  <Link to={`/legislation/${encodeURIComponent(d.billId ?? "")}`}
+                        className="font-display font-bold text-[18px] sm:text-[20px] tracking-[-0.02em] leading-snug hover:text-blue transition-colors">
+                    {d.billTitle}
+                  </Link>
+                ) : (
+                  <Link to={`/votes/${encodeURIComponent(d.voteEventId)}`}
+                        className="font-display font-bold text-[18px] sm:text-[20px] tracking-[-0.02em] leading-snug hover:text-blue transition-colors">
+                    {d.voteEventDescription ?? t("common.noDescription")}
+                  </Link>
                 )}
+                <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted mt-1">
+                  {d.billTitle && (
+                    <Link to={`/votes/${encodeURIComponent(d.voteEventId)}`} className="hover:underline">
+                      {d.billMark ? `${d.billMark} · ` : ""}{d.voteEventDescription ?? t("common.noDescription")}
+                    </Link>
+                  )}
+                  {d.billTitle && d.voteType ? " · " : ""}
+                  {d.voteType && t(`voteType.${d.voteType}` as const, { defaultValue: d.voteType })}
+                </div>
                 <div className="mt-3 flex flex-wrap gap-2 font-mono text-[11px]">
                   <ChoicePill label={leftName} choice={d.leftChoice} side="left" />
                   <ChoicePill label={rightName} choice={d.rightChoice} side="right" />
