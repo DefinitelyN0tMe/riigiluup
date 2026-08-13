@@ -11,6 +11,10 @@ export default function MpTopicRadar({ data }: { data: Data }) {
     );
   }
   const size = 300;
+  // Horizontal breathing room in the viewBox so the side labels (text-anchor start/end) are not
+  // clipped by the chart edge — without it "Ukraina" rendered as "Ukr", "sõjaline salastatus" as
+  // "sõjaline s", etc. Only the sides need it; top/bottom labels sit near the middle.
+  const padX = 92;
   const cx = size / 2, cy = size / 2, R = size / 2 - 30;
   const n = data.topics.length;
   const max = Math.max(...data.topics.map((t) => t.billCount), 1);
@@ -29,7 +33,7 @@ export default function MpTopicRadar({ data }: { data: Data }) {
   return (
     <div className="flex flex-col items-center gap-3">
       <svg role="img" aria-label={t("viz.a11y.mpTopicRadar", { defaultValue: "Radar chart of the MP's activity across policy topic areas." })}
-           viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[320px]">
+           viewBox={`${-padX} 0 ${size + padX * 2} ${size}`} className="w-full max-w-[400px]">
         {[0.25, 0.5, 0.75, 1].map((f) => (
           <polygon key={f}
                    points={Array.from({ length: n }).map((_, i) => {
@@ -51,7 +55,7 @@ export default function MpTopicRadar({ data }: { data: Data }) {
           return (
             <text key={i} x={p.x} y={p.y} textAnchor={anchor} dominantBaseline="middle"
                   fontFamily="'JetBrains Mono', monospace" fontSize={9} fill="#0A0A0A" fontWeight={600}>
-              {truncate(p.label, 12)}
+              {truncate(p.label, 18)}
             </text>
           );
         })}
