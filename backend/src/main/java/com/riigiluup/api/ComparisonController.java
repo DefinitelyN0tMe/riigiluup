@@ -80,7 +80,10 @@ public class ComparisonController {
                         (String) r[1],
                         r[2] == null ? null : r[2].toString(),
                         (String) r[3],
-                        (String) r[4]))
+                        (String) r[4],
+                        r[5] == null ? null : r[5].toString(),   // bill id
+                        (String) r[6],                            // bill title
+                        billMark(r[7], (String) r[8])))           // "644 SE"
                 .toList();
 
         FactionComparisonDto dto = new FactionComparisonDto(
@@ -95,5 +98,11 @@ public class ComparisonController {
 
     private static long num(Object o) {
         return o instanceof Number n ? n.longValue() : 0L;
+    }
+
+    /** "644 SE" from a bill's mark + draft type; null when there is no linked bill. */
+    private static String billMark(Object mark, String draftType) {
+        if (mark == null) return null;
+        return draftType == null || draftType.isBlank() ? mark.toString() : mark + " " + draftType;
     }
 }

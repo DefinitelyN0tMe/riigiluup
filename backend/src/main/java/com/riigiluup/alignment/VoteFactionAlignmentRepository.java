@@ -41,12 +41,15 @@ public interface VoteFactionAlignmentRepository
     List<Object[]> pairwiseCounts(@Param("left") String left, @Param("right") String right);
 
     /** Recent vote events where the two factions' majorities differed:
-     *  row = [id, description, started_at, left_choice, right_choice], newest first. */
+     *  row = [id, description, started_at, left_choice, right_choice, bill_id, bill_title, bill_mark,
+     *  bill_type], newest first. */
     @Query(value = """
-        SELECT ve.id, ve.description, ve.started_at, a.majority_choice, b.majority_choice
+        SELECT ve.id, ve.description, ve.started_at, a.majority_choice, b.majority_choice,
+               li.id, li.title, li.mark, li.draft_type_code
         FROM vote_faction_alignment a
         JOIN vote_faction_alignment b ON b.vote_event_id = a.vote_event_id
         JOIN vote_event ve ON ve.id = a.vote_event_id
+        LEFT JOIN legislative_item li ON li.id = ve.legislative_item_id
         WHERE a.faction_external_id = :left AND b.faction_external_id = :right
           AND a.has_clear_majority AND b.has_clear_majority
           AND a.majority_choice <> b.majority_choice

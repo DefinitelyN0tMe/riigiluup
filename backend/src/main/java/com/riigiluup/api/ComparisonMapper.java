@@ -43,15 +43,20 @@ public class ComparisonMapper {
                         "Agreement rate = same choice / (same + different), among votes where BOTH MPs cast a comparable choice (FOR / AGAINST / ABSTAINED). Non-participation reported separately."
                 ),
                 recentDisagreements.stream()
-                        .map(pair -> new ComparisonDto.DisagreementDto(
-                                pair[0].getVoteEvent().getId(),
-                                pair[0].getVoteEvent().getDescription(),
-                                pair[0].getVoteEvent().getType() == null ? null
-                                        : pair[0].getVoteEvent().getType().name(),
-                                pair[0].getVoteEvent().getStartedAt() == null ? null
-                                        : pair[0].getVoteEvent().getStartedAt().toString(),
+                        .map(pair -> {
+                            var ve = pair[0].getVoteEvent();
+                            var bill = ve.getLegislativeItem();
+                            return new ComparisonDto.DisagreementDto(
+                                ve.getId(),
+                                ve.getDescription(),
+                                ve.getType() == null ? null : ve.getType().name(),
+                                ve.getStartedAt() == null ? null : ve.getStartedAt().toString(),
                                 pair[0].getChoice() == null ? null : pair[0].getChoice().name(),
-                                pair[1].getChoice() == null ? null : pair[1].getChoice().name()))
+                                pair[1].getChoice() == null ? null : pair[1].getChoice().name(),
+                                bill == null ? null : bill.getId(),
+                                bill == null ? null : bill.getTitle(),
+                                PoliticianProfileMapper.billMark(bill));
+                        })
                         .toList()
         );
     }

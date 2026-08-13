@@ -40,6 +40,9 @@ public record ComparisonDto(
             String voteType,
             String startedAt,
             String leftChoice,
-            String rightChoice
+            String rightChoice,
+            UUID billId,
+            String billTitle,
+            String billMark
     ) {}
 }

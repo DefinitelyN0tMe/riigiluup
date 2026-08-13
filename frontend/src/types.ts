@@ -291,6 +291,9 @@ export type ComparisonDisagreement = {
   startedAt: string | null;
   leftChoice: string;
   rightChoice: string;
+  billId: string | null;
+  billTitle: string | null;
+  billMark: string | null;
 };
 
 export type ComparisonResponse = {
@@ -454,6 +457,9 @@ export type FactionComparison = {
     startedAt: string | null;
     leftChoice: string;
     rightChoice: string;
+    billId: string | null;
+    billTitle: string | null;
+    billMark: string | null;
   }[];
   methodologyNote: string;
 };

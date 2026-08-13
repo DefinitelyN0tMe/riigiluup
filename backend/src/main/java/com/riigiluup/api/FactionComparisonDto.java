@@ -20,6 +20,9 @@ public record FactionComparisonDto(
             String description,
             String startedAt,
             String leftChoice,
-            String rightChoice
+            String rightChoice,
+            String billId,
+            String billTitle,
+            String billMark
     ) {}
 }

@@ -17,6 +17,9 @@ type Disagreement = {
   startedAt: string | null;
   leftChoice: string;
   rightChoice: string;
+  billId: string | null;
+  billTitle: string | null;
+  billMark: string | null;
 };
 
 /** Shared result panel: agreement headline + overlap + recent disagreements. */
@@ -51,10 +54,25 @@ function AgreementResult({
           <ul className="divide-y divide-rule border border-rule rounded-[14px]">
             {disagreements.map((d) => (
               <li key={d.voteEventId} className="p-3 text-sm flex justify-between items-start gap-3">
-                <Link to={`/votes/${d.voteEventId}`} className="min-w-0 text-ink hover:underline">
-                  {d.description ?? t("common.noDescription")}
-                  {d.startedAt && <span className="block font-mono text-[11px] text-muted">{formatDate(d.startedAt)}</span>}
-                </Link>
+                <span className="min-w-0">
+                  {d.billTitle ? (
+                    <Link to={`/legislation/${encodeURIComponent(d.billId ?? "")}`} className="text-ink font-medium hover:underline">
+                      {d.billTitle}
+                    </Link>
+                  ) : (
+                    <Link to={`/votes/${d.voteEventId}`} className="text-ink hover:underline">
+                      {d.description ?? t("common.noDescription")}
+                    </Link>
+                  )}
+                  <span className="block font-mono text-[11px] text-muted">
+                    {d.billTitle && (
+                      <Link to={`/votes/${d.voteEventId}`} className="hover:underline">
+                        {d.billMark ? `${d.billMark} · ` : ""}{d.description ?? t("common.noDescription")}
+                      </Link>
+                    )}
+                    {d.billTitle && d.startedAt ? " · " : ""}{d.startedAt ? formatDate(d.startedAt) : ""}
+                  </span>
+                </span>
                 <span className="shrink-0 text-right text-xs">
                   <span className="text-blue font-medium">{t(`choice.${d.leftChoice}`, { defaultValue: d.leftChoice })}</span>
                   <span className="text-muted mx-1">/</span>
@@ -149,6 +167,9 @@ function PoliticianCompare() {
             startedAt: d.startedAt,
             leftChoice: d.leftChoice,
             rightChoice: d.rightChoice,
+            billId: d.billId,
+            billTitle: d.billTitle,
+            billMark: d.billMark,
           }))}
         />
       )}
