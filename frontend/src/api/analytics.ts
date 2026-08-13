@@ -144,6 +144,9 @@ export type VoteMargin = {
   forCount: number;
   againstCount: number;
   margin: number;
+  billId: string | null;
+  billTitle: string | null;
+  billMark: string | null;
 };
 export type HighlightsBundle = {
   streaks: AttendanceStreak[];

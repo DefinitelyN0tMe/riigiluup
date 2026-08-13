@@ -48,7 +48,14 @@ export default function VoteDetailPage() {
       </div>
 
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold text-ink">{data.description ?? t("common.noDescription")}</h1>
+        <h1 className="text-2xl font-semibold text-ink">
+          {data.linkedBill?.title ?? data.description ?? t("common.noDescription")}
+        </h1>
+        {data.linkedBill && data.description && (
+          <p className="text-sm text-slate-500">
+            {data.linkedBill.mark != null ? `${data.linkedBill.mark} · ` : ""}{data.description}
+          </p>
+        )}
         <p className="text-sm text-slate-600">
           {t("votes.meta", { type: typeLabel, number: data.votingNumber ?? "—", when })}
         </p>

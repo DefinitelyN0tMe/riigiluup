@@ -113,7 +113,8 @@ public final class AnalyticsDto {
     public record AttendanceStreak(String memberSlug, String memberName, String factionShortName,
                                    int consecutivePresent, int totalRecent) {}
     public record VoteMargin(UUID voteId, Integer voteNumber, String description, String startedAt,
-                             int forCount, int againstCount, int margin) {}
+                             int forCount, int againstCount, int margin,
+                             UUID billId, String billTitle, String billMark) {}
 
     /* ================ MEMBER ACTIVITY (most active MPs) ================ */
     public record MemberActivityBoard(List<MemberActivityItem> items, Instant computedAt) {}

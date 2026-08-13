@@ -84,6 +84,10 @@ export default function GroupsPage() {
             </section>
           );
         })}
+
+      {data && CATEGORY_ORDER.every((c) => (byCategory.get(c) ?? []).length === 0) && (
+        <p className="font-serif italic text-[14px] text-ink-2 py-4">{t("common.noResults")}</p>
+      )}
     </div>
   );
 }

@@ -83,7 +83,7 @@
       "nextSyncUnknown": "↺ sünk ajakava järgi"
     },
     "nowVoting": {
-      "kicker": "Möödunud istung · 01. juuni 2026",
+      "kicker": "Möödunud istung",
       "titlePre": "Kes ",
       "titleEm": "kuidas",
       "titlePost": " hääletas",
@@ -991,7 +991,28 @@
     }
   },
   "compare": {
+    "disagreementsLede": "Kronoloogiline logi hääletustest, kus need kaks saadikut valisid võrreldavatest võimalustest erinevalt. Iga rida on kliki kaugusel originaalvormist.",
     "title": "Võrdlus",
+    "leftMp": "Vasak saadik",
+    "rightMp": "Parem saadik",
+    "prompt": "Vali kaks saadikut, et näha, kuidas nad hääletavad.",
+    "computing": "Arvutan…",
+    "groupAlignmentLine": "Rühmakuuluvus:",
+    "groupAlignmentCounts": "({{matches}}/{{eligible}})",
+    "voteAgreement": "Hääletuste kokkulangevus",
+    "recentDisagreements": "Hiljutised erimeelsused ({{count}})",
+    "noDisagreements": "Praeguses ajaaknas võrreldavaid erimeelsusi ei ole.",
+    "left": "Vasak",
+    "right": "Parem",
+    "addToTray": "Lisa võrdlusse",
+    "removeFromTray": "Eemalda võrdlusest",
+    "trayLabel": "Võrdlus {{count}}/2",
+    "trayHint": "Vajuta kaardil ⊕, et lisada.",
+    "trayAriaLabel": "Võrdluse valik",
+    "clear": "Tühjenda",
+    "removeChip": "Eemalda {{name}} võrdlusest",
+    "inlineTitle": "Võrdlus",
+    "panelAriaLabel": "Saadikute võrdlus",
     "lede": "Võrdle kahte saadikut või kahte fraktsiooni nende hääletamise järgi.",
     "tab": {
       "parties": "Fraktsioonid",

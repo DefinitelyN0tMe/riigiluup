@@ -45,7 +45,7 @@ export default function HighlightsStrip({ data }: { data: HighlightsBundle }) {
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-[11px] font-bold text-hot-deep">±{v.margin}</span>
                     <span className="font-display text-sm font-semibold tracking-[-0.015em] truncate flex-1">
-                      {v.description ?? "—"}
+                      {v.billTitle ?? v.description ?? "—"}
                     </span>
                   </div>
                   <div className="mt-1.5 h-1.5 rounded-full bg-off overflow-hidden flex">

@@ -395,8 +395,11 @@ export default function HomePage() {
     // Drop the "unaffiliated MPs" group first: it is not a party, and a blunt slice(0,6) over the
     // alphabetical faction list was silently dropping a real party (SDE) to keep it.
     const list = (factions.data ?? []).filter((f) => !/mittekuuluv/i.test(f.name));
-    const coalitionNames = ["Reformierakond", "Eesti 200", "Sotsiaaldemokraatliku"];
-    return list.slice(0, 6).map((f) => {
+    // Governing coalition since March 2025: Reform + Eesti 200 (SDE left the government and is now
+    // in opposition). Hardcoded because coalition status is not in the source data — revisit on any
+    // government change.
+    const coalitionNames = ["Reformierakond", "Eesti 200"];
+    return list.map((f) => {
       const isCoalition = coalitionNames.some((n) => f.name.includes(n));
       return {
         seats: f.memberCount,
@@ -416,7 +419,7 @@ export default function HomePage() {
         voteTotal={votes.data?.totalElements}
         billTotal={legislation.data?.totalElements}
         summary={homeSummary.data}
-        factionCount={factions.data?.length}
+        factionCount={factions.data?.filter((f) => !/mittekuuluv/i.test(f.name)).length}
       />
       <MarqueeStrip />
 

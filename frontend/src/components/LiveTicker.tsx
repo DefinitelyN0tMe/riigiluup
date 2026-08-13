@@ -13,7 +13,7 @@ function toTickerItem(v: VoteListItem): TickerItem {
   const result = `${v.resultInFavor} / ${v.resultAgainst} / ${v.resultNeutral}`;
   return {
     id,
-    title: v.description ?? "—",
+    title: v.billTitle ?? v.description ?? "—",
     result,
     up: v.resultInFavor >= v.resultAgainst,
   };

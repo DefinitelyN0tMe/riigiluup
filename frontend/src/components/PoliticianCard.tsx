@@ -10,6 +10,7 @@ const PARTY_COLOR: Record<string, string> = {
   "Isamaa fraktsioon": "#FFB020",
   "Sotsiaaldemokraatliku Erakonna fraktsioon": "#FF4B3E",
   "Eesti 200 fraktsioon": "#1EA98A",
+  "Fraktsiooni mittekuuluvad Riigikogu liikmed": "#94a3b8",
 };
 
 export default function PoliticianCard({
@@ -26,7 +27,7 @@ export default function PoliticianCard({
   const { t } = useTranslation();
   const initials = `${p.firstName?.[0] ?? ""}${p.lastName?.[0] ?? ""}`.toUpperCase();
   const photoSrc = resolveMediaUrl(p.photoUrl);
-  const color = PARTY_COLOR[p.factionName ?? ""] ?? "#0072CE";
+  const color = PARTY_COLOR[p.factionName ?? ""] ?? "#94a3b8";
   const canToggle = onToggleCompare && (!compareDisabled || compareActive);
   return (
     <Link

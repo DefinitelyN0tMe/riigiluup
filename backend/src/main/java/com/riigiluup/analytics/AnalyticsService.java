@@ -891,11 +891,14 @@ public class AnalyticsService {
 
         // Tight votes: last 20 named votes with smallest FOR-AGAINST margin (both > 0)
         String tightSql = """
-            SELECT id, voting_number, description, started_at, result_in_favor, result_against
-            FROM vote_event
-            WHERE type = 'OPEN' AND started_at IS NOT NULL
-              AND result_in_favor > 0 AND result_against > 0
-            ORDER BY ABS(result_in_favor - result_against) ASC
+            SELECT ve.id, ve.voting_number, ve.description, ve.started_at,
+                   ve.result_in_favor, ve.result_against,
+                   li.id, li.title, li.mark, li.draft_type_code
+            FROM vote_event ve
+            LEFT JOIN legislative_item li ON li.id = ve.legislative_item_id
+            WHERE ve.type = 'OPEN' AND ve.started_at IS NOT NULL
+              AND ve.result_in_favor > 0 AND ve.result_against > 0
+            ORDER BY ABS(ve.result_in_favor - ve.result_against) ASC
             LIMIT 6
             """;
         List<Object[]> tightRows = em.createNativeQuery(tightSql).getResultList();
@@ -907,9 +910,14 @@ public class AnalyticsService {
             Instant ts = instantOf(r[3]);
             int forC = ((Number) r[4]).intValue();
             int agnC = ((Number) r[5]).intValue();
+            UUID billId = uuidOf(r[6]);
+            String billTitle = (String) r[7];
+            String billMark = r[8] == null ? null
+                    : (r[9] == null || ((String) r[9]).isBlank() ? r[8].toString() : r[8] + " " + r[9]);
             tightVotes.add(new AnalyticsDto.VoteMargin(vid, num, desc,
                     ts != null ? ts.toString() : null,
-                    forC, agnC, Math.abs(forC - agnC)));
+                    forC, agnC, Math.abs(forC - agnC),
+                    billId, billTitle, billMark));
         }
 
         return new AnalyticsDto.HighlightsBundle(streaks, tightVotes);
