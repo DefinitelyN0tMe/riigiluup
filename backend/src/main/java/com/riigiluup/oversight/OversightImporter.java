@@ -198,6 +198,12 @@ public class OversightImporter {
         for (int attempt = 1; attempt <= 3; attempt++) {
             try {
                 return client.fetchDocumentsPage(documentType, page, PAGE_SIZE);
+            } catch (org.springframework.web.client.HttpClientErrorException.NotFound nf) {
+                // The register does not support filtering by this documentType — notably
+                // interpellationsAnswerDocument 404s (interpellations are answered orally in the
+                // sitting, not via a queryable answer document). Skip the type, don't fail the run.
+                log.info("oversight: documentType {} not queryable (404) — skipping", documentType);
+                return null;
             } catch (RuntimeException e) {
                 last = e;
                 log.warn("oversight page fetch {} p{} attempt {}/3 failed: {}",

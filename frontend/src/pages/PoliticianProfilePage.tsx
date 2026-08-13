@@ -206,7 +206,9 @@ function OversightSection({ items, total }: { items: OversightItem[]; total: num
                 <span className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-paper border border-rule text-ink-2">
                   {t(`profile.oversight.kind.${o.kind}`, { defaultValue: o.kind })}
                 </span>
-                {o.answered ? (
+                {/* Answer status only for written questions: interpellations are answered orally in
+                    the sitting, so there is no reliable answer document to derive a status from. */}
+                {o.kind === "WRITTEN_QUESTION" && (o.answered ? (
                   <span className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-blue/10 text-blue">
                     {rd != null ? t("profile.oversight.answeredIn", { count: rd }) : t("profile.oversight.answered")}
                   </span>
@@ -218,7 +220,7 @@ function OversightSection({ items, total }: { items: OversightItem[]; total: num
                   <span className="font-mono text-[10px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded bg-rule/40 text-muted">
                     {t("profile.oversight.awaiting")}
                   </span>
-                )}
+                ))}
               </div>
               <p className="text-ink font-medium text-[15px] leading-snug">{o.title}</p>
               <div className="text-[12px] leading-snug text-muted mt-1">
