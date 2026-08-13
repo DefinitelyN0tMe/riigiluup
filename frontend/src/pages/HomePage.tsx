@@ -22,10 +22,14 @@ const PARTY_COLOR: Record<string, string> = {
   "Isamaa fraktsioon": "#FFB020",
   "Sotsiaaldemokraatliku Erakonna fraktsioon": "#FF4B3E",
   "Eesti 200 fraktsioon": "#1EA98A",
+  // The "unaffiliated MPs" group is not a party — give it a neutral grey, not the fallback blue
+  // (which would clash with Reform's blue on the parties chart).
+  "Fraktsiooni mittekuuluvad Riigikogu liikmed": "#94a3b8",
 };
 function partyColor(name?: string | null) {
-  if (!name) return "#0072CE";
-  return PARTY_COLOR[name] ?? "#0072CE";
+  // Neutral grey fallback so an unmapped/new faction never masquerades as Reform blue.
+  if (!name) return "#94a3b8";
+  return PARTY_COLOR[name] ?? "#94a3b8";
 }
 
 /** Deterministic rank for (slug, seed): a stable per-seed shuffle key (FNV-1a style). */
@@ -90,8 +94,7 @@ function Hero({ syncedAt }: { syncedAt: string | null }) {
         </div>
       </div>
 
-      <div className="relative z-[3] pt-8 sm:pt-12 flex flex-col xs:flex-row justify-between items-start xs:items-end gap-3 text-white/70 font-mono text-[10px] sm:text-[11px] tracking-[0.06em]">
-        <div className="flex gap-3"><span>001 / 007</span><span>·</span><b className="text-white font-bold">{t("homePage.hero.footIntroduction")}</b></div>
+      <div className="relative z-[3] pt-8 sm:pt-12 flex justify-end text-white/70 font-mono text-[10px] sm:text-[11px] tracking-[0.06em]">
         <div className="text-right">
           {syncedAt && <>{t("chrome.ticker.sync")} <b className="text-white font-bold">{syncedAt}</b> · </>}{t("homePage.hero.compositionLine")}
         </div>
@@ -451,7 +454,7 @@ export default function HomePage() {
 
       <section className="bg-paper px-5 sm:px-8 md:px-10 py-12 sm:py-16 md:py-20">
         <SectionHead
-          index="IV."
+          index="III."
           kicker={t("homePage.parties.kicker")}
           title={<>{t("homePage.parties.titlePre")}<span className="font-serif italic font-light text-blue">{t("homePage.parties.titleEm")}</span>{t("homePage.parties.titlePost")}</>}
           more={{ to: "/compare", label: t("homePage.parties.more") }}
