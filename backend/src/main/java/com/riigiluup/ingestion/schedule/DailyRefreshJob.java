@@ -87,6 +87,9 @@ public class DailyRefreshJob {
             LocalDate today = LocalDate.now(TALLINN);
             voteImporter.runWindow(today.minusDays(7), today);
             legislationImporter.runWindow(today.minusDays(7), today);
+            // A new amendment does not change a bill's stage, so the change-detection window above
+            // skips it; refresh amendments for all active bills daily so new proposals surface next-day.
+            legislationImporter.refreshActiveBillAmendments();
             voteBillLinker.linkAll();
             // 7-day speech window: stenograms publish next day and get edited for a few
             // days after, so re-upserting a week keeps texts converged with the source.

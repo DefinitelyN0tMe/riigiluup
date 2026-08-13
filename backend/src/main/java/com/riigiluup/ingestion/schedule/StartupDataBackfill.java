@@ -81,7 +81,7 @@ public class StartupDataBackfill {
         try {
             if (amendmentRepo.count() == 0) {
                 log.info("Startup backfill: backfilling bill amendments for active bills");
-                legislationImporter.backfillAmendmentsForActiveBills();
+                legislationImporter.refreshActiveBillAmendments();
             }
         } catch (Exception e) {
             log.warn("Startup amendment backfill failed (retries next boot): {}", e.toString());

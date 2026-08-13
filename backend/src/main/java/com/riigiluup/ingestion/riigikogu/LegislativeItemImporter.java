@@ -257,13 +257,15 @@ public class LegislativeItemImporter {
     }
 
     /**
-     * One-time backfill of amendments for bills still in proceeding. The daily change-detection path
-     * skips the detail fetch for bills whose stage/status is unchanged, so already-active bills need
-     * one forced detail fetch to populate their amendments. Bounded to in-proceeding phases (where
-     * amendments are actually proposed); concluded bills fill in as the daily window re-touches them.
-     * Runs one throttled detail call per active bill, each in its own transaction.
+     * Refresh amendments for every bill still in proceeding. The daily change-detection path skips the
+     * detail fetch for bills whose stage/status is unchanged, but a new amendment does NOT change a
+     * bill's stage — so without this, a new amendment on a stage-static active bill would not surface
+     * until the bill next advances. Run daily (and once on startup) it keeps amendments current within
+     * a day. Bounded to in-proceeding phases (where amendments are proposed); concluded bills are
+     * static and fill in as the daily window re-touches them. One throttled detail call per active
+     * bill, each in its own transaction. Idempotent (full-replace per bill).
      */
-    public void backfillAmendmentsForActiveBills() {
+    public void refreshActiveBillAmendments() {
         java.util.List<java.util.UUID> ids = itemRepo.findIdsByPhaseIn(java.util.List.of(
                 com.riigiluup.legislation.LegislationPhase.SUBMITTED,
                 com.riigiluup.legislation.LegislationPhase.IN_COMMITTEE,
