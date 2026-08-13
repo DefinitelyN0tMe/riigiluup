@@ -93,7 +93,9 @@ const SELECT_CLS =
 function PartyCompare() {
   const { t } = useTranslation();
   const factions = useQuery({ queryKey: ["factions"], queryFn: fetchFactions });
-  const opts = (factions.data ?? []).filter((f) => !/mittekuuluv/i.test(f.name));
+  // Include the "unaffiliated MPs" group too: it is a 20-seat Riigikogu faction with real
+  // majority-vote data, so it is a meaningful (if less cohesive) thing to compare against.
+  const opts = factions.data ?? [];
   const [left, setLeft] = useState("");
   const [right, setRight] = useState("");
   const cmp = useQuery({
@@ -106,19 +108,19 @@ function PartyCompare() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <select className={SELECT_CLS} value={left} onChange={(e) => setLeft(e.target.value)} aria-label={t("compare.pickLeft")}>
           <option value="">{t("compare.pickParty")}</option>
-          {opts.map((f) => <option key={f.externalId} value={f.externalId} disabled={f.externalId === right}>{f.name.replace(/fraktsioon/i, "").trim()}</option>)}
+          {opts.map((f) => <option key={f.externalId} value={f.externalId} disabled={f.externalId === right}>{f.name.replace(/fraktsiooni?/i, "").trim()}</option>)}
         </select>
         <select className={SELECT_CLS} value={right} onChange={(e) => setRight(e.target.value)} aria-label={t("compare.pickRight")}>
           <option value="">{t("compare.pickParty")}</option>
-          {opts.map((f) => <option key={f.externalId} value={f.externalId} disabled={f.externalId === left}>{f.name.replace(/fraktsioon/i, "").trim()}</option>)}
+          {opts.map((f) => <option key={f.externalId} value={f.externalId} disabled={f.externalId === left}>{f.name.replace(/fraktsiooni?/i, "").trim()}</option>)}
         </select>
       </div>
       {cmp.isLoading && <p className="mt-6 text-muted font-mono text-sm">{t("common.loading")}</p>}
       {cmp.error && <LoadFailed error={cmp.error} className="mt-6" />}
       {cmp.data && (
         <AgreementResult
-          leftName={cmp.data.left.name.replace(/fraktsioon/i, "").trim()}
-          rightName={cmp.data.right.name.replace(/fraktsioon/i, "").trim()}
+          leftName={cmp.data.left.name.replace(/fraktsiooni?/i, "").trim()}
+          rightName={cmp.data.right.name.replace(/fraktsiooni?/i, "").trim()}
           rate={cmp.data.agreementRate}
           same={cmp.data.sameCount}
           overlap={cmp.data.totalOverlap}
