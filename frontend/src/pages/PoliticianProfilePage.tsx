@@ -258,6 +258,11 @@ function OversightSection({ items, total }: { items: OversightItem[]; total: num
           {t("profile.oversight.moreNote", { total })}
         </p>
       )}
+      {items.some((o) => o.kind === "INTERPELLATION") && (
+        <p className="text-[11px] leading-snug text-muted mt-3 pt-3 border-t border-rule/60">
+          {t("profile.oversight.interpellationNote")}
+        </p>
+      )}
     </section>
   );
 }

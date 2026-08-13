@@ -795,7 +795,8 @@
       "showLess": "Näita vähem",
       "moreNote": "Kokku {{total}} küsimust.",
       "readQuestion": "Loe küsimust",
-      "readAnswer": "Loe vastust"
+      "readAnswer": "Loe vastust",
+      "interpellationNote": "Arupärimistele vastatakse suuliselt istungil, mistõttu neil ei ole eraldi vastuse staatust (erinevalt kirjalikest küsimustest)."
     },
     "activity": {
       "title": "Aktiivsus parlamendis",
@@ -899,6 +900,10 @@
       "members": "Liikmed",
       "ledBills": "Juhitavad eelnõud",
       "initiatives": "Kollektiivsed pöördumised"
+    },
+    "group": {
+      "STANDING": "Alatised komisjonid",
+      "SPECIAL": "Eri- ja uurimiskomisjonid"
     }
   },
   "initiatives": {

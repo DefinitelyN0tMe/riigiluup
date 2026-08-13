@@ -21,7 +21,8 @@ public final class CommitteeDto {
             String secretariat,
             long memberCount,
             long ledBillCount,
-            long initiativeCount
+            long initiativeCount,
+            String kind          // STANDING | SPECIAL
     ) {
     }
 
@@ -45,7 +46,8 @@ public final class CommitteeDto {
             String secretariat,
             List<Member> members,
             LedBills ledBills,
-            List<InitiativeDto.ListItem> initiatives
+            List<InitiativeDto.ListItem> initiatives,
+            String kind          // STANDING | SPECIAL
     ) {
     }
 }

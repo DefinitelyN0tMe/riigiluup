@@ -795,7 +795,8 @@
       "showLess": "Show less",
       "moreNote": "{{total}} questions in total.",
       "readQuestion": "Read the question",
-      "readAnswer": "Read the answer"
+      "readAnswer": "Read the answer",
+      "interpellationNote": "Interpellations are answered orally in the sitting, so they carry no separate answer status - unlike written questions."
     },
     "activity": {
       "title": "Activity in parliament",
@@ -899,6 +900,10 @@
       "members": "Members",
       "ledBills": "Bills led",
       "initiatives": "Citizen initiatives"
+    },
+    "group": {
+      "STANDING": "Standing committees",
+      "SPECIAL": "Select & investigation committees"
     }
   },
   "initiatives": {

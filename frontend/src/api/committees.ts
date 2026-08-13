@@ -10,6 +10,7 @@ export type CommitteeListItem = {
   memberCount: number;
   ledBillCount: number;
   initiativeCount: number;
+  kind: "STANDING" | "SPECIAL" | string;
 };
 
 export type CommitteeMemberRef = {
@@ -36,6 +37,7 @@ export type CommitteeDetail = {
   members: CommitteeMemberRef[];
   ledBills: { total: number; recent: CommitteeBillRef[] };
   initiatives: InitiativeListItem[];
+  kind: "STANDING" | "SPECIAL" | string;
 };
 
 export function fetchCommittees(): Promise<CommitteeListItem[]> {

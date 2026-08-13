@@ -47,15 +47,25 @@ export default function CommitteesPage() {
       )}
       {error && <LoadFailed error={error} className="mt-2 text-hot-deep font-mono text-sm" />}
 
-      {data && (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 list-none p-0">
-          {data.map((c) => (
-            <li key={c.externalId}>
-              <CommitteeCard c={c} />
-            </li>
-          ))}
-        </ul>
-      )}
+      {data &&
+        (["STANDING", "SPECIAL"] as const).map((kind) => {
+          const group = data.filter((c) => c.kind === kind);
+          if (group.length === 0) return null;
+          return (
+            <section key={kind} aria-label={t(`committees.group.${kind}`)} className="mb-8">
+              <h2 className="font-display font-bold text-[20px] tracking-[-0.02em] mb-3">
+                {t(`committees.group.${kind}`)}
+              </h2>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 list-none p-0">
+                {group.map((c) => (
+                  <li key={c.externalId}>
+                    <CommitteeCard c={c} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
     </div>
   );
 }

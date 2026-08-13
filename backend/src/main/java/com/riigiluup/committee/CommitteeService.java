@@ -34,26 +34,36 @@ public class CommitteeService {
     private final LegislativeItemRepository itemRepo;
     private final InitiativeService initiativeService;
 
-    /** The 11 active standing committees as cards, with cheap aggregate counts. */
+    /** Active committees as cards: the standing committees first, then the select/investigation
+     *  committees (erikomisjon / uurimiskomisjon), with cheap aggregate counts. */
     @Cacheable("committees-list")
     @Transactional(readOnly = true)
     public List<CommitteeDto.ListItem> list() {
-        return groupRepo.findByTypeAndActiveTrueOrderByName(GroupType.STANDING_COMMITTEE).stream()
+        List<Group> committees = new java.util.ArrayList<>();
+        committees.addAll(groupRepo.findByTypeAndActiveTrueOrderByName(GroupType.STANDING_COMMITTEE));
+        committees.addAll(groupRepo.findByTypeAndActiveTrueOrderByName(GroupType.SPECIAL_COMMITTEE));
+        return committees.stream()
                 .map(g -> new CommitteeDto.ListItem(
                         g.getExternalId(), g.getName(), g.getShortName(), g.getColorHex(),
                         g.getSecretariatName(),
                         membershipRepo.countByGroupAndActiveTrue(g),
                         itemRepo.countByLeadingCommitteeExternalId(g.getExternalId()),
-                        initiativeService.countByCommitteeIfAny(g.getId())))
+                        initiativeService.countByCommitteeIfAny(g.getId()),
+                        kindOf(g.getType())))
                 .toList();
     }
 
-    /** Empty when the id is unknown, inactive, or not a standing committee. */
+    /** Empty when the id is unknown, inactive, or not a committee (standing or select/investigation). */
     @Transactional(readOnly = true)
     public Optional<CommitteeDto.Detail> detail(String externalId) {
-        return groupRepo
-                .findByExternalIdAndTypeAndActiveTrue(externalId, GroupType.STANDING_COMMITTEE)
+        return groupRepo.findByExternalIdAndActiveTrue(externalId)
+                .filter(g -> g.getType() == GroupType.STANDING_COMMITTEE
+                          || g.getType() == GroupType.SPECIAL_COMMITTEE)
                 .map(this::toDetail);
+    }
+
+    private static String kindOf(GroupType type) {
+        return type == GroupType.SPECIAL_COMMITTEE ? "SPECIAL" : "STANDING";
     }
 
     private CommitteeDto.Detail toDetail(Group g) {
@@ -73,7 +83,8 @@ public class CommitteeService {
                 g.getSecretariatName(),
                 members,
                 new CommitteeDto.LedBills(total, recent),
-                initiativeService.byCommittee(g.getId()));
+                initiativeService.byCommittee(g.getId()),
+                kindOf(g.getType()));
     }
 
     private static CommitteeDto.Member toMember(GroupMembership gm) {
