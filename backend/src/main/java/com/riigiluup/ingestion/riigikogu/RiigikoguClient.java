@@ -66,6 +66,10 @@ public class RiigikoguClient {
                 .uri(b -> b.path("/api/documents")
                         .queryParam("lang", "et")
                         .queryParam("documentType", documentType)
+                        // Explicit newest-first: the importer's early-stop relies on descending
+                        // `created`. The register defaults to this, but pinning it makes the scan
+                        // correct regardless of any future change to the default order.
+                        .queryParam("sort", "created,desc")
                         .queryParam("page", page)
                         .queryParam("size", size)
                         .build())

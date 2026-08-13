@@ -284,8 +284,10 @@ public class LegislativeItemImporter {
     }
 
     private void reconcileAmendments(LegislativeItem item, DraftDetailDto d) {
+        // Guard the null detail BEFORE the delete: the backfill path passes the fetched detail
+        // straight in, and a null/empty body would otherwise NPE after the rows were already deleted.
+        if (d == null || d.amendments() == null) return;
         amendmentRepo.deleteByLegislativeItem(item);
-        if (d.amendments() == null) return;
         int seq = 0;
         for (DraftDetailDto.Amendment a : d.amendments()) {
             if (a == null || a.title() == null || a.title().isBlank()) continue;
