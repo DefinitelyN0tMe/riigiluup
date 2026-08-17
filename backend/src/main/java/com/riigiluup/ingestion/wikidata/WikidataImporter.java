@@ -412,32 +412,53 @@ public class WikidataImporter {
      */
     private void enrichWikipediaStats(Map<String, PlenaryMember> matchedByQid) {
         if (matchedByQid.isEmpty()) return;
+        // The two sub-steps are independent: a WDQS timeout on the counts must not lose the
+        // pageviews (and vice versa). Each is caught on its own; reach stats never fail the run.
+        Map<String, Integer> langCounts = new HashMap<>();
         try {
-            Map<String, Integer> langCounts = fetchLangCounts(matchedByQid.keySet());  // SPARQL, outside tx
-            Map<String, Integer> pageviews = fetchPageviews(matchedByQid);             // REST, outside tx
-            int enriched = tx.execute(status ->
-                    applyWikipediaStats(matchedByQid, langCounts, pageviews));
-            log.info("wikipedia stats: enriched {} MPs (lang-version count + 90d pageviews)", enriched);
+            langCounts = fetchLangCounts(matchedByQid.keySet());   // SPARQL, outside tx
         } catch (Exception e) {
-            // Reach stats are a nice-to-have; never let them fail the whole cross-reference.
-            log.warn("wikipedia stats enrichment failed (lang count/pageviews skipped): {}", e.getMessage());
+            log.warn("wikipedia lang-count skipped: {}", e.getMessage());
+        }
+        Map<String, Integer> pageviews = new HashMap<>();
+        try {
+            pageviews = fetchPageviews(matchedByQid);              // REST, outside tx
+        } catch (Exception e) {
+            log.warn("wikipedia pageviews skipped: {}", e.getMessage());
+        }
+        if (langCounts.isEmpty() && pageviews.isEmpty()) return;
+        final Map<String, Integer> lc = langCounts, pv = pageviews;
+        try {
+            int enriched = tx.execute(status -> applyWikipediaStats(matchedByQid, lc, pv));
+            log.info("wikipedia stats: enriched {} MPs (lang={}, views={})", enriched, lc.size(), pv.size());
+        } catch (Exception e) {
+            log.warn("wikipedia stats write skipped: {}", e.getMessage());
         }
     }
 
-    /** SPARQL: number of *.wikipedia.org sitelinks per matched QID. */
+    /**
+     * SPARQL: number of *.wikipedia.org sitelinks per matched QID. Chunked — a single VALUES list
+     * of ~90 QIDs with a COUNT(DISTINCT) over every sitelink times out WDQS (504); small batches
+     * stay well inside its query limit.
+     */
     private Map<String, Integer> fetchLangCounts(Set<String> qids) {
-        String values = qids.stream().map(q -> "wd:" + q).collect(Collectors.joining(" "));
-        JsonNode result = fetchSparql(String.format(WP_COUNT_SPARQL_TEMPLATE, values));
         Map<String, Integer> counts = new HashMap<>();
-        if (result == null) return counts;
-        for (JsonNode row : result.path("results").path("bindings")) {
-            String qUri = row.path("person").path("value").asText(null);
-            String cnt = row.path("cnt").path("value").asText(null);
-            if (qUri == null || cnt == null) continue;
-            String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
-            try {
-                counts.put(qid, Integer.parseInt(cnt.trim()));
-            } catch (NumberFormatException ignored) { /* skip a non-numeric count */ }
+        List<String> all = new ArrayList<>(qids);
+        int chunk = 20;
+        for (int i = 0; i < all.size(); i += chunk) {
+            List<String> sub = all.subList(i, Math.min(i + chunk, all.size()));
+            String values = sub.stream().map(q -> "wd:" + q).collect(Collectors.joining(" "));
+            JsonNode result = fetchSparql(String.format(WP_COUNT_SPARQL_TEMPLATE, values));
+            if (result == null) continue;
+            for (JsonNode row : result.path("results").path("bindings")) {
+                String qUri = row.path("person").path("value").asText(null);
+                String cnt = row.path("cnt").path("value").asText(null);
+                if (qUri == null || cnt == null) continue;
+                String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
+                try {
+                    counts.put(qid, Integer.parseInt(cnt.trim()));
+                } catch (NumberFormatException ignored) { /* skip a non-numeric count */ }
+            }
         }
         return counts;
     }
