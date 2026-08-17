@@ -159,10 +159,11 @@ public class WikidataImporter {
     /** Known Estonian party QIDs; a P102 QID outside it is stored but flagged (see enrichParties). */
     private final Set<String> allowedPartyQids;
     // Bounded timeouts like every other HTTP client here (RiigikoguClient et al.): without them a
-    // hung socket would wedge the backfill daemon thread forever. Read is generous (WDQS permits
-    // queries up to ~60s); the pageviews REST calls return in well under a second.
+    // hung socket would wedge the backfill daemon thread forever. Read is set above WDQS's own 60s
+    // query cap so queue+execution congestion on the core crossref isn't clipped, while still
+    // bounding a true socket hang to ~2 min; the pageviews REST calls return in well under a second.
     private static final int CONNECT_TIMEOUT_MS = 5_000;
-    private static final int READ_TIMEOUT_MS = 60_000;
+    private static final int READ_TIMEOUT_MS = 120_000;
     private final RestClient rest = RestClient.builder()
             .requestFactory(timeoutRequestFactory())
             // Wikidata's UA policy: identify the client + contact so they can reach out.
