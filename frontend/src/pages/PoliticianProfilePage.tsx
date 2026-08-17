@@ -18,7 +18,7 @@ import DeviationsCalendar from "../components/analytics/DeviationsCalendar";
 import SimilarPeers from "../components/analytics/SimilarPeers";
 import { fetchMpTopicRadar, fetchMpDeviationsTimeline, fetchMpSimilarPeers } from "../api/analytics";
 import { formatDate } from "../lib/formatDate";
-import { formatPercent } from "../lib/formatNumber";
+import { formatPercent, formatCompact } from "../lib/formatNumber";
 
 function pct(v: number | null): string {
   if (v == null) return "—";
@@ -460,16 +460,27 @@ export default function PoliticianProfilePage() {
                 : i18n.resolvedLanguage === "ru" ? data.wikipediaUrlRu
                 : data.wikipediaUrlEn;
               if (!wiki) return null;
+              const langs = data.wikipediaLangCount;
+              const views = data.wikipediaPageviews90d;
               return (
-                <a
-                  href={wiki}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-estonia hover:underline"
-                  title={t("profile.wikipediaTooltip", "Wikipedia article about this MP (CC BY-SA)")}
-                >
-                  {t("profile.wikipedia", "Wikipedia")}
-                </a>
+                <span className="inline-flex items-baseline gap-1.5">
+                  <a
+                    href={wiki}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-estonia hover:underline"
+                    title={t("profile.wikipediaTooltip", "Wikipedia article about this MP (CC BY-SA)")}
+                  >
+                    {t("profile.wikipedia", "Wikipedia")}
+                  </a>
+                  {(langs != null || views != null) && (
+                    <span className="text-muted text-xs">
+                      {langs != null && t("profile.wikipediaLangs", { langs })}
+                      {langs != null && views != null && " · "}
+                      {views != null && t("profile.wikipediaViews", { views: formatCompact(views) })}
+                    </span>
+                  )}
+                </span>
               );
             })()}
           </div>

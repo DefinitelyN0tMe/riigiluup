@@ -89,6 +89,8 @@ export type PoliticianProfile = {
   wikipediaUrlEn: string | null;
   wikipediaUrlEt: string | null;
   wikipediaUrlRu: string | null;
+  wikipediaLangCount: number | null;
+  wikipediaPageviews90d: number | null;
   faction: Faction | null;
   party: Party | null;
   committees: CommitteeMembership[];

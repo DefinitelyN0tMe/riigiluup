@@ -218,6 +218,8 @@ public class PoliticianProfileMapper {
                 m.getWikipediaUrlEn(),
                 m.getWikipediaUrlEt(),
                 m.getWikipediaUrlRu(),
+                m.getWikipediaLangCount(),
+                m.getWikipediaPageviews90d(),
                 m.getFactionExternalId() == null ? null
                         : new PoliticianProfileDto.Faction(
                                 m.getFactionExternalId(), m.getFactionName()),

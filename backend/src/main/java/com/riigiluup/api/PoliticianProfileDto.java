@@ -26,6 +26,8 @@ public record PoliticianProfileDto(
         String wikipediaUrlEn,
         String wikipediaUrlEt,
         String wikipediaUrlRu,
+        Integer wikipediaLangCount,
+        Integer wikipediaPageviews90d,
         Faction faction,
         Party party,
         List<GroupMembershipDto> committees,

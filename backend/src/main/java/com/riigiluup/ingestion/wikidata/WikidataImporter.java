@@ -10,6 +10,7 @@ import com.riigiluup.person.PlenaryMemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -18,6 +19,8 @@ import org.springframework.web.client.RestClient;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,9 +45,9 @@ import java.util.stream.Collectors;
  * existing MPs by (fullName, dateOfBirth); a name-only fallback is used only when the name is
  * unambiguous on both sides. Matches update the four Wikidata columns on plenary_member.
  *
- * <p>The three SPARQL calls run outside any transaction; each write pass commits in its own
- * short {@link TransactionTemplate} so no DB connection is held across HTTP (same pattern as
- * the Riigikogu importers).
+ * <p>The SPARQL (and Wikimedia REST pageviews) calls run outside any transaction; each write pass
+ * commits in its own short {@link TransactionTemplate} so no DB connection is held across HTTP
+ * (same pattern as the Riigikogu importers).
  *
  * <p>Idempotent: safe to re-run. Not scheduled — triggered by
  * {@code POST /api/v1/admin/import/wikidata}.
@@ -129,6 +132,25 @@ public class WikidataImporter {
             }
             """;
 
+    // Count of the person's *.wikipedia.org sitelinks (= number of language versions their article
+    // exists in). wikibase:wikiGroup "wikipedia" excludes Commons/Wikiquote/Wikisource sitelinks.
+    private static final String WP_COUNT_SPARQL_TEMPLATE = """
+            SELECT ?person (COUNT(DISTINCT ?article) AS ?cnt) WHERE {
+              VALUES ?person { %s }
+              ?article schema:about ?person ;
+                       schema:isPartOf ?site .
+              ?site wikibase:wikiGroup "wikipedia" .
+            }
+            GROUP BY ?person
+            """;
+
+    // Wikimedia REST pageviews API (public, no key; UA required). Trailing-window daily views of one
+    // article, "user" agent bucket (excludes bots/spiders). Path vars are encoded once by RestClient.
+    private static final String PAGEVIEWS_URL =
+            "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
+            + "/{proj}/all-access/user/{title}/daily/{start}/{end}";
+    private static final DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
+
     private final PlenaryMemberRepository memberRepo;
     private final MpPartyMembershipRepository partyMembershipRepo;
     private final ImportRunLogRepository runLogRepo;
@@ -176,6 +198,7 @@ public class WikidataImporter {
 
             enrichBio(crossref.matchedByQid());
             enrichParties(crossref.matchedByQid());
+            enrichWikipediaStats(crossref.matchedByQid());
             run.setStatus("SUCCESS");
         } catch (Exception e) {
             log.error("wikidata cross-ref failed", e);
@@ -380,6 +403,122 @@ public class WikidataImporter {
             stored++;
         }
         return stored;
+    }
+
+    /**
+     * Fourth pass over matched QIDs: Wikipedia "reach" for the profile, suggested by Wikimedia Eesti:
+     * the number of language versions the article exists in (Wikidata sitelinks) and the trailing
+     * ~90-day human pageviews of the primary-language article (Wikimedia REST pageviews API).
+     */
+    private void enrichWikipediaStats(Map<String, PlenaryMember> matchedByQid) {
+        if (matchedByQid.isEmpty()) return;
+        try {
+            Map<String, Integer> langCounts = fetchLangCounts(matchedByQid.keySet());  // SPARQL, outside tx
+            Map<String, Integer> pageviews = fetchPageviews(matchedByQid);             // REST, outside tx
+            int enriched = tx.execute(status ->
+                    applyWikipediaStats(matchedByQid, langCounts, pageviews));
+            log.info("wikipedia stats: enriched {} MPs (lang-version count + 90d pageviews)", enriched);
+        } catch (Exception e) {
+            // Reach stats are a nice-to-have; never let them fail the whole cross-reference.
+            log.warn("wikipedia stats enrichment failed (lang count/pageviews skipped): {}", e.getMessage());
+        }
+    }
+
+    /** SPARQL: number of *.wikipedia.org sitelinks per matched QID. */
+    private Map<String, Integer> fetchLangCounts(Set<String> qids) {
+        String values = qids.stream().map(q -> "wd:" + q).collect(Collectors.joining(" "));
+        JsonNode result = fetchSparql(String.format(WP_COUNT_SPARQL_TEMPLATE, values));
+        Map<String, Integer> counts = new HashMap<>();
+        if (result == null) return counts;
+        for (JsonNode row : result.path("results").path("bindings")) {
+            String qUri = row.path("person").path("value").asText(null);
+            String cnt = row.path("cnt").path("value").asText(null);
+            if (qUri == null || cnt == null) continue;
+            String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
+            try {
+                counts.put(qid, Integer.parseInt(cnt.trim()));
+            } catch (NumberFormatException ignored) { /* skip a non-numeric count */ }
+        }
+        return counts;
+    }
+
+    /** Wikimedia REST: trailing ~90-day pageviews for each matched MP's primary Wikipedia article. */
+    private Map<String, Integer> fetchPageviews(Map<String, PlenaryMember> matchedByQid) {
+        LocalDate end = LocalDate.now(ZoneOffset.UTC).minusDays(1);   // yesterday: today's data is partial
+        LocalDate start = end.minusDays(89);                          // ~90-day inclusive window
+        String startS = start.format(YMD);
+        String endS = end.format(YMD);
+        Map<String, Integer> views = new HashMap<>();
+        for (Map.Entry<String, PlenaryMember> e : matchedByQid.entrySet()) {
+            PlenaryMember mp = e.getValue();
+            // Prefer the Estonian article (the primary audience), then English, then Russian.
+            String url = firstNonBlank(mp.getWikipediaUrlEt(), mp.getWikipediaUrlEn(), mp.getWikipediaUrlRu());
+            WikiRef ref = parseWikiRef(url);
+            if (ref == null) continue;
+            try {
+                Integer total = fetchArticlePageviews(ref, startS, endS);
+                if (total != null) views.put(e.getKey(), total);
+            } catch (Exception ex) {
+                // 404 (no data / title mismatch) or a transient error: skip this one MP, keep going.
+                log.debug("pageviews skipped for {} ({}): {}", mp.getExternalId(), ref.title(), ex.getMessage());
+            }
+        }
+        return views;
+    }
+
+    private Integer fetchArticlePageviews(WikiRef ref, String start, String end) {
+        JsonNode res = rest.get()
+                .uri(PAGEVIEWS_URL, ref.project(), ref.title(), start, end)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(JsonNode.class);
+        if (res == null) return null;
+        long sum = 0;
+        for (JsonNode item : res.path("items")) {
+            sum += item.path("views").asLong(0);
+        }
+        return (int) Math.min(sum, Integer.MAX_VALUE);
+    }
+
+    private int applyWikipediaStats(Map<String, PlenaryMember> matchedByQid,
+                                    Map<String, Integer> langCounts, Map<String, Integer> pageviews) {
+        int enriched = 0;
+        for (Map.Entry<String, PlenaryMember> e : matchedByQid.entrySet()) {
+            PlenaryMember mp = e.getValue();
+            Integer lc = langCounts.get(e.getKey());
+            Integer pv = pageviews.get(e.getKey());
+            boolean changed = false;
+            if (lc != null) { mp.setWikipediaLangCount(lc); changed = true; }
+            if (pv != null) { mp.setWikipediaPageviews90d(pv); changed = true; }
+            if (changed) {
+                mp.setUpdatedAt(Instant.now());
+                memberRepo.save(mp); // re-attach: mp was detached when the cross-ref tx committed
+                enriched++;
+            }
+        }
+        return enriched;
+    }
+
+    /** A Wikipedia article reference: project domain (e.g. "et.wikipedia.org") + decoded page title. */
+    record WikiRef(String project, String title) {
+    }
+
+    /** Parse a validated {@code https://<lang>.wikipedia.org/wiki/<Title>} URL into project + title. */
+    static WikiRef parseWikiRef(String url) {
+        if (url == null || url.isBlank()) return null;
+        try {
+            URI u = URI.create(url.trim());
+            String host = u.getHost();
+            String path = u.getPath(); // decoded ("/wiki/Lauri_Läänemets")
+            if (host == null || path == null) return null;
+            int idx = path.indexOf("/wiki/");
+            if (idx < 0) return null;
+            String title = path.substring(idx + "/wiki/".length());
+            if (title.isBlank()) return null;
+            return new WikiRef(host, title);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     /** One P102 statement parsed from Wikidata, before the person is resolved to an MP. */

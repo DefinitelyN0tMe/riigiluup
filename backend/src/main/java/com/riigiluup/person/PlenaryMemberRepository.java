@@ -25,6 +25,8 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
     /** True once any member has a current-mandate-start value — gates the one-time populate. */
     boolean existsByCurrentMandateStartIsNotNull();
 
+    boolean existsByWikipediaLangCountIsNotNull();
+
     /** Active seats held by a faction — used to label the faction-comparison sides. */
     long countByActiveTrueAndFactionExternalId(String factionExternalId);
 

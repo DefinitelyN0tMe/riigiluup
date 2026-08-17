@@ -93,6 +93,14 @@ public class PlenaryMember {
     @Column(name = "wikipedia_url_ru", columnDefinition = "text")
     private String wikipediaUrlRu;
 
+    /** Number of language versions the person's Wikipedia article exists in (Wikidata sitelinks); nullable. */
+    @Column(name = "wikipedia_lang_count")
+    private Integer wikipediaLangCount;
+
+    /** Total human pageviews of the primary Wikipedia article over the trailing ~90 days; nullable. */
+    @Column(name = "wikipedia_pageviews_90d")
+    private Integer wikipediaPageviews90d;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_snapshot_id")
     private SourceSnapshot sourceSnapshot;

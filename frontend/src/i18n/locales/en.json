@@ -704,6 +704,8 @@
     "formerMpTooltip": "This person is no longer a member of the current Riigikogu. Their historical votes and bills are still shown.",
     "wikipedia": "Wikipedia",
     "wikipediaTooltip": "Wikipedia article about this MP (CC BY-SA)",
+    "wikipediaLangs": "in {{langs}} languages",
+    "wikipediaViews": "{{views}} views (90d)",
     "loadingVotes": "Loading voting history…",
     "noVotes": "No recorded votes yet.",
     "loadingBills": "Loading bills…",

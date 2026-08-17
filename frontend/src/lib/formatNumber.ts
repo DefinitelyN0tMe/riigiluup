@@ -38,3 +38,14 @@ export function formatPercent(rate: number, fractionDigits = 1): string {
 export function formatPercentValue(value: number, fractionDigits = 1): string {
   return `${formatDecimal(value, fractionDigits)}%`;
 }
+
+/**
+ * Compact, locale-aware number for large counts.
+ * e.g. formatCompact(3421) -> "3,4 tuh" (et) / "3,4 тыс." (ru) / "3.4K" (en).
+ */
+export function formatCompact(value: number): string {
+  return new Intl.NumberFormat(activeLocale(), {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
+}

@@ -102,8 +102,12 @@ public class StartupDataBackfill {
                     .findFirstBySourceNameAndJobNameOrderByStartedAtDesc("wikidata", "wikidata.mp-crossref")
                     .map(r -> r.getStartedAt() != null && r.getStartedAt().isAfter(cutoff))
                     .orElse(false);
-            if (!fresh) {
-                log.info("Startup backfill: Wikidata data stale (>2 days), refreshing party memberships / Q-IDs");
+            // The Wikipedia reach stats (lang-version count + pageviews) are new; force one refresh
+            // when they've never been populated, even if the last crossref run is otherwise fresh.
+            boolean statsMissing = !memberRepo.existsByWikipediaLangCountIsNotNull();
+            if (!fresh || statsMissing) {
+                log.info("Startup backfill: refreshing Wikidata (stale={}, wikipedia-stats-missing={})",
+                        !fresh, statsMissing);
                 wikidataImporter.runOnce();
             }
         } catch (Exception e) {

@@ -704,6 +704,8 @@
     "formerMpTooltip": "See isik ei ole enam praeguse Riigikogu liige. Tema varasemad hääletused ja eelnõud on endiselt kuvatud.",
     "wikipedia": "Vikipeedia",
     "wikipediaTooltip": "Vikipeedia artikkel selle saadiku kohta (CC BY-SA)",
+    "wikipediaLangs": "{{langs}} keeles",
+    "wikipediaViews": "{{views}} vaatamist (90 p)",
     "loadingVotes": "Hääletusajaloo laadimine…",
     "noVotes": "Registreeritud hääletusi veel pole.",
     "loadingBills": "Eelnõude laadimine…",
