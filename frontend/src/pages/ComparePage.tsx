@@ -5,10 +5,11 @@ import { Link, useSearchParams } from "react-router-dom";
 import { fetchFactions, fetchPoliticians } from "../api/politicians";
 import { fetchComparison, fetchFactionComparison } from "../api/comparisons";
 import { formatDate } from "../lib/formatDate";
+import { formatPercent } from "../lib/formatNumber";
 import LoadFailed from "../components/LoadFailed";
 
 function pct(rate: number | null | undefined): string {
-  return rate == null ? "—" : `${(rate * 100).toFixed(1)}%`;
+  return rate == null ? "—" : formatPercent(rate);
 }
 
 type Disagreement = {

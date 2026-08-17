@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MpDeviationsTimeline } from "../../api/analytics";
+import { formatDecimal } from "../../lib/formatNumber";
 
 /**
  * GitHub-style contribution heatmap of an MP's deviations from their faction's majority.
@@ -97,7 +98,7 @@ export default function DeviationsCalendar({ data }: { data: MpDeviationsTimelin
             {t("viz.deviations.summary", {
               dev: data.totalDeviations,
               elig: data.totalEligible,
-              pct: data.totalEligible === 0 ? "0" : (100 * data.totalDeviations / data.totalEligible).toFixed(1),
+              pct: data.totalEligible === 0 ? "0" : formatDecimal(100 * data.totalDeviations / data.totalEligible),
             })}
           </div>
         </div>

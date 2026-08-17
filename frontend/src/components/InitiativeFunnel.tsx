@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { InitiativeFunnel as FunnelData } from "../api/initiatives";
+import { formatPercentValue } from "../lib/formatNumber";
 
 // Step key -> where clicking that bar sends the reader.
 const STEP_TARGETS: Record<string, string> = {
@@ -77,7 +78,7 @@ export default function InitiativeFunnel({ data }: { data: FunnelData }) {
                     </span>
                     <span className="font-mono text-[11px] text-muted whitespace-nowrap">
                       <b className="font-display font-bold text-[16px] text-ink">{s.count.toLocaleString(i18n.resolvedLanguage)}</b>
-                      {s.shareOfTargeted != null && <span className="ml-1.5">{s.shareOfTargeted.toFixed(1)}%</span>}
+                      {s.shareOfTargeted != null && <span className="ml-1.5">{formatPercentValue(s.shareOfTargeted)}</span>}
                     </span>
                   </div>
                   <div className="h-7 sm:h-8 rounded-lg bg-off overflow-hidden">

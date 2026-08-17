@@ -18,10 +18,11 @@ import DeviationsCalendar from "../components/analytics/DeviationsCalendar";
 import SimilarPeers from "../components/analytics/SimilarPeers";
 import { fetchMpTopicRadar, fetchMpDeviationsTimeline, fetchMpSimilarPeers } from "../api/analytics";
 import { formatDate } from "../lib/formatDate";
+import { formatPercent } from "../lib/formatNumber";
 
 function pct(v: number | null): string {
   if (v == null) return "—";
-  return `${(v * 100).toFixed(1)}%`;
+  return formatPercent(v);
 }
 
 function ActivityStat({ value, label, hint }: { value: number; label: string; hint?: string }) {
@@ -767,7 +768,7 @@ export default function PoliticianProfilePage() {
           <h2 className="text-lg font-semibold text-ink mb-2">{t("sections.groupAlignment")}</h2>
           <div className="border border-slate-200 rounded-lg p-4">
             <p className="text-3xl font-semibold text-ink">
-              {data.groupAlignment.rate == null ? "—" : `${(data.groupAlignment.rate * 100).toFixed(1)}%`}
+              {data.groupAlignment.rate == null ? "—" : formatPercent(data.groupAlignment.rate)}
             </p>
             <p className="text-xs text-slate-500 mt-1">
               {t("profile.groupAlignmentDetail", { matches: data.groupAlignment.matches, eligible: data.groupAlignment.eligible })}

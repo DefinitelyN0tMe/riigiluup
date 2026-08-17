@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { NightVotes } from "../../api/analytics";
+import { formatDecimal } from "../../lib/formatNumber";
 
 /**
  * "Night votes" investigative log — votes started outside conventional working hours
@@ -15,7 +16,7 @@ export default function NightVotesLog({ data }: { data: NightVotes }) {
 
   const dayNames = [t("viz.timing.d1"), t("viz.timing.d2"), t("viz.timing.d3"), t("viz.timing.d4"),
                     t("viz.timing.d5"), t("viz.timing.d6"), t("viz.timing.d7")];
-  const nightPct = (data.nightRatio * 100).toFixed(1);
+  const nightPct = formatDecimal(data.nightRatio * 100);
   const openBucketFilter = (params: URLSearchParams) => navigate(`/votes?${params.toString()}`);
 
   return (

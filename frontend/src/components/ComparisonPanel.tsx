@@ -2,13 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchComparison } from "../api/comparisons";
 import { resolveMediaUrl } from "../api/client";
+import { formatPercent } from "../lib/formatNumber";
 import LoadFailed from "./LoadFailed";
 import AgreementBar from "./AgreementBar";
 import DisagreementsTimeline from "./analytics/DisagreementsTimeline";
 
 function pct(v: number | null): string {
   if (v == null) return "—";
-  return `${(v * 100).toFixed(1)}%`;
+  return formatPercent(v);
 }
 
 /**

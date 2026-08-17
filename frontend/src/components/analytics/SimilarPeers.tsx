@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { MpSimilarPeers, PeerAgreement } from "../../api/analytics";
+import { formatPercent } from "../../lib/formatNumber";
 
 export default function SimilarPeers({ data, currentSlug }: { data: MpSimilarPeers; currentSlug: string }) {
   const { t } = useTranslation();
@@ -57,7 +58,7 @@ function PeerList({
               </div>
               <div className="flex flex-col items-end gap-1 min-w-[80px]">
                 <div className={`font-display font-bold text-[18px] leading-none tracking-[-0.03em] ${rankColor}`}>
-                  {(p.agreementRate * 100).toFixed(0)}%
+                  {formatPercent(p.agreementRate, 0)}
                 </div>
                 <div className="w-20 h-1 rounded-full bg-off overflow-hidden">
                   <div className={`h-full ${barColor}`} style={{ width: `${p.agreementRate * 100}%` }} />

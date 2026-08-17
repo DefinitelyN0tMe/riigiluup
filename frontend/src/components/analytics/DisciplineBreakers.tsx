@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { DisciplineBreakers as Data } from "../../api/analytics";
 import { formatDate } from "../../lib/formatDate";
+import { formatDecimal } from "../../lib/formatNumber";
 
 export default function DisciplineBreakers({ data }: { data: Data }) {
   const { t } = useTranslation();
@@ -38,7 +39,7 @@ export default function DisciplineBreakers({ data }: { data: Data }) {
               <div className="col-start-2 md:col-start-auto flex flex-col items-end gap-1 min-w-0">
                 <div className="flex items-baseline gap-1.5">
                   <span className="font-display font-bold text-[22px] sm:text-[26px] leading-none tracking-[-0.03em] text-hot">
-                    {(it.deviationRate * 100).toFixed(1)}
+                    {formatDecimal(it.deviationRate * 100)}
                   </span>
                   <span className="font-serif italic text-[16px] text-muted">%</span>
                 </div>

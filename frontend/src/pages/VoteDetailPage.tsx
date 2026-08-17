@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchVoteDetail } from "../api/votes";
+import { formatDecimal } from "../lib/formatNumber";
 import VoteResultBar from "../components/VoteResultBar";
 import LoadFailed from "../components/LoadFailed";
 import VoteDefectorsPanel from "../components/analytics/VoteDefectorsPanel";
@@ -95,7 +96,7 @@ export default function VoteDetailPage() {
                 {margin >= 0 ? "+" : ""}{margin}
               </span>
               <span className="font-serif italic text-[16px] text-muted">
-                {t("pages.voteDetail.voteWord")} ({marginPct >= 0 ? "+" : ""}{marginPct.toFixed(1)}%)
+                {t("pages.voteDetail.voteWord")} ({marginPct >= 0 ? "+" : ""}{formatDecimal(marginPct)}%)
               </span>
             </div>
             <div className="mt-3 relative h-2 rounded-full bg-off overflow-hidden">

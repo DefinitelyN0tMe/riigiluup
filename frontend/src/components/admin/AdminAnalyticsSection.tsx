@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import { useTranslation } from "react-i18next";
 import { AdminUnauthorizedError, fetchAdminAnalytics } from "../../api/admin";
 import type { AdminAnalytics, AdminAnalyticsMetric } from "../../types";
+import { formatPercentValue } from "../../lib/formatNumber";
 
 type Range = "24h" | "7d" | "30d";
 const RANGES: Range[] = ["24h", "7d", "30d"];
@@ -23,7 +24,7 @@ function Delta({ metric }: { metric: AdminAnalyticsMetric | null }) {
   const up = pct > 0;
   return (
     <span className={`font-mono text-[11px] ${up ? "text-emerald-600" : "text-rose-600"}`}>
-      {up ? "▲" : "▼"} {Math.abs(pct).toFixed(0)}%
+      {up ? "▲" : "▼"} {formatPercentValue(Math.abs(pct), 0)}
     </span>
   );
 }

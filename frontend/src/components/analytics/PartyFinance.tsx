@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { PartyFinanceBoard } from "../../api/analytics";
+import { formatPercentValue } from "../../lib/formatNumber";
 
 // Fixed categorical colours for income sources (not parties).
 const SOURCE_COLORS: Record<string, string> = {
@@ -61,7 +62,7 @@ export default function PartyFinance({ data }: { data: PartyFinanceBoard }) {
                     <div
                       key={k}
                       style={{ width: `${w}%`, backgroundColor: SOURCE_COLORS[k] }}
-                      title={`${t(`viz.finance.source.${k}`)}: €${eurFull.format(amt)} (${w.toFixed(0)}%)`}
+                      title={`${t(`viz.finance.source.${k}`)}: €${eurFull.format(amt)} (${formatPercentValue(w, 0)})`}
                     />
                   );
                 })}
