@@ -150,8 +150,12 @@ public class InitiativeService {
                 i.getAuthors(),
                 i.getPhase() == null ? null : i.getPhase().slug(),
                 i.getSignatureCount(),
+                // Same rule as the detail view: the flat Riigikogu threshold applies only to national
+                // initiatives; local (KOV) ones use a residents-percentage the source doesn't give us.
+                PARLIAMENT.equals(i.getDestination()) ? PARLIAMENT_THRESHOLD : null,
                 i.getParliamentDecision() == null ? null : i.getParliamentDecision().slug(),
                 i.getSentToParliamentAt(),
+                i.getFinishedInParliamentAt(),
                 committeesOf(i.getId()),
                 sourceUrl(i.getExternalId()));
     }

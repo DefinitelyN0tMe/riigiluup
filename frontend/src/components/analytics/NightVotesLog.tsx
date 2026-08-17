@@ -2,13 +2,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { NightVotes } from "../../api/analytics";
 import { formatDecimal } from "../../lib/formatNumber";
+import { formatDateTime } from "../../lib/formatDate";
 
 /**
  * "Night votes" investigative log — votes started outside conventional working hours
  * (08:00–22:00 Europe/Tallinn) or on weekends. Shows overall metric + editorial list.
  */
 export default function NightVotesLog({ data }: { data: NightVotes }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   if (data.totalVotes === 0) {
     return <div className="text-muted font-mono text-sm">{t("viz.noData")}</div>;
@@ -106,10 +107,10 @@ export default function NightVotesLog({ data }: { data: NightVotes }) {
                       className="block p-4 sm:p-5 hover:bg-off transition-colors">
                   <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-1">
                     <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted">
-                      {it.startedAt ? new Date(it.startedAt).toLocaleString(i18n.resolvedLanguage, {
+                      {formatDateTime(it.startedAt, {
                         day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
                         timeZone: "Europe/Tallinn"
-                      }) : "—"}
+                      })}
                     </span>
                     <span className={`font-mono text-[9px] tracking-[0.16em] uppercase font-bold px-1.5 py-0.5 rounded ${it.lateNight ? "bg-hot text-white" : "bg-ink text-white"}`}>
                       {it.lateNight ? t("viz.nightVotes.tagLateNight") : t("viz.nightVotes.tagNight")}

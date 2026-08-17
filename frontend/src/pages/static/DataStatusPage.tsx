@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchDataStatus } from "../../api/politicians";
+import { formatDateTime } from "../../lib/formatDate";
+import LoadFailed from "../../components/LoadFailed";
 
 export default function DataStatusPage() {
-  const { t, i18n } = useTranslation();
-  const { data } = useQuery({ queryKey: ["data-status"], queryFn: fetchDataStatus });
+  const { t } = useTranslation();
+  const { data, isPending, isError, error } = useQuery({ queryKey: ["data-status"], queryFn: fetchDataStatus });
 
   return (
     <div className="max-w-[1200px] mx-auto w-full px-5 sm:px-8 md:px-10 py-8 sm:py-12">
@@ -40,12 +42,16 @@ export default function DataStatusPage() {
       </div>
 
       {/* Job table */}
-      {(!data || data.length === 0) ? (
+      {isError ? (
+        <LoadFailed error={error} />
+      ) : isPending ? (
+        <p className="font-mono text-sm text-muted">{t("common.loading")}</p>
+      ) : (!data || data.length === 0) ? (
         <p className="font-serif italic text-muted">{t("dataStatus.empty")}</p>
       ) : (
         <div className="overflow-x-auto no-scrollbar -mx-5 sm:mx-0 px-5 sm:px-0">
           <table className="w-full border border-rule rounded-[20px] overflow-hidden bg-white min-w-[720px]">
-            <caption className="sr-only">Latest ingestion job runs</caption>
+            <caption className="sr-only">{t("dataStatus.tableCaption")}</caption>
             <thead className="bg-off">
               <tr className="text-left font-mono text-[10px] tracking-[0.14em] uppercase text-muted">
                 <th scope="col" className="px-4 py-3 font-bold">{t("dataStatus.col.source")}</th>
@@ -63,9 +69,9 @@ export default function DataStatusPage() {
                     <td className="px-4 py-3 font-mono text-[11px] tracking-[0.06em]">{s.sourceName}</td>
                     <td className="px-4 py-3 font-medium">{s.jobName}</td>
                     <td className="px-4 py-3 font-mono text-[11px] text-muted">
-                      {s.lastRunAt ? new Date(s.lastRunAt).toLocaleString(i18n.resolvedLanguage, {
+                      {formatDateTime(s.lastRunAt, {
                         day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
-                      }) : "—"}
+                      })}
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1.5 font-mono text-[10px] tracking-[0.14em] uppercase font-bold ${success ? "text-live-deep" : "text-hot-deep"}`}>

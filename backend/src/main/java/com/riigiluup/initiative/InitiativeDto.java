@@ -25,8 +25,10 @@ public final class InitiativeDto {
             String authors,
             String phase,
             Integer signatureCount,
+            Integer threshold,
             String decision,
             Instant sentToParliamentAt,
+            Instant finishedInParliamentAt,
             List<CommitteeRef> committees,
             String sourceUrl
     ) {

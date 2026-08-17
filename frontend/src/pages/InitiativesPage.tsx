@@ -7,8 +7,6 @@ import SearchInput from "../components/SearchInput";
 import LoadFailed from "../components/LoadFailed";
 import { formatDate } from "../lib/formatDate";
 
-const SIGNATURE_THRESHOLD = 1000;
-
 const PHASE_CODES = ["", "edit", "sign", "parliament", "government", "done"] as const;
 const DECISION_CODES = [
   "",
@@ -44,17 +42,26 @@ function badgeClass(map: Record<string, string>, key: string | null): string {
   return map[key] ?? FALLBACK_BADGE_CLASS;
 }
 
-/** Signature count against the 1000-signature legal threshold, with a clear reached/not-reached indicator. */
-function SignatureMeter({ count }: { count: number | null }) {
+/** Signature count against the source-provided threshold, with a clear reached/not-reached indicator. */
+function SignatureMeter({ count, threshold }: { count: number | null; threshold: number | null }) {
   const { t, i18n } = useTranslation();
   const c = count ?? 0;
-  const reached = c >= SIGNATURE_THRESHOLD;
-  const pct = Math.min(100, (c / SIGNATURE_THRESHOLD) * 100);
+  // Local (KOV) initiatives use a residents-percentage threshold the source doesn't expose; without
+  // it we can't honestly draw a "reached" bar, so show the bare signature count instead of a flat 1000.
+  if (threshold == null) {
+    return (
+      <span className="font-mono text-[12px] font-bold tracking-[0.02em] whitespace-nowrap text-ink-2">
+        {c.toLocaleString(i18n.resolvedLanguage)}
+      </span>
+    );
+  }
+  const reached = c >= threshold;
+  const pct = Math.min(100, (c / threshold) * 100);
   return (
     <div
       className="flex items-center gap-2 shrink-0"
       role="img"
-      aria-label={t("initiatives.signatureProgress", { count: c, threshold: SIGNATURE_THRESHOLD })}
+      aria-label={t("initiatives.signatureProgress", { count: c, threshold })}
     >
       <div className="w-20 h-1.5 rounded-full bg-rule overflow-hidden">
         <div className={`h-full ${reached ? "bg-live-deep" : "bg-blue"}`} style={{ width: `${pct}%` }} />
@@ -63,7 +70,7 @@ function SignatureMeter({ count }: { count: number | null }) {
         className={`font-mono text-[12px] font-bold tracking-[0.02em] whitespace-nowrap ${reached ? "text-live-deep" : "text-ink-2"}`}
       >
         {c.toLocaleString(i18n.resolvedLanguage)}
-        <span className="text-muted font-normal"> / {SIGNATURE_THRESHOLD.toLocaleString(i18n.resolvedLanguage)}</span>
+        <span className="text-muted font-normal"> / {threshold.toLocaleString(i18n.resolvedLanguage)}</span>
       </span>
     </div>
   );
@@ -94,12 +101,18 @@ function InitiativeCard({ item }: { item: InitiativeListItem }) {
       </p>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <SignatureMeter count={item.signatureCount} />
-        {item.decision && (
+        <SignatureMeter count={item.signatureCount} threshold={item.threshold} />
+        {item.decision ? (
           <span className={`px-2 py-0.5 rounded text-xs font-medium ${badgeClass(DECISION_CLASS, item.decision)}`}>
             {t(`initiatives.decision.${item.decision}` as const, { defaultValue: item.decision })}
           </span>
-        )}
+        ) : item.finishedInParliamentAt ? (
+          // Concluded in parliament but the source carries no decision coding — mark it explicitly
+          // rather than leaving a blank, per the site's explicit-absence convention.
+          <span className="px-2 py-0.5 rounded text-xs font-medium bg-off text-muted border border-rule">
+            {t("initiatives.decision.missing")}
+          </span>
+        ) : null}
       </div>
 
       {item.committees.length > 0 && (

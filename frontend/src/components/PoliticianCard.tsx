@@ -2,16 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Politician } from "../types";
 import { resolveMediaUrl } from "../api/client";
-
-const PARTY_COLOR: Record<string, string> = {
-  "Eesti Reformierakonna fraktsioon": "#0072CE",
-  "Eesti Keskerakonna fraktsioon": "#003E7E",
-  "Eesti Konservatiivse Rahvaerakonna fraktsioon": "#0A0A0A",
-  "Isamaa fraktsioon": "#FFB020",
-  "Sotsiaaldemokraatliku Erakonna fraktsioon": "#FF4B3E",
-  "Eesti 200 fraktsioon": "#1EA98A",
-  "Fraktsiooni mittekuuluvad Riigikogu liikmed": "#94a3b8",
-};
+import { partyColor } from "../lib/partyColors";
 
 export default function PoliticianCard({
   p,
@@ -27,7 +18,7 @@ export default function PoliticianCard({
   const { t } = useTranslation();
   const initials = `${p.firstName?.[0] ?? ""}${p.lastName?.[0] ?? ""}`.toUpperCase();
   const photoSrc = resolveMediaUrl(p.photoUrl);
-  const color = PARTY_COLOR[p.factionName ?? ""] ?? "#94a3b8";
+  const color = partyColor(p.factionName);
   const canToggle = onToggleCompare && (!compareDisabled || compareActive);
   return (
     <Link

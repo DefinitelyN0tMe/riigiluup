@@ -1,5 +1,6 @@
 package com.riigiluup.election;
 
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.w3c.dom.Element;
@@ -26,7 +27,20 @@ public class ElectionResultsClient {
     private static final String RESULTS_URL_TEMPLATE =
             "https://opendata.valimised.ee/api/%s/RESULTS.xml";
 
-    private final RestClient rest = RestClient.builder().build();
+    // Bounded timeouts like every other HTTP client here: without them a hung socket to
+    // opendata.valimised.ee would park the startup-backfill daemon thread indefinitely.
+    private static final int CONNECT_TIMEOUT_MS = 5_000;
+    private static final int READ_TIMEOUT_MS = 30_000;
+    private final RestClient rest = RestClient.builder()
+            .requestFactory(timeoutRequestFactory())
+            .build();
+
+    private static SimpleClientHttpRequestFactory timeoutRequestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(CONNECT_TIMEOUT_MS);
+        factory.setReadTimeout(READ_TIMEOUT_MS);
+        return factory;
+    }
 
     /** Candidates of any published election (RK / EP / KOV) by its code, e.g. "EP_2024". */
     public List<ElectionCandidateDto> fetchResults(String electionCode) {

@@ -88,15 +88,20 @@ services:
       options:
         max-size: "20m"
         max-file: "5"
+    # Only wait for api to have STARTED, not be healthy: the static SPA must come up even when the
+    # API is degraded (bad migration, DB hiccup) so visitors get the shell + an "unavailable" state
+    # instead of a total outage. The SPA already degrades to empty/error states on fetch failure.
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started
 
   # Privacy-first analytics (no cookies, no personal data, self-hosted). Reuses the
   # existing Postgres (separate `umami` database) and is served on its own origin,
   # analytics.<domain>, via nginx (the prebuilt image only serves from the root path).
   umami:
-    image: ghcr.io/umami-software/umami:postgresql-latest
+    # Pinned by digest (postgresql-latest as of 2026-08-17) for reproducibility; a floating tag
+    # could silently swap in a breaking version on redeploy. Bump deliberately when upgrading.
+    image: ghcr.io/umami-software/umami@sha256:8edfe4beaef13f9d1300619fa264ef250a3688df9cc54d24ca830ca31cb475ec
     restart: unless-stopped
     mem_limit: 384m
     logging:
@@ -131,14 +136,17 @@ services:
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
       - letsencrypt:/etc/letsencrypt
       - certbot_webroot:/var/www/certbot
+    # The edge must never be gated on api health: nginx serves the ACME challenge path (cert
+    # renewal) and the static SPA, so if it waited for a healthy api a bad deploy would also take
+    # down TLS renewal and the shell. Proxy calls to a down api simply 502 until it recovers.
     depends_on:
-      api:
-        condition: service_healthy
       web:
         condition: service_started
 
   certbot:
-    image: certbot/certbot:latest
+    # Pinned by digest (certbot:latest as of 2026-08-17): a floating tag here is the highest-risk
+    # one - a breaking certbot change would silently stop TLS renewal. Bump deliberately.
+    image: certbot/certbot@sha256:34ee91d2f43008eb78a007d22f23ed4b2eaa9a454cb27ca2c042b49527a695b4
     entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
     restart: unless-stopped
     logging:

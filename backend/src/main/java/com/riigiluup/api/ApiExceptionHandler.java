@@ -41,8 +41,23 @@ public class ApiExceptionHandler {
             MissingServletRequestParameterException.class
     })
     public ResponseEntity<Map<String, Object>> badRequest(Exception ex, HttpServletRequest req) {
-        return body(HttpStatus.BAD_REQUEST, "bad_request",
-                ex.getMessage() == null ? "Invalid request" : ex.getMessage(), req);
+        return body(HttpStatus.BAD_REQUEST, "bad_request", sanitizeBadRequest(ex), req);
+    }
+
+    /**
+     * Keep useful hand-written validation messages, but never echo JVM-internal detail:
+     * a bad enum param (e.g. VoteEventType.valueOf("FOO")) throws "No enum constant
+     * com.riigiluup.vote.VoteEventType.FOO", and a type-mismatch names the target class.
+     */
+    private static String sanitizeBadRequest(Exception ex) {
+        if (ex instanceof MethodArgumentTypeMismatchException mm) {
+            return "Invalid value for parameter '" + mm.getName() + "'";
+        }
+        String msg = ex.getMessage();
+        if (msg == null || msg.startsWith("No enum constant")) {
+            return "Invalid value for a request parameter";
+        }
+        return msg;
     }
 
     /** Bean-validation failures on @RequestBody DTOs — condensed to field: message pairs. */

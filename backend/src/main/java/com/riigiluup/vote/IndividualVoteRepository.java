@@ -14,6 +14,9 @@ import java.util.UUID;
 
 public interface IndividualVoteRepository extends JpaRepository<IndividualVote, UUID> {
 
+    /** True once a voting's individual (roll-call) votes are stored — they are immutable thereafter. */
+    boolean existsByVoteEvent(VoteEvent event);
+
     /** Roll-call participation computed from our own ingested votes (robust, no live API call). */
     interface ParticipationAgg {
         long getTotal();

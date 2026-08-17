@@ -33,7 +33,11 @@ public class InitiativeController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return service.list(q, phase, decision, committee, page, Math.min(size, 100));
+        // Clamp both bounds like the other list controllers: a negative page/size becomes a
+        // negative SQL OFFSET/LIMIT and a raw 500 instead of a clean, cacheable response.
+        int safePage = Math.max(0, page);
+        int safeSize = Math.min(Math.max(1, size), 100);
+        return service.list(q, phase, decision, committee, safePage, safeSize);
     }
 
     @GetMapping("/{id}")

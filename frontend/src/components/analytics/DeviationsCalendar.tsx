@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { MpDeviationsTimeline } from "../../api/analytics";
 import { formatDecimal } from "../../lib/formatNumber";
+import { formatDate } from "../../lib/formatDate";
 
 /**
  * GitHub-style contribution heatmap of an MP's deviations from their faction's majority.
@@ -90,8 +91,8 @@ export default function DeviationsCalendar({ data }: { data: MpDeviationsTimelin
         <div>
           <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted">
             {t("viz.deviations.subtitle", {
-              from: new Date(data.rangeFrom).toLocaleDateString(i18n.resolvedLanguage, { month: "short", year: "2-digit" }),
-              to: new Date(data.rangeTo).toLocaleDateString(i18n.resolvedLanguage, { month: "short", year: "2-digit" }),
+              from: formatDate(data.rangeFrom, { month: "short", year: "2-digit" }),
+              to: formatDate(data.rangeTo, { month: "short", year: "2-digit" }),
             })}
           </div>
           <div className="font-serif italic text-[16px] text-ink-2 mt-1">
@@ -129,7 +130,7 @@ export default function DeviationsCalendar({ data }: { data: MpDeviationsTimelin
                 <g key={`${wi}-${di}`}>
                   {cell && (
                     <title>
-                      {new Date(cell.date + "T00:00:00Z").toLocaleDateString(i18n.resolvedLanguage, {
+                      {formatDate(cell.date + "T00:00:00Z", {
                         day: "2-digit", month: "long", year: "numeric",
                       })} · {cell.deviations}/{cell.eligible} {t("viz.deviations.tooltipUnit")}
                     </title>

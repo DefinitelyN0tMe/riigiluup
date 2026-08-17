@@ -945,6 +945,7 @@
       "done": "Finished"
     },
     "decision": {
+      "missing": "Decision code missing",
       "return": "Returned to submitters",
       "reject": "Rejected",
       "solve-differently": "Resolved by other means",
@@ -1426,6 +1427,7 @@
     "title": "Data freshness",
     "intro": "Riigiluup refreshes upstream Riigikogu data every 6 hours (03:05, 09:05, 15:05, 21:05 Europe/Tallinn). The table below lists the most recent successful runs of each ingestion job.",
     "empty": "No successful runs recorded yet.",
+    "tableCaption": "Latest ingestion job runs",
     "col": {
       "source": "Source",
       "job": "Job",

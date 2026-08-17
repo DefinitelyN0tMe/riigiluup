@@ -945,6 +945,7 @@
       "done": "Lõppenud"
     },
     "decision": {
+      "missing": "Otsuse kodeering puudub",
       "return": "Tagastatud esitajale",
       "reject": "Tagasi lükatud",
       "solve-differently": "Lahendatud muul viisil",
@@ -1426,6 +1427,7 @@
     "title": "Andmete värskus",
     "intro": "Riigiluup värskendab Riigikogu andmeid iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn). Alltoodud tabel loetleb iga sissetuleku töö viimased edukad käivitused.",
     "empty": "Edukaid käivitusi pole veel registreeritud.",
+    "tableCaption": "Viimased sissetuleku tööde käivitused",
     "col": {
       "source": "Allikas",
       "job": "Töö",

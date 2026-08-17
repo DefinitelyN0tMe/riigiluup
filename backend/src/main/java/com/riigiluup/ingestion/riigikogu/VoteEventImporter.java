@@ -154,6 +154,16 @@ public class VoteEventImporter {
                 .findBySourceNameAndExternalId(client.sourceName(), summary.uuid())
                 .orElse(null);
 
+        // Historical roll-call votes are immutable once recorded. If this voting's individual
+        // votes are already stored, skip the throttled detail re-fetch entirely. Otherwise every
+        // 6-hourly run re-fetches every voting in the (up to 90-day) window, so a single
+        // permanently-404ing voting — which keeps the run PARTIAL and pins the window wide — turns
+        // into a mass re-fetch storm against the source. A voting still missing its votes (new, or
+        // a prior failed fetch) falls through and is (re)tried as before.
+        if (existing != null && individualVoteRepo.existsByVoteEvent(existing)) {
+            return;
+        }
+
         SourceSnapshot summarySnap = snapshotForSummary(sitting, summary);
         if (existing == null) {
             existing = eventMapper.toEntity(summary, sitting);

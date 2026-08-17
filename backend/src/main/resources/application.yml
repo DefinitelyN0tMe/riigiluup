@@ -1,6 +1,12 @@
 spring:
   application:
     name: riigiluup
+  task:
+    scheduling:
+      # ~9 @Scheduled importers share the scheduler; the default pool of 1 serializes them, so a
+      # long catch-up import delays the later crons. A small pool lets spaced jobs run independently.
+      pool:
+        size: 3
   profiles:
     # Bare `./gradlew bootRun` (README dev flow) runs as local; compose and prod
     # deploys always pass SPRING_PROFILES_ACTIVE explicitly.

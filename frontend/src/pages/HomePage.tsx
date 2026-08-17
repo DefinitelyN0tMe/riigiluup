@@ -14,23 +14,8 @@ import PartyDonut from "../components/PartyDonut";
 import SectionHead from "../components/SectionHead";
 import MarqueeStrip from "../components/MarqueeStrip";
 import type { HomeSummary, Politician, VoteListItem } from "../types";
+import { partyColor } from "../lib/partyColors";
 
-const PARTY_COLOR: Record<string, string> = {
-  "Eesti Reformierakonna fraktsioon": "#0072CE",
-  "Eesti Keskerakonna fraktsioon": "#003E7E",
-  "Eesti Konservatiivse Rahvaerakonna fraktsioon": "#0A0A0A",
-  "Isamaa fraktsioon": "#FFB020",
-  "Sotsiaaldemokraatliku Erakonna fraktsioon": "#FF4B3E",
-  "Eesti 200 fraktsioon": "#1EA98A",
-  // The "unaffiliated MPs" group is not a party — give it a neutral grey, not the fallback blue
-  // (which would clash with Reform's blue on the parties chart).
-  "Fraktsiooni mittekuuluvad Riigikogu liikmed": "#94a3b8",
-};
-function partyColor(name?: string | null) {
-  // Neutral grey fallback so an unmapped/new faction never masquerades as Reform blue.
-  if (!name) return "#94a3b8";
-  return PARTY_COLOR[name] ?? "#94a3b8";
-}
 
 /** Deterministic rank for (slug, seed): a stable per-seed shuffle key (FNV-1a style). */
 function seededRank(slug: string, seed: number): number {

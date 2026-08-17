@@ -216,11 +216,16 @@ export default function InitiativeDetailPage() {
                 {data.finishedInParliamentAt
                   ? formatDate(data.finishedInParliamentAt)
                   : t("initiatives.timeline.noFinishDate", { defaultValue: "No finish date from the source" })}
-                {data.decision && (
+                {data.decision ? (
                   <span className="ml-2 inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-off text-ink-2 border border-rule">
                     {t(`initiatives.decision.${data.decision}` as const, { defaultValue: data.decision })}
                   </span>
-                )}
+                ) : data.finishedInParliamentAt ? (
+                  // Concluded but the source has no decision coding — state it explicitly, not blank.
+                  <span className="ml-2 inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-off text-muted border border-rule">
+                    {t("initiatives.decision.missing")}
+                  </span>
+                ) : null}
                 {data.sentToGovernmentAt && (
                   <div className="text-muted text-[12px] mt-1">
                     {t("initiatives.timeline.sentToGovernment", { defaultValue: "Sent to the Government" })}: {formatDate(data.sentToGovernmentAt)}

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { fetchDataStatus } from "../api/politicians";
+import { formatDateTime } from "../lib/formatDate";
 
 /**
  * Freshness for a specific dataset. `job` selects which import's status to show, so a page
@@ -9,11 +10,11 @@ import { fetchDataStatus } from "../api/politicians";
  * votes = every 6 h) rather than one shared row with a mismatched cadence label.
  */
 export default function DataFreshnessBadge({ job }: { job: string }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { data } = useQuery({ queryKey: ["data-status"], queryFn: fetchDataStatus });
   const row = (data ?? []).find((d) => d.jobName === job) ?? data?.[0];
   if (!row?.lastRunAt) return null;
-  const when = new Date(row.lastRunAt).toLocaleString(i18n.resolvedLanguage, {
+  const when = formatDateTime(row.lastRunAt, {
     day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
   const cadenceLabel = t(`freshness.cadence.${row.cadence}`, { defaultValue: t("freshness.cadence.GENERIC") });

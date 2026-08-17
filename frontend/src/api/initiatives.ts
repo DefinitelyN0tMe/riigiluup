@@ -14,8 +14,10 @@ export type InitiativeListItem = {
   authors: string | null;
   phase: string | null;
   signatureCount: number | null;
+  threshold: number | null;
   decision: string | null;
   sentToParliamentAt: string | null;
+  finishedInParliamentAt: string | null;
   committees: CommitteeRef[];
   sourceUrl: string;
 };

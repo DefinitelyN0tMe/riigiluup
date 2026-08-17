@@ -77,6 +77,7 @@ public class RahvaalgatusImporter {
                 .build());
         int seen = 0;
         int upserted = 0;
+        int failed = 0;
         try {
             String csv = client.fetchInitiativesCsv();
             List<RahvaalgatusCsvParser.Row> rows = RahvaalgatusCsvParser.parse(csv);
@@ -84,11 +85,23 @@ public class RahvaalgatusImporter {
             Map<String, UUID> committeeIdsByName = activeCommitteeIdsByName();
             for (RahvaalgatusCsvParser.Row row : rows) {
                 if (row.externalId() == null) continue;
-                tx.executeWithoutResult(status -> upsert(row, committeeIdsByName));
-                upserted++;
+                // Per-row isolation like the other importers: one malformed/constraint-violating
+                // row must not fail (and keep failing daily) the whole initiative refresh.
+                try {
+                    tx.executeWithoutResult(status -> upsert(row, committeeIdsByName));
+                    upserted++;
+                } catch (Exception e) {
+                    failed++;
+                    log.warn("failed rahvaalgatus row {}: {}", row.externalId(), e.toString());
+                }
             }
-            run.setStatus("SUCCESS");
-            log.info("imported {} rahvaalgatus initiatives", upserted);
+            if (failed > 0) {
+                run.setStatus("PARTIAL");
+                run.setErrorMessage(failed + " initiative row(s) failed and were skipped");
+            } else {
+                run.setStatus("SUCCESS");
+            }
+            log.info("imported {} rahvaalgatus initiatives ({} failed)", upserted, failed);
         } catch (Exception e) {
             log.error("rahvaalgatus import failed", e);
             run.setStatus("FAILED");

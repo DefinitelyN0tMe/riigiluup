@@ -83,6 +83,8 @@ public class AdminExternalAffiliationController {
             throw new IllegalArgumentException("validFrom is required");
         if (req.sourceUrl() == null || req.sourceUrl().isBlank())
             throw new IllegalArgumentException("sourceUrl is required");
+        if (!isHttpUrl(req.sourceUrl().trim()))
+            throw new IllegalArgumentException("sourceUrl must be an http(s) URL");
         if (req.sourceLabel() == null || req.sourceLabel().isBlank())
             throw new IllegalArgumentException("sourceLabel is required");
 
@@ -96,14 +98,28 @@ public class AdminExternalAffiliationController {
         e.setSourceLabel(req.sourceLabel().trim());
         e.setNote(nullIfBlank(req.note()));
 
+        // Default to a neutral curator label, never the principal name: under prod OIDC the
+        // principal name is the admin's Google email, and verifiedBy is surfaced on the PUBLIC
+        // MP profile. An admin who wants a specific attribution can pass verifiedBy explicitly.
         String verifier = nullIfBlank(req.verifiedBy());
-        if (verifier == null) verifier = principal == null ? "admin" : principal.getName();
+        if (verifier == null) verifier = "riigiluup-curator";
         e.setVerifiedBy(verifier);
         e.setVerifiedAt(req.verifiedAt() != null ? req.verifiedAt() : LocalDate.now());
     }
 
     private static String nullIfBlank(String s) {
         return (s == null || s.isBlank()) ? null : s.trim();
+    }
+
+    /** Accept only http/https URLs so a curator-entered source can't become a javascript: href. */
+    private static boolean isHttpUrl(String url) {
+        try {
+            String scheme = java.net.URI.create(url).getScheme();
+            return scheme != null
+                    && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private static AffiliationDto toDto(ExternalAffiliation e) {
