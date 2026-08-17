@@ -456,10 +456,23 @@ export default function PoliticianProfilePage() {
               {t("common.apiData")}
             </a>
             {(() => {
-              const wiki = i18n.resolvedLanguage === "et" ? data.wikipediaUrlEt
-                : i18n.resolvedLanguage === "ru" ? data.wikipediaUrlRu
-                : data.wikipediaUrlEn;
-              if (!wiki) return null;
+              // Prefer the viewer-language article, but fall back to any available one: an MP with
+              // only an Estonian article should still show a link (and NOT the "no article" marker)
+              // to a Russian/English reader.
+              const order = i18n.resolvedLanguage === "et"
+                ? [data.wikipediaUrlEt, data.wikipediaUrlEn, data.wikipediaUrlRu]
+                : i18n.resolvedLanguage === "ru"
+                  ? [data.wikipediaUrlRu, data.wikipediaUrlEt, data.wikipediaUrlEn]
+                  : [data.wikipediaUrlEn, data.wikipediaUrlEt, data.wikipediaUrlRu];
+              const wiki = order.find((u) => u != null) ?? null;
+              if (!wiki) {
+                // No article in any of et/en/ru: mark it explicitly so absence is legible, not blank.
+                return (
+                  <span className="text-muted text-xs">
+                    {t("profile.wikipediaNone", "No Wikipedia article")}
+                  </span>
+                );
+              }
               const langs = data.wikipediaLangCount;
               const views = data.wikipediaPageviews90d;
               return (

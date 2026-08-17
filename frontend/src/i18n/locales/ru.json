@@ -724,6 +724,7 @@
     "wikipediaTooltip": "Статья в Википедии об этом депутате (CC BY-SA)",
     "wikipediaLangs": "на {{langs}} языках",
     "wikipediaViews": "{{views}} просмотров (90 дн)",
+    "wikipediaNone": "Статьи в Википедии нет",
     "loadingVotes": "Загрузка истории голосований…",
     "noVotes": "Голосований пока нет.",
     "loadingBills": "Загрузка законопроектов…",

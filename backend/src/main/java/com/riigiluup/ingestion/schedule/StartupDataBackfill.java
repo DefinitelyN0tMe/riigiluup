@@ -104,7 +104,10 @@ public class StartupDataBackfill {
                     .orElse(false);
             // The Wikipedia reach stats (lang-version count + pageviews) are new; force one refresh
             // when they've never been populated, even if the last crossref run is otherwise fresh.
-            boolean statsMissing = !memberRepo.existsByWikipediaLangCountIsNotNull();
+            // "Populated" = EITHER column has a value, so a persistently-failing lang-count SPARQL
+            // (while pageviews succeed) can't wedge every boot into re-running the whole import.
+            boolean statsMissing = !memberRepo.existsByWikipediaLangCountIsNotNull()
+                    && !memberRepo.existsByWikipediaPageviews90dIsNotNull();
             if (!fresh || statsMissing) {
                 log.info("Startup backfill: refreshing Wikidata (stale={}, wikipedia-stats-missing={})",
                         !fresh, statsMissing);

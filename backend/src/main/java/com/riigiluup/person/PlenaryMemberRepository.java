@@ -27,6 +27,8 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
 
     boolean existsByWikipediaLangCountIsNotNull();
 
+    boolean existsByWikipediaPageviews90dIsNotNull();
+
     /** Active seats held by a faction — used to label the faction-comparison sides. */
     long countByActiveTrueAndFactionExternalId(String factionExternalId);
 

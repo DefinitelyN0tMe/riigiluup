@@ -96,7 +96,7 @@ export default function VoteDetailPage() {
                 {margin >= 0 ? "+" : ""}{margin}
               </span>
               <span className="font-serif italic text-[16px] text-muted">
-                {t("pages.voteDetail.voteWord")} ({marginPct >= 0 ? "+" : ""}{formatDecimal(marginPct)}%)
+                {t("pages.voteDetail.voteWord")} ({marginPct >= 0 ? "+" : "-"}{formatDecimal(Math.abs(marginPct))}%)
               </span>
             </div>
             <div className="mt-3 relative h-2 rounded-full bg-off overflow-hidden">

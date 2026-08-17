@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -157,11 +158,24 @@ public class WikidataImporter {
     private final TransactionTemplate tx;
     /** Known Estonian party QIDs; a P102 QID outside it is stored but flagged (see enrichParties). */
     private final Set<String> allowedPartyQids;
+    // Bounded timeouts like every other HTTP client here (RiigikoguClient et al.): without them a
+    // hung socket would wedge the backfill daemon thread forever. Read is generous (WDQS permits
+    // queries up to ~60s); the pageviews REST calls return in well under a second.
+    private static final int CONNECT_TIMEOUT_MS = 5_000;
+    private static final int READ_TIMEOUT_MS = 60_000;
     private final RestClient rest = RestClient.builder()
+            .requestFactory(timeoutRequestFactory())
             // Wikidata's UA policy: identify the client + contact so they can reach out.
             .defaultHeader(HttpHeaders.USER_AGENT, "riigiluup/0.1 (riigiluup@gmail.com)")
             .defaultHeader(HttpHeaders.ACCEPT, "application/sparql-results+json")
             .build();
+
+    private static SimpleClientHttpRequestFactory timeoutRequestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(CONNECT_TIMEOUT_MS);
+        factory.setReadTimeout(READ_TIMEOUT_MS);
+        return factory;
+    }
 
     public WikidataImporter(PlenaryMemberRepository memberRepo,
                             MpPartyMembershipRepository partyMembershipRepo,
@@ -448,16 +462,22 @@ public class WikidataImporter {
         for (int i = 0; i < all.size(); i += chunk) {
             List<String> sub = all.subList(i, Math.min(i + chunk, all.size()));
             String values = sub.stream().map(q -> "wd:" + q).collect(Collectors.joining(" "));
-            JsonNode result = fetchSparql(String.format(WP_COUNT_SPARQL_TEMPLATE, values));
-            if (result == null) continue;
-            for (JsonNode row : result.path("results").path("bindings")) {
-                String qUri = row.path("person").path("value").asText(null);
-                String cnt = row.path("cnt").path("value").asText(null);
-                if (qUri == null || cnt == null) continue;
-                String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
-                try {
-                    counts.put(qid, Integer.parseInt(cnt.trim()));
-                } catch (NumberFormatException ignored) { /* skip a non-numeric count */ }
+            try {
+                JsonNode result = fetchSparql(String.format(WP_COUNT_SPARQL_TEMPLATE, values));
+                if (result == null) continue;
+                for (JsonNode row : result.path("results").path("bindings")) {
+                    String qUri = row.path("person").path("value").asText(null);
+                    String cnt = row.path("cnt").path("value").asText(null);
+                    if (qUri == null || cnt == null) continue;
+                    String qid = qUri.substring(qUri.lastIndexOf('/') + 1);
+                    try {
+                        counts.put(qid, Integer.parseInt(cnt.trim()));
+                    } catch (NumberFormatException ignored) { /* skip a non-numeric count */ }
+                }
+            } catch (Exception e) {
+                // One chunk timing out (WDQS 504) must not discard the counts already collected.
+                log.warn("wikipedia lang-count chunk [{}..{}] skipped: {}",
+                        i, Math.min(i + chunk, all.size()), e.getMessage());
             }
         }
         return counts;

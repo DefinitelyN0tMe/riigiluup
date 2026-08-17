@@ -706,6 +706,7 @@
     "wikipediaTooltip": "Wikipedia article about this MP (CC BY-SA)",
     "wikipediaLangs": "in {{langs}} languages",
     "wikipediaViews": "{{views}} views (90d)",
+    "wikipediaNone": "No Wikipedia article",
     "loadingVotes": "Loading voting history…",
     "noVotes": "No recorded votes yet.",
     "loadingBills": "Loading bills…",

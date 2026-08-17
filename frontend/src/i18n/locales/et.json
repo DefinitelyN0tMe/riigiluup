@@ -706,6 +706,7 @@
     "wikipediaTooltip": "Vikipeedia artikkel selle saadiku kohta (CC BY-SA)",
     "wikipediaLangs": "{{langs}} keeles",
     "wikipediaViews": "{{views}} vaatamist (90 p)",
+    "wikipediaNone": "Vikipeedia artikkel puudub",
     "loadingVotes": "Hääletusajaloo laadimine…",
     "noVotes": "Registreeritud hääletusi veel pole.",
     "loadingBills": "Eelnõude laadimine…",
