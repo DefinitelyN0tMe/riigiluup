@@ -114,7 +114,10 @@ riigiluup:
         per-minute: 300
       - name: analytics
         pattern: "/api/v1/analytics/.*"
-        per-minute: 20
+        # The /analytics page fires ~15 of these in one burst on load, so a limit near that tripped
+        # 429s on a normal reload/second visit. Results are @Cacheable (repeat hits are cheap), so a
+        # generous per-IP ceiling (~8 full page loads/min) is safe and still bounds scraping.
+        per-minute: 120
       - name: default
         pattern: "/api/v1/(?!admin/).*"
         per-minute: 60
