@@ -51,8 +51,9 @@ fi
 CRON_BACKUP="5 4 * * * cd /opt/riigiluup/deploy && ./scripts/backup.sh >> /var/log/riigiluup-backup.log 2>&1"
 CRON_RENEW="0 3 * * 1 cd /opt/riigiluup/deploy && ./scripts/renew-cert.sh >> /var/log/riigiluup-cert.log 2>&1"
 CRON_PRUNE="30 4 * * 0 docker builder prune -f >> /var/log/riigiluup-prune.log 2>&1"
-( crontab -l 2>/dev/null | grep -Fv 'scripts/backup.sh' | grep -Fv 'scripts/renew-cert.sh' | grep -Fv 'docker builder prune'; \
-  echo "$CRON_BACKUP"; echo "$CRON_RENEW"; echo "$CRON_PRUNE" ) | crontab -
+CRON_DISK="0 */6 * * * /opt/riigiluup/deploy/scripts/disk-alert.sh 85 >> /var/log/riigiluup-disk.log 2>&1"
+( crontab -l 2>/dev/null | grep -Fv 'scripts/backup.sh' | grep -Fv 'scripts/renew-cert.sh' | grep -Fv 'docker builder prune' | grep -Fv 'scripts/disk-alert.sh'; \
+  echo "$CRON_BACKUP"; echo "$CRON_RENEW"; echo "$CRON_PRUNE"; echo "$CRON_DISK" ) | crontab -
 
 echo "Server ready. Next steps:"
 echo "  1. Fill /opt/riigiluup/.env with production secrets."
