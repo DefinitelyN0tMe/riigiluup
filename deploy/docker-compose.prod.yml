@@ -53,6 +53,9 @@ services:
       RIIGILUUP_ADMIN_ALLOWED_EMAILS: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS}
       GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID}
       GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET}
+      # Personal Telegram bot for ops alerts (import failures, startup). Blank = alerts disabled.
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_ALERT_CHAT_ID: ${TELEGRAM_ALERT_CHAT_ID:-}
       # Read-only access to the internal Umami instance so the admin panel can show analytics
       # without exposing the Umami dashboard publicly. Blank password/id = analytics disabled.
       UMAMI_INTERNAL_URL: http://umami:3000

@@ -34,6 +34,7 @@ public class DailyRefreshJob {
     private final com.riigiluup.oversight.OversightImporter oversightImporter;
     private final com.riigiluup.ingestion.riigikogu.ImportRunLogRepository runLogRepo;
     private final AnalyticsCacheEvictor cacheEvictor;
+    private final com.riigiluup.alert.TelegramAlertService alert;
 
     /**
      * Window start for a windowed refresh: normally {@code today - defaultDays}, but if the last
@@ -73,6 +74,7 @@ public class DailyRefreshJob {
             log.info("Votes refresh finished");
         } catch (Exception e) {
             log.error("Votes refresh failed", e);
+            alert.send("⚠️ RiigiLuup: hääletuste värskendus ebaõnnestus — " + e);
         } finally {
             running.set(false);
         }
@@ -117,6 +119,7 @@ public class DailyRefreshJob {
             log.info("Daily refresh finished");
         } catch (Exception e) {
             log.error("Daily refresh failed", e);
+            alert.send("⚠️ RiigiLuup: igapäevane värskendus ebaõnnestus — " + e);
         } finally {
             running.set(false);
         }
