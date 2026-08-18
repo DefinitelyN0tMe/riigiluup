@@ -1,12 +1,11 @@
 spring:
   application:
     name: riigiluup
-  task:
-    scheduling:
-      # ~9 @Scheduled importers share the scheduler; the default pool of 1 serializes them, so a
-      # long catch-up import delays the later crons. A small pool lets spaced jobs run independently.
-      pool:
-        size: 3
+  # NOTE: the scheduler pool is deliberately left at the default size 1. The @Scheduled importers
+  # rely on implicit serialization: refreshVotes/refreshDaily share one AtomicBoolean (a larger pool
+  # makes the 04:30 daily run SKIP for the day if 03:05 votes overruns), and several importers do
+  # read-modify-write on shared tables (plenary_member, legislative_item) with no @Version. Do not
+  # raise the pool without adding per-cron guards and optimistic locking first.
   profiles:
     # Bare `./gradlew bootRun` (README dev flow) runs as local; compose and prod
     # deploys always pass SPRING_PROFILES_ACTIVE explicitly.

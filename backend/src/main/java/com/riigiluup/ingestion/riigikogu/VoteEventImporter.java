@@ -20,6 +20,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.security.MessageDigest;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HexFormat;
@@ -154,13 +155,17 @@ public class VoteEventImporter {
                 .findBySourceNameAndExternalId(client.sourceName(), summary.uuid())
                 .orElse(null);
 
-        // Historical roll-call votes are immutable once recorded. If this voting's individual
-        // votes are already stored, skip the throttled detail re-fetch entirely. Otherwise every
-        // 6-hourly run re-fetches every voting in the (up to 90-day) window, so a single
-        // permanently-404ing voting — which keeps the run PARTIAL and pins the window wide — turns
-        // into a mass re-fetch storm against the source. A voting still missing its votes (new, or
-        // a prior failed fetch) falls through and is (re)tried as before.
-        if (existing != null && individualVoteRepo.existsByVoteEvent(existing)) {
+        // Skip the throttled detail re-fetch only for SETTLED votings: already-stored votes AND
+        // started more than 14 days ago. This keeps normal operation unchanged (the refresh window
+        // is 7 days, so recent votings are still re-fetched every run — picking up upstream roll-call
+        // corrections and late-materialised voters, and keeping fresh votes flowing), while stopping
+        // a permanently-404ing voting (which keeps the run PARTIAL and pins the window out to 90 days)
+        // from turning every 6-hourly run into a mass re-fetch storm over months of settled votings.
+        // A voting still missing its votes (new, or a prior failed fetch) falls through and is retried.
+        if (existing != null
+                && existing.getStartedAt() != null
+                && existing.getStartedAt().isBefore(Instant.now().minus(Duration.ofDays(14)))
+                && individualVoteRepo.existsByVoteEvent(existing)) {
             return;
         }
 
