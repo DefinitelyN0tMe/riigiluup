@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
@@ -205,22 +206,49 @@ function BillFilter({ onSelect }: { onSelect: (billId: string, billCode: string)
   const [query, setQuery] = useState("");
   const [suggest, setSuggest] = useState<LegislationListItem[]>([]);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1); // highlighted suggestion for keyboard nav
 
   useEffect(() => {
-    if (query.trim().length < 2) { setSuggest([]); return; }
+    if (query.trim().length < 2) { setSuggest([]); setActive(-1); return; }
     let cancelled = false;
     const timer = setTimeout(async () => {
       try {
         const res = await fetchLegislation({ q: query.trim(), size: 8 });
-        if (!cancelled) { setSuggest(res.items); setOpen(true); }
+        if (!cancelled) { setSuggest(res.items); setOpen(true); setActive(-1); }
       } catch { /* ignore */ }
     }, 200);
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
 
+  // Keep the highlighted option scrolled into view when arrowing past the visible area.
+  useEffect(() => {
+    if (active >= 0) document.getElementById(`bill-opt-${active}`)?.scrollIntoView({ block: "nearest" });
+  }, [active]);
+
   const codeOf = (b: LegislationListItem) =>
     b.mark != null && b.draftTypeCode ? `${b.mark} ${b.draftTypeCode}` : (b.title ?? "");
 
+  const choose = (b: LegislationListItem) => {
+    onSelect(b.id, codeOf(b));
+    setQuery(""); setSuggest([]); setOpen(false); setActive(-1);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!open && suggest.length > 0) { setOpen(true); return; }
+      setActive((i) => Math.min(i + 1, suggest.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      if (open && active >= 0 && active < suggest.length) { e.preventDefault(); choose(suggest[active]); }
+    } else if (e.key === "Escape") {
+      setOpen(false); setActive(-1);
+    }
+  };
+
+  const showList = open && suggest.length > 0;
   return (
     <div className="relative mt-3">
       <input
@@ -228,29 +256,39 @@ function BillFilter({ onSelect }: { onSelect: (billId: string, billCode: string)
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => suggest.length > 0 && setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={() => setOpen(false)}
+        onKeyDown={onKeyDown}
         placeholder={t("speeches.billFilterPlaceholder")}
         aria-label={t("speeches.billFilterPlaceholder")}
+        role="combobox"
+        aria-expanded={showList}
+        aria-controls="bill-filter-listbox"
+        aria-autocomplete="list"
+        aria-activedescendant={active >= 0 ? `bill-opt-${active}` : undefined}
         className="w-full sm:max-w-[560px] bg-white border border-rule rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue"
       />
-      {open && suggest.length > 0 && (
-        <ul className="absolute z-20 mt-1 w-full sm:max-w-[560px] bg-white border border-rule rounded-2xl shadow-lg overflow-hidden max-h-80 overflow-y-auto">
-          {suggest.map((b) => (
-            <li key={b.id}>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  onSelect(b.id, codeOf(b));
-                  setQuery(""); setSuggest([]); setOpen(false);
-                }}
-                className="w-full text-left px-4 py-2.5 hover:bg-off transition-colors"
-              >
-                <span className="font-mono text-[11px] text-blue tracking-[0.06em]">
-                  {b.mark != null && b.draftTypeCode ? `${b.mark} ${b.draftTypeCode}` : "—"}
-                </span>
-                <span className="block text-sm text-ink truncate">{b.title}</span>
-              </button>
+      {showList && (
+        <ul
+          id="bill-filter-listbox"
+          role="listbox"
+          aria-label={t("speeches.billFilterPlaceholder")}
+          className="absolute z-20 mt-1 w-full sm:max-w-[560px] bg-white border border-rule rounded-2xl shadow-lg overflow-hidden max-h-80 overflow-y-auto"
+        >
+          {suggest.map((b, i) => (
+            <li
+              key={b.id}
+              id={`bill-opt-${i}`}
+              role="option"
+              aria-selected={i === active}
+              onMouseDown={(e) => e.preventDefault()}
+              onMouseEnter={() => setActive(i)}
+              onClick={() => choose(b)}
+              className={`cursor-pointer px-4 py-2.5 transition-colors ${i === active ? "bg-off" : "hover:bg-off"}`}
+            >
+              <span className="font-mono text-[11px] text-blue tracking-[0.06em]">
+                {b.mark != null && b.draftTypeCode ? `${b.mark} ${b.draftTypeCode}` : "—"}
+              </span>
+              <span className="block text-sm text-ink truncate">{b.title}</span>
             </li>
           ))}
         </ul>
