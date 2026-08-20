@@ -21,3 +21,5 @@ Allow: /
 
 User-agent: *
 Disallow: /
+
+Sitemap: https://riigiluup.ee/sitemap.xml

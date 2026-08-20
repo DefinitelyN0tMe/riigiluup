@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Top-level routes only. Per-entity URLs (politicians/votes/legislation/initiatives/committees/
+     groups details) are generated from data at deploy time (see the sitemap-generation step). -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>/politicians</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>/votes</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>/legislation</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>/compare</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>/methodology</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>/methodology/participation</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>/methodology/alignment</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>/methodology/agreement</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>/sources</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
-  <url><loc>/about</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
-  <url><loc>/privacy</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
-  <url><loc>/terms</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
-  <url><loc>/corrections</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://riigiluup.ee/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://riigiluup.ee/politicians</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://riigiluup.ee/votes</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://riigiluup.ee/legislation</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://riigiluup.ee/initiatives</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://riigiluup.ee/committees</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://riigiluup.ee/groups</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://riigiluup.ee/speeches</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://riigiluup.ee/analytics</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://riigiluup.ee/compare</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://riigiluup.ee/data-status</loc><changefreq>daily</changefreq><priority>0.4</priority></url>
+  <url><loc>https://riigiluup.ee/methodology</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://riigiluup.ee/methodology/participation</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://riigiluup.ee/methodology/alignment</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://riigiluup.ee/methodology/agreement</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://riigiluup.ee/methodology/analytics</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://riigiluup.ee/sources</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://riigiluup.ee/about</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://riigiluup.ee/corrections</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://riigiluup.ee/privacy</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://riigiluup.ee/terms</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
 </urlset>
