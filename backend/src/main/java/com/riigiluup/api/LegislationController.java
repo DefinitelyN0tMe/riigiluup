@@ -54,7 +54,7 @@ public class LegislationController {
                 (q == null || q.isBlank()) ? null : q,
                 phaseParam, membership, topicEdid, minDays, maxDays,
                 (committee == null || committee.isBlank()) ? null : committee,
-                PageRequest.of(Math.min(Math.max(0, page), 10_000), Math.min(size, 100)));
+                PageRequest.of(Math.min(Math.max(0, page), 10_000), Math.min(Math.max(1, size), 100)));
         return PageResponse.of(p.map(mapper::toListItem));
     }
 

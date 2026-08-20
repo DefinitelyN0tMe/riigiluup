@@ -18,7 +18,7 @@ export default function MetricCard({ label, value, hint, sourceUrl }: Props) {
         href={sourceUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Source for ${label} (opens in new tab)`}
+        aria-label={`${t("common.sourceLink")} — ${label} (${t("a11y.opensNewTab")})`}
         className="text-xs text-estonia hover:underline mt-1 inline-block"
       >
         {t("common.sourceLink")}

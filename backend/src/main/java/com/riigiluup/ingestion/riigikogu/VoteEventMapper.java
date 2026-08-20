@@ -2,12 +2,16 @@ package com.riigiluup.ingestion.riigikogu;
 
 import com.riigiluup.vote.VoteEvent;
 import com.riigiluup.vote.VoteEventType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 
+@Slf4j
 @Component
 public class VoteEventMapper {
 
@@ -68,7 +72,21 @@ public class VoteEventMapper {
 
     private static Instant parseTs(String s) {
         if (s == null || s.isBlank()) return null;
-        try { return LocalDateTime.parse(s).atZone(SOURCE_ZONE).toInstant(); }
-        catch (Exception e) { return null; }
+        // Normal case: offset-less local Estonian wall-clock -> interpret in the source zone.
+        try {
+            return LocalDateTime.parse(s).atZone(SOURCE_ZONE).toInstant();
+        } catch (DateTimeParseException ignored) { /* fall through to offset-bearing forms */ }
+        // Defensive fallbacks so a reformatted/offset-bearing timestamp isn't silently dropped:
+        // a null started_at hides the vote from every analytics query AND (with no timestamp) it is
+        // re-fetched on every 6-hourly run forever (the >14-day settled-skip needs a non-null date).
+        try {
+            return OffsetDateTime.parse(s).toInstant();
+        } catch (DateTimeParseException ignored) { /* try a bare instant next */ }
+        try {
+            return Instant.parse(s);
+        } catch (DateTimeParseException e) {
+            log.warn("vote timestamp unparseable, storing null (vote will re-fetch each run): '{}'", s);
+            return null;
+        }
     }
 }

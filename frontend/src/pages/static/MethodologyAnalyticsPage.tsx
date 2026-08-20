@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import type React from "react";
 
 /**
@@ -79,7 +80,7 @@ export default function MethodologyAnalyticsPage({ embedded = false }: { embedde
       <h2>{t(`${K}.repro.heading`)}</h2>
       <p>
         {t(`${K}.repro.body`)}{" "}
-        <a href="/corrections" className="text-estonia hover:underline">/corrections</a>.
+        <Link to="/corrections" className="text-estonia hover:underline">/corrections</Link>.
       </p>
     </article>
   );

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 type Props = {
   index: string;   // "I.", "II." etc
@@ -25,11 +26,11 @@ export default function SectionHead({ index, kicker, title, more, onInk = false 
       </div>
       <div className={`hidden md:block border-t-2 ${ruleCls} self-end mb-4`} />
       {more && (
-        <a href={more.to}
+        <Link to={more.to}
            className={`justify-self-start md:justify-self-end inline-flex items-center gap-2.5 px-4 sm:px-5 py-2.5 sm:py-3 border-2 rounded-full font-bold text-[13px] sm:text-[14px] tracking-[-0.005em] transition-colors ${moreCls}`}>
           {more.label}
           <span className="w-5 h-5 rounded-full bg-ink text-white grid place-items-center font-mono text-[11px] rotate-[-45deg]">↑</span>
-        </a>
+        </Link>
       )}
     </div>
   );

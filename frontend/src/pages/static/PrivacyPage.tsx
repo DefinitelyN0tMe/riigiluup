@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 export default function PrivacyPage() {
   const { t } = useTranslation();
@@ -22,7 +23,7 @@ export default function PrivacyPage() {
       <h2>{t("privacy.rightHeading")}</h2>
       <p>
         {t("privacy.rightBody1")}
-        <a href="/corrections" className="text-estonia hover:underline">{t("footer.corrections")}</a>
+        <Link to="/corrections" className="text-estonia hover:underline">{t("footer.corrections")}</Link>
         {t("privacy.rightBody2")}
       </p>
       <h2>{t("privacy.photosHeading")}</h2>

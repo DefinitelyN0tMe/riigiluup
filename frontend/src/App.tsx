@@ -40,6 +40,7 @@ const TITLE_KEYS: Array<[string, string]> = [
   ["/legislation", "nav.bills"],
   ["/initiatives", "nav.initiatives"],
   ["/committees", "nav.committees"],
+  ["/groups", "nav.groups"],
   ["/speeches", "nav.speeches"],
   ["/analytics", "nav.analytics"],
   ["/compare", "nav.compare"],

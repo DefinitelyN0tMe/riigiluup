@@ -38,7 +38,7 @@ public class PoliticianLegislationController {
         if (m == null) return ResponseEntity.notFound().build();
         long count = sponsorshipRepo.countByPlenaryMember(m);
         Page<LegislativeItem> p = sponsorshipRepo.findItemsSponsoredByMember(
-                m, PageRequest.of(page, Math.min(size, 100)));
+                m, PageRequest.of(Math.max(0, page), Math.min(Math.max(1, size), 100)));
         return ResponseEntity.ok(new Response(
                 (int) count,
                 PageResponse.of(p.map(mapper::toListItem))

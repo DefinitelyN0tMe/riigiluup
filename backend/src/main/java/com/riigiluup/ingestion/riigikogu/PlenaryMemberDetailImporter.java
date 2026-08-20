@@ -330,7 +330,10 @@ public class PlenaryMemberDetailImporter {
         java.util.Map<String, com.riigiluup.person.MpPressActivity> rows = new java.util.LinkedHashMap<>();
         for (PlenaryMemberDetailDto.PressEntry p : dto.press()) {
             if (p == null || p.description() == null || p.description().isBlank()) continue;
-            String url = truncate(p.url(), 1024);
+            // Scheme-validate: this URL is rendered as an <a href> on the public profile, so a
+            // javascript:/data: value from the source feed must never reach the DB (every other
+            // externally-sourced href here is validated; this was the lone gap).
+            String url = httpUrlOrNull(truncate(p.url(), 1024));
             rows.put(p.description() + "|" + (url == null ? "" : url),
                     com.riigiluup.person.MpPressActivity.builder()
                             .memberExternalId(memberExternalId)
@@ -347,6 +350,18 @@ public class PlenaryMemberDetailImporter {
     private static String truncate(String s, int max) {
         if (s == null) return null;
         return s.length() <= max ? s : s.substring(0, max);
+    }
+
+    /** Keep only http/https URLs (rendered later as an href); null out anything else. */
+    private static String httpUrlOrNull(String url) {
+        if (url == null || url.isBlank()) return null;
+        try {
+            String scheme = java.net.URI.create(url.trim()).getScheme();
+            return scheme != null && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))
+                    ? url.trim() : null;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static java.time.LocalDate parseDate(String iso) {
