@@ -13,6 +13,10 @@ import java.util.UUID;
 
 public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
 
+    /** All vote ids for the sitemap. */
+    @org.springframework.data.jpa.repository.Query("select v.id from VoteEvent v")
+    java.util.List<java.util.UUID> findAllIdsForSitemap();
+
     Optional<VoteEvent> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     /** Vote events since a given instant — drives the homepage "+N this week" delta. */

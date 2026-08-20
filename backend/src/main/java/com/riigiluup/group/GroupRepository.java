@@ -7,6 +7,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GroupRepository extends JpaRepository<Group, UUID> {
+
+    /** (externalId, type) of active groups with a detail page, for the sitemap. */
+    @org.springframework.data.jpa.repository.Query("select g.externalId, g.type from Group g where g.active = true and g.externalId is not null and g.type in :types")
+    java.util.List<Object[]> findExternalIdAndTypeForSitemap(@org.springframework.data.repository.query.Param("types") java.util.Collection<GroupType> types);
     Optional<Group> findBySourceNameAndExternalId(String sourceName, String externalId);
     List<Group> findByTypeAndActiveTrueOrderByName(GroupType type);
     Optional<Group> findByExternalIdAndTypeAndActiveTrue(String externalId, GroupType type);

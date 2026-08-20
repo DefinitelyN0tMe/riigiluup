@@ -10,6 +10,10 @@ import java.util.UUID;
 
 public interface InitiativeRepository extends JpaRepository<Initiative, Long> {
 
+    /** All initiative ids for the sitemap. */
+    @org.springframework.data.jpa.repository.Query("select i.id from Initiative i")
+    java.util.List<Long> findAllIdsForSitemap();
+
     Optional<Initiative> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     /** Reverse link for the bill page: "this act started as a citizen initiative". */

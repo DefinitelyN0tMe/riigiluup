@@ -12,6 +12,10 @@ import java.util.UUID;
 
 public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UUID> {
 
+    /** All slugs for the sitemap. */
+    @org.springframework.data.jpa.repository.Query("select m.slug from PlenaryMember m where m.slug is not null")
+    java.util.List<String> findAllSlugsForSitemap();
+
     Optional<PlenaryMember> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     Optional<PlenaryMember> findBySlug(String slug);

@@ -12,6 +12,10 @@ import java.util.UUID;
 
 public interface LegislativeItemRepository extends JpaRepository<LegislativeItem, UUID> {
 
+    /** All legislative-item ids for the sitemap. */
+    @org.springframework.data.jpa.repository.Query("select i.id from LegislativeItem i")
+    java.util.List<java.util.UUID> findAllIdsForSitemap();
+
     Optional<LegislativeItem> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     /** Bills still under proceeding (not yet adopted/rejected/withdrawn) — homepage "in progress" delta. */
