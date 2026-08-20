@@ -1123,7 +1123,7 @@
         "sourceUrl": "Source URL",
         "sourceLabel": "Source label",
         "verifiedBy": "Verified by",
-        "verifiedByHint": "defaults to signed-in user",
+        "verifiedByHint": "defaults to riigiluup-curator",
         "verifiedAt": "Verified on",
         "note": "Note"
       }

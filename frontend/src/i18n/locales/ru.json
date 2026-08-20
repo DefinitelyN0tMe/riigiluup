@@ -1165,7 +1165,7 @@
         "sourceUrl": "URL источника",
         "sourceLabel": "Подпись источника",
         "verifiedBy": "Проверил",
-        "verifiedByHint": "по умолчанию — вошедший пользователь",
+        "verifiedByHint": "по умолчанию — riigiluup-curator",
         "verifiedAt": "Дата проверки",
         "note": "Заметка"
       }

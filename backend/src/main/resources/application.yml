@@ -170,7 +170,9 @@ riigiluup:
   admin:
     username: ${RIIGILUUP_ADMIN_USERNAME:admin}
     password: ${RIIGILUUP_ADMIN_PASSWORD:change-me}
-    allowed-emails: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS:riigiluup@gmail.com}
+    # Default empty = fail closed (no admin allowed) if the env var is unset; prod sets it in .env.
+    # Never bake a personal email into the committed default (leaks PII once the repo is public).
+    allowed-emails: ${RIIGILUUP_ADMIN_ALLOWED_EMAILS:}
 
 ---
 spring:

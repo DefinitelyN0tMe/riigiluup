@@ -1123,7 +1123,7 @@
         "sourceUrl": "Allika URL",
         "sourceLabel": "Allika kirjeldus",
         "verifiedBy": "Kontrollis",
-        "verifiedByHint": "vaikimisi sisselogitud kasutaja",
+        "verifiedByHint": "vaikimisi riigiluup-curator",
         "verifiedAt": "Kontrolli kuupäev",
         "note": "Märkus"
       }
