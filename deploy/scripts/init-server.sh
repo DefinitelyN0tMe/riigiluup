@@ -55,6 +55,10 @@ CRON_DISK="0 */6 * * * /opt/riigiluup/deploy/scripts/disk-alert.sh 85 >> /var/lo
 ( crontab -l 2>/dev/null | grep -Fv 'scripts/backup.sh' | grep -Fv 'scripts/renew-cert.sh' | grep -Fv 'docker builder prune' | grep -Fv 'scripts/disk-alert.sh'; \
   echo "$CRON_BACKUP"; echo "$CRON_RENEW"; echo "$CRON_PRUNE"; echo "$CRON_DISK" ) | crontab -
 
+# 8. Rotate the cron-appended logs so they can't grow unbounded.
+cp /opt/riigiluup/deploy/logrotate/riigiluup /etc/logrotate.d/riigiluup 2>/dev/null \
+  || echo "  (logrotate config not installed — copy deploy/logrotate/riigiluup to /etc/logrotate.d/ manually)"
+
 echo "Server ready. Next steps:"
 echo "  1. Fill /opt/riigiluup/.env with production secrets."
 echo "  2. Bring the stack up:  cd /opt/riigiluup && docker compose -f docker-compose.prod.yml up -d"

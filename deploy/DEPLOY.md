@@ -154,13 +154,38 @@ curl -u beta:<beta-pass> -u admin:<admin-pass> -X POST \
 - **TLS renewal:** `deploy/scripts/renew-cert.sh` runs weekly via cron.
 - **Update the app:** `git pull` in `/opt/riigiluup`, then
   `docker compose -f deploy/docker-compose.prod.yml up -d --build`. The database
-  volume is preserved; Flyway applies any new migrations on start.
+  volume is preserved; Flyway applies any new migrations on start. **After the api
+  container is recreated, reload nginx** (`docker exec deploy-nginx-1 nginx -s reload`)
+  so it re-resolves the upstream — otherwise a new api IP yields 502.
+- **Monitoring / alerts:** a personal Telegram bot pings on api startup and on any
+  import failure; `disk-alert.sh` (cron) warns at >85% disk; `backup.sh` verifies each
+  dump and alerts on failure. An external UptimeRobot check on `/healthz` alerts (and
+  watches TLS) even if the whole box is down. `docker builder prune -f` runs weekly to
+  keep build cache from filling the disk.
+
+## Rollback / incident response
+
+If a deploy breaks the site (api boot-loops on a bad migration, a bad build, etc.):
+
+1. **Diagnose:** `docker compose -f deploy/docker-compose.prod.yml logs --tail=100 api`
+   (Flyway/boot errors), `docker ps` (health), `curl -s https://<domain>/healthz`
+   (`{"status":"UP"}` = api + DB alive).
+2. **Roll back the code:** on the server, `cd /opt/riigiluup && git checkout <previous-good-sha>`
+   then `docker compose -f deploy/docker-compose.prod.yml up -d --build`, then reload
+   nginx. The web/nginx edge is decoupled from api health, so the static SPA and TLS
+   renewal stay up even while the api is down — visitors get a degraded shell, not a blank page.
+3. **A bad migration can't be auto-reverted.** Either fix-forward (add a corrective
+   migration) and redeploy, or restore the last good dump: `deploy/scripts/restore.sh
+   backups/<dump>` then redeploy the prior code. Flyway is forward-only; never hand-edit
+   `flyway_schema_history`.
+4. **Disk full / OOM:** `df -h /` + `docker system df`; `docker builder prune -f` frees
+   build cache. Both disk >85% and OOM surface via the alerts above.
 
 ## Security posture (built in)
 
 - `prod` refuses to start with default/blank DB or admin passwords, or without OIDC.
 - Admin panel: Google OIDC + email allow-list; per-IP rate limits (default 60/min,
-  files 300/min, analytics 20/min); file proxy bounded by a semaphore.
+  files 300/min, analytics 120/min); file proxy bounded by a semaphore.
 - nginx: TLS 1.2/1.3, HSTS, strict CSP, anti-clickjacking, `server_tokens off`,
   actuator reduced to `/health`. The API port is not published outside the Docker
   network — nginx is the only ingress.

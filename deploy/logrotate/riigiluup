@@ -1,0 +1,11 @@
+# Rotate the cron-appended logs (backup / cert / disk / prune) so they can't grow unbounded on a
+# months-unattended box. Install to /etc/logrotate.d/riigiluup (init-server.sh does this).
+/var/log/riigiluup-*.log {
+    weekly
+    rotate 8
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}
