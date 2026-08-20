@@ -52,7 +52,10 @@ CRON_BACKUP="5 4 * * * cd /opt/riigiluup/deploy && ./scripts/backup.sh >> /var/l
 CRON_RENEW="0 3 * * 1 cd /opt/riigiluup/deploy && ./scripts/renew-cert.sh >> /var/log/riigiluup-cert.log 2>&1"
 CRON_PRUNE="30 4 * * 0 docker builder prune -f >> /var/log/riigiluup-prune.log 2>&1"
 CRON_DISK="0 */6 * * * /opt/riigiluup/deploy/scripts/disk-alert.sh 85 >> /var/log/riigiluup-disk.log 2>&1"
-( crontab -l 2>/dev/null | grep -Fv 'scripts/backup.sh' | grep -Fv 'scripts/renew-cert.sh' | grep -Fv 'docker builder prune' | grep -Fv 'scripts/disk-alert.sh'; \
+# `|| true`: grep -Fv exits 1 when it filters out ALL lines (empty crontab on a fresh box, or a
+# crontab holding only these managed lines). Under `set -euo pipefail` that would abort the subshell
+# BEFORE the echoes and pipe an empty stream to `crontab -` — wiping the crontab / installing nothing.
+( { crontab -l 2>/dev/null | grep -Fv 'scripts/backup.sh' | grep -Fv 'scripts/renew-cert.sh' | grep -Fv 'docker builder prune' | grep -Fv 'scripts/disk-alert.sh' || true; }; \
   echo "$CRON_BACKUP"; echo "$CRON_RENEW"; echo "$CRON_PRUNE"; echo "$CRON_DISK" ) | crontab -
 
 # 8. Rotate the cron-appended logs so they can't grow unbounded.

@@ -110,6 +110,15 @@ public class OgShellController {
             if (bytes != null) {
                 String fetched = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
                 if (fetched.contains("<html")) {
+                    // Drift guard: if index.html's title/description/og:url literals ever change
+                    // (e.g. a brand-casing edit), the replace()s below would silently no-op and every
+                    // shared card would go generic with no error. Make that loud instead.
+                    if (!fetched.contains(BASE_TITLE) || !fetched.contains(BASE_DESC)
+                            || !fetched.contains(OG_URL_TAG)) {
+                        log.warn("og-shell: base index.html no longer contains an expected literal "
+                                + "(title/desc/og:url) — per-entity rewrite will no-op; update the "
+                                + "BASE_TITLE / BASE_DESC / OG_URL_TAG constants to match index.html");
+                    }
                     cachedShell = fetched;
                     cachedAt = now;
                     return fetched;
