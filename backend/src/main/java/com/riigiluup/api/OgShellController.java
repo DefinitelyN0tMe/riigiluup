@@ -103,11 +103,17 @@ public class OgShellController {
         String c = cachedShell;
         if (c != null && now - cachedAt < 300_000L) return c;
         try {
-            String fetched = web.get().uri("http://web:80/index.html").retrieve().body(String.class);
-            if (fetched != null && fetched.contains("<html")) {
-                cachedShell = fetched;
-                cachedAt = now;
-                return fetched;
+            // Fetch bytes and decode UTF-8 explicitly: the web response has no charset in its
+            // Content-Type, so RestClient would default to ISO-8859-1 and mangle the em-dash / ä in
+            // the tags we match on, so the replace() would silently no-op.
+            byte[] bytes = web.get().uri("http://web:80/index.html").retrieve().body(byte[].class);
+            if (bytes != null) {
+                String fetched = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+                if (fetched.contains("<html")) {
+                    cachedShell = fetched;
+                    cachedAt = now;
+                    return fetched;
+                }
             }
         } catch (Exception e) {
             log.warn("og-shell: base index.html fetch failed: {}", e.getMessage());
