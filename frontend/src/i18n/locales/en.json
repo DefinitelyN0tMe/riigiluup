@@ -150,6 +150,7 @@
     "searchNote": "Search matches exact word forms in the original language of the speech (mostly Estonian). Speeches by the chair, ministers and guests appear under the name printed in the stenogram."
   },
   "analytics": {
+    "sourcePrefix": "Source",
     "hero": {
       "kicker": "Analytics · Riigikogu mirror",
       "titlePre": "Who is ",
@@ -1297,7 +1298,7 @@
       },
       "discipline": {
         "heading": "MPs who break ranks",
-        "body": "For each MP we count how often they voted against their own faction's majority, out of all the votes where their faction had a clear position. A higher share means they broke ranks more often. MPs with very few such votes are left out so the ranking isn't based on one or two cases."
+        "body": "For each MP we count how often they voted against their own faction's majority, out of all the votes where their faction had a clear position. A higher share means they broke ranks more often. MPs with very few such votes are left out so the ranking isn't based on one or two cases. If an MP switched factions during the term, the rate spans the whole term and is measured against whichever faction they were in at each vote, though the table shows them under their current one."
       },
       "attendance": {
         "heading": "Presence at checks",

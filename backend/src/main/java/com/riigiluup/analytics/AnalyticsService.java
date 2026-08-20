@@ -21,6 +21,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
  * Queries prefer native SQL where PostgreSQL date-part / bulk-aggregation is significantly faster
  * than JPQL; otherwise JPQL with typed Tuples.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -328,7 +330,14 @@ public class AnalyticsService {
                 byBucket.merge(bucketOf(r.getCategoryId()), r.getAmount().longValue(), Long::sum);
             }
             long total = byBucket.values().stream().mapToLong(Long::longValue).sum();
-            if (total <= 0) continue;
+            if (total <= 0) {
+                // No ERJK rows matched this parliamentary party by name-substring. Don't show a
+                // misleading "€0"; but log it so the drop isn't silent — a name-mapping gap here
+                // would otherwise make a party vanish from the finance board unnoticed.
+                log.warn("party-finance: no ERJK match for party '{}' (>= {}); omitted from board",
+                        p.getFullName(), FINANCE_SINCE_YEAR);
+                continue;
+            }
 
             List<AnalyticsDto.FinanceBucket> buckets = byBucket.entrySet().stream()
                     .map(e -> new AnalyticsDto.FinanceBucket(e.getKey(), e.getValue()))

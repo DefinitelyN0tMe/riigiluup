@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import {
   fetchAttendanceMatrix, fetchBillFlow, fetchBillVelocity, fetchCoSponsorship,
   fetchDisciplineBreakers, fetchElections, fetchFactionAgreement, fetchHighlights, fetchMemberActivity,
@@ -36,12 +37,18 @@ function Failed({ err }: { err: unknown }) {
   return <div className="text-hot-deep font-mono text-sm py-6" role="alert">{message}</div>;
 }
 function Section({
-  index, kicker, title, children, note,
-}: { index: string; kicker: string; title: ReactNode; children: ReactNode; note?: string }) {
+  index, kicker, title, children, note, source,
+}: { index: string; kicker: string; title: ReactNode; children: ReactNode; note?: string; source?: string }) {
+  const { t } = useTranslation();
   return (
     <section className="px-5 sm:px-8 md:px-10 py-10 sm:py-14 md:py-16 border-b border-rule">
       <SectionHead index={index} kicker={kicker} title={title} />
-      {note && <p className="font-serif italic text-[16px] sm:text-[18px] text-ink-2 max-w-[64ch] mb-8 sm:mb-10">{note}</p>}
+      {note && <p className={`font-serif italic text-[16px] sm:text-[18px] text-ink-2 max-w-[64ch] ${source ? "mb-2" : "mb-8 sm:mb-10"}`}>{note}</p>}
+      {source && (
+        <p className="font-mono text-[11px] tracking-[0.06em] text-muted mb-8 sm:mb-10">
+          {t("analytics.sourcePrefix")}: <Link to="/sources" className="text-blue hover:underline">{source}</Link>
+        </p>
+      )}
       {children}
     </section>
   );
@@ -206,6 +213,7 @@ export default function AnalyticsPage() {
         index="XI." kicker={t("analytics.sec.activity.kicker")}
         title={<>{t("analytics.sec.activity.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.activity.titleEm")}</span>{t("analytics.sec.activity.titlePost")}</>}
         note={t("analytics.sec.activity.note")}
+        source="Riigikogu stenogrammid"
       >
         {activity.isLoading ? <Loading /> : activity.error ? <Failed err={activity.error} /> :
           activity.data && <ActiveMembers data={activity.data} />}
@@ -215,6 +223,7 @@ export default function AnalyticsPage() {
         index="XII." kicker={t("analytics.sec.elections.kicker")}
         title={<>{t("analytics.sec.elections.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.elections.titleEm")}</span>{t("analytics.sec.elections.titlePost")}</>}
         note={t("analytics.sec.elections.note")}
+        source="valimised.ee"
       >
         {elections.isLoading ? <Loading /> : elections.error ? <Failed err={elections.error} /> :
           elections.data && <ElectionLeaders data={elections.data} />}
@@ -224,6 +233,7 @@ export default function AnalyticsPage() {
         index="XIII." kicker={t("analytics.sec.finance.kicker")}
         title={<>{t("analytics.sec.finance.titlePre")}<span className="font-serif italic font-light text-blue">{t("analytics.sec.finance.titleEm")}</span>{t("analytics.sec.finance.titlePost")}</>}
         note={t("analytics.sec.finance.note")}
+        source="ERJK"
       >
         {finance.isLoading ? <Loading /> : finance.error ? <Failed err={finance.error} /> :
           finance.data && <PartyFinance data={finance.data} />}

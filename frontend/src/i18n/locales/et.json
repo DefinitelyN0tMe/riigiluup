@@ -150,6 +150,7 @@
     "searchNote": "Otsing leiab täpsed sõnavormid kõne originaalkeeles (peamiselt eesti). Istungi juhataja, ministrite ja külaliste sõnavõtud kuvatakse stenogrammis trükitud nime all."
   },
   "analytics": {
+    "sourcePrefix": "Allikas",
     "hero": {
       "kicker": "Analüütika · Riigikogu peegel",
       "titlePre": "Kes on ",
@@ -1297,7 +1298,7 @@
       },
       "discipline": {
         "heading": "Saadikud, kes lähevad fraktsioonist lahku",
-        "body": "Iga saadiku puhul loeme, kui sageli ta hääletas oma fraktsiooni enamuse vastu — kõigist hääletustest, kus tema fraktsioonil oli selge seisukoht. Mida suurem osakaal, seda sagedamini ta läks omadele vastu. Saadikud, kellel on väga vähe selliseid hääletusi, jäetakse välja, et edetabel ei põhineks ühel-kahel juhtumil."
+        "body": "Iga saadiku puhul loeme, kui sageli ta hääletas oma fraktsiooni enamuse vastu — kõigist hääletustest, kus tema fraktsioonil oli selge seisukoht. Mida suurem osakaal, seda sagedamini ta läks omadele vastu. Saadikud, kellel on väga vähe selliseid hääletusi, jäetakse välja, et edetabel ei põhineks ühel-kahel juhtumil. Kui saadik on ametiaja jooksul fraktsiooni vahetanud, hõlmab määr kogu ametiaega ja on iga hääletuse puhul arvutatud tema tollase fraktsiooni suhtes, ehkki tabelis kuvatakse ta praeguse fraktsiooni all."
       },
       "attendance": {
         "heading": "Kohalolek kontrollidel",
