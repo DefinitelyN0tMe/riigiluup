@@ -112,9 +112,13 @@ export default function NightVotesLog({ data }: { data: NightVotes }) {
                         timeZone: "Europe/Tallinn"
                       })}
                     </span>
-                    <span className={`font-mono text-[9px] tracking-[0.16em] uppercase font-bold px-1.5 py-0.5 rounded ${it.lateNight ? "bg-hot text-white" : "bg-ink text-white"}`}>
-                      {it.lateNight ? t("viz.nightVotes.tagLateNight") : t("viz.nightVotes.tagNight")}
-                    </span>
+                    {(it.hourOfDay < data.windowStartHour || it.hourOfDay >= data.windowEndHour) && (
+                      // Only a genuine off-hours vote gets the "night" tag; a weekend DAYTIME vote is
+                      // in the list too but must not be mislabelled "night" — its weekend tag suffices.
+                      <span className={`font-mono text-[9px] tracking-[0.16em] uppercase font-bold px-1.5 py-0.5 rounded ${it.lateNight ? "bg-hot text-white" : "bg-ink text-white"}`}>
+                        {it.lateNight ? t("viz.nightVotes.tagLateNight") : t("viz.nightVotes.tagNight")}
+                      </span>
+                    )}
                     {it.weekend && (
                       <span className="font-mono text-[9px] tracking-[0.16em] uppercase font-bold px-1.5 py-0.5 rounded bg-amber text-ink">
                         {t("viz.nightVotes.tagWeekend")}

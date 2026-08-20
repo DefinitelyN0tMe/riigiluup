@@ -634,7 +634,11 @@ public class AnalyticsService {
                 .toList();
 
         int total = days.size();
-        int median = total == 0 ? 0 : days.get(total / 2);
+        // True median: average the two central values for an even sample (was the upper-middle one,
+        // marginally overstating the "half faster / half slower" claim on small/even samples).
+        int median = total == 0 ? 0
+                : (total % 2 == 1 ? days.get(total / 2)
+                                  : (days.get(total / 2 - 1) + days.get(total / 2)) / 2);
         int p90 = total == 0 ? 0 : days.get(Math.min(total - 1, (int) Math.floor(total * 0.9)));
         int fastest = total == 0 ? 0 : days.get(0);
         int slowest = total == 0 ? 0 : days.get(total - 1);
@@ -749,6 +753,11 @@ public class AnalyticsService {
                 double rate = totalComparable == 0 ? 0.5 : matches / (matches + d);
                 y = 2 * rate - 1;
             }
+            // Minimum-sample floor (same >=10 as the similar-peers metric): without it a no-data or
+            // barely-seated MP defaults to x=0 / y=0 and lands at the crosshair centre, reading as an
+            // authoritative "centrist" the data cannot support. Excluded MPs are listed in the
+            // methodology exclusions.
+            if (totalComparable < 10) continue;
             // Small deterministic jitter to prevent stacking
             double jitterX = deterministicJitter(m.getSlug(), 1);
             double jitterY = deterministicJitter(m.getSlug(), 2);

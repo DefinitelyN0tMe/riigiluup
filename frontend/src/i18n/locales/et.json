@@ -227,7 +227,7 @@
         "titlePre": "Kus ",
         "titleEm": "iga saadik",
         "titlePost": " paikneb",
-        "note": "X-telg: kui palju saadik hääletab koalitsiooniga (+1) vs opositsiooniga (−1). Y-telg: kui lojaalne on oma fraktsioonile (+1) või dissident (−1). Väärtused arvutatud tegelikest hääletustest, mitte deklaratiivsest positsioonist."
+        "note": "X-telg: kui palju saadik hääletab koalitsiooniga (+1) vs opositsiooniga (−1). Y-telg: kui lojaalne on oma fraktsioonile (+1) või dissident (−1). Väärtused arvutatud tegelikest hääletustest, mitte deklaratiivsest positsioonist. Liiga väheste võrreldavate hääletustega saadikud (nt äsja ametisse asunud asendajad) jäetakse kaardilt välja."
       },
       "cospons": {
         "kicker": "Reaalne koostöö",
@@ -473,7 +473,7 @@
         "total": "Nimelisi hääli kokku",
         "totalHint": "Kõik registreeritud nimelised hääletused.",
         "night": "Öised",
-        "nightHint": "{{pct}}% väljaspool tööaega või nädalavahetusel.",
+        "nightHint": "{{pct}}% väljaspool tavapärast tööaega.",
         "weekend": "Nädalavahetusel",
         "weekendHint": "Laupäeval või pühapäeval toimunud hääled.",
         "late": "Süvaöised",

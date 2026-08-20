@@ -227,7 +227,7 @@
         "titlePre": "Where ",
         "titleEm": "each MP",
         "titlePost": " sits",
-        "note": "X-axis: how much the MP votes with the coalition (+1) vs opposition (−1). Y-axis: how loyal to their faction (+1) or dissident (−1). Values computed from actual votes, not declared position."
+        "note": "X-axis: how much the MP votes with the coalition (+1) vs opposition (−1). Y-axis: how loyal to their faction (+1) or dissident (−1). Values computed from actual votes, not declared position. MPs with too few comparable votes (e.g. just-seated substitutes) are left off the chart."
       },
       "cospons": {
         "kicker": "Real collaboration",
@@ -473,7 +473,7 @@
         "total": "Named votes total",
         "totalHint": "All recorded named votes.",
         "night": "Night",
-        "nightHint": "{{pct}}% outside working hours or on weekends.",
+        "nightHint": "{{pct}}% outside normal working hours.",
         "weekend": "Weekend",
         "weekendHint": "Held on Saturday or Sunday.",
         "late": "Late-night",
