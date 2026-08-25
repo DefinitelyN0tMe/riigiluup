@@ -11,6 +11,7 @@
   ![Spring Boot 3.3](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F)
   ![React 18](https://img.shields.io/badge/React-18-61DAFB)
   ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791)
+  ![Licence EUPL-1.2](https://img.shields.io/badge/Licence-EUPL--1.2-blue)
   [![CI](https://github.com/DefinitelyN0tMe/riigiluup/actions/workflows/ci.yml/badge.svg)](https://github.com/DefinitelyN0tMe/riigiluup/actions/workflows/ci.yml)
 </div>
 
@@ -22,27 +23,30 @@
 
 For every member of parliament you can see:
 
-- 🗳️ **How they voted** — every roll-call vote, including the times they broke with their own faction
-- 📜 **What they proposed** — bills sponsored and where each one is in the legislative pipeline
-- 🎤 **What they said** — full-text searchable plenary speeches (100k+ and counting)
-- 🏛️ **Where they sit** — committees, factions, and party membership history (cross-referenced with Wikidata)
-- 💶 **Who funds their party** — political party financing from the ERJK register
+- 🗳️ **How they voted** — every roll-call vote, including the times they broke with their own faction; close and late-night votes are flagged
+- 📜 **What they proposed** — bills sponsored and where each one sits in the legislative pipeline, with amendments and links to the acts they became
+- 🎤 **What they said** — full-text searchable plenary speeches (100k+ and counting), linked to the bill under debate
+- 🏛️ **Where they sit** — committees, factions, party-membership history, plus friendship groups and delegations
+- 🗺️ **Where they ran** — full electoral history (Riigikogu since 1992, plus recent European and local elections) with personal-vote results
+- ✉️ **How ministers answer them** — written questions and interpellations, with each minister's response time measured against the legal deadline (who answers, who stalls)
+- 🌍 **How widely they are known** — linked Wikidata item and Wikipedia reach (article languages + 90-day pageviews)
+- 💶 **Who funds their party** — political-party financing from the ERJK register
 - ⚖️ **Side-by-side comparison** — pick any two MPs and compare their voting records directly
 
-Plus an analytics section: voting similarity between MPs, faction discipline, attendance patterns, the citizens' initiative funnel, and more. Everything is available in **Estonian, English, and Russian**.
+Plus an analytics section: voting similarity between MPs, faction discipline and deviations, attendance patterns, ministerial response latency, topic breakdowns, co-sponsorship networks, legislative velocity, the citizens' initiative funnel, and more. Everything is available in **Estonian, English, and Russian**.
 
-No accounts, no tracking, no paywall — just public data presented honestly. Where numbers are shown, they link back to the underlying votes so you can check the work.
+No accounts, no tracking, no paywall — just public data presented honestly. Where numbers are shown, they link back to the underlying votes so you can check the work, and every derived metric has a stated methodology.
 
 ## Data sources
 
 | Source | What we take from it |
 |---|---|
-| [api.riigikogu.ee](https://api.riigikogu.ee) | MPs, factions, committees, bills, votes, stenograms (CC BY-SA 3.0) |
-| [Wikidata](https://www.wikidata.org) | Party membership history (P102), biographies |
+| [api.riigikogu.ee](https://api.riigikogu.ee) | MPs, factions, committees, bills, amendments, votes, stenograms, written questions & interpellations (CC BY-SA 3.0) |
+| [Wikidata](https://www.wikidata.org) + Wikipedia | Party-membership history (P102), biographies, article reach (languages + pageviews); we also report data gaps back to the community |
 | [rahvaalgatus.ee](https://rahvaalgatus.ee) | Citizens' initiatives and their parliamentary journey |
 | [Riigi Teataja](https://www.riigiteataja.ee) | Links from passed bills to the acts they became |
-| valimised.ee | Election results |
-| ERJK | Party financing reports |
+| valimised.ee + [M. Mölder dataset](https://www.eestipoliitika.ee) | Election results, and historical candidate / electoral history from 1992 onward |
+| ERJK | Party-financing reports |
 
 Importers are polite by design: requests to the parliament API are throttled to ~1 rps, raw payloads are snapshotted with change-detection, and every import run is journaled.
 
@@ -54,7 +58,7 @@ Importers are polite by design: requests to the parliament API are throttled to 
 
 **Backend** — Java 21, Spring Boot 3.3, PostgreSQL 16, Flyway, Caffeine cache, Resilience4j (retry + circuit breaker around upstream APIs).
 **Frontend** — React 18, TypeScript (strict), Vite, Tailwind CSS, TanStack Query, i18next. Visualisations are hand-rolled SVG — no chart libraries.
-**Ops** — Docker Compose, nginx (TLS, CSP, rate limiting), GitHub Actions CI.
+**Ops** — Docker Compose, nginx (TLS, CSP, rate limiting, per-entity social-preview injection), self-hosted Umami analytics (cookieless), GitHub Actions CI.
 
 ### Architecture in one diagram
 
@@ -65,6 +69,7 @@ flowchart LR
         WD[Wikidata SPARQL]
         RA[rahvaalgatus.ee]
         RT[Riigi Teataja]
+        EL[valimised + historical]
     end
     subgraph Backend["Spring Boot API"]
         IMP[Importers<br/>throttled + journaled] --> SNAP[(source_snapshot<br/>SHA-256 change detection)]
@@ -75,7 +80,11 @@ flowchart LR
     Upstream --> IMP
 ```
 
-Backend packages follow **package-by-feature** (`person`, `vote`, `legislation`, `speech`, `committee`, `initiative`, `analytics`, `ingestion`, `admin`, …). Importers upsert by natural key, run per-item transactions, and survive partial upstream failures; a resumable orchestrator (`/api/v1/admin/backfill/full`) seeds the full history in dependency order.
+Backend packages follow **package-by-feature** (`person`, `vote`, `legislation`, `speech`, `committee`, `initiative`, `oversight`, `question`, `activity`, `analytics`, `ingestion`, `admin`, …). Importers upsert by natural key, run per-item transactions, and survive partial upstream failures; a resumable orchestrator (`/api/v1/admin/backfill/full`) seeds the full history in dependency order.
+
+### Reuse for other parliaments
+
+Riigiluup is wired to Estonian sources today, but the design keeps that seam explicit: importers are per-source and per-feature, the domain layer is source-agnostic, and every figure carries its provenance. Adapting the toolkit to another parliament that publishes open data (for example the Polish Sejm, which exposes a comparable API) is a data-integration effort against that seam rather than a rewrite. Generalising this into a documented, country-agnostic adapter layer plus a public read API is active work.
 
 ### Run it locally
 
@@ -117,9 +126,10 @@ HTTP clients are tested against WireMock; repositories against a real Postgres v
 
 - Admin panel: Google OIDC with an email allow-list; HTTP Basic exists as a dev/staging fallback only. **In the `prod` profile the app refuses to start without OIDC configured, with a default admin password, or with a default database password.**
 - All native SQL is parameterised; ingested HTML (biographies) is sanitised with jsoup before storage.
-- Per-IP rate limiting behind nginx (`X-Real-IP`), strict CSP, HSTS, actuator reduced to `/actuator/health` by default.
+- Per-IP rate limiting behind nginx (`X-Real-IP`), strict CSP, HSTS, self-hosted fonts (no third-party requests), actuator reduced to `/actuator/health` by default.
+- Privacy by default: self-hosted, cookieless analytics; IP-anonymised access logs; no third-party trackers.
 
-### Deployment
+### Deployment & operations
 
 Production configuration lives in `deploy/`: hardened nginx, TLS issuance/renewal scripts, backups, and a server bootstrap script (`init-server.sh` — ufw, fail2ban, Docker). Copy `deploy/.env.production.example` to `.env` and set at minimum:
 
@@ -133,12 +143,14 @@ RIIGILUUP_ADMIN_ALLOWED_EMAILS=you@example.com
 
 Then `docker compose -f docker-compose.prod.yml up -d`. A site-wide private-beta gate (nginx basic auth + `noindex`) is available for pre-launch testing.
 
+Serving extras handled at the edge: a dynamically generated `/sitemap.xml` (per-entity URLs), per-entity social-preview cards for crawlers, and `Organization` + `WebSite` JSON-LD. Operations are watched by a container health check (`/healthz`), a Docker autoheal sidecar, an external uptime monitor, and Telegram alerts on failed refreshes or a full disk.
+
 ### Project layout
 
 ```
 backend/    Spring Boot API — importers, domain, analytics, admin
 frontend/   React SPA — pages, components, i18n (et/en/ru)
-deploy/     production compose, nginx, TLS & backup scripts
+deploy/     production compose, nginx, TLS & backup scripts, alerts
 .github/    CI: unit + integration tests, frontend build, bundle report
 ```
 
@@ -146,6 +158,9 @@ deploy/     production compose, nginx, TLS & backup scripts
 
 Issues and pull requests are welcome. The short version: keep the fast test suite green (`./gradlew test`), match the surrounding code style, and be kind to the upstream APIs — they are a shared resource.
 
-## Data licence
+## Licence
 
-Parliamentary data © Riigikogu, republished under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). This project displays and aggregates it with attribution; verify anything important against the primary sources linked throughout the UI.
+- **Code** — [European Union Public Licence v1.2 (EUPL-1.2)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12), a copyleft licence with network coverage, available in all official EU languages. See [`LICENSE`](LICENSE).
+- **Data** — Parliamentary data © Riigikogu, republished under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Historical electoral data © Martin Mölder ([eestipoliitika.ee](https://www.eestipoliitika.ee), collected with support from the Postimees Foundation grant POST36), used with permission and attribution.
+
+This project displays and aggregates public data with attribution; verify anything important against the primary sources linked throughout the UI.
