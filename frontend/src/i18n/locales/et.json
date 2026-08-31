@@ -459,7 +459,7 @@
       "overlap": "kattuvat häält"
     },
     "defectors": {
-      "title": "Fraktsioonidisitspliin selles hääletuses",
+      "title": "Fraktsioonidistsipliin selles hääletuses",
       "subtitle": "Kes läks vastu oma fraktsiooni enamusele",
       "noDefectors": "Ükski fraktsioon ei näinud kõrvalekaldeid — kõik hääletasid oma rühma enamusega.",
       "majorityChose": "Enamus valis",
@@ -1354,7 +1354,7 @@
   },
   "sources": {
     "title": "Andmeallikad",
-    "intro": "Kõik poliitilised andmed Riigiluup's on imporditud Riigikogu ametlikest avaandmetest. Midagi ei krablita, ei toimetata ega osteta.",
+    "intro": "Kõik poliitilised andmed Riigiluup's on imporditud Riigikogu ametlikest avaandmetest. Midagi ei kraabita, ei toimetata ega osteta.",
     "primary": "Peamine allikas",
     "primaryPre": "Riigikogu avaandmete API aadressil ",
     "primaryMid": " (OpenAPI spetsifikatsioon aadressil ",
@@ -1486,7 +1486,7 @@
     "step3": "Allika link kontrollimiseks.",
     "buttonExplainerA": "Allolev nupp ",
     "buttonExplainerB": "Saada parandus",
-    "buttonExplainerC": " avab teie meiliklindi eeltäidetud mallis.",
+    "buttonExplainerC": " avab teie meilikliendi eeltäidetud mallis.",
     "sendButton": "Saada parandus",
     "whatWeDoHeading": "Mida me teeme",
     "whatWeDo": "Iga usaldusväärse teate vaatab hoidja üle 7 päeva jooksul. Kui probleem on Riigiluup enda esituses, parandatakse see ja avaldatakse. Kui probleem on ülesvoolu Riigikogu andmetes, edastame selle Riigikogu andmemeeskonnale ja märgime teate sellel lehel.",
