@@ -158,7 +158,7 @@
       "titlePost": " kellega",
       "lede": "Visualisatsioonid ainult avaandmete peal. Iga arv on jälgitav Riigikogu vormini. Ei arvamust, ei pingerida — ainult see, mida hääletused, kohalolekud ja eelnõud ise ütlevad.",
       "toc1": "Partei × partei",
-      "toc2": "Kes murrab reeglit",
+      "toc2": "Kõrvalekalded fraktsioonist",
       "toc3": "Eelnõude vool",
       "toc4": "Kohalolek",
       "toc5": "Millal hääletatakse",
@@ -175,17 +175,17 @@
     },
     "sec": {
       "agreement": {
-        "kicker": "Alliansid ja rivaalid",
+        "kicker": "Fraktsioonide kokkulangevus",
         "titlePre": "Kes ",
         "titleEm": "kellega",
         "titlePost": " hääletab",
-        "note": "Iga ruut näitab, kui tihti kaks fraktsiooni jõudsid samale enamuse otsusele. Diagonaal on iseendale võrreldes — alati 100%. Andmed vaid nimelistelt hääletustelt, kus mõlemal parteil oli selge enamus."
+        "note": "Iga ruut näitab, kui tihti kaks fraktsiooni jõudsid samale enamuse otsusele. Diagonaal on iseendale võrreldes — alati 100%. Andmed vaid nimelistelt hääletustelt, kus mõlemal fraktsioonil oli selge enamus."
       },
       "discipline": {
-        "kicker": "Parteidistsipliini murdjad",
-        "titlePre": "Kes ",
-        "titleEm": "ei kuula",
-        "titlePost": " fraktsiooni",
+        "kicker": "Kõrvalekalded fraktsiooni joonest",
+        "titlePre": "Kes hääletab ",
+        "titleEm": "erinevalt",
+        "titlePost": " oma fraktsioonist",
         "note": "Top-24 saadikut, kes on kõige sagedamini hääletanud vastupidiselt oma fraktsiooni selge enamuse valikule. Nimelised hääletused, kus fraktsioonil oli tegelik enamus."
       },
       "flow": {
@@ -207,7 +207,7 @@
         "titlePre": "Töö ",
         "titleEm": "rütm",
         "titlePost": "",
-        "note": "7 nädalapäeva × 24 tundi. Tumesinine = tipphõive. Kell hilja hääletamine on erakorraline ja väärib küsimist."
+        "note": "7 nädalapäeva × 24 tundi. Tumesinine = tipphõive. Kell hilja hääletamine on erakorraline."
       },
       "topics": {
         "kicker": "Millega parlament tegeleb",

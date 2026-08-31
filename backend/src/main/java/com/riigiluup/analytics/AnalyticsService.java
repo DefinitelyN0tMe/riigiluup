@@ -80,7 +80,9 @@ public class AnalyticsService {
      * ============================================================ */
     @Cacheable("analytics-faction-agreement")
     public AnalyticsDto.FactionAgreementMatrix factionAgreement(Instant from, Instant to) {
-        List<Group> factions = activeFactions();
+        List<Group> factions = activeFactions().stream()
+                .filter(g -> !isNonAffiliatedGroup(g.getName()))
+                .toList();
         int n = factions.size();
         Map<String, Integer> idx = new HashMap<>();
         for (int i = 0; i < n; i++) idx.put(factions.get(i).getExternalId(), i);
@@ -190,6 +192,7 @@ public class AnalyticsService {
                     double rate = elig == 0 ? 0 : (double) devs / (double) elig;
                     return new Row(m, (int) devs, (int) elig, rate);
                 })
+                .filter(r -> !isNonAffiliatedGroup(r.m.getFactionName()))
                 .sorted(Comparator.<Row>comparingDouble(r -> -r.rate).thenComparingInt(r -> -r.devs))
                 .limit(limit)
                 .toList();
@@ -1279,6 +1282,11 @@ public class AnalyticsService {
         if (s.contains("Isamaa")) return "Isamaa";
         if (s.contains("Eesti 200") || s.contains("E200")) return "Eesti 200";
         return s;
+    }
+
+    /** True for the non-attached-members pseudo-group (Fraktsiooni mittekuuluvad ...): no whip, no single line. */
+    private static boolean isNonAffiliatedGroup(String name) {
+        return name != null && name.toLowerCase().contains("mittekuuluv");
     }
 
     private static double deterministicJitter(String seed, int salt) {

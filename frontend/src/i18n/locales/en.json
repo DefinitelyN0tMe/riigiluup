@@ -158,7 +158,7 @@
       "titlePost": " with whom",
       "lede": "Visualizations built purely on open data. Every number is traceable to a Riigikogu form. No opinion, no ranking — only what the votes, attendance and bills themselves say.",
       "toc1": "Party × party",
-      "toc2": "Discipline breakers",
+      "toc2": "Faction deviations",
       "toc3": "Bill flow",
       "toc4": "Attendance",
       "toc5": "When they vote",
@@ -175,17 +175,17 @@
     },
     "sec": {
       "agreement": {
-        "kicker": "Alliances and rivals",
+        "kicker": "Faction agreement",
         "titlePre": "Who votes ",
         "titleEm": "with whom",
         "titlePost": "",
-        "note": "Each cell shows how often two factions reached the same majority choice. The diagonal is self-comparison — always 100%. Data only from named votes where both parties had a clear majority."
+        "note": "Each cell shows how often two factions reached the same majority choice. The diagonal is self-comparison — always 100%. Data only from named votes where both factions had a clear majority."
       },
       "discipline": {
-        "kicker": "Discipline breakers",
-        "titlePre": "Who ",
-        "titleEm": "ignores",
-        "titlePost": " the faction",
+        "kicker": "Faction deviations",
+        "titlePre": "Who votes ",
+        "titleEm": "differently",
+        "titlePost": " from their faction",
         "note": "Top-24 MPs who most often voted against their faction's clear majority choice. Named votes where the faction had an actual majority."
       },
       "flow": {
@@ -207,7 +207,7 @@
         "titlePre": "The ",
         "titleEm": "rhythm",
         "titlePost": " of work",
-        "note": "7 weekdays × 24 hours. Dark blue = peak activity. Late-night voting is exceptional and worth asking about."
+        "note": "7 weekdays × 24 hours. Dark blue = peak activity. Late-night voting is exceptional."
       },
       "topics": {
         "kicker": "What parliament works on",
