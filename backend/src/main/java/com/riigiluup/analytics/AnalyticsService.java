@@ -192,7 +192,7 @@ public class AnalyticsService {
                     double rate = elig == 0 ? 0 : (double) devs / (double) elig;
                     return new Row(m, (int) devs, (int) elig, rate);
                 })
-                .filter(r -> !isNonAffiliatedGroup(r.m.getFactionName()))
+                .filter(r -> r.m.isActive() && !isNonAffiliatedGroup(r.m.getFactionName()))
                 .sorted(Comparator.<Row>comparingDouble(r -> -r.rate).thenComparingInt(r -> -r.devs))
                 .limit(limit)
                 .toList();
