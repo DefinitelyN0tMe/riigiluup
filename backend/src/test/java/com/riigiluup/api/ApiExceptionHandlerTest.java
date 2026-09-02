@@ -55,7 +55,7 @@ class ApiExceptionHandlerTest {
                 handler.badRequest(new IllegalArgumentException(), req);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).containsEntry("message", "Invalid request");
+        assertThat(response.getBody()).containsEntry("message", "Invalid value for a request parameter");
     }
 
     @Test
