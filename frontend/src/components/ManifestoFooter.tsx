@@ -53,7 +53,7 @@ export default function ManifestoFooter() {
             <li><Link to="/about" className="opacity-80 hover:opacity-100">{t("footer.about")}</Link></li>
             <li><Link to="/privacy" className="opacity-80 hover:opacity-100">{t("footer.privacy")}</Link></li>
             <li><Link to="/terms" className="opacity-80 hover:opacity-100">{t("footer.terms")}</Link></li>
-            <li><a href="https://opendata.riigikogu.ee" target="_blank" rel="noreferrer noopener" className="opacity-80 hover:opacity-100">{t("chrome.foot.riigikoguApi")}</a></li>
+            <li><a href="https://api.riigikogu.ee" target="_blank" rel="noreferrer noopener" className="opacity-80 hover:opacity-100">{t("chrome.foot.riigikoguApi")}</a></li>
           </ul>
         </div>
       </div>

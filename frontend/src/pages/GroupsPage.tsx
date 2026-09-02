@@ -48,6 +48,7 @@ export default function GroupsPage() {
       {data && data.length > 0 && (
         <input
           type="search"
+          aria-label={t("a11y.searchGroups")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={t("groups.searchPlaceholder")}

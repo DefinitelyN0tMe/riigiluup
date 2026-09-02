@@ -597,6 +597,7 @@
     "filterByPhase": "Filtreeri etapi järgi",
     "searchMps": "Otsi saadikut nime järgi",
     "searchBills": "Otsi eelnõu pealkirja järgi",
+    "searchGroups": "Otsi rühma nime järgi",
     "result": "Tulemus",
     "individualVotes": "Individuaalsed hääled",
     "metrics": "Näitajad",
@@ -904,7 +905,8 @@
     },
     "group": {
       "STANDING": "Alatised komisjonid",
-      "SPECIAL": "Eri- ja uurimiskomisjonid"
+      "SPECIAL": "Eri- ja uurimiskomisjonid",
+      "OTHER": "Muud komisjonid"
     },
     "specialNoBills": "Eri- ja uurimiskomisjonid ei juhi eelnõusid - nende ülesanne on parlamentaarne järelevalve ja uurimine, mitte seadusloome."
   },
@@ -1364,7 +1366,7 @@
     "license": "Litsents",
     "licenseBody1": "Riigikogu avaandmed on avaldatud litsentsi ",
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
-    "licenseBody1c": " alusel. Selle saidi enda koondsisu ja kood on avaldatud sama litsentsi alusel, et taaskasutus oleks lihtne.",
+    "licenseBody1c": " alusel. Selle saidi enda koondsisu on avaldatud sama litsentsi alusel, et taaskasutus oleks lihtne. Lähtekood on avaldatud Euroopa Liidu avaliku litsentsi (EUPL-1.2) alusel.",
     "updateFrequency": "Uuendussagedus",
     "updateBody": "Hääletused sünkroonitakse iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), nii et uued nimelised hääletused ilmuvad samal päeval. Saadikud, fraktsioonid, profiilide detailid ja eelnõud värskenduvad kord ööpäevas (04:30 Europe/Tallinn): need muutuvad aeglaselt ning varasemad andmed on muutumatud ega laadita uuesti. Päise \"Viimane sünkroonimine\" märgis näitab viimase eduka värskenduse ajatemplit.",
     "additional": "Muud allikad",
@@ -1458,7 +1460,7 @@
     "licenseBody1a": "Riigiluup's kuvatavad koondandmed on avaldatud litsentsi ",
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
     "licenseBody1c": " alusel, mis on sama litsents, mida kasutavad Riigikogu avaandmed. Võite neid taaskasutada — sealhulgas ärilistel eesmärkidel — tingimusel, et (a) viitate Riigiluup'le ja Riigikogule kui allikatele ning (b) avaldate tuletatud andmed sama litsentsi alusel.",
-    "licenseBody2": "Saidi lähtekood on saadaval OSI-heakskiidetud vaba tarkvara litsentsi alusel.",
+    "licenseBody2": "Saidi lähtekood on avaldatud Euroopa Liidu avaliku litsentsi (EUPL-1.2) alusel — see on OSI heakskiidetud vaba tarkvara litsents.",
     "warrantyHeading": "Garantii puudub",
     "warrantyBody": "Riigiluup pakutakse \"nagu on\". Iga fakt pärineb avalikust API-st ja võib ilma ette teatamata muutuda. Sait püüab olla täpne, kuid ei garanteeri seda. Enne otsuste tegemist kontrollige originaali linki \"Allikas ↗\" igal kaardil, graafikul või näitajal.",
     "neutralityHeading": "Toimetuse neutraalsus",

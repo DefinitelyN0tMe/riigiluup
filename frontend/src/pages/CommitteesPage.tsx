@@ -47,9 +47,16 @@ export default function CommitteesPage() {
       )}
       {error && <LoadFailed error={error} className="mt-2 text-hot-deep font-mono text-sm" />}
 
+      {data && data.length === 0 && (
+        <p className="font-serif italic text-[14px] text-ink-2 py-4">{t("common.noResults")}</p>
+      )}
+
       {data &&
-        (["STANDING", "SPECIAL"] as const).map((kind) => {
-          const group = data.filter((c) => c.kind === kind);
+        (["STANDING", "SPECIAL", "OTHER"] as const).map((kind) => {
+          const group =
+            kind === "OTHER"
+              ? data.filter((c) => c.kind !== "STANDING" && c.kind !== "SPECIAL")
+              : data.filter((c) => c.kind === kind);
           if (group.length === 0) return null;
           return (
             <section key={kind} aria-label={t(`committees.group.${kind}`)} className="mb-8">

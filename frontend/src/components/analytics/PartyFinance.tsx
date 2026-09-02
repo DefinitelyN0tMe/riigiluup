@@ -40,6 +40,10 @@ export default function PartyFinance({ data }: { data: PartyFinanceBoard }) {
       <ul className="flex flex-col gap-4">
         {data.parties.map((p) => {
           const bucket = Object.fromEntries(p.buckets.map((b) => [b.key, b.amount]));
+          const barLabel = SOURCE_ORDER
+            .filter((k) => (bucket[k] ?? 0) > 0)
+            .map((k) => `${t(`viz.finance.source.${k}`)} ${formatPercentValue(((bucket[k] ?? 0) / p.total) * 100, 0)}`)
+            .join(", ");
           return (
             <li key={p.partyName} className="bg-white rounded-[22px] border border-rule p-4 sm:p-5">
               <div className="flex items-baseline justify-between gap-3 mb-2.5">
@@ -53,7 +57,7 @@ export default function PartyFinance({ data }: { data: PartyFinanceBoard }) {
                   €{eur.format(p.total)}
                 </span>
               </div>
-              <div className="h-3 rounded-full bg-off overflow-hidden flex">
+              <div className="h-3 rounded-full bg-off overflow-hidden flex" role="img" aria-label={`${p.partyName}: ${barLabel}`}>
                 {SOURCE_ORDER.map((k) => {
                   const amt = bucket[k] ?? 0;
                   if (!amt) return null;

@@ -597,6 +597,7 @@
     "filterByPhase": "Filter by phase",
     "searchMps": "Search MPs by name",
     "searchBills": "Search bills by title",
+    "searchGroups": "Search groups by name",
     "result": "Result",
     "individualVotes": "Individual votes",
     "metrics": "Metrics",
@@ -904,7 +905,8 @@
     },
     "group": {
       "STANDING": "Standing committees",
-      "SPECIAL": "Select & investigation committees"
+      "SPECIAL": "Select & investigation committees",
+      "OTHER": "Other committees"
     },
     "specialNoBills": "Select and investigation committees do not lead bills - their role is parliamentary oversight and investigation, not legislation."
   },
@@ -1364,7 +1366,7 @@
     "license": "License",
     "licenseBody1": "Riigikogu open data is released under ",
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
-    "licenseBody1c": ". This site's own aggregated content and code are released under the same license so downstream reuse is straightforward.",
+    "licenseBody1c": ". This site's own aggregated content is released under the same license so downstream reuse is straightforward. The source code is released under the European Union Public Licence (EUPL-1.2).",
     "updateFrequency": "Update frequency",
     "updateBody": "Votes sync every 6 hours (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), so new roll-calls appear the same day. Members, factions, profile details and bills refresh once a day (04:30 Europe/Tallinn): they change slowly, and past records are immutable and never re-fetched. The \"Last sync\" badge in the header shows the timestamp of the last successful refresh.",
     "additional": "Other sources",
@@ -1458,7 +1460,7 @@
     "licenseBody1a": "The aggregated data displayed on Riigiluup is released under ",
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
     "licenseBody1c": ", the same license used by the underlying Riigikogu open data. You may reuse it — including for commercial purposes — provided you (a) credit Riigiluup and Riigikogu as sources, and (b) release derived data under the same license.",
-    "licenseBody2": "The site's source code is available under an OSI-approved permissive open-source license.",
+    "licenseBody2": "The site's source code is released under the European Union Public Licence (EUPL-1.2), an OSI-approved copyleft license.",
     "warrantyHeading": "No warranty",
     "warrantyBody": "Riigiluup is provided \"as is\". Every fact is sourced from a public API and can change without notice. The site aims for accuracy but cannot guarantee it. Use the \"Source ↗\" link on any card, chart, or metric to verify against the original before making decisions.",
     "neutralityHeading": "Editorial neutrality",
