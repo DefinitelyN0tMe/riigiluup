@@ -139,9 +139,12 @@ class CommitteeApiIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void detail_inactiveCommittee_returns404() throws Exception {
+    void detail_dissolvedCommittee_resolvesReadOnly() throws Exception {
+        // A dissolved (inactive) committee resolves to a read-only page (200), not 404, so a bill
+        // initiated by a now-dissolved committee still opens; it simply shows no current members.
         mockMvc.perform(get("/api/v1/committees/COMOLD"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.members.length()", equalTo(0)));
     }
 
     @Test

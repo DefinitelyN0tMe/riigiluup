@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -128,6 +129,13 @@ class VoteEventImporterIntegrationTest extends AbstractIntegrationTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(WireMockSupport.fixture(
                                 "fixtures/riigikogu/voting-detail-vot-1000-corrected.json"))));
+
+        // Keep vot-1000 inside the re-fetch window regardless of wall-clock time: the importer
+        // deliberately skips re-fetching settled votings (>14 days old), so without this the
+        // correction would never be applied once the fixed fixture date ages past two weeks.
+        VoteEvent stored = voteEventRepo.findBySourceNameAndExternalId("riigikogu", "vot-1000").orElseThrow();
+        stored.setStartedAt(Instant.now());
+        voteEventRepo.save(stored);
 
         ImportRunLog second = importer.runWindow(
                 LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 16));
