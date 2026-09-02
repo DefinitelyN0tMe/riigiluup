@@ -1,37 +1,49 @@
-# Weekly dependency + base-image update PRs so security fixes surface on a site that runs
-# unattended for months. Minor/patch bumps are grouped to keep PR noise down; security updates
-# are always raised regardless of the group.
+# Monthly dependency + base-image update PRs so security fixes surface on a site that runs
+# unattended for months, without flooding a solo maintainer. Each ecosystem is grouped into a
+# single PR (all update types) to keep noise minimal; security updates are always raised.
 version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 5
     groups:
       frontend:
-        update-types: ["minor", "patch"]
+        patterns: ["*"]
 
   - package-ecosystem: "gradle"
     directory: "/backend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 5
     groups:
       backend:
-        update-types: ["minor", "patch"]
+        patterns: ["*"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns: ["*"]
 
   - package-ecosystem: "docker"
     directory: "/backend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      docker-backend:
+        patterns: ["*"]
 
   - package-ecosystem: "docker"
     directory: "/frontend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      docker-frontend:
+        patterns: ["*"]
