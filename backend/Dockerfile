@@ -1,5 +1,5 @@
 # --- build ---
-FROM gradle:8.10-jdk21 AS build
+FROM gradle:9.7-jdk21 AS build
 WORKDIR /app
 COPY settings.gradle.kts build.gradle.kts ./
 COPY src ./src
