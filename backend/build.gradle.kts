@@ -33,7 +33,7 @@ dependencies {
     // bucket4j starter removed 2026-07-13 — 0.12.x SPI required a specific cache-backend module
     // that never resolved cleanly with our Caffeine setup. Replaced by com.riigiluup.api.RateLimitFilter
     // (60 lines, Caffeine window, per-IP).
-    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
