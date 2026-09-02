@@ -745,6 +745,7 @@ public class AnalyticsService {
 
         List<AnalyticsDto.MpPoint> points = new ArrayList<>();
         for (PlenaryMember m : members) {
+            if (isNonAffiliatedGroup(m.getFactionName())) continue; // independents have no faction line to measure loyalty against
             double[] agg = memberScore.get(m.getId());
             int[] cnt = memberCount.get(m.getId());
             double x = 0;
@@ -903,7 +904,7 @@ public class AnalyticsService {
         for (Object[] r : streakRows) {
             UUID mid = uuidOf(r[0]);
             PlenaryMember m = memberRepo.findById(mid).orElse(null);
-            if (m == null) continue;
+            if (m == null || !m.isActive()) continue;
             Group f = m.getFactionExternalId() != null ? factionByExt.get(m.getFactionExternalId()) : null;
             String factionShort = f != null ? shortenFactionName(f.getName()) : shortenFactionName(m.getFactionName());
             streaks.add(new AnalyticsDto.AttendanceStreak(m.getSlug(), m.getFullName(), factionShort,
@@ -992,7 +993,6 @@ public class AnalyticsService {
               AND (
                 EXTRACT(hour FROM (ve.started_at AT TIME ZONE 'Europe/Tallinn'))::int < :startH
                 OR EXTRACT(hour FROM (ve.started_at AT TIME ZONE 'Europe/Tallinn'))::int >= :endH
-                OR MOD(EXTRACT(dow FROM (ve.started_at AT TIME ZONE 'Europe/Tallinn'))::int + 6, 7) >= 5
               )
             ORDER BY ve.started_at DESC
             LIMIT :n
@@ -1255,6 +1255,7 @@ public class AnalyticsService {
                 .toList();
         Map<String, String> out = new HashMap<>();
         for (Group g : activeFactions()) {
+            if (isNonAffiliatedGroup(g.getName())) continue; // not a real faction — no coalition/opposition role
             String n = g.getName().toLowerCase();
             boolean inCoalition = coalition.stream().anyMatch(n::contains);
             out.put(g.getExternalId(), inCoalition ? "coalition" : "opposition");

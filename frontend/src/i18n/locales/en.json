@@ -677,11 +677,6 @@
     "TAGASI_LUKATUD": "Rejected",
     "TAGASI_VOETUD": "Withdrawn"
   },
-  "home": {
-    "title": "Riigiluup",
-    "intro": "Civic-tech platform aggregating open data from the Estonian Riigikogu. Browse Members of Parliament and follow their voting behaviour. Every fact links back to the official source. No opinions, no rankings.",
-    "browseMps": "Browse MPs"
-  },
   "politicians": {
     "title": "Members of the Riigikogu",
     "searchPlaceholder": "Search by name…",
@@ -1291,10 +1286,6 @@
         "heading": "How often factions vote alike",
         "body": "For every vote where two factions each took a clear side, we check whether they landed on the same side. The agreement figure is the share of those votes where they voted the same way. A faction has a \"clear side\" when most of its members chose the same option — for, against, or abstain; evenly split votes and presence checks are left out.",
         "note": "A high figure means the two factions' majorities happened to coincide, not that they agree ideologically — many overlaps are on procedural or uncontested motions."
-      },
-      "cohesion": {
-        "heading": "How united a faction votes",
-        "body": "Within a single faction over the last 30 days, we look at how often its members voted together with the faction's own majority. The higher the share, the more united the faction voted. Factions with very few such votes in the window are left out so the ranking stays stable."
       },
       "discipline": {
         "heading": "MPs who break ranks",

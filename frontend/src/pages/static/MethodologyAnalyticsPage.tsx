@@ -31,9 +31,6 @@ export default function MethodologyAnalyticsPage({ embedded = false }: { embedde
       <p>{t(`${K}.factionAgreement.body`)}</p>
       <Note label={t(`${K}.noteLabel`)}>{t(`${K}.factionAgreement.note`)}</Note>
 
-      <h2>{t(`${K}.cohesion.heading`)}</h2>
-      <p>{t(`${K}.cohesion.body`)}</p>
-
       <h2>{t(`${K}.discipline.heading`)}</h2>
       <p>{t(`${K}.discipline.body`)}</p>
 

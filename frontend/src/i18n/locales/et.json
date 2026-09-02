@@ -677,11 +677,6 @@
     "TAGASI_LUKATUD": "Tagasi lükatud",
     "TAGASI_VOETUD": "Tagasi võetud"
   },
-  "home": {
-    "title": "Riigiluup",
-    "intro": "Kodanikutehnoloogia platvorm, mis koondab Eesti Riigikogu avaandmeid. Sirvige Riigikogu liikmeid ja jälgige nende hääletuskäitumist. Iga fakt viitab ametlikule allikale. Ilma arvamuste ja edetabeliteta.",
-    "browseMps": "Vaata saadikuid"
-  },
   "politicians": {
     "title": "Riigikogu liikmed",
     "searchPlaceholder": "Otsi nime järgi…",
@@ -1291,10 +1286,6 @@
         "heading": "Kui sageli fraktsioonid hääletavad ühtemoodi",
         "body": "Iga hääletuse puhul, kus mõlemad fraktsioonid võtsid selge seisukoha, kontrollime, kas nad jäid samale poolele. Kokkulangevuse näitaja on nende hääletuste osakaal, kus nad hääletasid ühtemoodi. Fraktsioonil on \"selge seisukoht\", kui enamik selle liikmeid valis sama variandi — poolt, vastu või erapooletu; võrdselt jagunenud hääletused ja kohaloleku kontrollid jäävad välja.",
         "note": "Kõrge näitaja tähendab, et kahe fraktsiooni enamused sattusid kokku, mitte et nad on ideoloogiliselt ühel meelel — paljud kokkulangevused on protseduurilistel või vaidlusteta hääletustel."
-      },
-      "cohesion": {
-        "heading": "Kui ühtselt fraktsioon hääletab",
-        "body": "Ühe fraktsiooni sees viimase 30 päeva jooksul vaatame, kui sageli selle liikmed hääletasid koos fraktsiooni enda enamusega. Mida suurem osakaal, seda ühtsemalt fraktsioon hääletas. Fraktsioonid, kus aknas oli väga vähe selliseid hääletusi, jäetakse välja, et edetabel oleks stabiilne."
       },
       "discipline": {
         "heading": "Saadikud, kes lähevad fraktsioonist lahku",

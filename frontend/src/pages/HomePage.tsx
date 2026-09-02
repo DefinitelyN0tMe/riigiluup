@@ -13,6 +13,7 @@ import Sparkline from "../components/Sparkline";
 import PartyDonut from "../components/PartyDonut";
 import SectionHead from "../components/SectionHead";
 import MarqueeStrip from "../components/MarqueeStrip";
+import LoadFailed from "../components/LoadFailed";
 import type { HomeSummary, Politician, VoteListItem } from "../types";
 import { partyColor } from "../lib/partyColors";
 
@@ -237,7 +238,19 @@ function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
 /* ============ MP CARDS ============ */
 function MpFeatureCard({ p }: { p: Politician | null }) {
   const { t } = useTranslation();
-  const factionUpper = (p?.factionName ?? "REFORMIERAKOND").toUpperCase();
+  if (!p) {
+    // Never invent a specific politician as a loading/empty fallback — show a neutral skeleton.
+    return (
+      <div aria-hidden className="md:col-span-2 md:row-span-2 relative overflow-hidden bg-blue/70 rounded-[22px] p-6 sm:p-8 flex flex-col justify-between animate-pulse min-h-[240px]">
+        <div className="flex justify-end"><div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/20" /></div>
+        <div className="mt-6 space-y-3">
+          <div className="h-12 w-2/3 rounded bg-white/20" />
+          <div className="h-5 w-1/3 rounded bg-white/15" />
+        </div>
+      </div>
+    );
+  }
+  const factionUpper = (p.factionName ?? "").toUpperCase();
   return (
     <Link to={p ? `/politicians/${encodeURIComponent(p.slug)}` : "/politicians"}
       className="md:col-span-2 md:row-span-2 relative overflow-hidden bg-blue text-white rounded-[22px] p-6 sm:p-8 flex flex-col justify-between hover:-translate-y-0.5 transition-transform">
@@ -246,15 +259,15 @@ function MpFeatureCard({ p }: { p: Politician | null }) {
       </div>
       <div className="flex justify-end items-start relative">
         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white text-blue grid place-items-center font-serif font-semibold text-[26px] sm:text-[28px] tracking-[-0.02em]">
-          {initials(p ?? undefined) || "KK"}
+          {initials(p) || ""}
         </div>
       </div>
       <div className="relative mt-6">
         <h3 className="font-display font-bold text-[34px] sm:text-[44px] md:text-[54px] leading-[0.92] tracking-[-0.045em]">
-          {p?.firstName ?? "Kaja"}<br />
-          <span className="font-serif italic font-light text-stroke-white">{p?.lastName ?? "Kallas"}.</span>
+          {p.firstName}<br />
+          <span className="font-serif italic font-light text-stroke-white">{p.lastName}.</span>
         </h3>
-        <div className="text-white/85 mt-2 text-sm sm:text-base">{p?.factionName ?? "Reformierakond"}</div>
+        <div className="text-white/85 mt-2 text-sm sm:text-base">{p.factionName ?? ""}</div>
         <div className="mt-8 pt-5 border-t border-white/18 font-mono text-[10px] tracking-[0.18em] uppercase opacity-70">
           {t("homePage.bento.featureCta")}
         </div>
@@ -416,7 +429,8 @@ export default function HomePage() {
           more={{ to: "/votes", label: t("homePage.nowVoting.more") }}
         />
         {votes.isLoading && <p className="text-muted">{t("homePage.nowVoting.loading")}</p>}
-        {!votes.isLoading && voteItems.length === 0 && <p className="text-muted">{t("homePage.nowVoting.empty")}</p>}
+        {votes.error && <LoadFailed error={votes.error} className="text-hot-deep font-mono text-sm" />}
+        {!votes.isLoading && !votes.error && voteItems.length === 0 && <p className="text-muted">{t("homePage.nowVoting.empty")}</p>}
         <div className="flex flex-col gap-3 sm:gap-4">
           {voteItems.map((v, i) => (
             <VoteRowCard key={v.id} v={v} live={i === 0 && isLiveVote(v)} />
@@ -432,6 +446,7 @@ export default function HomePage() {
           more={{ to: "/politicians", label: t("homePage.bento.more") }}
         />
         {politicians.isLoading && <p className="text-muted">{t("homePage.bento.loading")}</p>}
+        {politicians.error && <LoadFailed error={politicians.error} className="text-hot-deep font-mono text-sm" />}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 auto-rows-fr">
           <MpFeatureCard p={feat} />
           {rest.map((p, i) => (
@@ -450,6 +465,7 @@ export default function HomePage() {
           more={{ to: "/compare", label: t("homePage.parties.more") }}
         />
         {factions.isLoading && <p className="text-muted">{t("homePage.parties.loading")}</p>}
+        {factions.error && <LoadFailed error={factions.error} className="text-hot-deep font-mono text-sm" />}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
           {partyMeta.map((p) => (
             <PartyDonut key={p.label} {...p} />
