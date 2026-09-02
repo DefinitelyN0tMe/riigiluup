@@ -228,7 +228,7 @@
         "titlePre": "Kus ",
         "titleEm": "iga saadik",
         "titlePost": " paikneb",
-        "note": "X-telg: kui palju saadik hääletab koalitsiooniga (+1) vs opositsiooniga (−1). Y-telg: kui lojaalne on oma fraktsioonile (+1) või dissident (−1). Väärtused arvutatud tegelikest hääletustest, mitte deklaratiivsest positsioonist. Liiga väheste võrreldavate hääletustega saadikud (nt äsja ametisse asunud asendajad) jäetakse kaardilt välja."
+        "note": "X-telg: kui palju saadik hääletab koalitsiooniga (+1) vs opositsiooniga (−1). Y-telg: kui lojaalne on oma fraktsioonile (+1) või dissident (−1). Väärtused arvutatud tegelikest hääletustest, mitte deklaratiivsest positsioonist. Liiga väheste võrreldavate hääletustega saadikud (nt äsja ametisse asunud asendajad) jäetakse kaardilt välja. Fraktsioonita saadikud ei ole kaardil, sest fraktsioonilojaalsust ei saa neile määratleda."
       },
       "cospons": {
         "kicker": "Reaalne koostöö",
@@ -1184,7 +1184,7 @@
   },
   "about": {
     "title": "Riigiluup'st",
-    "intro": "Riigiluup on avalik, avatud lähtekoodiga tööriist, mis muudab Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi enda avaandmed — saadikud, nimelised hääletused ja eelnõud — ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Kaetud on praegune Riigikogu koosseis (2023–2027) ning nimeliste hääletuste ajalugu ulatub 2019. aastani; iga näitaja viitab ametlikule Riigikogu allikale.",
+    "intro": "Riigiluup on avalik, avatud lähtekoodiga tööriist, mis muudab Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi enda avaandmed — saadikud, nimelised hääletused ja eelnõud — ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Kaetud on praegune Riigikogu koosseis (2023–2027) ning nimelised hääletused alates 2023. aasta aprillist; iga näitaja viitab ametlikule Riigikogu allikale.",
     "editorial": "Toimetuse hoiak",
     "editorialBody": "Teenus ei omista ideoloogilisi silte, moraalseid hindeid ega edetabeleid — see on peegel, mitte tõlgendaja. See esitab faktilisi arve ja suhtarve ning jätab järeldused teile. Kui näitajat võib valesti mõista, kirjeldame valemit, mis on arvestatud, mis välja jäetud ja teadaolevad piirangud; arvu ei esitata kunagi hea ega halvana — üksnes kirjeldatakse ja lingitakse, et saaksite selle Riigikogu algvormiga võrrelda.",
     "funding": "Sõltumatus ja rahastus",

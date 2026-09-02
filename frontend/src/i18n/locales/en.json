@@ -228,7 +228,7 @@
         "titlePre": "Where ",
         "titleEm": "each MP",
         "titlePost": " sits",
-        "note": "X-axis: how much the MP votes with the coalition (+1) vs opposition (−1). Y-axis: how loyal to their faction (+1) or dissident (−1). Values computed from actual votes, not declared position. MPs with too few comparable votes (e.g. just-seated substitutes) are left off the chart."
+        "note": "X-axis: how much the MP votes with the coalition (+1) vs opposition (−1). Y-axis: how loyal to their faction (+1) or dissident (−1). Values computed from actual votes, not declared position. MPs with too few comparable votes (e.g. just-seated substitutes) are left off the chart. Non-attached members are not plotted, as faction loyalty is undefined for them."
       },
       "cospons": {
         "kicker": "Real collaboration",
@@ -1184,7 +1184,7 @@
   },
   "about": {
     "title": "About Riigiluup",
-    "intro": "Riigiluup is a public, open-source tool that makes the work of the Estonian Riigikogu easier to follow. It aggregates the parliament's own open data — MPs, roll-call votes, and bills — and presents it as neutral profiles, timelines, comparisons, and analytics. It covers the current Riigikogu (2023–2027), with roll-call voting records reaching back to 2019, and every figure links back to the official Riigikogu source.",
+    "intro": "Riigiluup is a public, open-source tool that makes the work of the Estonian Riigikogu easier to follow. It aggregates the parliament's own open data — MPs, roll-call votes, and bills — and presents it as neutral profiles, timelines, comparisons, and analytics. It covers the current Riigikogu (2023–2027), with roll-call voting records from April 2023 onward, and every figure links back to the official Riigikogu source.",
     "editorial": "Editorial stance",
     "editorialBody": "The service does not assign ideological labels, moral scores, or rankings — it is a mirror, not an interpreter. It reports factual counts and rates and lets you draw your own conclusions. Where a metric could be misread, we document the formula, what is included, what is excluded, and the known limitations; a figure is never framed as good or bad, only described and linked back so you can check it against the original Riigikogu form.",
     "funding": "Independence and funding",
