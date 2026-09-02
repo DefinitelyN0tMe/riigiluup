@@ -33,7 +33,7 @@ public enum InitiativePhase {
         return Arrays.stream(values())
                 .filter(p -> p.slug.equals(slug))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new UnknownSourceSlugException(
                         "Unknown rahvaalgatus phase: '" + slug + "'"));
     }
 }

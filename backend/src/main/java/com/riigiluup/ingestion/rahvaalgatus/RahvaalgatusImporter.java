@@ -90,7 +90,11 @@ public class RahvaalgatusImporter {
                 try {
                     tx.executeWithoutResult(status -> upsert(row, committeeIdsByName));
                     upserted++;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
+                    // A malformed / constraint-violating row is skipped (PARTIAL). But an unknown
+                    // phase / decision slug is a structural source change that must fail the whole
+                    // run loudly (see InitiativePhase#fromSlug) rather than silently drop rows.
+                    if (hasCause(e, UnknownSourceSlugException.class)) throw e;
                     failed++;
                     log.warn("failed rahvaalgatus row {}: {}", row.externalId(), e.toString());
                 }
@@ -113,6 +117,13 @@ public class RahvaalgatusImporter {
             runLogRepo.save(run);
         }
         return run;
+    }
+
+    private static boolean hasCause(Throwable t, Class<? extends Throwable> type) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (type.isInstance(c)) return true;
+        }
+        return false;
     }
 
     /** Loaded once per run — 11 rows, but resolving per initiative would be 1141 queries. */

@@ -31,7 +31,7 @@ public enum ParliamentDecision {
         return Arrays.stream(values())
                 .filter(d -> d.slug.equals(slug))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new UnknownSourceSlugException(
                         "Unknown rahvaalgatus parliament_decision: '" + slug + "'"));
     }
 }
