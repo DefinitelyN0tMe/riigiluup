@@ -55,8 +55,10 @@ public class DailyRefreshJob {
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     /**
-     * Votes every 6 hours so new roll-calls appear the same day. Cheap: the votings list is
-     * date-filtered and historical votes are immutable, so only the recent window is fetched.
+     * Votes AND stenograms every 6 hours so new roll-calls and speeches appear the same day.
+     * Cheap: the votings list is date-filtered and historical votes are immutable, so only the
+     * recent window is fetched; the verbatims window is a single API call. Speeches run in their
+     * own try/catch so a stenogram failure never masks or aborts the vote refresh (and vice versa).
      */
     @Scheduled(cron = "${riigiluup.schedule.votes-refresh-cron}",
                zone = "${riigiluup.schedule.daily-refresh-zone}")
@@ -70,12 +72,23 @@ public class DailyRefreshJob {
             LocalDate today = LocalDate.now(TALLINN);
             voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today);
             voteBillLinker.linkAll();
-            cacheEvictor.evictAll();
             log.info("Votes refresh finished");
         } catch (Exception e) {
             log.error("Votes refresh failed", e);
             alert.send("⚠️ RiigiLuup: hääletuste värskendus ebaõnnestus — " + e);
+        }
+        try {
+            // 7-day speech window, 6-hourly: stenograms publish next day and get edited for a few
+            // days after, so re-upserting a week keeps texts converged with the source, and polling
+            // every 6 hours picks a freshly published stenogram up within hours, not the next morning.
+            LocalDate today = LocalDate.now(TALLINN);
+            speechImporter.runWindow(windowStart("speeches.window-refresh", today, 7, 60), today);
+            log.info("Speeches refresh finished");
+        } catch (Exception e) {
+            log.error("Speeches refresh failed", e);
+            alert.send("⚠️ RiigiLuup: stenogrammide värskendus ebaõnnestus — " + e);
         } finally {
+            cacheEvictor.evictAll();
             running.set(false);
         }
     }
@@ -109,9 +122,7 @@ public class DailyRefreshJob {
             // skips it; refresh amendments for all active bills daily so new proposals surface next-day.
             legislationImporter.refreshActiveBillAmendments();
             voteBillLinker.linkAll();
-            // 7-day speech window: stenograms publish next day and get edited for a few
-            // days after, so re-upserting a week keeps texts converged with the source.
-            speechImporter.runWindow(windowStart("speeches.window-refresh", today, 7, 60), today);
+            // Speeches are refreshed 6-hourly in refreshVotes() (see above), not here.
             // Oversight: pick up new written questions/interpellations and answers (incl. late replies
             // to older questions). Cheap windowed re-scan of the document register.
             oversightImporter.refreshRecent();

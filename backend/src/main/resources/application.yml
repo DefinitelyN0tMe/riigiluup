@@ -154,8 +154,9 @@ riigiluup:
     # Q913551=SDE, Q56249403=Eesti 200, Q113677848=Parempoolsed, Q3896796=Republicans/Conservatives.
     allowed-party-qids: ${RIIGILUUP_WIKIDATA_ALLOWED_PARTY_QIDS:Q738947,Q163347,Q1428217,Q928652,Q794028,Q913551,Q56249403,Q113677848,Q3896796}
   schedule:
-    # Votes every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) — new roll-calls
-    # appear the same day; the votings list is date-filtered so this stays cheap.
+    # Votes AND stenograms every 6 hours at HH:05 (03:05, 09:05, 15:05, 21:05 Europe/Tallinn) — new
+    # roll-calls and freshly published speeches appear within hours; the votings list is
+    # date-filtered and the verbatims window is a single call, so this stays cheap.
     votes-refresh-cron: "0 5 3/6 * * *"
     # Members + committees + legislation once a day at 04:30. These change slowly, and legislation
     # now skips unchanged bills instead of re-downloading the whole catalogue every run.
