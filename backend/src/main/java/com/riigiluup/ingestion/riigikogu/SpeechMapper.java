@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,9 +52,19 @@ public class SpeechMapper {
         return out;
     }
 
-    /** Verbatim timestamps carry an explicit offset (unlike votings), so no zone assumption here. */
+    private static final ZoneId TALLINN = ZoneId.of("Europe/Tallinn");
+
+    /**
+     * The verbatims API stamps every speech event with "+00:00", but the wall-clock value is
+     * Tallinn LOCAL time: a 10:00 sitting opens at "10:00:09+00:00" in both EET and EEST, while
+     * the sitting-level date on the same payload is correct UTC (07:00Z / 08:00Z). Trusting the
+     * offset stored every speech 2-3 hours late and broke the speech/vote chronology on bill
+     * pages (votes come with real UTC). So: take the wall-clock part and re-zone it as
+     * Europe/Tallinn, which is DST-aware. V40 re-zoned the rows written before this fix.
+     */
     private static Instant parseInstant(String s) {
-        return s == null ? null : OffsetDateTime.parse(s).toInstant();
+        return s == null ? null
+                : OffsetDateTime.parse(s).toLocalDateTime().atZone(TALLINN).toInstant();
     }
 
     /** Agenda item titles arrive as HTML fragments ("<p>…</p>") — keep only the text. */

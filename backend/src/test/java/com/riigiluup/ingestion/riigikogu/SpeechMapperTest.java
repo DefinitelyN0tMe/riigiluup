@@ -58,7 +58,8 @@ class SpeechMapperTest {
         SpeechMapper.FlatSpeech s = out.get(0);
         assertThat(s.speakerUuid()).isEqualTo("person-1");
         assertThat(s.speakerRaw()).isEqualTo("Esimees Lauri Hussar");
-        assertThat(s.spokenAt()).isEqualTo(Instant.parse("2026-06-08T15:00:44Z"));
+        // The source's "15:00:44+00:00" is Tallinn wall-clock time (EEST in June), not UTC.
+        assertThat(s.spokenAt()).isEqualTo(Instant.parse("2026-06-08T12:00:44Z"));
         assertThat(s.sittingTitle()).isEqualTo("XV Riigikogu, VII istungjärk, täiskogu istung");
         assertThat(s.sittingLink()).isEqualTo("https://stenogrammid.riigikogu.ee/202606081500");
         assertThat(s.agendaItemTitle()).isEqualTo("Istungi rakendamine");
