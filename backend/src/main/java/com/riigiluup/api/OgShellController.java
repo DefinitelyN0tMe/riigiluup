@@ -186,7 +186,9 @@ public class OgShellController {
         try {
             CrawlerContent.Page p = page.get();
             if (p == null) return fallback.get();
-            String html = shell(p.title().replace(" — Riigiluup", ""), p.description(), path);
+            // The home page keeps the base title as is; entity/hub titles get the " — Riigiluup" suffix once.
+            String title = BASE_TITLE.equals(p.title()) ? null : p.title().replace(" — Riigiluup", "");
+            String html = shell(title, p.description(), path);
             if (html.contains(ROOT_DIV)) {
                 html = html.replace(ROOT_DIV, "<div id=\"root\">" + p.bodyHtml() + "</div>");
             } else {
