@@ -74,4 +74,37 @@ class CrawlerContentTest {
                 .contains("(15.09.2026)")
                 .doesNotContain("<muutmise>");
     }
+
+    @Test
+    void analyticsMirrorsPageRoundingAndSurvivesMissingSections() {
+        var latency = new com.riigiluup.analytics.AnalyticsDto.ResponseLatencyBoard(java.util.List.of(
+                new com.riigiluup.analytics.AnalyticsDto.ResponseLatencyItem("Kristen Michal", "peaminister Kristen Michal",
+                        153, 128, 44, 47.0, 8),
+                new com.riigiluup.analytics.AnalyticsDto.ResponseLatencyItem("A <b>", null, 10, 0, 0, null, 0)),
+                java.time.LocalDate.of(2023, 4, 10), Instant.now());
+        var agreement = new com.riigiluup.analytics.AnalyticsDto.FactionAgreementMatrix(
+                java.util.List.of(
+                        new com.riigiluup.analytics.AnalyticsDto.FactionCell("1", "F1", "Reform", "x", 36),
+                        new com.riigiluup.analytics.AnalyticsDto.FactionCell("2", "F2", "EKRE", "x", 9),
+                        new com.riigiluup.analytics.AnalyticsDto.FactionCell("3", "F3", "Uus", "x", 1)),
+                java.util.List.of(java.util.List.of(1.0, 0.1994, 0.5), java.util.Arrays.asList(0.1994, 1.0, null),
+                        java.util.Arrays.asList(0.5, null, 1.0)),
+                java.util.List.of(java.util.List.of(10, 1389, 5), java.util.List.of(1389, 10, 5), java.util.List.of(5, 0, 5)),
+                1638, Instant.now());
+
+        CrawlerContent.Page p = CrawlerContent.analytics(new CrawlerContent.AnalyticsData(
+                latency, agreement, null, null, null, null, null, null, null, null));
+
+        assertThat(p.title()).isEqualTo("Analüütika — Riigiluup");
+        assertThat(p.bodyHtml())
+                .contains("Kristen Michal (peaminister): 153 küsimust, 34% tähtaegselt, vastuse mediaan 47 päeva, üle tähtaja praegu: 8")
+                .contains("kokku 163 küsimust ja arupärimist, neist 128 on vastatud, 44 tähtaegselt (34% vastatutest)")
+                .contains("alates 10.04.2023")
+                .contains("A &lt;b&gt;: 10 küsimust</li>")
+                .contains("Reform ja EKRE: 20% (1389 hääletust)")
+                .doesNotContain("EKRE ja Uus")
+                .doesNotContain("<b>")
+                .doesNotContain("null")
+                .doesNotContain("XI. Kõige aktiivsemad");
+    }
 }

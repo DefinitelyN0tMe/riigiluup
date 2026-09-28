@@ -47,6 +47,7 @@ public class OgShellController {
     private final PoliticianController politicianApi;
     private final com.riigiluup.committee.CommitteeService committeeService;
     private final com.riigiluup.group.GroupDirectoryService groupService;
+    private final com.riigiluup.analytics.AnalyticsController analyticsApi;
 
     /**
      * Rendered crawler pages, 10 min. Crawlers are the only callers; a profile page costs ~1-1.5 s of
@@ -144,6 +145,33 @@ public class OgShellController {
     @ResponseBody
     public String votesList() {
         return rendered("/votes", () -> CrawlerContent.votesList(recentVotes()), () -> shell(null, null, "/votes"));
+    }
+
+    @GetMapping(value = "/analytics", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String analytics() {
+        // Same endpoints and defaults as the page (see frontend/src/api/analytics.ts). Each section is
+        // fetched on its own, so one failing query drops that section instead of the whole page.
+        return rendered("/analytics", () -> CrawlerContent.analytics(new CrawlerContent.AnalyticsData(
+                quietly(analyticsApi::responseLatency),
+                quietly(() -> analyticsApi.factionAgreement(null, null)),
+                quietly(() -> analyticsApi.disciplineBreakers(24, 20)),
+                quietly(analyticsApi::billFlow),
+                quietly(analyticsApi::billVelocity),
+                quietly(() -> analyticsApi.nightVotes(8, 22, 20)),
+                quietly(analyticsApi::memberActivity),
+                quietly(analyticsApi::elections),
+                quietly(analyticsApi::partyFinance),
+                quietly(analyticsApi::initiativeFunnel))), () -> shell(null, null, "/analytics"));
+    }
+
+    private static <T> T quietly(java.util.function.Supplier<T> s) {
+        try {
+            return s.get();
+        } catch (Exception e) {
+            log.warn("og-shell: analytics section skipped: {}", e.toString());
+            return null;
+        }
     }
 
     @GetMapping(value = "/committees/{externalId}", produces = "text/html;charset=UTF-8")

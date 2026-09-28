@@ -395,6 +395,301 @@ final class CrawlerContent {
         return new Page(g.name() + " — Riigiluup", g.name() + ": " + kind.toLowerCase(Locale.ROOT) + ", liikmed.", wrap(b), null);
     }
 
+    private static final Map<String, String> FLOW_NODE_ET = Map.ofEntries(
+            Map.entry("initiated", "Algatatud"), Map.entry("in_committee", "Komisjonis"),
+            Map.entry("first_reading", "I lugemine"), Map.entry("second_reading", "II lugemine"),
+            Map.entry("third_reading", "III lugemine"), Map.entry("in_readings", "Lugemistel"),
+            Map.entry("submitted", "Esitatud"), Map.entry("adopted", "Vastu võetud"),
+            Map.entry("rejected", "Tagasi lükatud"), Map.entry("withdrawn", "Tagasi võetud"), Map.entry("other", "Muu"));
+    private static final Map<String, String> FINANCE_ET = Map.of(
+            "state", "riigitoetus", "donations", "annetused", "membership", "liikmemaksud", "loans", "laenud", "other", "muu");
+    private static final Map<String, String> FUNNEL_ET = Map.of(
+            "targeted", "Riigikogule suunatud", "signing", "Allkirjade kogumisel", "threshold", "Allkirjade lävend täitunud",
+            "sent", "Riigikogusse saadetud", "decided", "Otsustatud",
+            "draftAct", "Võeti menetlusse eelnõuna või riikliku küsimusena");
+    private static final Map<String, String> DECISION_ET = Map.of(
+            "return", "Tagastatud esitajale", "reject", "Tagasi lükatud", "solve-differently", "Lahendatud muul viisil",
+            "forward", "Edastatud", "forward-to-government", "Edastatud Vabariigi Valitsusele",
+            "draft-act-or-national-matter", "Eelnõu või riiklikult tähtis küsimus");
+    private static final Map<String, String> MANDATE_ET = Map.of(
+            "PERSONAL", "Isikumandaat", "DISTRICT", "Ringkonnamandaat", "COMPENSATION", "Kompensatsioonimandaat",
+            "SUBSTITUTE", "Asendusliige");
+
+    /** Everything the /analytics page shows as numbers, from the same endpoints and with the same defaults. */
+    record AnalyticsData(
+            com.riigiluup.analytics.AnalyticsDto.ResponseLatencyBoard latency,
+            com.riigiluup.analytics.AnalyticsDto.FactionAgreementMatrix agreement,
+            com.riigiluup.analytics.AnalyticsDto.DisciplineBreakers discipline,
+            com.riigiluup.analytics.AnalyticsDto.BillFlow flow,
+            com.riigiluup.analytics.AnalyticsDto.BillVelocity velocity,
+            com.riigiluup.analytics.AnalyticsDto.NightVotes night,
+            com.riigiluup.analytics.AnalyticsDto.MemberActivityBoard activity,
+            com.riigiluup.analytics.AnalyticsDto.ElectionBoard elections,
+            com.riigiluup.analytics.AnalyticsDto.PartyFinanceBoard finance,
+            com.riigiluup.initiative.InitiativeDto.Funnel funnel) {}
+
+    /**
+     * Crawler text for /analytics. Mirrors the page: same section numbers, titles and notes, same
+     * rounding (whole percent / whole days where the page rounds), same top-N cuts. Sections that are
+     * purely visual on the page (attendance grid, timing heatmap, topics, scatter, co-sponsorship) are
+     * only named, with a pointer to the interactive page. A section whose data is missing is skipped.
+     */
+    static Page analytics(AnalyticsData d) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Riigikogu analüütika</h1>")
+                .append("<p>Analüüsid ainult Riigikogu avaandmete põhjal. Iga arv on jälgitav ametliku allikani. ")
+                .append("Ei arvamusi ega hinnanguid: ainult see, mida hääletused, kohalolekud, eelnõud ja ")
+                .append("dokumendiregister ise ütlevad. Interaktiivsed graafikud: <a href=\"").append(SITE)
+                .append("/analytics\">riigiluup.ee/analytics</a>. Arvutuskäik: <a href=\"").append(SITE)
+                .append("/methodology/analytics\">metoodika</a>.</p>");
+
+        var lat = d.latency();
+        if (lat != null && lat.ministers() != null && !lat.ministers().isEmpty()) {
+            long total = 0, answered = 0, onTime = 0, overdue = 0;
+            for (var m : lat.ministers()) {
+                total += m.total(); answered += m.answered(); onTime += m.answeredOnTime(); overdue += m.overdueNow();
+            }
+            b.append("<section id=\"vastamise-kiirus\"><h2>XIV. Kes vastab tähtaegselt: ministrite vastamise kiirus</h2>")
+             .append("<p>Jooksva koosseisu arupärimised ja kirjalikud küsimused")
+             .append(lat.since() != null ? " (alates " + DATE.format(lat.since()) + ")" : "")
+             .append(", mõõdetuna allika enda fikseeritud vastamistähtaja vastu: esitamisest registreeritud kirjaliku ")
+             .append("vastuseni või täiskogu istungini, kus minister arupärimisele vastas. Alla viie küsimusega ministrid ")
+             .append("on peidetud; esitajatele tagastatud küsimused on välja jäetud.</p>")
+             .append("<p>Loetletud ministritele on esitatud kokku ").append(total).append(" küsimust ja arupärimist, neist ")
+             .append(answered).append(" on vastatud, ").append(onTime).append(" tähtaegselt")
+             .append(answered > 0 ? " (" + Math.round(onTime * 100.0 / answered) + "% vastatutest)" : "")
+             .append(". Praegu on üle tähtaja vastuseta ").append(overdue).append(".</p><ol>");
+            for (var m : lat.ministers()) {
+                String office = m.addresseeRole() == null ? null : m.addresseeRole().replace(m.addresseeName(), "").trim();
+                b.append("<li>").append(esc(m.addresseeName()))
+                 .append(office != null && !office.isEmpty() ? " (" + esc(office) + ")" : "")
+                 .append(": ").append(m.total()).append(" küsimust");
+                if (m.answered() > 0) b.append(", ").append(Math.round(m.answeredOnTime() * 100.0 / m.answered())).append("% tähtaegselt");
+                if (m.medianDaysToAnswer() != null) b.append(", vastuse mediaan ").append(Math.round(m.medianDaysToAnswer())).append(" päeva");
+                if (m.overdueNow() > 0) b.append(", üle tähtaja praegu: ").append(m.overdueNow());
+                b.append("</li>");
+            }
+            b.append("</ol></section>");
+        }
+
+        var ag = d.agreement();
+        if (ag != null && ag.factions() != null && ag.matrix() != null) {
+            b.append("<section><h2>I. Kes kellega hääletab: fraktsioonide kokkulangevus</h2>")
+             .append("<p>Kui tihti kaks fraktsiooni jõudsid samale enamuse otsusele. Andmed vaid nimelistelt hääletustelt, ")
+             .append("kus mõlemal fraktsioonil oli selge enamus (kokku ").append(ag.totalVotesConsidered())
+             .append(" hääletust).</p><ul>");
+            var f = ag.factions();
+            for (int i = 0; i < f.size(); i++) {
+                for (int j = i + 1; j < f.size(); j++) {
+                    Double v = cell(ag.matrix(), i, j);
+                    if (v == null) continue;
+                    Integer n = ag.support() == null ? null : intCell(ag.support(), i, j);
+                    b.append("<li>").append(esc(f.get(i).shortName())).append(" ja ").append(esc(f.get(j).shortName()))
+                     .append(": ").append(Math.round(v * 100)).append("%")
+                     .append(n != null ? " (" + n + " hääletust)" : "").append("</li>");
+                }
+            }
+            b.append("</ul></section>");
+        }
+
+        var disc = d.discipline();
+        if (disc != null && disc.items() != null && !disc.items().isEmpty()) {
+            b.append("<section><h2>II. Kes hääletab erinevalt oma fraktsioonist</h2>")
+             .append("<p>").append(disc.items().size()).append(" saadikut, kes on kõige sagedamini hääletanud vastupidiselt ")
+             .append("oma fraktsiooni selge enamuse valikule. Nimelised hääletused, kus fraktsioonil oli tegelik enamus.</p><ol>");
+            for (var it : disc.items()) {
+                b.append("<li><a href=\"").append(esc(SITE + "/politicians/" + it.memberSlug())).append("\">")
+                 .append(esc(it.memberName())).append("</a>")
+                 .append(it.factionShortName() != null ? " (" + esc(it.factionShortName()) + ")" : "")
+                 .append(": ").append(pct(it.deviationRate(), ET)).append(", ").append(it.deviations()).append(" / ")
+                 .append(it.eligible()).append(" hääletust fraktsiooni enamusest kõrvale</li>");
+            }
+            b.append("</ol></section>");
+        }
+
+        var flow = d.flow();
+        if (flow != null && flow.nodes() != null && !flow.nodes().isEmpty()) {
+            b.append("<section><h2>III. Kus eelnõud peatuvad: eelnõude vool</h2><p>Kokku ").append(flow.totalBills())
+             .append(" eelnõu. Mitu eelnõu on jõudnud igasse menetlusetappi:</p><ul>");
+            for (var n : flow.nodes()) {
+                if (n.count() <= 0) continue;
+                b.append(li(esc(FLOW_NODE_ET.getOrDefault(n.id(), n.label())) + ": " + n.count()));
+            }
+            b.append("</ul></section>");
+        }
+
+        var vel = d.velocity();
+        if (vel != null && vel.totalAdopted() > 0) {
+            b.append("<section><h2>VII. Kui kiiresti eelnõud läbi lähevad</h2><p>Päevi eelnõu algatamisest vastuvõtmiseni, ")
+             .append(vel.totalAdopted()).append(" vastu võetud eelnõu põhjal: mediaan ").append(vel.medianDays())
+             .append(" päeva, 90. protsentiil ").append(vel.p90Days()).append(" päeva, kiireim ").append(vel.fastestDays())
+             .append(", aeglaseim ").append(vel.slowestDays()).append(" päeva.</p>");
+            if (vel.buckets() != null && !vel.buckets().isEmpty()) {
+                b.append("<ul>");
+                for (var bu : vel.buckets()) b.append(li(esc(bu.label()) + ": " + bu.count()));
+                b.append("</ul>");
+            }
+            b.append("</section>");
+        }
+
+        var night = d.night();
+        if (night != null && night.totalVotes() > 0) {
+            b.append("<section><h2>X. Öised hääletused</h2><p>Riigikogu tavalised istungid toimuvad päeval. Kõigist ")
+             .append(night.totalVotes()).append(" nimelisest hääletusest ").append(night.nightVotes())
+             .append(" (").append(pct(night.nightRatio(), ET)).append(") toimus enne kella ")
+             .append(night.windowStartHour()).append(":00 või pärast ").append(night.windowEndHour())
+             .append(":00, neist ").append(night.lateNightVotes()).append(" kella 22:00 ja 06:00 vahel; nädalavahetusel ")
+             .append(night.weekendVotes()).append(". See ei tähenda automaatselt, et midagi on valesti.</p>");
+            if (night.items() != null && !night.items().isEmpty()) {
+                b.append("<ul>");
+                for (var it : night.items().subList(0, Math.min(10, night.items().size()))) {
+                    b.append("<li><a href=\"").append(esc(SITE + "/votes/" + it.voteId())).append("\">")
+                     .append(esc(it.description() != null ? it.description() : "Hääletus")).append("</a>");
+                    if (it.linkedBillTitle() != null) b.append(": ").append(esc(it.linkedBillTitle()));
+                    b.append(" (").append(esc(localStamp(it.startedAt()))).append(", poolt ").append(it.forCount())
+                     .append(", vastu ").append(it.againstCount()).append(")</li>");
+                }
+                b.append("</ul>");
+            }
+            b.append("</section>");
+        }
+
+        var act = d.activity();
+        if (act != null && act.items() != null && !act.items().isEmpty()) {
+            var ranked = act.items().stream()
+                    .sorted((x, y) -> Integer.compare(y.speeches(), x.speeches())).limit(15).toList();
+            b.append("<section><h2>XI. Kõige aktiivsemad saadikud</h2><p>Sõnavõtud ja küsimused täiskogu stenogrammidest, ")
+             .append("pluss arupärimised ja kirjalikud küsimused jooksval koosseisul. 15 enim sõna võtnud saadikut. ")
+             .append("Arvud kajastavad aktiivsuse mahtu, mitte selle sisu.</p><ol>");
+            for (var m : ranked) {
+                b.append("<li><a href=\"").append(esc(SITE + "/politicians/" + m.memberSlug())).append("\">")
+                 .append(esc(m.memberName())).append("</a>")
+                 .append(m.factionShortName() != null ? " (" + esc(m.factionShortName()) + ")" : "")
+                 .append(": ").append(m.speeches()).append(" sõnavõttu, ").append(m.questions()).append(" küsimust, ")
+                 .append(m.interpellations()).append(" arupärimist, ").append(m.writtenQuestions())
+                 .append(" kirjalikku küsimust</li>");
+            }
+            b.append("</ol></section>");
+        }
+
+        var el = d.elections();
+        if (el != null && el.members() != null && !el.members().isEmpty()) {
+            b.append("<section><h2>XII. Kellel on enim isiklikke hääli</h2><p>Istuvad saadikud 2023. aasta ")
+             .append("Riigikogu valimistel saadud isiklike häälte järgi (15 esimest). Asendajaid, keda ise ei valitud, ei ")
+             .append("näidata.</p><ol>");
+            for (var m : el.members().subList(0, Math.min(15, el.members().size()))) {
+                b.append("<li><a href=\"").append(esc(SITE + "/politicians/" + m.memberSlug())).append("\">")
+                 .append(esc(m.memberName())).append("</a>")
+                 .append(m.partyName() != null ? " (" + esc(m.partyName()) + ")" : "")
+                 .append(": ").append(m.personalVotes()).append(" häält")
+                 .append(m.mandateType() != null ? ", " + esc(MANDATE_ET.getOrDefault(m.mandateType(), m.mandateType()).toLowerCase(Locale.ROOT)) : "")
+                 .append("</li>");
+            }
+            b.append("</ol>");
+            if (el.mandates() != null && !el.mandates().isEmpty()) {
+                b.append("<p>Mandaaditüübid: ");
+                List<String> parts = new ArrayList<>();
+                for (var mc : el.mandates()) parts.add(esc(MANDATE_ET.getOrDefault(mc.mandateType(), mc.mandateType())) + " " + mc.count());
+                b.append(String.join(", ", parts)).append(".</p>");
+            }
+            b.append("</section>");
+        }
+
+        var fin = d.finance();
+        if (fin != null && fin.parties() != null && !fin.parties().isEmpty()) {
+            b.append("<section><h2>XIII. Kuidas parteid on rahastatud</h2><p>Parlamendierakondade deklareeritud tulud alates ")
+             .append(fin.sinceYear()).append(". aastast allikate kaupa, Erakondade Rahastamise Järelevalve Komisjoni (ERJK) ")
+             .append("registrist. Summad on aruandelised, eurodes.</p><ul>");
+            for (var p : fin.parties()) {
+                b.append("<li>").append(esc(p.partyName())).append(": kokku ").append(p.total()).append(" €");
+                if (p.buckets() != null && !p.buckets().isEmpty()) {
+                    List<String> parts = new ArrayList<>();
+                    for (var bu : p.buckets()) if (bu.amount() > 0) parts.add(FINANCE_ET.getOrDefault(bu.key(), bu.key()) + " " + bu.amount() + " €");
+                    b.append(" (").append(String.join(", ", parts)).append(")");
+                }
+                b.append("</li>");
+            }
+            b.append("</ul></section>");
+        }
+
+        var fu = d.funnel();
+        if (fu != null && fu.steps() != null && !fu.steps().isEmpty()) {
+            b.append("<section><h2>XV. Mis saab kollektiivsetest pöördumistest</h2><p>Iga Rahvaalgatus.ee kaudu ")
+             .append("Riigikogule esitatud kollektiivne pöördumine, esimesest kavandist lõpliku otsuseni.</p><ul>");
+            for (var st : fu.steps()) b.append(li(esc(FUNNEL_ET.getOrDefault(st.key(), st.key())) + ": " + st.count()));
+            b.append("</ul>");
+            if (fu.decisions() != null && !fu.decisions().isEmpty()) {
+                b.append("<p>Otsused: ");
+                List<String> parts = new ArrayList<>();
+                for (var dc : fu.decisions()) parts.add(esc(DECISION_ET.getOrDefault(dc.decision(), dc.decision())) + " " + dc.count());
+                b.append(String.join(", ", parts)).append(".</p>");
+            }
+            if (fu.reachedThresholdButNeverSent() > 0) {
+                b.append("<p>").append(fu.reachedThresholdButNeverSent())
+                 .append(" pöördumist kogus nõutud 1000 allkirja, kuid neid Riigikogule kunagi ei saadetud.</p>");
+            }
+            if (fu.sentBelowThreshold() > 0) {
+                b.append("<p>").append(fu.sentBelowThreshold())
+                 .append(" pöördumist saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud.</p>");
+            }
+            if (fu.medianDaysToDecision() != null) {
+                b.append("<p>Mediaan otsuseni: ").append(Math.round(fu.medianDaysToDecision())).append(" päeva (n = ")
+                 .append(fu.medianSampleSize()).append(").</p>");
+            }
+            b.append("</section>");
+        }
+
+        b.append("<p>Ainult interaktiivsena lehel: IV kohalolek istungite kaupa, V hääletuste aeg nädalapäeva ja tunni ")
+         .append("järgi, VI eelnõude teemad, VIII saadikute paiknemine hääletuste põhjal, IX koos algatamise võrgustik.</p>");
+        b.append("</article>");
+
+        b.append("<section lang=\"en\"><p>Analytics on the Estonian parliament (Riigikogu), computed only from its open data: ")
+         .append("how often parliamentary groups vote the same way, MPs who most often vote against their group's majority, ")
+         .append("where bills stop, how fast bills pass, night votes, the most active MPs, personal votes in the 2023 election, ")
+         .append("party finance (ERJK) and citizen initiatives.");
+        if (lat != null && lat.ministers() != null && !lat.ministers().isEmpty()) {
+            b.append(" Section XIV measures how quickly each minister answers MPs' interpellations and written questions ")
+             .append("against the deadline recorded by the source: share answered on time, median days to answer and ")
+             .append("questions overdue right now.");
+        }
+        b.append("</p></section>");
+        b.append("<section lang=\"ru\"><p>Аналитика по парламенту Эстонии (Рийгикогу) только на основе открытых данных: ")
+         .append("насколько часто фракции голосуют одинаково, кто чаще других голосует против большинства своей фракции, ")
+         .append("где останавливаются законопроекты, ночные голосования, самые активные депутаты, личные голоса на выборах 2023 года, ")
+         .append("финансирование партий и гражданские инициативы. Раздел XIV: как быстро министры отвечают на запросы и ")
+         .append("письменные вопросы депутатов относительно срока, указанного в источнике.</p></section>");
+
+        return new Page("Analüütika — Riigiluup",
+                "Riigikogu analüütika avaandmete põhjal: fraktsioonide kokkulangevus, ministrite vastamise kiirus, "
+                        + "eelnõude vool, öised hääletused, aktiivsus, valimised ja erakondade rahastamine.",
+                wrap(b), null);
+    }
+
+    private static final Locale ET = Locale.forLanguageTag("et");
+
+    private static Double cell(List<List<Double>> m, int i, int j) {
+        if (i >= m.size() || m.get(i) == null || j >= m.get(i).size()) return null;
+        return m.get(i).get(j);
+    }
+
+    private static Integer intCell(List<List<Integer>> m, int i, int j) {
+        if (i >= m.size() || m.get(i) == null || j >= m.get(i).size()) return null;
+        return m.get(i).get(j);
+    }
+
+    /** "2026-06-17T21:10:51.860Z" -> "18.06.2026 00:10" (Tallinn); anything unparseable is shown as is. */
+    private static String localStamp(String iso) {
+        if (iso == null) return "";
+        try {
+            return DATE_TIME.format(java.time.Instant.parse(iso).atZone(TALLINN));
+        } catch (Exception e) {
+            try {
+                return DATE_TIME.format(java.time.OffsetDateTime.parse(iso).atZoneSameInstant(TALLINN));
+            } catch (Exception e2) {
+                return iso;
+            }
+        }
+    }
+
     private static String roleEt(String role) {
         if (role == null) return null;
         return switch (role) {
