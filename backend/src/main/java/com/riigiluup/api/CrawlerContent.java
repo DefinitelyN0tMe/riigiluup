@@ -141,8 +141,13 @@ final class CrawlerContent {
         if (when != null) b.append(", ").append(when);
         if (v.sittingTitle() != null) b.append(" (").append(esc(v.sittingTitle())).append(')');
         b.append(".</p><ul>");
+        // The source's resultAbstained overlaps (did-not-vote + absent); the true partition is the one
+        // the vote page uses (frontend lib/voteTally): abstained = neutral, didNotVote = present minus
+        // the three cast choices, absent = absent. It sums to the seat count.
+        int abstained = v.resultNeutral();
+        int didNotVote = Math.max(0, v.resultPresent() - v.resultInFavor() - v.resultAgainst() - v.resultNeutral());
         b.append(li("Poolt: " + v.resultInFavor() + "; vastu: " + v.resultAgainst() + "; erapooletuid: "
-                + v.resultAbstained() + "; puudus: " + v.resultAbsent()));
+                + abstained + "; ei hääletanud: " + didNotVote + "; puudus: " + v.resultAbsent()));
         if (v.linkedBill() != null && v.linkedBill().title() != null) {
             b.append("<li>Eelnõu: <a href=\"").append(esc(SITE + "/legislation/" + v.linkedBill().id())).append("\">")
                     .append(esc(v.linkedBill().title())).append("</a></li>");
@@ -160,12 +165,14 @@ final class CrawlerContent {
         b.append("</article>");
         b.append("<section lang=\"en\"><p>Roll-call vote in the Estonian parliament (Riigikogu)")
                 .append(when != null ? " on " + when : "").append(": ").append(v.resultInFavor()).append(" for, ")
-                .append(v.resultAgainst()).append(" against, ").append(v.resultAbstained()).append(" abstained.</p></section>");
+                .append(v.resultAgainst()).append(" against, ").append(abstained).append(" abstained, ")
+                .append(didNotVote).append(" did not vote, ").append(v.resultAbsent()).append(" absent.</p></section>");
         b.append("<section lang=\"ru\"><p>Поимённое голосование в Рийгикогу")
                 .append(when != null ? " " + when : "").append(": за ").append(v.resultInFavor()).append(", против ")
-                .append(v.resultAgainst()).append(", воздержались ").append(v.resultAbstained()).append(".</p></section>");
+                .append(v.resultAgainst()).append(", воздержались ").append(abstained).append(", не голосовали ")
+                .append(didNotVote).append(", отсутствовали ").append(v.resultAbsent()).append(".</p></section>");
         String desc = title + (when != null ? " (" + when + ")" : "") + ": poolt " + v.resultInFavor()
-                + ", vastu " + v.resultAgainst() + ", erapooletuid " + v.resultAbstained() + ".";
+                + ", vastu " + v.resultAgainst() + ", erapooletuid " + abstained + ", ei hääletanud " + didNotVote + ".";
         return new Page(title + " — Riigiluup", desc, wrap(b), null);
     }
 
