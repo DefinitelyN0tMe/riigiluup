@@ -19,6 +19,7 @@ import com.riigiluup.source.SourceSnapshotRepository;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -140,7 +141,12 @@ public class LegislativeItemImporter {
             int[] cnt = paginateAndUpsert(from, to);
             seen = cnt[0];
             upserted = cnt[1];
-            run.setStatus("SUCCESS");
+            if (cnt[2] > 0) {
+                run.setStatus("PARTIAL");
+                run.setErrorMessage(cnt[2] + " draft(s) the source would not serve (404) were skipped");
+            } else {
+                run.setStatus("SUCCESS");
+            }
         } catch (Exception e) {
             log.error("legislation window import failed", e);
             run.setStatus("FAILED");
@@ -161,29 +167,34 @@ public class LegislativeItemImporter {
      * {@link #runAllDrafts} (wide range).
      */
     private int[] paginateAndUpsert(LocalDate from, LocalDate to) {
-        int seen = 0, upserted = 0;
+        int[] acc = new int[3]; // seen, upserted, skipped (unservable at source)
         int pageNum = 0;
         int fetchSize = 100;
         int safety = 500;
+        Integer totalPages = null;
         while (true) {
             log.info("fetching drafts window {}..{} page={}", from, to, pageNum);
-            DraftListDto page = client.fetchDraftsInWindow(from, to, pageNum, fetchSize);
+            DraftListDto page;
+            try {
+                page = client.fetchDraftsInWindow(from, to, pageNum, fetchSize);
+            } catch (HttpClientErrorException.NotFound e) {
+                // The source intermittently 404s a whole page of the catalogue (seen from 24.09.2026:
+                // page 73 of 90 at size=100) while the same records are served fine in smaller pages.
+                // One bad page used to abort the whole daily refresh, freezing every bill after it.
+                // Re-read that span in small pages and skip only what still will not come back.
+                log.warn("drafts page {} (size {}) returned 404, re-reading it in pages of {}",
+                        pageNum, fetchSize, FALLBACK_SIZE);
+                rereadSpanInSmallPages(from, to, pageNum, fetchSize, acc);
+                if (totalPages == null || pageNum >= totalPages - 1) break;
+                pageNum++;
+                continue;
+            }
             if (page == null || page._embedded() == null
                     || page._embedded().content() == null
                     || page._embedded().content().isEmpty()) break;
-            for (DraftListDto.DraftListEntry entry : page._embedded().content()) {
-                seen++;
-                try {
-                    tx.executeWithoutResult(status -> upsertOne(entry));
-                    upserted++;
-                } catch (CallNotPermittedException e) {
-                    throw e; // circuit breaker open → let the run fail instead of persisting stage-less bills
-                } catch (Exception e) {
-                    log.warn("failed draft {} ({}): {}",
-                            entry.uuid(), entry.title(), e.toString());
-                }
-            }
+            upsertEntries(page._embedded().content(), acc);
             DraftListDto.Page meta = page.page();
+            if (meta != null && meta.totalPages() != null) totalPages = meta.totalPages();
             boolean lastPage = meta == null
                     || meta.totalPages() == null
                     || meta.number() == null
@@ -196,7 +207,48 @@ public class LegislativeItemImporter {
                 break;
             }
         }
-        return new int[]{seen, upserted};
+        if (acc[2] > 0) {
+            log.warn("draft-window {}..{}: {} draft(s) skipped, source returned 404 for them", from, to, acc[2]);
+        }
+        return acc;
+    }
+
+    private static final int FALLBACK_SIZE = 10;
+
+    /** Re-reads the records of one {@code bigSize} page as {@code FALLBACK_SIZE}-sized pages. */
+    private void rereadSpanInSmallPages(LocalDate from, LocalDate to, int bigPage, int bigSize, int[] acc) {
+        int perBig = bigSize / FALLBACK_SIZE;
+        for (int i = 0; i < perBig; i++) {
+            int small = bigPage * perBig + i;
+            DraftListDto sub;
+            try {
+                sub = client.fetchDraftsInWindow(from, to, small, FALLBACK_SIZE);
+            } catch (HttpClientErrorException.NotFound e) {
+                log.warn("drafts page {} (size {}) still 404, skipping up to {} draft(s)",
+                        small, FALLBACK_SIZE, FALLBACK_SIZE);
+                acc[2] += FALLBACK_SIZE;
+                continue;
+            }
+            if (sub == null || sub._embedded() == null
+                    || sub._embedded().content() == null
+                    || sub._embedded().content().isEmpty()) return; // ran past the end of the catalogue
+            upsertEntries(sub._embedded().content(), acc);
+        }
+    }
+
+    private void upsertEntries(List<DraftListDto.DraftListEntry> entries, int[] acc) {
+        for (DraftListDto.DraftListEntry entry : entries) {
+            acc[0]++;
+            try {
+                tx.executeWithoutResult(status -> upsertOne(entry));
+                acc[1]++;
+            } catch (CallNotPermittedException e) {
+                throw e; // circuit breaker open → let the run fail instead of persisting stage-less bills
+            } catch (Exception e) {
+                log.warn("failed draft {} ({}): {}",
+                        entry.uuid(), entry.title(), e.toString());
+            }
+        }
     }
 
     private void upsertOne(DraftListDto.DraftListEntry entry) {
