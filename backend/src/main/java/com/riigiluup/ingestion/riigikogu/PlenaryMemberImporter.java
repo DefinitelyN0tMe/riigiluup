@@ -45,6 +45,7 @@ public class PlenaryMemberImporter {
             for (PlenaryMemberDto dto : dtos) {
                 if (upsert(dto)) upserted++;
             }
+            deactivateMembersGoneFromList(dtos);
             run.setRecordsSeen(dtos.size());
             run.setRecordsUpserted(upserted);
             run.setStatus("SUCCESS");
@@ -58,6 +59,33 @@ public class PlenaryMemberImporter {
         }
         return run;
     }
+
+    /**
+     * The list feed is the current composition of the Riigikogu. A member whose mandate ended (for
+     * example a substitute whose minister returned) simply disappears from it, and upsert() never
+     * sees them again, so they used to stay active forever: the site showed 103 sitting MPs for a
+     * 101-seat parliament. Mark such members inactive. Guarded against a truncated response: a list
+     * far below the chamber size is treated as a source hiccup and nobody is deactivated.
+     */
+    private void deactivateMembersGoneFromList(List<PlenaryMemberDto> dtos) {
+        if (dtos.size() < MIN_PLAUSIBLE_LIST_SIZE) {
+            log.warn("plenary-members list has only {} entries, skipping deactivation of absent members",
+                    dtos.size());
+            return;
+        }
+        java.util.Set<String> current = new java.util.HashSet<>();
+        for (PlenaryMemberDto dto : dtos) current.add(dto.uuid());
+        for (PlenaryMember m : memberRepo.findByActiveTrueOrderByLastNameAscFirstNameAsc()) {
+            if (!client.sourceName().equals(m.getSourceName())) continue;
+            if (current.contains(m.getExternalId())) continue;
+            m.setActive(false);
+            m.setUpdatedAt(Instant.now());
+            log.info("member {} no longer in the Riigikogu list, marked inactive", m.getFullName());
+        }
+    }
+
+    /** The chamber has 101 seats; a list much shorter than that is a partial response, not reality. */
+    private static final int MIN_PLAUSIBLE_LIST_SIZE = 90;
 
     private boolean upsert(PlenaryMemberDto dto) {
         String payloadStr;
