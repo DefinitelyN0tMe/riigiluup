@@ -50,12 +50,18 @@ public interface SourceSnapshotRepository extends JpaRepository<SourceSnapshot, 
      * Batched delete (one bounded transaction per call) so a large ageing cohort can't blow the
      * 30 s statement_timeout in a single statement — which would roll back and never succeed,
      * letting the table grow unbounded. The retention job loops this until it returns 0.
+     * The newest snapshot of each entity is never deleted, however old: change detection skips a
+     * re-fetch only when a detail snapshot exists, so purging the last one would make the next run
+     * re-download every unchanged bill (~8,000 calls at 1 req/s) as if it were new.
      */
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM source_snapshot WHERE id IN ("
-            + "SELECT id FROM source_snapshot "
-            + "WHERE entity_type IN (:entityTypes) AND fetched_at < :cutoff LIMIT :batch)",
+            + "SELECT s.id FROM source_snapshot s "
+            + "WHERE s.entity_type IN (:entityTypes) AND s.fetched_at < :cutoff "
+            + "AND EXISTS (SELECT 1 FROM source_snapshot n WHERE n.source_name = s.source_name "
+            + "AND n.entity_type = s.entity_type AND n.external_id = s.external_id "
+            + "AND n.fetched_at > s.fetched_at) LIMIT :batch)",
             nativeQuery = true)
     int deleteBatchByEntityTypeInAndFetchedAtBefore(
             @org.springframework.data.repository.query.Param("entityTypes")

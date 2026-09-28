@@ -93,6 +93,11 @@ resilience4j:
         slidingWindowSize: 20
         failureRateThreshold: 50
         waitDurationInOpenState: 30s
+        # A 404 means "this resource does not exist" (a missing catalogue page, a file UUID nobody
+        # has), not "the source is down". Counting it as a failure let a few missing resources, or
+        # a burst of requests for random file ids, open the breaker and stall every importer.
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException$NotFound
 
 riigiluup:
   cors:

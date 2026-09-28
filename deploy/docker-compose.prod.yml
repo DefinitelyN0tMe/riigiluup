@@ -88,6 +88,16 @@ services:
   web:
     build: ../frontend
     restart: unless-stopped
+    # Static-only check (the SPA shell is served), deliberately NOT through /api-proxy: an API outage
+    # must not make autoheal restart the web container. Catches a dead or wedged web nginx, which the
+    # external /healthz monitor cannot see (it goes edge -> api directly).
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/index.html || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    labels:
+      autoheal: "true"
     logging:
       driver: json-file
       options:
@@ -163,7 +173,7 @@ services:
       - letsencrypt:/etc/letsencrypt
       - certbot_webroot:/var/www/certbot
 
-  # Watches only containers labelled autoheal=true (currently just api) and runs `docker restart`
+  # Watches only containers labelled autoheal=true (api and web) and runs `docker restart`
   # when Docker marks them 'unhealthy'. Fills the gap Compose leaves: restart: unless-stopped only
   # reacts to a crash/exit, not to a process that is alive but wedged (api replying DOWN to its
   # healthcheck). Needs the Docker socket to issue restarts — that grants Docker-daemon control, so

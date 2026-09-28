@@ -16,6 +16,12 @@ public interface ImportRunLogRepository extends JpaRepository<ImportRunLog, UUID
      *  instead of a fixed offset, so a downtime longer than the window does not silently lose data. */
     Optional<ImportRunLog> findFirstByJobNameAndStatusOrderByStartedAtDesc(String jobName, String status);
 
+    /** Latest run of a job that landed data (SUCCESS or PARTIAL): the freshness watchdog's yardstick. */
+    Optional<ImportRunLog> findFirstByJobNameAndStatusInOrderByStartedAtDesc(String jobName, java.util.Collection<String> statuses);
+
+    /** Latest run of a job whatever its outcome. */
+    Optional<ImportRunLog> findFirstByJobNameOrderByStartedAtDesc(String jobName);
+
     /** Most recent successful (or partial) import finish time — drives the "last sync" stat. */
     @Query("select max(r.finishedAt) from ImportRunLog r where r.status in ('SUCCESS', 'PARTIAL')")
     Optional<Instant> findLastSuccessfulSyncAt();

@@ -33,26 +33,26 @@ class SnapshotRetentionJobIntegrationTest extends AbstractIntegrationTest {
         Instant longAgo = Instant.now().minus(365, ChronoUnit.DAYS); // > 180
         Instant recent = Instant.now().minus(10, ChronoUnit.DAYS);   // < 180
 
-        // Stale details of each retained kind — should be purged.
-        repo.save(snapshot("voting-detail", "stale-vote", longAgo));
-        repo.save(snapshot("draft-detail", "stale-draft", longAgo));
+        // Stale details that have a newer snapshot of the same entity: purged.
+        repo.save(snapshot("voting-detail", "vote-a", longAgo));
+        repo.save(snapshot("voting-detail", "vote-a", recent));
+        repo.save(snapshot("draft-detail", "draft-a", longAgo));
+        repo.save(snapshot("draft-detail", "draft-a", longAgo.plus(1, ChronoUnit.DAYS)));
+
+        // Stale but the only (latest) snapshot of its entity: kept, change detection depends on it.
         repo.save(snapshot("plenary-member-detail", "stale-mp", longAgo));
 
-        // Recent detail — retained.
-        repo.save(snapshot("voting-detail", "recent-vote", recent));
-
-        // Stale summary — retained (only detail types are purged).
+        // Stale summary: retained (only detail types are purged).
         repo.save(snapshot("voting-summary", "stale-summary", longAgo));
 
-        assertThat(repo.count()).isEqualTo(5);
+        assertThat(repo.count()).isEqualTo(6);
 
         job.purgeOldDetailSnapshots();
 
-        // Two survivors: recent-vote (detail but young) + stale-summary (wrong type).
-        assertThat(repo.count()).isEqualTo(2);
         assertThat(repo.findAll())
-                .extracting(SourceSnapshot::getExternalId)
-                .containsExactlyInAnyOrder("recent-vote", "stale-summary");
+                .extracting(x -> x.getExternalId() + "@" + (x.getFetchedAt().isBefore(recent.minusSeconds(1)) ? "old" : "new"))
+                .containsExactlyInAnyOrder("vote-a@new", "draft-a@old", "stale-mp@old", "stale-summary@old");
+        assertThat(repo.count()).isEqualTo(4);
     }
 
     @Test

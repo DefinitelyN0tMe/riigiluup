@@ -58,10 +58,40 @@ public class DailyRefreshJob {
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     /**
+     * Runs one import step in isolation: an exception or a returned FAILED run log is logged and sent
+     * to Telegram, and the caller carries on with the next step. Importers record most failures as a
+     * FAILED row and return normally, so checking the returned status is what makes them visible.
+     * PARTIAL (some records skipped, the rest landed) is logged only; the freshness watchdog covers a
+     * job that stops landing data altogether.
+     */
+    private void step(String label, java.util.function.Supplier<Object> body) {
+        try {
+            Object result = body.get();
+            if (result instanceof com.riigiluup.ingestion.riigikogu.ImportRunLog run) {
+                if ("FAILED".equals(run.getStatus())) {
+                    String err = run.getErrorMessage() == null ? "" : " — " + abbreviate(run.getErrorMessage());
+                    log.error("{} failed: {}", label, run.getErrorMessage());
+                    alert.send("⚠️ RiigiLuup: " + label + " ebaõnnestus" + err);
+                } else if ("PARTIAL".equals(run.getStatus())) {
+                    log.warn("{} partial: {}", label, run.getErrorMessage());
+                }
+            }
+        } catch (Exception e) {
+            log.error("{} failed", label, e);
+            alert.send("⚠️ RiigiLuup: " + label + " ebaõnnestus — " + abbreviate(e.toString()));
+        }
+    }
+
+    private static String abbreviate(String s) {
+        String one = s.replaceAll("\\s+", " ").trim();
+        return one.length() > 200 ? one.substring(0, 200) + "…" : one;
+    }
+
+    /**
      * Votes AND stenograms every 6 hours so new roll-calls and speeches appear the same day.
      * Cheap: the votings list is date-filtered and historical votes are immutable, so only the
-     * recent window is fetched; the verbatims window is a single API call. Speeches run in their
-     * own try/catch so a stenogram failure never masks or aborts the vote refresh (and vice versa).
+     * recent window is fetched; the verbatims window is a single API call. Each step is isolated, so a
+     * stenogram failure never masks or aborts the vote refresh (and vice versa).
      */
     @Scheduled(cron = "${riigiluup.schedule.votes-refresh-cron}",
                zone = "${riigiluup.schedule.daily-refresh-zone}")
@@ -74,23 +104,15 @@ public class DailyRefreshJob {
         java.time.Instant since = java.time.Instant.now();
         try {
             LocalDate today = LocalDate.now(TALLINN);
-            voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today);
-            voteBillLinker.linkAll();
-            log.info("Votes refresh finished");
-        } catch (Exception e) {
-            log.error("Votes refresh failed", e);
-            alert.send("⚠️ RiigiLuup: hääletuste värskendus ebaõnnestus — " + e);
-        }
-        try {
+            step("hääletuste värskendus",
+                    () -> voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today));
+            step("hääletuste ja eelnõude sidumine", voteBillLinker::linkAll);
             // 7-day speech window, 6-hourly: stenograms publish next day and get edited for a few
             // days after, so re-upserting a week keeps texts converged with the source, and polling
             // every 6 hours picks a freshly published stenogram up within hours, not the next morning.
-            LocalDate today = LocalDate.now(TALLINN);
-            speechImporter.runWindow(windowStart("speeches.window-refresh", today, 7, 60), today);
-            log.info("Speeches refresh finished");
-        } catch (Exception e) {
-            log.error("Speeches refresh failed", e);
-            alert.send("⚠️ RiigiLuup: stenogrammide värskendus ebaõnnestus — " + e);
+            step("stenogrammide värskendus",
+                    () -> speechImporter.runWindow(windowStart("speeches.window-refresh", today, 7, 60), today));
+            log.info("Votes refresh finished");
         } finally {
             cacheEvictor.evictAll();
             indexNow.submitChangedSince(since);
@@ -102,6 +124,7 @@ public class DailyRefreshJob {
      * Members, committees and legislation once a day. Legislation uses change-detection so the whole
      * bill catalogue is not re-downloaded; member detail IS force-refreshed daily (see below) so
      * faction/committee moves surface next-day, since the list feed carries no faction to diff on.
+     * Every step runs in isolation: one failing source no longer skips everything after it.
      */
     @Scheduled(cron = "${riigiluup.schedule.daily-refresh-cron}",
                zone = "${riigiluup.schedule.daily-refresh-zone}")
@@ -113,33 +136,31 @@ public class DailyRefreshJob {
         log.info("Daily refresh starting");
         java.time.Instant since = java.time.Instant.now();
         try {
-            usergroupImporter.runOnce();
-            memberImporter.runOnce();
+            LocalDate today = LocalDate.now(TALLINN);
+            step("komisjonide ja ühenduste värskendus", usergroupImporter::runOnce);
+            step("saadikute nimekirja värskendus", memberImporter::runOnce);
             // Force a full detail refresh daily (not the 7-day freshness-gated path): the
             // /api/plenary-members list feed carries no faction, so member detail is the only
             // source of faction, committee role and the faction-history timeline. Refreshing it
             // every day means a faction departure/switch or committee change shows up the next
             // day rather than up to a week later. ~101 throttled calls, a couple of minutes.
-            detailImporter.runOnce(true);
-            LocalDate today = LocalDate.now(TALLINN);
-            voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today);
-            legislationImporter.runWindow(today.minusDays(7), today);
+            step("saadikute detailide värskendus", () -> detailImporter.runOnce(true));
+            step("hääletuste värskendus",
+                    () -> voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today));
+            step("eelnõude värskendus", () -> legislationImporter.runWindow(today.minusDays(7), today));
             // A new amendment does not change a bill's stage, so the change-detection window above
             // skips it; refresh amendments for all active bills daily so new proposals surface next-day.
-            legislationImporter.refreshActiveBillAmendments();
-            voteBillLinker.linkAll();
+            step("muudatusettepanekute värskendus", () -> { legislationImporter.refreshActiveBillAmendments(); return null; });
+            step("hääletuste ja eelnõude sidumine", voteBillLinker::linkAll);
             // Speeches are refreshed 6-hourly in refreshVotes() (see above), not here.
             // Oversight: pick up new written questions/interpellations and answers (incl. late replies
             // to older questions). Cheap windowed re-scan of the document register.
-            oversightImporter.refreshRecent();
-            cacheEvictor.evictAll();
+            step("arupärimiste ja küsimuste värskendus", oversightImporter::refreshRecent);
             checkIntegrity();
             log.info("Daily refresh finished");
-        } catch (Exception e) {
-            log.error("Daily refresh failed", e);
-            alert.send("⚠️ RiigiLuup: igapäevane värskendus ebaõnnestus — " + e);
         } finally {
-            // Also after a partial failure: whatever did land is live and worth announcing.
+            // Also after a partial failure: whatever did land is live and worth showing and announcing.
+            cacheEvictor.evictAll();
             indexNow.submitChangedSince(since);
             running.set(false);
         }

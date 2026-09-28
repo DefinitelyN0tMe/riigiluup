@@ -281,7 +281,11 @@ public class LegislativeItemImporter {
             existing.setSourceSnapshot(listSnap);
             existing = itemRepo.save(existing);
         } else {
-            mapper.applyDetail(existing, toDetailShapeFromEntry(entry));
+            // Do not pre-apply the list entry to a bill we already have: the list shape has no
+            // introduction/initial title/acceptance date, so applying it nulled those fields, and if
+            // the detail fetch below then failed, the new stage codes made the next run's change
+            // detection skip the bill for good. Left untouched, a failed fetch is simply retried
+            // next run (stage/status still differ from the list).
             existing.setSourceSnapshot(listSnap);
         }
 
@@ -501,16 +505,6 @@ public class LegislativeItemImporter {
                     .topic(topic)
                     .build());
         }
-    }
-
-    /** Wrap a list entry as a synthetic detail for the mapper's applyDetail path. */
-    private static DraftDetailDto toDetailShapeFromEntry(DraftListDto.DraftListEntry e) {
-        return new DraftDetailDto(
-                e.uuid(), e.title(), null, e.mark(), e.membership(), e.draftTypeCode(),
-                e.activeDraftStage(), e.activeDraftStatus(), null,
-                e.initiated(), null, e.amendmentsDeadline(),
-                e.leadingCommittee(), List.of(), List.of(), List.of(), List.of()
-        );
     }
 
     private SourceSnapshot snapshotFor(String entity, String externalId, Object payload) {

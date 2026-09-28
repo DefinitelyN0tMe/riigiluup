@@ -129,7 +129,18 @@ public class PlenaryMemberDetailImporter {
             } while (slice.hasNext());
             log.info("detail refresh: {} fetched, {} skipped as fresh (< {} days)",
                     upserted, skipped, detailMaxAgeDays);
-            run.setStatus("SUCCESS");
+            // Per-member failures are caught above so one bad record cannot stop the rest, but they
+            // must not add up to a silent "SUCCESS": report what did not land.
+            int failed = seen - skipped - upserted;
+            if (failed > 0 && upserted == 0) {
+                run.setStatus("FAILED");
+                run.setErrorMessage("all " + failed + " member detail fetches failed");
+            } else if (failed > 0) {
+                run.setStatus("PARTIAL");
+                run.setErrorMessage(failed + " member detail fetch(es) failed");
+            } else {
+                run.setStatus("SUCCESS");
+            }
         } catch (Exception e) {
             log.error("detail refresh outer loop failed", e);
             run.setStatus("FAILED");
