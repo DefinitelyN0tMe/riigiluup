@@ -47,13 +47,15 @@ final class CrawlerContent {
     static Page politician(PoliticianProfileDto p) {
         String name = p.fullName();
         String faction = p.faction() != null ? p.faction().name() : null;
+        boolean nonAttached = faction != null && faction.toLowerCase(Locale.ROOT).contains("mittekuuluv");
         String role = p.active() ? "Riigikogu liige" : "Endine Riigikogu liige";
         String url = SITE + "/politicians/" + p.slug();
 
         StringBuilder b = new StringBuilder();
         b.append("<article lang=\"et\"><h1>").append(esc(name)).append("</h1>");
         b.append("<p>").append(esc(role));
-        if (faction != null) b.append(". Fraktsioon: ").append(esc(faction));
+        if (nonAttached) b.append(". Ei kuulu ühtegi fraktsiooni");
+        else if (faction != null) b.append(". Fraktsioon: ").append(esc(faction));
         if (p.electoralDistrict() != null) b.append(". Valimisringkond: ").append(esc(p.electoralDistrict()));
         b.append(".</p><ul>");
         List<String> descBits = new ArrayList<>();
@@ -79,7 +81,7 @@ final class CrawlerContent {
         }
         if (p.election() != null && p.election().personalVotes() > 0) {
             b.append(li("Riigikogu valimised 2023: " + p.election().personalVotes() + " isiklikku häält"
-                    + (p.election().partyName() != null ? " (" + esc(p.election().partyName()) + " nimekiri)" : "")));
+                    + (p.election().partyName() != null ? " (nimekiri: " + esc(p.election().partyName()) + ")" : "")));
         }
         if (p.committees() != null && !p.committees().isEmpty()) {
             List<String> names = p.committees().stream().map(PoliticianProfileDto.GroupMembershipDto::name)
@@ -97,19 +99,21 @@ final class CrawlerContent {
                 ? pct(p.voting().participationRate(), Locale.forLanguageTag("ru")) : null;
         b.append("<section lang=\"en\"><p>").append(esc(name)).append(" is ")
                 .append(p.active() ? "a member" : "a former member").append(" of the Riigikogu, the parliament of Estonia")
-                .append(faction != null ? " (" + esc(faction) + ")" : "").append('.');
+                .append(nonAttached ? ", not affiliated with any parliamentary group"
+                        : faction != null ? " (" + esc(faction) + ")" : "").append('.');
         if (votePctEn != null) b.append(" Voted in ").append(votePctEn).append(" of recorded roll-call votes.");
         if (p.activity() != null) b.append(' ').append(p.activity().speeches()).append(" plenary speeches.");
         b.append("</p></section>");
         b.append("<section lang=\"ru\"><p>").append(esc(name)).append(p.active() ? " — депутат" : " — бывший депутат")
                 .append(" Рийгикогу, парламента Эстонии")
-                .append(faction != null ? " (" + esc(faction) + ")" : "").append('.');
+                .append(nonAttached ? ", не входит ни в одну фракцию"
+                        : faction != null ? " (" + esc(faction) + ")" : "").append('.');
         if (votePctRu != null) b.append(" Участие в поимённых голосованиях: ").append(votePctRu).append('.');
         if (p.activity() != null) b.append(" Выступлений на пленарных заседаниях: ").append(p.activity().speeches()).append('.');
         b.append("</p></section>");
 
-        String desc = name + ": " + role.toLowerCase(Locale.ROOT)
-                + (faction != null ? ", " + faction : "")
+        String desc = name + ": " + role
+                + (nonAttached ? ", fraktsioonidesse mittekuuluv" : faction != null ? ", " + faction : "")
                 + (descBits.isEmpty() ? "" : ". " + capitalize(String.join(", ", descBits)))
                 + ". Andmed Riigikogu avaandmetest.";
 
@@ -121,7 +125,7 @@ final class CrawlerContent {
         StringBuilder ld = new StringBuilder("{\"@context\":\"https://schema.org\",\"@type\":\"Person\"");
         ld.append(",\"name\":").append(js(name)).append(",\"url\":").append(js(url));
         ld.append(",\"jobTitle\":").append(js(role));
-        if (faction != null) ld.append(",\"memberOf\":{\"@type\":\"Organization\",\"name\":").append(js(faction)).append('}');
+        if (faction != null && !nonAttached) ld.append(",\"memberOf\":{\"@type\":\"Organization\",\"name\":").append(js(faction)).append('}');
         if (!sameAs.isEmpty()) ld.append(",\"sameAs\":").append(jsArr(sameAs));
         ld.append('}');
         return new Page(name + " — Riigiluup", desc, wrap(b), ld.toString());
