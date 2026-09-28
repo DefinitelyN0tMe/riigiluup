@@ -121,7 +121,7 @@ class CrawlerContentTest {
     void billStatusReflectsTheRealOutcomeNotAlwaysInProceedings() {
         CrawlerContent.Page rejected = CrawlerContent.legislation(bill("REJECTED", "TAGASI_LYKATUD", null));
         assertThat(rejected.bodyHtml())
-                .contains("Seaduse eelnõu 127 SE (XV Riigikogu), algatatud 01.06.2023. Tagasi lükatud 25.10.2023.")
+                .contains("Seaduse eelnõu 127 SE (XV Riigikogu), algatatud 01.06.2023. Tagasi lükatud.")
                 .contains("Status: rejected").contains("Статус: отклонён")
                 .doesNotContain("menetluses").doesNotContain("EFFECTUATION").contains("Jõustumine");
         assertThat(rejected.jsonLd()).doesNotContain("legislationPassedBy");
@@ -134,7 +134,7 @@ class CrawlerContentTest {
         assertThat(CrawlerContent.legislation(bill("IN_READINGS", "TEINE_LUGEMINE", null)).bodyHtml())
                 .contains("Riigikogu menetluses (teine lugemine).");
         assertThat(CrawlerContent.legislation(bill("OTHER", "VALJA_LANGENUD_KOOSEISU_LOPPEMISEGA", null)).bodyHtml())
-                .contains("Menetlusest välja langenud Riigikogu koosseisu volituste lõppemisega 25.10.2023.");
+                .contains("Menetlusest välja langenud Riigikogu koosseisu volituste lõppemisega.");
     }
 
     @Test

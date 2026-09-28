@@ -766,17 +766,18 @@ final class CrawlerContent {
     /** Where the bill stands, in the words the bill page uses; never "in proceedings" for a closed bill. */
     static String statusEt(LegislationDetailDto d) {
         String code = d.activeStageSourceCode() == null ? "" : d.activeStageSourceCode();
-        String when = d.activeStatusDate() != null ? " " + DATE.format(d.activeStatusDate()) : "";
+        // No date for non-adopted outcomes: the source's activeStatusDate is not the date of the
+        // outcome (bill 985 OE: 02.09 while it was rejected on 23.09). The dated stages follow below.
         switch (d.phase() == null ? "OTHER" : d.phase()) {
             case "ADOPTED":
-                return "vastu võetud" + (d.acceptedDate() != null ? " " + DATE.format(d.acceptedDate()) : when);
+                return "vastu võetud" + (d.acceptedDate() != null ? " " + DATE.format(d.acceptedDate()) : "");
             case "REJECTED":
-                return "tagasi lükatud" + when;
+                return "tagasi lükatud";
             case "WITHDRAWN":
                 return switch (code) {
-                    case "TAGASTATUD" -> "tagastatud algatajale" + when;
-                    case "LOPETATUD" -> "menetlus lõpetatud" + when;
-                    default -> "tagasi võetud" + when;
+                    case "TAGASTATUD" -> "tagastatud algatajale";
+                    case "LOPETATUD" -> "menetlus lõpetatud";
+                    default -> "tagasi võetud";
                 };
             case "SUBMITTED":
                 return "Riigikogu menetluses";
@@ -789,11 +790,11 @@ final class CrawlerContent {
             }
             default:
                 return switch (code) {
-                    case "VALJA_LANGENUD" -> "menetlusest välja langenud" + when;
-                    case "VALJA_LANGENUD_KOOSEISU_LOPPEMISEGA" -> "menetlusest välja langenud Riigikogu koosseisu volituste lõppemisega" + when;
-                    case "YHENDATUD" -> "ühendatud teise eelnõuga" + when;
-                    case "VALJA_ARVATUD" -> "menetlusest välja arvatud" + when;
-                    case "VALJA_KUULUTAMATA_JAETUD" -> "välja kuulutamata jäetud" + when;
+                    case "VALJA_LANGENUD" -> "menetlusest välja langenud";
+                    case "VALJA_LANGENUD_KOOSEISU_LOPPEMISEGA" -> "menetlusest välja langenud Riigikogu koosseisu volituste lõppemisega";
+                    case "YHENDATUD" -> "ühendatud teise eelnõuga";
+                    case "VALJA_ARVATUD" -> "menetlusest välja arvatud";
+                    case "VALJA_KUULUTAMATA_JAETUD" -> "välja kuulutamata jäetud";
                     default -> "menetluse seis: vaata Riigikogu eelnõu lehte";
                 };
         }
