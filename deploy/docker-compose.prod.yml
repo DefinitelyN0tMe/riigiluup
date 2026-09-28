@@ -56,6 +56,8 @@ services:
       # Personal Telegram bot for ops alerts (import failures, startup). Blank = alerts disabled.
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_ALERT_CHAT_ID: ${TELEGRAM_ALERT_CHAT_ID:-}
+      # IndexNow key (public by design, must match frontend/public/<key>.txt). Blank = no submissions.
+      INDEXNOW_KEY: ${INDEXNOW_KEY:-}
       # Read-only access to the internal Umami instance so the admin panel can show analytics
       # without exposing the Umami dashboard publicly. Blank password/id = analytics disabled.
       UMAMI_INTERNAL_URL: http://umami:3000

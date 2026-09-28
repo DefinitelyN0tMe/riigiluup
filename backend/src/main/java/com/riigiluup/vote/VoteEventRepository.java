@@ -20,6 +20,13 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
     @org.springframework.data.jpa.repository.Query("select v.id from VoteEvent v")
     java.util.List<java.util.UUID> findAllIdsForSitemap();
 
+    /**
+     * Votes first imported at or after {@code since}, with the linked bill id (may be null). Uses
+     * imported_at, which is set once on insert, so re-upserting the refresh window does not count.
+     */
+    @Query("select v.id, li.id from VoteEvent v left join v.legislativeItem li where v.importedAt >= :since")
+    java.util.List<Object[]> findIdsAndBillIdsImportedSince(@Param("since") Instant since);
+
     Optional<VoteEvent> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     /** Vote events since a given instant — drives the homepage "+N this week" delta. */

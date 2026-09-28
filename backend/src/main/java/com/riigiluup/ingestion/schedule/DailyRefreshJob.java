@@ -37,6 +37,7 @@ public class DailyRefreshJob {
     private final com.riigiluup.alert.TelegramAlertService alert;
     private final com.riigiluup.person.PlenaryMemberRepository memberRepo;
     private final com.riigiluup.group.GroupMembershipRepository membershipRepo;
+    private final com.riigiluup.seo.IndexNowService indexNow;
 
     /**
      * Window start for a windowed refresh: normally {@code today - defaultDays}, but if the last
@@ -70,6 +71,7 @@ public class DailyRefreshJob {
             return;
         }
         log.info("Votes refresh starting");
+        java.time.Instant since = java.time.Instant.now();
         try {
             LocalDate today = LocalDate.now(TALLINN);
             voteImporter.runWindow(windowStart("votes.window-refresh", today, 7, 90), today);
@@ -91,6 +93,7 @@ public class DailyRefreshJob {
             alert.send("⚠️ RiigiLuup: stenogrammide värskendus ebaõnnestus — " + e);
         } finally {
             cacheEvictor.evictAll();
+            indexNow.submitChangedSince(since);
             running.set(false);
         }
     }
@@ -108,6 +111,7 @@ public class DailyRefreshJob {
             return;
         }
         log.info("Daily refresh starting");
+        java.time.Instant since = java.time.Instant.now();
         try {
             usergroupImporter.runOnce();
             memberImporter.runOnce();
@@ -135,6 +139,8 @@ public class DailyRefreshJob {
             log.error("Daily refresh failed", e);
             alert.send("⚠️ RiigiLuup: igapäevane värskendus ebaõnnestus — " + e);
         } finally {
+            // Also after a partial failure: whatever did land is live and worth announcing.
+            indexNow.submitChangedSince(since);
             running.set(false);
         }
     }
