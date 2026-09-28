@@ -40,6 +40,9 @@ public class OgShellController {
     private final VoteEventRepository voteRepo;
     private final LegislativeItemRepository itemRepo;
     private final InitiativeRepository initiativeRepo;
+    private final PoliticianProfileController profileApi;
+    private final VoteController voteApi;
+    private final LegislationController legislationApi;
 
     private final RestClient web = RestClient.builder()
             .requestFactory(timeoutFactory())
@@ -50,36 +53,76 @@ public class OgShellController {
     @GetMapping(value = "/politicians/{slug}", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String politician(@PathVariable String slug) {
-        return memberRepo.findBySlug(slug)
+        String path = "/politicians/" + slug;
+        return rendered(path, () -> {
+            var dto = profileApi.get(slug).getBody();
+            return dto == null ? null : CrawlerContent.politician(dto);
+        }, () -> memberRepo.findBySlug(slug)
                 .map(m -> shell(m.getFullName(),
-                        m.getFactionName() != null ? m.getFactionName() : "Riigikogu liige",
-                        "/politicians/" + slug))
-                .orElseGet(() -> shell(null, null, "/politicians/" + slug));
+                        m.getFactionName() != null ? m.getFactionName() : "Riigikogu liige", path))
+                .orElseGet(() -> shell(null, null, path)));
     }
 
     @GetMapping(value = "/votes/{id}", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String vote(@PathVariable UUID id) {
-        return voteRepo.findById(id)
-                .map(v -> shell(v.getDescription(), "Nimeline hääletus Riigikogus", "/votes/" + id))
-                .orElseGet(() -> shell(null, null, "/votes/" + id));
+        String path = "/votes/" + id;
+        return rendered(path, () -> {
+            var dto = voteApi.detail(id).getBody();
+            return dto == null ? null : CrawlerContent.vote(dto);
+        }, () -> voteRepo.findById(id)
+                .map(v -> shell(v.getDescription(), "Nimeline hääletus Riigikogus", path))
+                .orElseGet(() -> shell(null, null, path)));
     }
 
     @GetMapping(value = "/legislation/{id}", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String legislation(@PathVariable UUID id) {
-        return itemRepo.findById(id)
-                .map(i -> shell(i.getTitle(), "Eelnõu menetlus Riigikogus", "/legislation/" + id))
-                .orElseGet(() -> shell(null, null, "/legislation/" + id));
+        String path = "/legislation/" + id;
+        return rendered(path, () -> {
+            var dto = legislationApi.detail(id).getBody();
+            return dto == null ? null : CrawlerContent.legislation(dto);
+        }, () -> itemRepo.findById(id)
+                .map(i -> shell(i.getTitle(), "Eelnõu menetlus Riigikogus", path))
+                .orElseGet(() -> shell(null, null, path)));
     }
 
     @GetMapping(value = "/initiatives/{id}", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String initiative(@PathVariable Long id) {
-        return initiativeRepo.findById(id)
-                .map(i -> shell(i.getTitle(), "Kollektiivne pöördumine Riigikogule", "/initiatives/" + id))
-                .orElseGet(() -> shell(null, null, "/initiatives/" + id));
+        String path = "/initiatives/" + id;
+        return rendered(path, () -> initiativeRepo.findById(id).map(CrawlerContent::initiative).orElse(null),
+                () -> shell(null, null, path));
     }
+
+    /**
+     * Full crawler page: the entity's meta tags plus a static fact block in #root and JSON-LD.
+     * Anything unexpected (entity missing, a DTO throwing) falls back to the previous meta-only
+     * shell, so a rendering bug can never turn a crawler visit into an error page.
+     */
+    private String rendered(String path, java.util.function.Supplier<CrawlerContent.Page> page,
+                            java.util.function.Supplier<String> fallback) {
+        try {
+            CrawlerContent.Page p = page.get();
+            if (p == null) return fallback.get();
+            String html = shell(p.title().replace(" — Riigiluup", ""), p.description(), path);
+            if (html.contains(ROOT_DIV)) {
+                html = html.replace(ROOT_DIV, "<div id=\"root\">" + p.bodyHtml() + "</div>");
+            } else {
+                log.warn("og-shell: base index.html has no empty #root div, fact block not injected");
+            }
+            if (p.jsonLd() != null && html.contains("</head>")) {
+                html = html.replace("</head>",
+                        "  <script type=\"application/ld+json\">" + p.jsonLd() + "</script>\n  </head>");
+            }
+            return html;
+        } catch (Exception e) {
+            log.warn("og-shell: crawler render failed for {}: {}", path, e.toString());
+            return fallback.get();
+        }
+    }
+
+    private static final String ROOT_DIV = "<div id=\"root\"></div>";
 
     /** Rewrite the base shell's meta tags for one entity. Null title/desc -> generic (homepage) card. */
     private String shell(String title, String desc, String path) {
