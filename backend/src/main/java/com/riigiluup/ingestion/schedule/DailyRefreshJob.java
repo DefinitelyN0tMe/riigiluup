@@ -35,6 +35,8 @@ public class DailyRefreshJob {
     private final com.riigiluup.ingestion.riigikogu.ImportRunLogRepository runLogRepo;
     private final AnalyticsCacheEvictor cacheEvictor;
     private final com.riigiluup.alert.TelegramAlertService alert;
+    private final com.riigiluup.person.PlenaryMemberRepository memberRepo;
+    private final com.riigiluup.group.GroupMembershipRepository membershipRepo;
 
     /**
      * Window start for a windowed refresh: normally {@code today - defaultDays}, but if the last
@@ -127,12 +129,40 @@ public class DailyRefreshJob {
             // to older questions). Cheap windowed re-scan of the document register.
             oversightImporter.refreshRecent();
             cacheEvictor.evictAll();
+            checkIntegrity();
             log.info("Daily refresh finished");
         } catch (Exception e) {
             log.error("Daily refresh failed", e);
             alert.send("⚠️ RiigiLuup: igapäevane värskendus ebaõnnestus — " + e);
         } finally {
             running.set(false);
+        }
+    }
+
+    /** The Riigikogu has 101 seats. */
+    private static final long CHAMBER_SIZE = 101;
+
+    /**
+     * Cheap invariants on the current composition, checked after every daily refresh. A silent drift
+     * here (an ended mandate never deactivated, a former MP still listed as a committee member) is
+     * exactly the kind of error a reader or a journalist spots first, so it goes to Telegram the same
+     * day instead of waiting to be noticed on the site. A count off by one can also be a real, brief
+     * transition (a seat vacant until the substitute is sworn in): the alert says "check", not "bug".
+     */
+    void checkIntegrity() {
+        try {
+            long active = memberRepo.countByActiveTrue();
+            long staleSeats = membershipRepo.countActiveHeldByInactiveMembers();
+            if (active != CHAMBER_SIZE || staleSeats > 0) {
+                String msg = "⚠️ RiigiLuup andmete kontroll: aktiivseid saadikuid " + active + " (peaks olema "
+                        + CHAMBER_SIZE + "), endiste saadikute aktiivseid liikmesusi " + staleSeats + ". Kontrolli.";
+                log.warn(msg);
+                alert.send(msg);
+            } else {
+                log.info("integrity check ok: {} active MPs, no stale memberships", active);
+            }
+        } catch (Exception e) {
+            log.warn("integrity check failed to run: {}", e.toString());
         }
     }
 }

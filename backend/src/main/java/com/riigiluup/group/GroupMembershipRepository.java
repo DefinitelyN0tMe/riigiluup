@@ -25,6 +25,10 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
     @Query("select count(gm) from GroupMembership gm where gm.active = true and gm.group.type = :type")
     long countActiveByType(@Param("type") GroupType type);
 
+    /** Active committee/group memberships held by MPs who are no longer active: must always be 0. */
+    @Query("select count(gm) from GroupMembership gm where gm.active = true and gm.plenaryMember.active = false")
+    long countActiveHeldByInactiveMembers();
+
     @Query("""
         select gm from GroupMembership gm
         join fetch gm.plenaryMember

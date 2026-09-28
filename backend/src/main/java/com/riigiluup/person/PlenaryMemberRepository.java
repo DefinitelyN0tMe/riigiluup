@@ -36,6 +36,8 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
     /** Active seats held by a faction — used to label the faction-comparison sides. */
     long countByActiveTrueAndFactionExternalId(String factionExternalId);
 
+    long countByActiveTrue();
+
     @Query("""
         select m from PlenaryMember m
         where (:active is null or m.active = :active)

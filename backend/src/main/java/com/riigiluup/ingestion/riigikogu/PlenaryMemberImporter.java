@@ -1,6 +1,8 @@
 package com.riigiluup.ingestion.riigikogu;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.riigiluup.group.GroupMembership;
+import com.riigiluup.group.GroupMembershipRepository;
 import com.riigiluup.person.PlenaryMember;
 import com.riigiluup.person.PlenaryMemberRepository;
 import com.riigiluup.source.ProcessingStatus;
@@ -29,6 +31,7 @@ public class PlenaryMemberImporter {
     private final PlenaryMemberRepository memberRepo;
     private final SourceSnapshotRepository snapshotRepo;
     private final ImportRunLogRepository runLogRepo;
+    private final GroupMembershipRepository membershipRepo;
 
     @Transactional
     public ImportRunLog runOnce() {
@@ -80,6 +83,12 @@ public class PlenaryMemberImporter {
             if (current.contains(m.getExternalId())) continue;
             m.setActive(false);
             m.setUpdatedAt(Instant.now());
+            // The detail importer only walks active members, so nothing would ever close this
+            // person's committee/group seats again: close them here, together with the mandate.
+            for (GroupMembership gm : membershipRepo.findByPlenaryMemberAndActiveTrue(m)) {
+                gm.setActive(false);
+                gm.setUpdatedAt(Instant.now());
+            }
             log.info("member {} no longer in the Riigikogu list, marked inactive", m.getFullName());
         }
     }
