@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -43,6 +44,20 @@ public class OgShellController {
     private final PoliticianProfileController profileApi;
     private final VoteController voteApi;
     private final LegislationController legislationApi;
+    private final PoliticianController politicianApi;
+    private final com.riigiluup.committee.CommitteeService committeeService;
+    private final com.riigiluup.group.GroupDirectoryService groupService;
+
+    /**
+     * Rendered crawler pages, 10 min. Crawlers are the only callers; a profile page costs ~1-1.5 s of
+     * DB work, so a crawl of the ~12k sitemap URLs would otherwise load the database needlessly. The
+     * data changes at most every 6 h, so 10 min of staleness is invisible.
+     */
+    private final com.github.benmanes.caffeine.cache.Cache<String, String> pageCache =
+            com.github.benmanes.caffeine.cache.Caffeine.newBuilder()
+                    .maximumSize(3_000)
+                    .expireAfterWrite(java.time.Duration.ofMinutes(10))
+                    .build();
 
     private final RestClient web = RestClient.builder()
             .requestFactory(timeoutFactory())
@@ -95,6 +110,70 @@ public class OgShellController {
                 () -> shell(null, null, path));
     }
 
+
+    // ---------------------------------------------------------------- hub pages (crawlers only, via nginx)
+
+    @GetMapping(value = "/", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String home() {
+        return rendered("/", () -> {
+            var factions = politicianApi.factions().stream()
+                    .map(f -> new CrawlerContent.NamedCount(f.name(), f.memberCount())).toList();
+            long active = memberRepo.countByActiveTrue();
+            return CrawlerContent.home(factions, active, recentBills(), recentVotes());
+        }, () -> baseShell());
+    }
+
+    @GetMapping(value = "/politicians", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String politicians() {
+        return rendered("/politicians", () -> CrawlerContent.politiciansList(
+                memberRepo.findByActiveTrueOrderByLastNameAscFirstNameAsc().stream()
+                        .map(m -> new CrawlerContent.MpLink(m.getSlug(), m.getFullName(), m.getFactionName()))
+                        .toList()), () -> shell(null, null, "/politicians"));
+    }
+
+    @GetMapping(value = "/legislation", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String legislationList() {
+        return rendered("/legislation", () -> CrawlerContent.billsList(recentBills()),
+                () -> shell(null, null, "/legislation"));
+    }
+
+    @GetMapping(value = "/votes", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String votesList() {
+        return rendered("/votes", () -> CrawlerContent.votesList(recentVotes()), () -> shell(null, null, "/votes"));
+    }
+
+    @GetMapping(value = "/committees/{externalId}", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String committee(@PathVariable String externalId) {
+        String path = "/committees/" + externalId;
+        return rendered(path, () -> committeeService.detail(externalId).map(CrawlerContent::committee).orElse(null),
+                () -> shell(null, null, path));
+    }
+
+    @GetMapping(value = "/groups/{externalId}", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String group(@PathVariable String externalId) {
+        String path = "/groups/" + externalId;
+        return rendered(path, () -> groupService.detail(externalId).map(CrawlerContent::group).orElse(null),
+                () -> shell(null, null, path));
+    }
+
+    private List<CrawlerContent.BillLink> recentBills() {
+        return itemRepo.findTop50ByInitiatedDateIsNotNullOrderByInitiatedDateDesc().stream()
+                .map(i -> new CrawlerContent.BillLink(i.getId(), i.getMark(), i.getDraftTypeCode(), i.getTitle(), i.getInitiatedDate()))
+                .toList();
+    }
+
+    private List<CrawlerContent.VoteLink> recentVotes() {
+        return voteRepo.findTop50ByStartedAtIsNotNullOrderByStartedAtDesc().stream()
+                .map(v -> new CrawlerContent.VoteLink(v.getId(), v.getDescription(), v.getStartedAt()))
+                .toList();
+    }
+
     /**
      * Full crawler page: the entity's meta tags plus a static fact block in #root and JSON-LD.
      * Anything unexpected (entity missing, a DTO throwing) falls back to the previous meta-only
@@ -102,6 +181,8 @@ public class OgShellController {
      */
     private String rendered(String path, java.util.function.Supplier<CrawlerContent.Page> page,
                             java.util.function.Supplier<String> fallback) {
+        String hit = pageCache.getIfPresent(path);
+        if (hit != null) return hit;
         try {
             CrawlerContent.Page p = page.get();
             if (p == null) return fallback.get();
@@ -115,6 +196,7 @@ public class OgShellController {
                 html = html.replace("</head>",
                         "  <script type=\"application/ld+json\">" + p.jsonLd() + "</script>\n  </head>");
             }
+            pageCache.put(path, html);
             return html;
         } catch (Exception e) {
             log.warn("og-shell: crawler render failed for {}: {}", path, e.toString());

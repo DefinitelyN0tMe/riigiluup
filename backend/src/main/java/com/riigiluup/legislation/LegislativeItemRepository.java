@@ -12,6 +12,9 @@ import java.util.UUID;
 
 public interface LegislativeItemRepository extends JpaRepository<LegislativeItem, UUID> {
 
+    /** Most recently initiated bills, for the crawler-readable /legislation and home pages. */
+    java.util.List<LegislativeItem> findTop50ByInitiatedDateIsNotNullOrderByInitiatedDateDesc();
+
     /** All legislative-item ids for the sitemap. */
     @org.springframework.data.jpa.repository.Query("select i.id from LegislativeItem i")
     java.util.List<java.util.UUID> findAllIdsForSitemap();

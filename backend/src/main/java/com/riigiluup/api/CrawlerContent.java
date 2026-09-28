@@ -266,6 +266,160 @@ final class CrawlerContent {
         return new Page(title + " — Riigiluup", desc, wrap(b), null);
     }
 
+    // ---------------------------------------------------------------- hub pages
+    // Lists give a crawler what a human gets from the navigation: links to every current MP, the latest
+    // bills and votes, committees and groups. Without them the entity pages were reachable only via the
+    // sitemap, and the pages were an island with no internal links between them.
+
+    /** Minimal views so the hubs do not depend on JPA entities or on several DTO shapes. */
+    record MpLink(String slug, String name, String faction) {}
+    record BillLink(java.util.UUID id, Integer mark, String typeCode, String title, java.time.LocalDate initiated) {}
+    record VoteLink(java.util.UUID id, String description, java.time.Instant startedAt) {}
+    record NamedCount(String name, long count) {}
+
+    static Page home(List<NamedCount> factions, long activeMps, List<BillLink> bills, List<VoteLink> votes) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Riigiluup: Riigikogu avaandmed loetavaks</h1>");
+        b.append("<p>Riigiluup on tasuta ja sõltumatu kodanikualgatus, mis koondab Eesti parlamendi Riigikogu avaandmed ")
+         .append("ühte kohta: kuidas iga saadik hääletab, milliseid eelnõusid menetletakse, mida istungitel räägitakse ning ")
+         .append("kui kiiresti ministrid saadikute küsimustele vastavad. Iga arv viitab ametlikule allikale. ")
+         .append("Lehel ei ole hinnanguid ega pingeridu ning see ei ole seotud ühegi erakonnaga.</p>");
+        b.append("<h2>Riigikogu koosseis</h2><p>Praeguses koosseisus on ").append(activeMps).append(" saadikut.</p><ul>");
+        for (NamedCount f : factions) b.append(li(esc(f.name()) + ": " + f.count()));
+        b.append("</ul><p><a href=\"").append(SITE).append("/politicians\">Kõik saadikud</a> · <a href=\"").append(SITE)
+         .append("/legislation\">Eelnõud</a> · <a href=\"").append(SITE).append("/votes\">Hääletused</a> · <a href=\"")
+         .append(SITE).append("/analytics\">Analüütika</a> · <a href=\"").append(SITE).append("/methodology\">Metoodika</a></p>");
+        appendBills(b, "Viimati algatatud eelnõud", bills, 10);
+        appendVotes(b, "Viimased hääletused", votes, 10);
+        b.append("</article>");
+        b.append("<section lang=\"en\"><p>Riigiluup is a free, independent citizen-built site that makes the open data of ")
+         .append("Estonia's parliament, the Riigikogu, readable: how each MP votes, which bills are moving, what is said in ")
+         .append("the chamber and how quickly ministers answer MPs' questions. Every figure links to its official source; ")
+         .append("no ratings, no party affiliation. Available in Estonian, Russian and English.</p></section>");
+        b.append("<section lang=\"ru\"><p>Riigiluup — бесплатный независимый гражданский сайт, который делает открытые данные ")
+         .append("парламента Эстонии (Рийгикогу) понятными: как голосует каждый депутат, какие законопроекты рассматриваются, ")
+         .append("что говорится на заседаниях и как быстро министры отвечают на вопросы депутатов. Каждая цифра ведёт к ")
+         .append("официальному источнику; без оценок и без партийной принадлежности.</p></section>");
+        return new Page("Riigiluup — Riigikogu läbipaistvus",
+                "Riigikogu avaandmed loetavaks: kuidas iga saadik hääletab, mida ta algatab ja kus on kandideerinud. Faktid, mitte hinnangud.",
+                wrap(b), null);
+    }
+
+    static Page politiciansList(List<MpLink> mps) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Riigikogu liikmed</h1><p>Praeguse Riigikogu koosseisu ")
+                .append(mps.size()).append(" saadikut. Iga profiil näitab hääletusi, kohalolekut, sõnavõtte, algatatud eelnõusid, ")
+                .append("komisjone ja valimistulemusi koos viidetega Riigikogu andmetele.</p><ul>");
+        for (MpLink m : mps) {
+            b.append("<li><a href=\"").append(esc(SITE + "/politicians/" + m.slug())).append("\">").append(esc(m.name()))
+             .append("</a>").append(m.faction() != null ? " (" + esc(m.faction()) + ")" : "").append("</li>");
+        }
+        b.append("</ul></article><section lang=\"en\"><p>All ").append(mps.size())
+         .append(" current members of the Riigikogu, the parliament of Estonia, each linking to a profile with votes, ")
+         .append("attendance, speeches, bills and election results.</p></section><section lang=\"ru\"><p>Все ")
+         .append(mps.size()).append(" действующих депутатов Рийгикогу со ссылками на профили.</p></section>");
+        return new Page("Saadikud — Riigiluup", "Riigikogu praeguse koosseisu " + mps.size()
+                + " saadikut: hääletused, kohalolek, sõnavõtud, eelnõud ja valimistulemused.", wrap(b), null);
+    }
+
+    static Page billsList(List<BillLink> bills) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Eelnõud</h1><p>Riigikogu menetluses olevad ja menetletud ")
+                .append("eelnõud: algatajad, menetluse käik, hääletused ja avaldamine Riigi Teatajas.</p>");
+        appendBills(b, "Viimati algatatud", bills, bills.size());
+        b.append("</article><section lang=\"en\"><p>Bills in the Estonian parliament (Riigikogu): sponsors, readings, votes and ")
+         .append("publication in the State Gazette.</p></section><section lang=\"ru\"><p>Законопроекты Рийгикогу: ")
+         .append("инициаторы, чтения, голосования и публикация в Riigi Teataja.</p></section>");
+        return new Page("Eelnõud — Riigiluup", "Riigikogu eelnõud: algatajad, menetluse käik ja hääletused.", wrap(b), null);
+    }
+
+    static Page votesList(List<VoteLink> votes) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Hääletused</h1><p>Riigikogu täiskogu nimelised hääletused: ")
+                .append("tulemus ja iga saadiku valik, fraktsioonide kaupa.</p>");
+        appendVotes(b, "Viimased hääletused", votes, votes.size());
+        b.append("</article><section lang=\"en\"><p>Roll-call votes in the Estonian parliament (Riigikogu), with each MP's choice.</p>")
+         .append("</section><section lang=\"ru\"><p>Поимённые голосования Рийгикогу с выбором каждого депутата.</p></section>");
+        return new Page("Hääletused — Riigiluup", "Riigikogu nimelised hääletused: tulemus ja iga saadiku valik.", wrap(b), null);
+    }
+
+    static Page committee(com.riigiluup.committee.CommitteeDto.Detail c) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>").append(esc(c.name())).append("</h1><p>Riigikogu komisjon")
+                .append(c.members() != null ? ", " + c.members().size() + " liiget" : "").append(".</p>");
+        if (c.members() != null && !c.members().isEmpty()) {
+            b.append("<h2>Liikmed</h2><ul>");
+            for (var m : c.members()) {
+                String role = roleEt(m.role());
+                b.append("<li>").append(m.slug() != null
+                        ? "<a href=\"" + esc(SITE + "/politicians/" + m.slug()) + "\">" + esc(m.name()) + "</a>" : esc(m.name()))
+                 .append(role != null ? ", " + role : "").append(m.factionName() != null ? " (" + esc(m.factionName()) + ")" : "")
+                 .append("</li>");
+            }
+            b.append("</ul>");
+        }
+        if (c.ledBills() != null && c.ledBills().recent() != null && !c.ledBills().recent().isEmpty()) {
+            b.append("<h2>Juhtivkomisjonina menetletud eelnõud (kokku ").append(c.ledBills().total()).append(")</h2><ul>");
+            for (var r : c.ledBills().recent()) {
+                b.append("<li><a href=\"").append(esc(SITE + "/legislation/" + r.id())).append("\">")
+                 .append(r.mark() != null ? r.mark() + ": " : "").append(esc(r.title())).append("</a></li>");
+            }
+            b.append("</ul>");
+        }
+        b.append("</article><section lang=\"en\"><p>").append(esc(c.name()))
+         .append(", a committee of the Estonian parliament (Riigikogu): members and bills it leads.</p></section>");
+        return new Page(c.name() + " — Riigiluup", c.name() + ": Riigikogu komisjoni liikmed ja juhitavad eelnõud.", wrap(b), null);
+    }
+
+    static Page group(com.riigiluup.group.GroupDirectoryDto.Detail g) {
+        String kind = switch (g.category() == null ? "" : g.category()) {
+            case "FRIENDSHIP" -> "Parlamendirühm (sõprusrühm)";
+            case "DELEGATION" -> "Riigikogu delegatsioon";
+            case "SUPPORT" -> "Toetusrühm";
+            default -> "Riigikogu ühendus";
+        };
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>").append(esc(g.name())).append("</h1><p>").append(kind)
+                .append(g.members() != null ? ", " + g.members().size() + " liiget" : "").append(".</p>");
+        if (g.members() != null && !g.members().isEmpty()) {
+            b.append("<ul>");
+            for (var m : g.members()) {
+                b.append("<li>").append(m.slug() != null
+                        ? "<a href=\"" + esc(SITE + "/politicians/" + m.slug()) + "\">" + esc(m.name()) + "</a>" : esc(m.name()))
+                 .append(m.factionName() != null ? " (" + esc(m.factionName()) + ")" : "").append("</li>");
+            }
+            b.append("</ul>");
+        }
+        b.append("</article>");
+        return new Page(g.name() + " — Riigiluup", g.name() + ": " + kind.toLowerCase(Locale.ROOT) + ", liikmed.", wrap(b), null);
+    }
+
+    private static String roleEt(String role) {
+        if (role == null) return null;
+        return switch (role) {
+            case "CHAIR" -> "esimees";
+            case "VICE_CHAIR" -> "aseesimees";
+            default -> null;
+        };
+    }
+
+    private static void appendBills(StringBuilder b, String heading, List<BillLink> bills, int max) {
+        if (bills == null || bills.isEmpty()) return;
+        b.append("<h2>").append(esc(heading)).append("</h2><ul>");
+        for (BillLink x : bills.subList(0, Math.min(max, bills.size()))) {
+            b.append("<li><a href=\"").append(esc(SITE + "/legislation/" + x.id())).append("\">")
+             .append(x.mark() != null ? x.mark() + (x.typeCode() != null ? " " + esc(x.typeCode()) : "") + ": " : "")
+             .append(esc(x.title())).append("</a>")
+             .append(x.initiated() != null ? " (" + DATE.format(x.initiated()) + ")" : "").append("</li>");
+        }
+        b.append("</ul>");
+    }
+
+    private static void appendVotes(StringBuilder b, String heading, List<VoteLink> votes, int max) {
+        if (votes == null || votes.isEmpty()) return;
+        b.append("<h2>").append(esc(heading)).append("</h2><ul>");
+        for (VoteLink v : votes.subList(0, Math.min(max, votes.size()))) {
+            b.append("<li><a href=\"").append(esc(SITE + "/votes/" + v.id())).append("\">")
+             .append(esc(v.description() != null ? v.description() : "Hääletus")).append("</a>")
+             .append(v.startedAt() != null ? " (" + DATE_TIME.format(v.startedAt().atZone(TALLINN)) + ")" : "").append("</li>");
+        }
+        b.append("</ul>");
+    }
+
     // ---------------------------------------------------------------- helpers
 
     private static String wrap(StringBuilder body) {

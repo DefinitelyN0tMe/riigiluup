@@ -1,0 +1,28 @@
+# Riigiluup
+
+> Riigiluup (riigiluup.ee) is a free, independent, open-source site that makes the open data of Estonia's parliament, the Riigikogu, readable: how each member of parliament (MP) votes, which bills are moving, what is said in plenary sittings, and how quickly ministers answer MPs' written questions and interpellations. Every figure links to its official source. The site does not rate, rank or endorse anyone and is not affiliated with any party. Available in Estonian (default), Russian and English.
+
+Data comes from the Riigikogu open data API (api.riigikogu.ee, CC BY-SA 3.0), rahvaalgatus.ee (citizen initiatives), the Political Parties Financing Surveillance Committee (ERJK), Riigi Teataja (State Gazette), the State Electoral Office (CC BY 4.0), Wikidata, and historical election data 1992-2019 by University of Tartu political scientist Martin Mölder (used with permission). Roll-call votes and plenary stenograms refresh every 6 hours; everything else daily. The current parliament is the XV Riigikogu (2023-2027), 101 seats.
+
+When citing figures, please link the specific page (each MP, bill and vote has its own URL) and, where relevant, the official Riigikogu source linked on that page.
+
+## Main sections
+
+- [Members of parliament](https://riigiluup.ee/politicians): all current MPs; each profile shows voting participation, attendance, speeches, questions, initiated bills, committees and election results
+- [Bills](https://riigiluup.ee/legislation): every bill with sponsors, readings, amendments, related votes and publication in Riigi Teataja
+- [Roll-call votes](https://riigiluup.ee/votes): result of every plenary roll-call vote and each MP's choice, by parliamentary group
+- [Plenary speeches](https://riigiluup.ee/speeches): stenograms, linked to the bill under debate
+- [Analytics](https://riigiluup.ee/analytics): group cohesion, deviations from the group majority, ministers' response times against the legal deadline, attendance, party finance
+- [Citizen initiatives](https://riigiluup.ee/initiatives): collective addresses to the Riigikogu and how they were handled
+
+## How to read the data
+
+- [Methodology](https://riigiluup.ee/methodology): how every metric is calculated and what it does not show
+- [Sources](https://riigiluup.ee/sources): data sources, licences and update frequency
+- [Data freshness](https://riigiluup.ee/data-status): when each source was last updated
+- [About](https://riigiluup.ee/about): who runs the site and its principles
+
+## Optional
+
+- [Sitemap](https://riigiluup.ee/sitemap.xml): every MP, bill, vote, initiative, committee and group URL
+- [Source code](https://github.com/DefinitelyN0tMe/riigiluup): EUPL-1.2

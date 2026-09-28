@@ -13,6 +13,9 @@ import java.util.UUID;
 
 public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
 
+    /** Latest roll-call votes, for the crawler-readable /votes and home pages. */
+    java.util.List<VoteEvent> findTop50ByStartedAtIsNotNullOrderByStartedAtDesc();
+
     /** All vote ids for the sitemap. */
     @org.springframework.data.jpa.repository.Query("select v.id from VoteEvent v")
     java.util.List<java.util.UUID> findAllIdsForSitemap();

@@ -48,4 +48,30 @@ class CrawlerContentTest {
         assertThat(p.title()).isEqualTo("Kollektiivne pöördumine — Riigiluup");
         assertThat(p.bodyHtml()).contains("<h1>Kollektiivne pöördumine</h1>").doesNotContain("null");
     }
+
+    @Test
+    void hubPagesLinkEveryEntityAndEscapeNames() {
+        var mps = java.util.List.of(
+                new CrawlerContent.MpLink("jaak-aab", "Jaak Aab", "Fraktsioon <x>"),
+                new CrawlerContent.MpLink("a-b", "A \"B\" & C", null));
+        CrawlerContent.Page p = CrawlerContent.politiciansList(mps);
+        assertThat(p.bodyHtml())
+                .contains("href=\"https://riigiluup.ee/politicians/jaak-aab\"")
+                .contains("href=\"https://riigiluup.ee/politicians/a-b\"")
+                .contains("(Fraktsioon &lt;x&gt;)")
+                .contains("A &quot;B&quot; &amp; C")
+                .contains("2 saadikut");
+
+        var bill = new CrawlerContent.BillLink(java.util.UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                903, "SE", "Ravimiseaduse <muutmise> eelnõu", java.time.LocalDate.of(2026, 9, 15));
+        CrawlerContent.Page home = CrawlerContent.home(
+                java.util.List.of(new CrawlerContent.NamedCount("Eesti Reformierakonna fraktsioon", 35)),
+                101, java.util.List.of(bill), java.util.List.of());
+        assertThat(home.bodyHtml())
+                .contains("Praeguses koosseisus on 101 saadikut")
+                .contains("903 SE: Ravimiseaduse &lt;muutmise&gt; eelnõu")
+                .contains("/legislation/00000000-0000-0000-0000-000000000001")
+                .contains("(15.09.2026)")
+                .doesNotContain("<muutmise>");
+    }
 }
