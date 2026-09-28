@@ -4,12 +4,21 @@ import { fetchDataStatus } from "../api/politicians";
 import { fetchVotes } from "../api/votes";
 import type { VoteListItem } from "../types";
 
-type TickerItem = { id: string; title: string; result: string; up: boolean };
+type TickerItem = { id: string; title: string; result: string; up: boolean | null };
 
-function toTickerItem(v: VoteListItem): TickerItem {
+function toTickerItem(v: VoteListItem, t: (k: string) => string): TickerItem {
   const id = v.votingNumber != null ? `#${v.votingNumber}` : `#${v.externalId}`;
   // for / against / abstained — use the real abstentions (resultNeutral); resultAbstained is an
   // overlapping source total (did-not-vote + absent), see lib/voteTally.
+  if (v.type === "ATTENDANCE_CHECK") {
+    // Not a vote: show who was in the hall, no for/against direction.
+    return {
+      id,
+      title: v.description ?? "—",
+      result: `${t("choice.PRESENT").toLowerCase()} ${v.resultPresent} / ${t("choice.ABSENT").toLowerCase()} ${v.resultAbsent}`,
+      up: null,
+    };
+  }
   const result = `${v.resultInFavor} / ${v.resultAgainst} / ${v.resultNeutral}`;
   return {
     id,
@@ -24,7 +33,7 @@ function Item({ it }: { it: TickerItem }) {
     <span className="inline-flex items-center gap-2.5">
       <b className="text-blue-glow font-bold">{it.id}</b>
       <span className="text-white/85">{it.title}</span>
-      <b className={it.up ? "text-live" : "text-hot"}>{it.up ? "↑" : "↓"}</b>
+      {it.up !== null && <b className={it.up ? "text-live" : "text-hot"}>{it.up ? "↑" : "↓"}</b>}
       <span className="text-white/70">{it.result}</span>
     </span>
   );
@@ -41,7 +50,7 @@ export default function LiveTicker() {
     : "—";
   const records = first?.lastRunRecords ?? "—";
 
-  const realItems = (votes?.items ?? []).map(toTickerItem);
+  const realItems = (votes?.items ?? []).map((v) => toTickerItem(v, t));
   // Doubled for a seamless marquee loop. Empty while loading / no data — no fabricated fallback.
   const items = realItems.length ? [...realItems, ...realItems] : [];
 

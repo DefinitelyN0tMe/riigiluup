@@ -107,4 +107,49 @@ class CrawlerContentTest {
                 .doesNotContain("null")
                 .doesNotContain("XI. Kõige aktiivsemad");
     }
+
+    private static LegislationDetailDto bill(String phase, String stage, java.time.LocalDate accepted) {
+        return new LegislationDetailDto(java.util.UUID.fromString("00000000-0000-0000-0000-000000000127"), "x",
+                127, 15, "SE", "Ravimiseaduse muutmise seaduse eelnõu", null, phase, stage, null, null,
+                java.time.LocalDate.of(2023, 10, 25), java.time.LocalDate.of(2023, 6, 1), accepted, null, null, null,
+                java.util.List.of(new LegislationDetailDto.StageDto("EFFECTUATION", null, null, 1)),
+                java.util.List.of(), java.util.List.of(), null, "https://www.riigikogu.ee/tegevus/eelnoud/eelnou/x",
+                null, null, java.util.List.of(), java.util.List.of());
+    }
+
+    @Test
+    void billStatusReflectsTheRealOutcomeNotAlwaysInProceedings() {
+        CrawlerContent.Page rejected = CrawlerContent.legislation(bill("REJECTED", "TAGASI_LYKATUD", null));
+        assertThat(rejected.bodyHtml())
+                .contains("Seaduse eelnõu 127 SE (XV Riigikogu), algatatud 01.06.2023. Tagasi lükatud 25.10.2023.")
+                .contains("Status: rejected").contains("Статус: отклонён")
+                .doesNotContain("menetluses").doesNotContain("EFFECTUATION").contains("Jõustumine");
+        assertThat(rejected.jsonLd()).doesNotContain("legislationPassedBy");
+
+        CrawlerContent.Page adopted = CrawlerContent.legislation(
+                bill("ADOPTED", "VASTU_VOETUD", java.time.LocalDate.of(2024, 2, 14)));
+        assertThat(adopted.bodyHtml()).contains("Vastu võetud 14.02.2024.");
+        assertThat(adopted.jsonLd()).contains("legislationPassedBy");
+
+        assertThat(CrawlerContent.legislation(bill("IN_READINGS", "TEINE_LUGEMINE", null)).bodyHtml())
+                .contains("Riigikogu menetluses (teine lugemine).");
+        assertThat(CrawlerContent.legislation(bill("OTHER", "VALJA_LANGENUD_KOOSEISU_LOPPEMISEGA", null)).bodyHtml())
+                .contains("Menetlusest välja langenud Riigikogu koosseisu volituste lõppemisega 25.10.2023.");
+    }
+
+    @Test
+    void attendanceCheckIsNotRenderedAsAVote() {
+        var v = new VoteDetailDto(java.util.UUID.randomUUID(), "x", 104293, "ATTENDANCE_CHECK", null,
+                "Kohaloleku kontroll", null, "Täiskogu istung", Instant.parse("2026-09-28T12:00:00Z"), null,
+                0, 0, 101, 0, 91, 10, null, java.util.List.of(), java.util.List.of(),
+                "https://api.riigikogu.ee/api/votings/x", "https://www.riigikogu.ee/x");
+        CrawlerContent.Page p = CrawlerContent.vote(v);
+        assertThat(p.bodyHtml())
+                .contains("Kohaloleku kontroll Riigikogu täiskogus, 28.09.2026 15:00")
+                .contains("Kohal: 91; puudus: 10")
+                .contains("91 present, 10 absent")
+                .contains("href=\"https://www.riigikogu.ee/x\"")
+                .doesNotContain("ei hääletanud").doesNotContain("Nimeline hääletus");
+        assertThat(p.title()).isEqualTo("Kohaloleku kontroll 28.09.2026 — Riigiluup");
+    }
 }

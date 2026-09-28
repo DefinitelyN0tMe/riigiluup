@@ -16,6 +16,7 @@ import MarqueeStrip from "../components/MarqueeStrip";
 import LoadFailed from "../components/LoadFailed";
 import type { HomeSummary, Politician, VoteListItem } from "../types";
 import { partyColor } from "../lib/partyColors";
+import { factionShortName, isCoalitionFaction } from "../lib/factionName";
 
 
 /** Deterministic rank for (slug, seed): a stable per-seed shuffle key (FNV-1a style). */
@@ -48,7 +49,7 @@ function Hero({ syncedAt }: { syncedAt: string | null }) {
       <div className="relative z-[3] pt-4 sm:pt-8 md:pt-10 grid grid-cols-1 md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-10 md:gap-16 items-end">
         <div>
           <div className="inline-flex items-center gap-3.5 font-mono text-[10px] xs:text-[11px] sm:text-[12px] tracking-[0.18em] uppercase mb-6 sm:mb-8">
-            <img src="/logo.png" alt="Riigiluup" className="w-8 h-8 rounded-full ring-1 ring-white/30 bg-white/95 object-contain p-0.5" />
+            <img src="/logo-96.png" alt="Riigiluup" width={32} height={32} className="w-8 h-8 rounded-full ring-1 ring-white/30 bg-white/95 object-contain p-0.5" />
             <span className="w-8 sm:w-10 h-px bg-white" />
             <span>{t("homePage.hero.eyebrow")}</span>
             <span className="bg-black/28 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1.5 tracking-[0.12em]">
@@ -183,7 +184,7 @@ function isLiveVote(v: VoteListItem): boolean {
 function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
   const { t } = useTranslation();
   const tally = voteTally(v);
-  const total = tally.inFavor + tally.against + tally.abstained + tally.didNotVote + tally.absent;
+  const total = tally.inFavor + tally.against + tally.abstained + tally.didNotVote + tally.present + tally.absent;
   const pct = (n: number) => (total ? (n / total) * 100 : 0);
   const when = v.startedAt ? formatDateTime(v.startedAt, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
   const typeLabel = live
@@ -216,6 +217,7 @@ function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
           {tally.against > 0 && <div className="bg-hot" style={{ width: `${pct(tally.against)}%` }} />}
           {tally.abstained > 0 && <div className="bg-ink" style={{ width: `${pct(tally.abstained)}%` }} />}
           {tally.didNotVote > 0 && <div className="bg-blue-deep" style={{ width: `${pct(tally.didNotVote)}%` }} />}
+          {tally.present > 0 && <div className="bg-blue" style={{ width: `${pct(tally.present)}%` }} />}
           {tally.absent > 0 && <div className="bg-[#D8D6CB]" style={{ width: `${pct(tally.absent)}%` }} />}
         </div>
         <div className="flex flex-wrap gap-2 sm:gap-3 justify-between font-mono text-[10px] tracking-[0.06em] text-muted">
@@ -223,6 +225,7 @@ function VoteRowCard({ v, live = false }: { v: VoteListItem; live?: boolean }) {
           {tally.against > 0 && <span><b className="text-ink font-bold mr-1">{tally.against}</b>{t("viz.highlights.against")}</span>}
           {tally.abstained > 0 && <span><b className="text-ink font-bold mr-1">{tally.abstained}</b>{t("choice.ABSTAINED").toLowerCase()}</span>}
           {tally.didNotVote > 0 && <span><b className="text-ink font-bold mr-1">{tally.didNotVote}</b>{t("choice.DID_NOT_VOTE").toLowerCase()}</span>}
+          {tally.present > 0 && <span><b className="text-ink font-bold mr-1">{tally.present}</b>{t("choice.PRESENT").toLowerCase()}</span>}
           {tally.absent > 0 && <span><b className="text-ink font-bold mr-1">{tally.absent}</b>{t("choice.ABSENT").toLowerCase()}</span>}
         </div>
       </div>
@@ -280,7 +283,7 @@ function MpMiniCard({ p, invert = false }: { p: Politician; invert?: boolean }) 
   const { t } = useTranslation();
   const photoSrc = resolveMediaUrl(p.photoUrl);
   const color = partyColor(p.factionName);
-  const partyShort = (p.factionName?.replace(/fraktsioon/i, "").trim() ?? "—").slice(0, 22);
+  const partyShort = (p.factionName ? factionShortName(p.factionName) : "—").slice(0, 22);
   return (
     <Link to={`/politicians/${encodeURIComponent(p.slug)}`}
       className={`rounded-[22px] p-5 sm:p-6 border relative overflow-hidden hover:-translate-y-0.5 transition-all ${
@@ -393,17 +396,12 @@ export default function HomePage() {
     // Drop the "unaffiliated MPs" group first: it is not a party, and a blunt slice(0,6) over the
     // alphabetical faction list was silently dropping a real party (SDE) to keep it.
     const list = (factions.data ?? []).filter((f) => !/mittekuuluv/i.test(f.name));
-    // Governing coalition since March 2025: Reform + Eesti 200 (SDE left the government and is now
-    // in opposition). Hardcoded because coalition status is not in the source data — revisit on any
-    // government change.
-    const coalitionNames = ["Reformierakond", "Eesti 200"];
     return list.map((f) => {
-      const isCoalition = coalitionNames.some((n) => f.name.includes(n));
       return {
         seats: f.memberCount,
         color: partyColor(f.name),
-        label: f.name.replace(/fraktsioon/i, "").trim(),
-        side: (isCoalition ? "coalition" : "opposition") as "coalition" | "opposition",
+        label: factionShortName(f.name),
+        side: (isCoalitionFaction(f.name) ? "coalition" : "opposition") as "coalition" | "opposition",
         factionExternalId: f.externalId,
       };
     });

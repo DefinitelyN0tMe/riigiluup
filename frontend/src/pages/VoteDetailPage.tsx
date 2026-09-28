@@ -36,7 +36,7 @@ export default function VoteDetailPage() {
   const typeLabel = t(`voteType.${data.type}` as const, { defaultValue: data.type });
 
   const tally = voteTally(data);
-  const total = tally.inFavor + tally.against + tally.abstained + tally.didNotVote + tally.absent;
+  const total = tally.inFavor + tally.against + tally.abstained + tally.didNotVote + tally.present + tally.absent;
   const quorum = 51;
   const margin = data.resultInFavor - data.resultAgainst;
   const marginPct = total ? (margin / total) * 100 : 0;
@@ -118,7 +118,8 @@ export default function VoteDetailPage() {
         )}
       </section>
 
-      <VoteDefectorsPanel v={data} />
+      {/* An attendance check has no choices to differ on, so no faction-majority panel. */}
+      {data.type === "OPEN" && <VoteDefectorsPanel v={data} />}
 
       <section aria-label={t("votes.breakdown")}>
         <h2 className="text-lg font-semibold text-ink mb-2">{t("votes.breakdown")}</h2>
@@ -134,7 +135,8 @@ export default function VoteDetailPage() {
                 inFavor={f.inFavor}
                 against={f.against}
                 abstained={f.abstained}
-                didNotVote={f.didNotVote + f.present}
+                didNotVote={f.didNotVote}
+                present={f.present}
                 absent={f.absent}
               />
             </div>

@@ -5,6 +5,8 @@ type Props = {
   against: number;
   abstained: number;
   didNotVote: number;
+  /** Attendance checks only: MPs in the hall. When > 0 the bar shows present/absent only. */
+  present?: number;
   absent: number;
 };
 
@@ -14,12 +16,13 @@ const COLORS = {
   against: "bg-hot",
   abstained: "bg-ink",
   didNotVote: "bg-blue-deep",
+  present: "bg-blue",
   absent: "bg-[#D8D6CB]",
 };
 
-export default function VoteResultBar({ inFavor, against, abstained, didNotVote, absent }: Props) {
+export default function VoteResultBar({ inFavor, against, abstained, didNotVote, present = 0, absent }: Props) {
   const { t } = useTranslation();
-  const total = inFavor + against + abstained + didNotVote + absent;
+  const total = inFavor + against + abstained + didNotVote + present + absent;
   if (total === 0) return <div className="h-3.5 bg-[#F1F0EA] rounded-lg" />;
   const seg = (n: number, cls: string, label: string) =>
     n > 0 ? (
@@ -30,6 +33,21 @@ export default function VoteResultBar({ inFavor, against, abstained, didNotVote,
         title={`${label}: ${n}`}
       />
     ) : null;
+  if (present > 0) {
+    const label = `${t("choice.PRESENT")}: ${present}, ${t("choice.ABSENT")}: ${absent}`;
+    return (
+      <div className="w-full" role="img" aria-label={label}>
+        <div className="flex h-3.5 rounded-lg overflow-hidden bg-[#F1F0EA]">
+          {seg(present, COLORS.present, t("choice.PRESENT"))}
+          {seg(absent, COLORS.absent, t("choice.ABSENT"))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-1 font-mono text-[10px] sm:text-[11px] tracking-[0.06em] text-muted">
+          <span><span className={`${COLORS.present} inline-block w-2 h-2 mr-1.5 align-middle`}></span><b className="text-ink font-bold mr-0.5">{present}</b>{t("choice.PRESENT").toLowerCase()}</span>
+          <span><span className={`${COLORS.absent} inline-block w-2 h-2 mr-1.5 align-middle`}></span><b className="text-ink font-bold mr-0.5">{absent}</b>{t("choice.ABSENT").toLowerCase()}</span>
+        </div>
+      </div>
+    );
+  }
   const legend = t("voteBar.legend", { inFavor, against, abstained, didNotVote, absent, total });
   return (
     <div className="w-full" role="img" aria-label={legend}>

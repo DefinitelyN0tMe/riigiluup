@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { Politician } from "../types";
 import { resolveMediaUrl } from "../api/client";
 import { partyColor } from "../lib/partyColors";
+import { factionShortName } from "../lib/factionName";
 
 export default function PoliticianCard({
   p,
@@ -44,7 +45,7 @@ export default function PoliticianCard({
       )}
       <div className="flex justify-between items-start mb-5">
         <div className="font-mono text-[10px] tracking-[0.14em] uppercase text-muted min-w-0 truncate pr-3 pl-8">
-          {p.factionName?.replace(/fraktsioon/i, "").trim() ?? t("common.noFaction")}
+          {p.factionName ? factionShortName(p.factionName) : t("common.noFaction")}
         </div>
         {photoSrc ? (
           <img src={photoSrc} alt={p.fullName} loading="lazy" className="w-11 h-11 rounded-full object-cover shrink-0" />

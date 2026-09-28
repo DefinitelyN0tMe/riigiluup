@@ -19,6 +19,11 @@ class LegislationPhaseTest {
         assertThat(LegislationPhase.fromStageCode("TAGASI_LYKATUD")).isEqualTo(LegislationPhase.REJECTED);
         assertThat(LegislationPhase.fromStageCode("LOPETATUD")).isEqualTo(LegislationPhase.WITHDRAWN);
         assertThat(LegislationPhase.fromStageCode("TAGASTATUD")).isEqualTo(LegislationPhase.WITHDRAWN);
+        // A freshly initiated bill (stage ALGATATUD) is submitted, not "other".
+        assertThat(LegislationPhase.fromStageCode("ALGATATUD")).isEqualTo(LegislationPhase.SUBMITTED);
+        // Back in the chamber after the President declined to promulgate it.
+        assertThat(LegislationPhase.fromStageCode("UUESTI_ARUTAMINE")).isEqualTo(LegislationPhase.IN_READINGS);
+        assertThat(LegislationPhase.fromStageCode("VALJA_LANGENUD")).isEqualTo(LegislationPhase.OTHER);
     }
 
     @Test

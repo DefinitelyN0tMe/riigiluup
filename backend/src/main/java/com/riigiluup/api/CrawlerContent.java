@@ -29,11 +29,24 @@ final class CrawlerContent {
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-    private static final Map<String, String[]> READING = Map.of(
-            "INITIATION", new String[]{"Algatamine", "Initiation", "Внесение"},
-            "FIRST_READING", new String[]{"Esimene lugemine", "First reading", "Первое чтение"},
-            "SECOND_READING", new String[]{"Teine lugemine", "Second reading", "Второе чтение"},
-            "THIRD_READING", new String[]{"Kolmas lugemine", "Third reading", "Третье чтение"});
+    private static final Map<String, String[]> READING = Map.ofEntries(
+            Map.entry("INITIATION", new String[]{"Algatamine", "Initiation", "Внесение"}),
+            Map.entry("FIRST_READING", new String[]{"Esimene lugemine", "First reading", "Первое чтение"}),
+            Map.entry("SECOND_READING", new String[]{"Teine lugemine", "Second reading", "Второе чтение"}),
+            Map.entry("THIRD_READING", new String[]{"Kolmas lugemine", "Third reading", "Третье чтение"}),
+            Map.entry("ESIMENE_LUGEMINE", new String[]{"Esimene lugemine", "First reading", "Первое чтение"}),
+            Map.entry("TEINE_LUGEMINE", new String[]{"Teine lugemine", "Second reading", "Второе чтение"}),
+            Map.entry("KOLMAS_LUGEMINE", new String[]{"Kolmas lugemine", "Third reading", "Третье чтение"}),
+            Map.entry("EFFECTUATION", new String[]{"Jõustumine", "Entry into force", "Вступление в силу"}),
+            Map.entry("VASTU_VOETUD", new String[]{"Vastu võetud", "Adopted", "Принят"}),
+            Map.entry("LOPETATUD", new String[]{"Lõpetatud", "Closed", "Завершено"}));
+
+    /** Step statuses as the bill page names them (frontend i18n stageStatus.*). */
+    private static final Map<String, String> STAGE_STATUS_ET = Map.of(
+            "ALGATATUD", "algatatud", "MENETLUSSE_VOETUD", "menetlusse võetud", "LOPETATUD", "lõpetatud",
+            "SAADETUD_VABARIIGI_PRESIDENDILE", "saadetud Vabariigi Presidendile", "VALJAKUULUTATUD", "välja kuulutatud",
+            "AVALDATUD_RIIGITEATAJAS", "avaldatud Riigi Teatajas", "TAGASI_LYKATUD", "tagasi lükatud",
+            "TAGASI_VOETUD", "tagasi võetud");
 
     private static final Map<String, String> DRAFT_TYPE_ET = Map.of(
             "SE", "seaduse eelnõu",
@@ -134,26 +147,39 @@ final class CrawlerContent {
     // ---------------------------------------------------------------- vote
 
     static Page vote(VoteDetailDto v) {
-        String title = v.description() != null ? v.description() : "Nimeline hääletus";
+        String motion = v.description() != null ? v.description() : "Nimeline hääletus";
+        boolean attendance = "ATTENDANCE_CHECK".equals(v.type());
+        String billTitle = v.linkedBill() != null ? v.linkedBill().title() : null;
+        String billLabel = billTitle == null ? null
+                : (v.linkedBill().mark() != null ? v.linkedBill().mark() + ": " : "") + billTitle;
         String when = v.startedAt() != null ? DATE_TIME.format(v.startedAt().atZone(TALLINN)) : null;
+        String day = v.startedAt() != null ? DATE.format(v.startedAt().atZone(TALLINN)) : null;
+        // Titles name the bill and the date, so thousands of "Lõpphääletus" pages are distinguishable.
+        String title = (billLabel != null ? billLabel + ". " : "") + motion + (day != null ? " " + day : "");
+        String sourceUrl = v.riigikoguPageUrl() != null ? v.riigikoguPageUrl() : v.sourceUrl();
         StringBuilder b = new StringBuilder();
-        b.append("<article lang=\"et\"><h1>").append(esc(title)).append("</h1><p>Nimeline hääletus Riigikogu täiskogus");
+        b.append("<article lang=\"et\"><h1>").append(esc(motion)).append("</h1><p>")
+         .append(attendance ? "Kohaloleku kontroll Riigikogu täiskogus" : "Nimeline hääletus Riigikogu täiskogus");
         if (when != null) b.append(", ").append(when);
         if (v.sittingTitle() != null) b.append(" (").append(esc(v.sittingTitle())).append(')');
         b.append(".</p><ul>");
         // The source's resultAbstained overlaps (did-not-vote + absent); the true partition is the one
         // the vote page uses (frontend lib/voteTally): abstained = neutral, didNotVote = present minus
-        // the three cast choices, absent = absent. It sums to the seat count.
+        // the three cast choices, absent = absent. It sums to the seat count. An attendance check is
+        // not a vote: only who was in the hall.
         int abstained = v.resultNeutral();
         int didNotVote = Math.max(0, v.resultPresent() - v.resultInFavor() - v.resultAgainst() - v.resultNeutral());
-        b.append(li("Poolt: " + v.resultInFavor() + "; vastu: " + v.resultAgainst() + "; erapooletuid: "
-                + abstained + "; ei hääletanud: " + didNotVote + "; puudus: " + v.resultAbsent()));
-        if (v.linkedBill() != null && v.linkedBill().title() != null) {
+        String tallyEt = attendance
+                ? "Kohal: " + v.resultPresent() + "; puudus: " + v.resultAbsent()
+                : "Poolt: " + v.resultInFavor() + "; vastu: " + v.resultAgainst() + "; erapooletuid: "
+                        + abstained + "; ei hääletanud: " + didNotVote + "; puudus: " + v.resultAbsent();
+        b.append(li(tallyEt));
+        if (billTitle != null) {
             b.append("<li>Eelnõu: <a href=\"").append(esc(SITE + "/legislation/" + v.linkedBill().id())).append("\">")
-                    .append(esc(v.linkedBill().title())).append("</a></li>");
+                    .append(esc(billLabel)).append("</a></li>");
         }
         b.append("</ul>");
-        if (v.factionBreakdowns() != null && !v.factionBreakdowns().isEmpty()) {
+        if (!attendance && v.factionBreakdowns() != null && !v.factionBreakdowns().isEmpty()) {
             b.append("<h2>Fraktsioonide kaupa</h2><ul>");
             for (var f : v.factionBreakdowns()) {
                 b.append(li(esc(f.factionName()) + ": poolt " + f.inFavor() + ", vastu " + f.against()
@@ -161,18 +187,29 @@ final class CrawlerContent {
             }
             b.append("</ul>");
         }
-        b.append(sources(v.sourceUrl(), "Hääletuse andmed Riigikogu avaandmetes"));
+        b.append(sources(sourceUrl, "Hääletus Riigikogu veebis"));
         b.append("</article>");
-        b.append("<section lang=\"en\"><p>Roll-call vote in the Estonian parliament (Riigikogu)")
-                .append(when != null ? " on " + when : "").append(": ").append(v.resultInFavor()).append(" for, ")
-                .append(v.resultAgainst()).append(" against, ").append(abstained).append(" abstained, ")
-                .append(didNotVote).append(" did not vote, ").append(v.resultAbsent()).append(" absent.</p></section>");
-        b.append("<section lang=\"ru\"><p>Поимённое голосование в Рийгикогу")
-                .append(when != null ? " " + when : "").append(": за ").append(v.resultInFavor()).append(", против ")
-                .append(v.resultAgainst()).append(", воздержались ").append(abstained).append(", не голосовали ")
-                .append(didNotVote).append(", отсутствовали ").append(v.resultAbsent()).append(".</p></section>");
-        String desc = title + (when != null ? " (" + when + ")" : "") + ": poolt " + v.resultInFavor()
-                + ", vastu " + v.resultAgainst() + ", erapooletuid " + abstained + ", ei hääletanud " + didNotVote + ".";
+        if (attendance) {
+            b.append("<section lang=\"en\"><p>Attendance check in the Estonian parliament (Riigikogu)")
+             .append(when != null ? " on " + when : "").append(": ").append(v.resultPresent()).append(" present, ")
+             .append(v.resultAbsent()).append(" absent.</p></section>");
+            b.append("<section lang=\"ru\"><p>Проверка присутствия в Рийгикогу")
+             .append(when != null ? " " + when : "").append(": присутствовали ").append(v.resultPresent())
+             .append(", отсутствовали ").append(v.resultAbsent()).append(".</p></section>");
+        } else {
+            b.append("<section lang=\"en\"><p>Roll-call vote in the Estonian parliament (Riigikogu)")
+             .append(when != null ? " on " + when : "").append(": ").append(v.resultInFavor()).append(" for, ")
+             .append(v.resultAgainst()).append(" against, ").append(abstained).append(" abstained, ")
+             .append(didNotVote).append(" did not vote, ").append(v.resultAbsent()).append(" absent.</p></section>");
+            b.append("<section lang=\"ru\"><p>Поимённое голосование в Рийгикогу")
+             .append(when != null ? " " + when : "").append(": за ").append(v.resultInFavor()).append(", против ")
+             .append(v.resultAgainst()).append(", воздержались ").append(abstained).append(", не голосовали ")
+             .append(didNotVote).append(", отсутствовали ").append(v.resultAbsent()).append(".</p></section>");
+        }
+        String desc = title + ": " + (attendance
+                ? "kohal " + v.resultPresent() + ", puudus " + v.resultAbsent() + "."
+                : "poolt " + v.resultInFavor() + ", vastu " + v.resultAgainst() + ", erapooletuid " + abstained
+                        + ", ei hääletanud " + didNotVote + ", puudus " + v.resultAbsent() + ".");
         return new Page(title + " — Riigiluup", desc, wrap(b), null);
     }
 
@@ -187,9 +224,9 @@ final class CrawlerContent {
         String type = d.draftTypeCode() != null ? DRAFT_TYPE_ET.get(d.draftTypeCode()) : null;
         b.append(esc(type != null ? capitalize(type) : "Eelnõu"));
         if (mark != null) b.append(' ').append(esc(mark));
-        b.append(" Riigikogu menetluses");
+        if (d.membership() != null) b.append(" (").append(roman(d.membership())).append(" Riigikogu)");
         if (d.initiatedDate() != null) b.append(", algatatud ").append(DATE.format(d.initiatedDate()));
-        b.append(".</p><ul>");
+        b.append(". ").append(esc(capitalize(statusEt(d)))).append(".</p><ul>");
         if (d.sponsors() != null && !d.sponsors().isEmpty()) {
             List<String> s = d.sponsors().stream().map(LegislationDetailDto.SponsorDto::displayName)
                     .filter(n -> n != null && !n.isBlank()).distinct().toList();
@@ -205,7 +242,9 @@ final class CrawlerContent {
                 String[] l = READING.get(st.readingCode());
                 String label = l != null ? l[0] : st.readingCode();
                 if (label == null) continue;
-                b.append(li(esc(label) + (st.occurredAt() != null ? ": " + DATE.format(st.occurredAt().atZone(TALLINN)) : "")));
+                String status = st.statusCode() != null ? STAGE_STATUS_ET.get(st.statusCode()) : null;
+                b.append(li(esc(label) + (status != null ? " (" + status + ")" : "")
+                        + (st.occurredAt() != null ? ": " + DATE.format(st.occurredAt().atZone(TALLINN)) : "")));
             }
             b.append("</ul>");
         }
@@ -225,21 +264,23 @@ final class CrawlerContent {
         b.append("<section lang=\"en\"><p>Bill").append(mark != null ? " " + esc(mark) : "")
                 .append(" in the Estonian parliament (Riigikogu)")
                 .append(d.initiatedDate() != null ? ", initiated " + DATE.format(d.initiatedDate()) : "")
-                .append(": ").append(esc(title)).append(".</p></section>");
+                .append(": ").append(esc(title)).append(". Status: ").append(esc(statusEn(d))).append(".</p></section>");
         b.append("<section lang=\"ru\"><p>Законопроект").append(mark != null ? " " + esc(mark) : "")
                 .append(" в Рийгикогу")
                 .append(d.initiatedDate() != null ? ", внесён " + DATE.format(d.initiatedDate()) : "")
-                .append(": ").append(esc(title)).append(".</p></section>");
+                .append(": ").append(esc(title)).append(". Статус: ").append(esc(statusRu(d))).append(".</p></section>");
 
         String desc = (mark != null ? mark + ": " : "") + title
                 + (d.initiatedDate() != null ? ". Algatatud " + DATE.format(d.initiatedDate()) : "")
-                + ". Menetluse käik ja hääletused Riigikogu avaandmetest.";
+                + ". " + capitalize(statusEt(d)) + ". Menetluse käik ja hääletused Riigikogu avaandmetest.";
         StringBuilder ld = new StringBuilder("{\"@context\":\"https://schema.org\",\"@type\":\"Legislation\"");
         ld.append(",\"name\":").append(js(title)).append(",\"url\":").append(js(url));
         if (mark != null) ld.append(",\"legislationIdentifier\":").append(js(mark));
         if (d.initiatedDate() != null) ld.append(",\"legislationDate\":").append(js(d.initiatedDate().toString()));
         ld.append(",\"legislationJurisdiction\":\"EE\"");
-        ld.append(",\"legislationPassedBy\":{\"@type\":\"GovernmentOrganization\",\"name\":\"Riigikogu\"}");
+        if ("ADOPTED".equals(d.phase())) {
+            ld.append(",\"legislationPassedBy\":{\"@type\":\"GovernmentOrganization\",\"name\":\"Riigikogu\"}");
+        }
         if (d.riigikoguPageUrl() != null) ld.append(",\"sameAs\":").append(js(d.riigikoguPageUrl()));
         ld.append('}');
         return new Page(title + " — Riigiluup", desc, wrap(b), ld.toString());
@@ -720,6 +761,71 @@ final class CrawlerContent {
              .append(v.startedAt() != null ? " (" + DATE_TIME.format(v.startedAt().atZone(TALLINN)) + ")" : "").append("</li>");
         }
         b.append("</ul>");
+    }
+
+    /** Where the bill stands, in the words the bill page uses; never "in proceedings" for a closed bill. */
+    static String statusEt(LegislationDetailDto d) {
+        String code = d.activeStageSourceCode() == null ? "" : d.activeStageSourceCode();
+        String when = d.activeStatusDate() != null ? " " + DATE.format(d.activeStatusDate()) : "";
+        switch (d.phase() == null ? "OTHER" : d.phase()) {
+            case "ADOPTED":
+                return "vastu võetud" + (d.acceptedDate() != null ? " " + DATE.format(d.acceptedDate()) : when);
+            case "REJECTED":
+                return "tagasi lükatud" + when;
+            case "WITHDRAWN":
+                return switch (code) {
+                    case "TAGASTATUD" -> "tagastatud algatajale" + when;
+                    case "LOPETATUD" -> "menetlus lõpetatud" + when;
+                    default -> "tagasi võetud" + when;
+                };
+            case "SUBMITTED":
+                return "Riigikogu menetluses";
+            case "IN_COMMITTEE":
+                return "Riigikogu menetluses (komisjonis)";
+            case "IN_READINGS": {
+                if ("UUESTI_ARUTAMINE".equals(code)) return "Riigikogu menetluses (uuesti arutamisel)";
+                String[] r = READING.get(code);
+                return "Riigikogu menetluses" + (r != null ? " (" + r[0].toLowerCase(Locale.ROOT) + ")" : "");
+            }
+            default:
+                return switch (code) {
+                    case "VALJA_LANGENUD" -> "menetlusest välja langenud" + when;
+                    case "VALJA_LANGENUD_KOOSEISU_LOPPEMISEGA" -> "menetlusest välja langenud Riigikogu koosseisu volituste lõppemisega" + when;
+                    case "YHENDATUD" -> "ühendatud teise eelnõuga" + when;
+                    case "VALJA_ARVATUD" -> "menetlusest välja arvatud" + when;
+                    case "VALJA_KUULUTAMATA_JAETUD" -> "välja kuulutamata jäetud" + when;
+                    default -> "menetluse seis: vaata Riigikogu eelnõu lehte";
+                };
+        }
+    }
+
+    static String statusEn(LegislationDetailDto d) {
+        return switch (d.phase() == null ? "OTHER" : d.phase()) {
+            case "ADOPTED" -> "adopted" + (d.acceptedDate() != null ? " " + DATE.format(d.acceptedDate()) : "");
+            case "REJECTED" -> "rejected";
+            case "WITHDRAWN" -> "withdrawn or closed";
+            case "SUBMITTED", "IN_COMMITTEE", "IN_READINGS" -> "in proceedings in the Riigikogu";
+            default -> "no longer in proceedings (lapsed, merged or not promulgated; see the Riigikogu page)";
+        };
+    }
+
+    static String statusRu(LegislationDetailDto d) {
+        return switch (d.phase() == null ? "OTHER" : d.phase()) {
+            case "ADOPTED" -> "принят" + (d.acceptedDate() != null ? " " + DATE.format(d.acceptedDate()) : "");
+            case "REJECTED" -> "отклонён";
+            case "WITHDRAWN" -> "отозван или производство прекращено";
+            case "SUBMITTED", "IN_COMMITTEE", "IN_READINGS" -> "в производстве Рийгикогу";
+            default -> "производство не ведётся (выбыл, объединён или не провозглашён; см. страницу Рийгикогу)";
+        };
+    }
+
+    /** Riigikogu composition number as the parliament writes it (15 -> XV). */
+    static String roman(int n) {
+        int[] v = {10, 9, 5, 4, 1};
+        String[] r = {"X", "IX", "V", "IV", "I"};
+        StringBuilder o = new StringBuilder();
+        for (int i = 0; i < v.length; i++) while (n >= v[i]) { o.append(r[i]); n -= v[i]; }
+        return o.toString();
     }
 
     // ---------------------------------------------------------------- helpers
