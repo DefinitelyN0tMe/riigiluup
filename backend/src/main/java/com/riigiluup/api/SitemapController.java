@@ -42,8 +42,26 @@ public class SitemapController {
     private final InitiativeRepository initiativeRepo;
     private final GroupRepository groupRepo;
 
+    /** Built sitemap reused for an hour: it is ~1 MB / 12k URLs and was rebuilt on every request. */
+    private static final long CACHE_MS = 3_600_000;
+    private volatile String cached;
+    private volatile long cachedAt;
+
     @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
-    public String sitemap() {
+    public org.springframework.http.ResponseEntity<String> sitemap() {
+        long now = System.currentTimeMillis();
+        String body = cached;
+        if (body == null || now - cachedAt > CACHE_MS) {
+            body = build();
+            cached = body;
+            cachedAt = now;
+        }
+        return org.springframework.http.ResponseEntity.ok()
+                .cacheControl(org.springframework.http.CacheControl.maxAge(java.time.Duration.ofHours(1)).cachePublic())
+                .body(body);
+    }
+
+    private String build() {
         StringBuilder sb = new StringBuilder(1 << 16);
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");

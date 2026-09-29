@@ -55,6 +55,8 @@ server:
         # which mitigates CSRF on the state-changing admin endpoints.
         same-site: lax
         http-only: true
+        # Only ever sent over HTTPS (prod is HTTPS-only behind nginx; the local profile turns it off).
+        secure: ${SESSION_COOKIE_SECURE:true}
 
 management:
   endpoints:
@@ -123,9 +125,17 @@ riigiluup:
         # 429s on a normal reload/second visit. Results are @Cacheable (repeat hits are cheap), so a
         # generous per-IP ceiling (~8 full page loads/min) is safe and still bounds scraping.
         per-minute: 120
+      - name: speeches
+        # Full-text stenogram search is the costliest public query (0.4-1.7 s), so it keeps a
+        # tighter bucket of its own.
+        pattern: "/api/v1/speeches.*"
+        per-minute: 120
       - name: default
+        # Raised from 60 (audit 29.09): a profile costs ~11 calls and the header 2 more, so a reader
+        # opening 6-7 MPs in tabs, or a newsroom/school behind one NAT address, hit 429 and got
+        # empty pages. The rest of these endpoints answer in 3-60 ms from cache.
         pattern: "/api/v1/(?!admin/).*"
-        per-minute: 60
+        per-minute: 240
   analytics:
     # Faction name substrings currently in the governing coalition — drives the coalition/
     # opposition axis of the MP scatter. Update on any change of government (SDE left in 2025).
@@ -185,6 +195,11 @@ spring:
   config:
     activate:
       on-profile: local
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
 riigiluup:
   cors:
     admin-origins: http://localhost:5173

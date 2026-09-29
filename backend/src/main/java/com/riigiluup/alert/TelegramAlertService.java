@@ -59,7 +59,8 @@ public class TelegramAlertService {
                     .toBodilessEntity();
         } catch (Exception e) {
             // Never propagate: the alert is a side-channel, not part of the caller's contract.
-            log.warn("Telegram alert send failed: {}", e.getMessage());
+            // Class name only: a client exception message contains the request URL, i.e. the bot token.
+            log.warn("Telegram alert send failed: {}", e.getClass().getSimpleName());
         }
     }
 

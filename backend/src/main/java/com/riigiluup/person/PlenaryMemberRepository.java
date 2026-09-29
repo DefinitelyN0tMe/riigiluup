@@ -12,6 +12,11 @@ import java.util.UUID;
 
 public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UUID> {
 
+    /** Every stored portrait URL (current and former MPs): the file proxy's allowlist. */
+    @org.springframework.data.jpa.repository.Query("select m.photoUrl from PlenaryMember m where m.photoUrl is not null")
+    java.util.List<String> findAllPhotoUrls();
+
+
     /** All slugs for the sitemap. */
     @org.springframework.data.jpa.repository.Query("select m.slug from PlenaryMember m where m.slug is not null")
     java.util.List<String> findAllSlugsForSitemap();

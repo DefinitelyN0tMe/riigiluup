@@ -117,4 +117,12 @@ class FileProxyControllerTest {
             return new FileProxyController.Loader(client, 4, 1000, "");
         }
     }
+
+    @Test
+    void unknown_file_id_is_404_without_any_upstream_call() {
+        FileProxyController.Loader loader = mock(FileProxyController.Loader.class);
+        FileProxyController controller = new FileProxyController(loader, id -> false);
+        assertThat(controller.download(VALID_UUID).getStatusCode().value()).isEqualTo(404);
+        verifyNoInteractions(loader);
+    }
 }

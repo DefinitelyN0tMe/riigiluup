@@ -15,12 +15,15 @@ export class ApiError extends Error {
   status: number;
   path: string;
   i18nKey: string;
-  constructor(status: number, path: string, statusText: string) {
+  /** Seconds the server asked us to wait (Retry-After on a 429), if it said. */
+  retryAfter: number | null;
+  constructor(status: number, path: string, statusText: string, retryAfter: number | null = null) {
     super(`API ${status} ${statusText} for ${path}`);
     this.name = "ApiError";
     this.status = status;
     this.path = path;
     this.i18nKey = pickI18nKey(status);
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -36,7 +39,8 @@ function pickI18nKey(status: number): string {
 export async function apiGet<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { headers: { Accept: "application/json" } });
   if (!res.ok) {
-    throw new ApiError(res.status, path, res.statusText);
+    const ra = Number(res.headers.get("Retry-After"));
+    throw new ApiError(res.status, path, res.statusText, Number.isFinite(ra) && ra > 0 ? ra : null);
   }
   return res.json() as Promise<T>;
 }

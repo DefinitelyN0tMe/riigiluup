@@ -45,15 +45,29 @@ public class FileProxyController {
             Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
     private final Loader loader;
+    /** Only ids the site links to (MP portraits) are proxied; everything else is a 404 with no upstream call. */
+    private final java.util.function.Predicate<String> knownId;
 
-    public FileProxyController(Loader loader) {
+    @org.springframework.beans.factory.annotation.Autowired
+    FileProxyController(Loader loader, KnownPhotoIds knownPhotoIds) {
+        this(loader, knownPhotoIds::contains);
+    }
+
+    FileProxyController(Loader loader, java.util.function.Predicate<String> knownId) {
         this.loader = loader;
+        this.knownId = knownId;
+    }
+
+    /** Test convenience: every well-formed id is allowed. */
+    FileProxyController(Loader loader) {
+        this(loader, id -> true);
     }
 
     @GetMapping("/{uuid}")
     public ResponseEntity<byte[]> download(@PathVariable String uuid) {
         // Reject junk keys up front — no loader/cache/upstream involvement at all.
         if (!isValidUuid(uuid)) return ResponseEntity.badRequest().build();
+        if (!knownId.test(uuid)) return ResponseEntity.notFound().build();
         byte[] bytes;
         try {
             bytes = loader.load(uuid);
@@ -63,8 +77,10 @@ public class FileProxyController {
         } catch (UpstreamBusyException e) {
             // Upstream fetch slots exhausted — shed load instead of holding the thread.
             return ResponseEntity.status(503).header("Retry-After", "5").build();
+        } catch (org.springframework.web.client.HttpClientErrorException.NotFound e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            log.warn("file proxy failed for {}", uuid, e);
+            log.warn("file proxy failed for {}: {}", uuid, e.toString());
             return ResponseEntity.status(502).build();
         }
         return ResponseEntity.ok()
