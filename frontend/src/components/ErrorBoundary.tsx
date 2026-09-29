@@ -34,9 +34,15 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, _info: ErrorInfo) {
-    // Recover automatically from a stale-chunk load error by reloading the page.
+    // Recover automatically from a stale-chunk load error by reloading the page, but only once
+    // per minute: if the asset is really gone, an unguarded reload would loop forever.
     if (error?.message && CHUNK_ERROR.test(error.message)) {
-      window.location.reload();
+      let last = 0;
+      try { last = Number(sessionStorage.getItem("chunkReloadAt") ?? 0); } catch { /* storage blocked */ }
+      if (Date.now() - last > 60_000) {
+        try { sessionStorage.setItem("chunkReloadAt", String(Date.now())); } catch { /* storage blocked */ }
+        window.location.reload();
+      }
     }
   }
 

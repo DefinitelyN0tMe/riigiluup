@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { MemberActivityBoard, ActivityMetric } from "../../api/analytics";
+import { localizeFactionShort } from "../../lib/factionName";
 
 const METRICS: ActivityMetric[] = ["speeches", "questions", "interpellations", "writtenQuestions"];
 const TOP_N = 15;
@@ -58,7 +59,7 @@ export default function ActiveMembers({ data }: { data: MemberActivityBoard }) {
                   </div>
                   <div className="flex items-center gap-2 mt-1 font-mono text-[10px] tracking-[0.12em] uppercase text-muted">
                     <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: color }} />
-                    {it.factionShortName ?? "—"}
+                    {localizeFactionShort(it.factionShortName, t)}
                   </div>
                   <div className="mt-1.5 h-1.5 rounded-full bg-off overflow-hidden max-w-[440px]">
                     <div className="h-full rounded-full" style={{ width: `${width}%`, backgroundColor: color }} />

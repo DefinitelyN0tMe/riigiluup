@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { ElectionBoard } from "../../api/analytics";
+import { localizeFactionShort } from "../../lib/factionName";
 
 const TOP_N = 15;
 
@@ -47,7 +48,7 @@ export default function ElectionLeaders({ data }: { data: ElectionBoard }) {
                   </div>
                   <div className="flex items-center gap-2 mt-1 font-mono text-[10px] tracking-[0.12em] uppercase text-muted">
                     <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: color }} />
-                    {m.factionShortName ?? "—"}
+                    {localizeFactionShort(m.factionShortName, t)}
                     <span className="opacity-70">· {t(`profile.election.mandate.${m.mandateType}`, m.mandateType)}</span>
                   </div>
                   <div className="mt-1.5 h-1.5 rounded-full bg-off overflow-hidden max-w-[440px]">

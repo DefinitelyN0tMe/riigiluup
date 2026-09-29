@@ -15,7 +15,7 @@
   "chrome": {
     "menuOpen": "Ava menüü",
     "menuClose": "Sulge menüü",
-    "watchLive": "Vaata live-istungit",
+    "watchLive": "Vaata istungi otseülekannet",
     "ticker": {
       "systemLive": "SÜSTEEM · TÖÖS · SÜNKROONITUD",
       "api": "API",
@@ -35,7 +35,7 @@
       "l2": "Ei pingerida",
       "l3": "Ainult andmed"
     },
-    "footerBlurb": "Kodanikualgatuslik Riigikogu andmete peegel — vaba tarkvara, avalik lähtekood, avatud API. Iga fakt viib tagasi originaalallikale.",
+    "footerBlurb": "Kodanikualgatuslik Riigikogu andmete peegel — vaba tarkvara, avalik lähtekood, avatud API. Iga fakt viib tagasi algallikale.",
     "foot": {
       "browse": "Sirvi",
       "browseDesc": "Saadikute profiilid, nimelised hääletused, eelnõud ja analüütika — otse Riigikogu avaandmetest, iga kirje viitab allikale.",
@@ -43,7 +43,9 @@
       "transparencyDesc": "Kuidas iga näitaja arvutatakse, allikate ja otspunktide loend, andmete värskuse logi ning paranduste teatamise vorm.",
       "citizen": "Kodanikule",
       "citizenDesc": "Mis projekt see on ja miks, privaatsuspoliitika, kasutustingimused ning otsejuurdepääs Riigikogu API-le.",
-      "riigikoguApi": "Riigikogu API ↗"
+      "riigikoguApi": "Riigikogu API ↗",
+      "codeLicense": "KOOD",
+      "dataLicense": "ANDMED © RIIGIKOGU,"
     }
   },
   "homePage": {
@@ -58,7 +60,7 @@
       "ctaMethodology": "Metoodika",
       "footIntroduction": "Sissejuhatus",
       "scrollHint": "KERI EDASI",
-      "compositionLine": "XV Riigikogu koosseis · 2023-2027"
+      "compositionLine": "XV Riigikogu koosseis · 2023–2027"
     },
     "nowVotingCard": {
       "eyebrow": "Praegu hääletusel",
@@ -68,7 +70,7 @@
     },
     "stats": {
       "mpsLabel": "SAADIKUD",
-      "mpsHint": "aktiivseid",
+      "mpsHint": "ametis",
       "votesLabel": "HÄÄLETUSED",
       "votesHint": "alates aprillist 2023",
       "billsLabel": "EELNÕUD",
@@ -79,7 +81,7 @@
       "votesDelta": "↑ +{{count}} sel nädalal",
       "votesDeltaQuiet": "○ sel nädalal uusi pole",
       "billsDelta": "↳ {{count}} menetluses",
-      "nextSync": "↺ järgmine sünk {{time}}",
+      "nextSync": "↺ järgmine sünkroonimine {{time}}",
       "nextSyncUnknown": "↺ sünk ajakava järgi"
     },
     "nowVoting": {
@@ -98,7 +100,7 @@
       "titlePost": "",
       "more": "Kõik 101 saadikut",
       "loading": "Laen saadikuid…",
-      "featureTag": "Saadik nädalast",
+      "featureTag": "Nädala saadik",
       "featureCta": "Ava profiil →",
       "cardVotes": "hääletust",
       "cardParticipation": "osalus"
@@ -107,20 +109,20 @@
       "kicker": "Läbipaistvus",
       "titlePre": "Iga fakt viib",
       "titleEm": "originaalallikale",
-      "body": "Riigiluup ei tõlgenda, ei hinda ega tekita pingerida. Iga hääletus, iga eelnõu ja iga metaandme väli sisaldab otselinki Riigikogu ametlikule vormile — ja sünk-logi näitab, millal iga rida viimati värskendati.",
-      "quote": "«Kui te ei saa allikat kontrollida, ei saa te süsteemi usaldada.»",
+      "body": "Riigiluup ei tõlgenda, ei hinda ega tekita pingerida. Iga hääletus, iga eelnõu ja iga metaandmeväli sisaldab otselinki Riigikogu ametlikule lehele — ja sünkroonimislogi näitab, millal iga rida viimati värskendati.",
+      "quote": "„Kui te ei saa allikat kontrollida, ei saa te süsteemi usaldada.“",
       "quoteAttr": "— Metoodika · v. 1.3 · 2026-07",
       "step1H": "Allikas",
-      "step1P": "Riigikogu OpenData API — nimelised hääletused, eelnõud, koosseis. Hääletused iga 6 tunni tagant, ülejäänu kord ööpäevas.",
+      "step1P": "Riigikogu OpenData API — nimelised hääletused, eelnõud, koosseis. Hääletused iga kuue tunni järel, muu kord ööpäevas.",
       "step1L": "RIIGIKOGU.EE",
       "step2H": "Sünk",
-      "step2P": "Idempotentne pipeline PostgreSQL-i. Iga kirje kannab source_hash ja fetched_at välja.",
+      "step2P": "Idempotentne andmete laadimine PostgreSQL-i. Igal kirjel on väljad source_hash ja fetched_at.",
       "step2L": "SÜNK-LOGI",
       "step3H": "Peegel",
-      "step3P": "Vaade lahtiseks, ilma tõlgenduseta. Iga rida viib tagasi originaalvormile.",
+      "step3P": "Andmed avatud kujul, ilma tõlgenduseta. Iga rida viib tagasi algallikale.",
       "step3L": "ANDMESKEEM",
       "step4H": "Parandus",
-      "step4P": "Iga viga saab teatada. Parandus on avalik, allkirjastatud ja versioneeritud.",
+      "step4P": "Igast veast saab teatada. Parandus on avalik, allkirjastatud ja versioneeritud.",
       "step4L": "PARANDUSED"
     },
     "parties": {
@@ -145,7 +147,7 @@
     "clearBill": "Eemalda eelnõu filter",
     "results_one": "{{count}} sõnavõtt",
     "results_other": "{{count}} sõnavõttu",
-    "empty": "Midagi ei leitud. Otsing on täpne sõnavormide järgi (eesti tüvestust pole) — proovi sõnavormi, nagu see saalis kõlas.",
+    "empty": "Midagi ei leitud. Otsing leiab ainult täpseid sõnavorme (eesti keele tüvesid ei tuvastata) — proovi sõna sellisel kujul, nagu see saalis kõlas.",
     "openStenogram": "Ava stenogramm",
     "searchNote": "Otsing leiab täpsed sõnavormid kõne originaalkeeles (peamiselt eesti). Istungi juhataja, ministrite ja külaliste sõnavõtud kuvatakse stenogrammis trükitud nime all."
   },
@@ -179,7 +181,7 @@
         "titlePre": "Kes ",
         "titleEm": "kellega",
         "titlePost": " hääletab",
-        "note": "Iga ruut näitab, kui tihti kaks fraktsiooni jõudsid samale enamuse otsusele. Diagonaal on iseendale võrreldes — alati 100%. Andmed vaid nimelistelt hääletustelt, kus mõlemal fraktsioonil oli selge enamus."
+        "note": "Iga ruut näitab, kui tihti kahe fraktsiooni enamus hääletas samamoodi. Diagonaalil on fraktsioon võrreldud iseendaga — alati 100%. Arvesse on võetud ainult nimelised hääletused, kus mõlemal fraktsioonil oli selge enamus."
       },
       "discipline": {
         "kicker": "Kõrvalekalded fraktsiooni joonest",
@@ -191,15 +193,15 @@
       "flow": {
         "kicker": "Eelnõude teekond",
         "titlePre": "Kus eelnõud ",
-        "titleEm": "surevad",
+        "titleEm": "takerduvad",
         "titlePost": "",
-        "note": "Kust läbi läheb ja kus takerdub — algatatud, komisjonis, I/II/III lugemisel, vastu võetud või tagasi lükatud. Iga voog on jälgitav ametliku menetluslehe kaudu."
+        "note": "Milliseid etappe eelnõud läbivad ja kus need takerduvad: algatatud, komisjonis, I/II/III lugemisel, vastu võetud või tagasi lükatud. Iga voog on jälgitav eelnõu ametliku menetluskäigu kaudu."
       },
       "attendance": {
         "kicker": "Kohalolek istungitel",
         "titlePre": "Kes ",
         "titleEm": "tuleb",
-        "titlePost": " tööle",
+        "titlePost": " istungile",
         "note": "Iga rida = üks saadik, iga tulp = üks kohaloleku kontroll (viimased 40). Sinine = kohal, punane = puudus. Paremal serval kohaloleku %."
       },
       "timing": {
@@ -207,14 +209,14 @@
         "titlePre": "Töö ",
         "titleEm": "rütm",
         "titlePost": "",
-        "note": "7 nädalapäeva × 24 tundi. Tumesinine = tipphõive. Kell hilja hääletamine on erakorraline."
+        "note": "7 nädalapäeva × 24 tundi. Tumesinine = kõige rohkem hääletusi. Hilisõhtune hääletamine on erandlik."
       },
       "topics": {
         "kicker": "Millega parlament tegeleb",
         "titlePre": "Töö ",
         "titleEm": "sisu",
         "titlePost": "",
-        "note": "Eurovoc teemade kaupa. Plaadi suurus = eelnõude arv, sinise tume = kui suur osa vastu võetud."
+        "note": "EuroVoci teemade kaupa. Ruudu suurus = eelnõude arv, mida tumedam sinine, seda suurem osa on vastu võetud."
       },
       "velocity": {
         "kicker": "Kiirus",
@@ -242,35 +244,35 @@
         "titlePre": "Mida ",
         "titleEm": "öösel",
         "titlePost": " otsustatakse",
-        "note": "Riigikogu tavalised istungid toimuvad päeval. Siin on loetletud nimelised hääletused enne kella 8 või pärast kella 22 ja nädalavahetusel, koos kellaaja, häältevahe ja seotud eelnõuga. Hiline kellaaeg ei tähenda iseenesest, et midagi oleks valesti: sageli venib nii pikk istung, näiteks kui eelnõu arutelu kestab kaua."
+        "note": "Riigikogu tavalised istungid toimuvad päeval. Siin on loetletud nimelised hääletused enne kella 8 või pärast kella 22 ja nädalavahetusel, koos kellaaja, häältevahe ja seotud eelnõuga. Hiline kellaaeg ei tähenda iseenesest, et midagi oleks valesti: sageli on põhjus lihtsalt pikaks veninud istung, näiteks kui eelnõu arutelu kestab kaua."
       },
       "activity": {
         "kicker": "Aktiivsus täiskogus",
         "titlePre": "Kõige ",
         "titleEm": "aktiivsemad",
         "titlePost": " saadikud",
-        "note": "Sõnavõtud ja küsimused täiskogu stenogrammidest, pluss iga saadiku esitatud arupärimised ja kirjalikud küsimused jooksval koosseisul. Vaheta mõõdikut, et ümber järjestada. Arvud kajastavad aktiivsuse mahtu, mitte selle sisu."
+        "note": "Sõnavõtud ja küsimused täiskogu stenogrammidest ning iga saadiku esitatud arupärimised ja kirjalikud küsimused jooksvas koosseisus. Järjestuse muutmiseks vali teine mõõdik. Arvud kajastavad aktiivsuse mahtu, mitte selle sisu."
       },
       "elections": {
         "kicker": "Isiklik mandaat",
         "titlePre": "Kellel on enim ",
         "titleEm": "isiklikke hääli",
         "titlePost": "",
-        "note": "Iga istuv saadik 2023. aasta valimistel saadud isiklike häälte järgi, koos mandaaditüüpide jaotusega. Isikumandaadi saab piisava häältearvuga üle ringkonna kvoodi; ringkonna- ja kompensatsioonimandaat jagatakse nimekirjast. Asendajaid, keda ise ei valitud, ei näidata."
+        "note": "Kõik ametis olevad saadikud 2023. aasta valimistel saadud isiklike häälte järgi, koos mandaaditüüpide jaotusega. Isikumandaadi saab kandidaat, kelle häälte arv on vähemalt võrdne ringkonna lihtkvoodiga; ringkonna- ja kompensatsioonimandaadid jagatakse nimekirjade alusel. Asendusliikmeid, kes ise valituks ei osutunud, ei näidata."
       },
       "finance": {
         "kicker": "Raha poliitikas",
         "titlePre": "Kuidas erakondi ",
         "titleEm": "rahastatakse",
         "titlePost": "",
-        "note": "Parlamendierakondade deklareeritud tulud alates 2023. aastast allikate kaupa, Erakondade Rahastamise Järelevalve Komisjoni (ERJK) registrist. Enamikul erakondadest on suurim tuluallikas riigitoetus, mõnel on aga annetusi rohkem kui riigitoetust (vt jaotust allpool). Summad on aruannetes deklareeritud, eurodes."
+        "note": "Parlamendierakondade deklareeritud tulud alates 2023. aastast allikate kaupa, Erakondade Rahastamise Järelevalve Komisjoni (ERJK) registrist. Enamikul erakondadest on suurim tuluallikas riigitoetus, mõnel on aga annetusi rohkem kui riigitoetust (vt jaotust allpool). Summad on eurodes, nii nagu need on aruannetes deklareeritud."
       },
       "latency": {
         "kicker": "Parlamentaarne järelevalve",
         "titlePre": "Kes ",
         "titleEm": "vastab",
         "titlePost": " tähtaegselt",
-        "note": "Jooksva koosseisu arupärimised ja kirjalikud küsimused, mõõdetuna allika enda fikseeritud vastamistähtaja vastu: esitamisest registreeritud kirjaliku vastuseni või täiskogu istungini, kus minister arupärimisele vastas. Alla viie küsimusega ministrid on peidetud; esitajatele tagastatud küsimused on välja jäetud."
+        "note": "Jooksva koosseisu arupärimised ja kirjalikud küsimused, võrrelduna allikas registreeritud vastamistähtajaga: esitamisest registreeritud kirjaliku vastuseni või täiskogu istungini, kus minister arupärimisele vastas. Ministreid, kellele on esitatud alla viie küsimuse, ei näidata; esitajatele tagastatud küsimused on välja jäetud."
       },
       "initiatives": {
         "kicker": "Otsedemokraatia",
@@ -285,7 +287,7 @@
     "noData": "Puuduvad andmed.",
     "activity": {
       "metricLabel": "Aktiivsuse mõõt",
-      "interpellationsHint": "Ametlik nõue, millele minister peab istungil vastama, ja sellele järgnev arutelu.",
+      "interpellationsHint": "Ametlik küsimus valitsusliikmele, millele too peab täiskogu istungil vastama; vastusele järgneb läbirääkimine.",
       "metric": {
         "speeches": "Sõnavõtud stenogrammis",
         "questions": "Küsimused",
@@ -297,8 +299,8 @@
       "questions_one": "{{count}} küsimus",
       "questions_other": "{{count}} küsimust",
       "onTime": "{{pct}}% tähtaegselt",
-      "overdue": "üle tähtaja praegu: {{count}}",
-      "medianDays": "mediaan, päeva"
+      "overdue": "praegu üle tähtaja: {{count}}",
+      "medianDays": "mediaan päevades"
     },
     "finance": {
       "footnote": "Tulud alates {{year}}",
@@ -315,20 +317,20 @@
     "a11y": {
       "factionAgreement": "Fraktsioonide kokkulangevuse maatriks {{n}}×{{n}}, aluseks {{totalVotes}} hääletust.",
       "attendance": "Saadikute × kohaloleku kontrolli soojuskaart, {{mps}} saadikut {{checks}} viimase kontrolli lõikes.",
-      "billFlow": "Eelnõude Sankey-diagramm, {{total}} eelnõu läbi parlamendi etappide.",
+      "billFlow": "Eelnõude Sankey diagramm: {{total}} eelnõu menetlusetappide kaupa.",
       "billVelocity": "Eelnõude kiiruse histogramm, mediaan {{median}} päeva algatusest vastuvõtmiseni.",
-      "cosponsorship": "Koossponsorluse graaf, {{nodes}} saadikut ja {{edges}} ühist eelnõu-serva.",
+      "cosponsorship": "Ühiselt algatatud eelnõude graaf: {{nodes}} saadikut ja {{edges}} seost.",
       "deviationsCalendar": "Kalendri-soojuskaart saadiku kõrvalekalletest oma fraktsiooni enamusest.",
-      "mpScatter": "Saadikute sarnasuse hajuvusdiagramm {{count}} saadikuga, x = koalitsioon vs opositsioon, y = fraktsioonilojaalsus.",
+      "mpScatter": "Saadikute hajuvusdiagramm, {{count}} saadikut: x = koalitsioon või opositsioon, y = kokkulangevus fraktsiooni enamusega.",
       "mpTopicRadar": "Saadiku aktiivsuse radar poliitika teemavaldkondades.",
-      "topicTreemap": "Poliitika teemade puukaart, suurus järgi eelnõude arv, kokku {{total}}.",
+      "topicTreemap": "Poliitikateemade puukaart, suurus eelnõude arvu järgi, kokku {{total}}.",
       "voteTiming": "Nädalapäev × tund soojuskaart {{total}} hääletusest, Europe/Tallinn."
     },
     "agreement": {
-      "basedOn_one": "põhineb {{count}} hääletusel · nimeline enamus",
-      "basedOn_other": "põhineb {{count}} hääletusel · nimeline enamus",
+      "basedOn_one": "põhineb {{count}} nimelisel hääletusel",
+      "basedOn_other": "põhineb {{count}} nimelisel hääletusel",
       "openCell": "Ava hääletused, kus {{a}} ja {{b}} enamused erinesid",
-      "clickHint": "Kliki lahtril, et näha erimeelsused"
+      "clickHint": "Kliki lahtril, et näha erimeelsusi"
     },
     "discipline": {
       "example": "Näide:",
@@ -341,7 +343,7 @@
       "legendWithdrawn": "tagasi võetud",
       "total_one": "kokku {{count}} eelnõu",
       "total_other": "kokku {{count}} eelnõu",
-      "openNode": "Ava {{count}} eelnõu etapist «{{label}}»",
+      "openNode": "Ava {{count}} eelnõu etapist „{{label}}“",
       "clickHint": "Kliki plokil, et filtreerida eelnõud selle etapi järgi",
       "node": {
         "initiated": "Algatatud",
@@ -360,20 +362,20 @@
     "attendance": {
       "present": "kohal",
       "absent": "puudus",
-      "noRecord": "puudub andmete kirje",
+      "noRecord": "andmed puuduvad",
       "footer_one": "viimane {{count}} kohaloleku kontroll · {{mps}} saadikut",
       "footer_other": "viimased {{count}} kohaloleku kontrolli · {{mps}} saadikut",
-      "openList": "Ava saadikute nimekiri klikkimiseks →"
+      "openList": "Ava saadikute nimekiri →"
     },
     "timing": {
       "footer": "aeg Europe/Tallinn · kokku {{votes}} hääletust · tipphõive {{max}}/tund",
-      "d1": "Esm",
-      "d2": "Teis",
-      "d3": "Kolm",
-      "d4": "Nelj",
-      "d5": "Reed",
-      "d6": "Laup",
-      "d7": "Püh",
+      "d1": "E",
+      "d2": "T",
+      "d3": "K",
+      "d4": "N",
+      "d5": "R",
+      "d6": "L",
+      "d7": "P",
       "openCell": "Ava {{count}} hääletust ({{day}} {{hour}}:00)",
       "clickHint": "Kliki lahtril, et näha hääletusi sellel tunnil"
     },
@@ -383,9 +385,9 @@
       "legend25": "< 25% vastu võetud",
       "legend50": "50–75%",
       "legend75": "> 75%",
-      "total": "Eurovoc kokku {{count}} eelnõu",
-      "openTile": "Ava {{count}} eelnõu teemast «{{label}}»",
-      "clickHint": "Kliki plaadil, et näha selle teema eelnõusid"
+      "total": "EuroVoc · kokku {{count}} eelnõu",
+      "openTile": "Ava {{count}} eelnõu teemast „{{label}}“",
+      "clickHint": "Kliki ruudul, et näha selle teema eelnõusid"
     },
     "velocity": {
       "b_week": "≤ 1 näd",
@@ -401,8 +403,8 @@
       "footer_one": "Põhineb {{count}} vastu võetud eelnõul.",
       "footer_other": "Põhineb {{count}} vastu võetud eelnõul.",
       "formula": "Päevi eelnõu algatamisest vastuvõtmiseni.",
-      "openBucket_one": "Ava {{count}} eelnõu vahemikust «{{label}}»",
-      "openBucket_other": "Ava {{count}} eelnõu vahemikust «{{label}}»",
+      "openBucket_one": "Ava {{count}} eelnõu vahemikust „{{label}}“",
+      "openBucket_other": "Ava {{count}} eelnõu vahemikust „{{label}}“",
       "clickHint": "Kliki tulbal, et näha konkreetseid eelnõusid"
     },
     "scatter": {
@@ -416,34 +418,34 @@
       "qCoInd": "koalitsioon, sageli erinevalt",
       "tooltipVotes": "hääletust",
       "tooltipDev": "fraktsiooni enamusest erinevat häält",
-      "openProfile": "Ava {{name}} profiil →"
+      "openProfile": "Ava profiil: {{name}} →"
     },
     "cospons": {
-      "center": "co-sponsorlus",
+      "center": "ühisalgatused",
       "bills_one": "{{count}} eelnõu",
       "bills_other": "{{count}} eelnõu",
       "tooltipBills": "eelnõu",
       "note": "Punkt on saadik (suurus näitab tema algatatud eelnõude arvu). Joon näitab, mitu korda kaks saadikut on koos eelnõu algatanud. Must joon ühendab eri fraktsioonide saadikuid."
     },
     "highlights": {
-      "partyOfWeek": "Nädala partei",
+      "partyOfWeek": "Nädala erakond",
       "unitySuffix": "% ühtsust",
-      "over": "üle {{count}} hääle · viimased 30 päeva",
+      "over": "{{count}} hääletuse põhjal · viimased 30 päeva",
       "noData": "Andmeid pole",
-      "streaks": "100% osaluse rida",
-      "streaksBody": "saadikut, kes viimases 8 kohaloleku kontrollis kohal",
+      "streaks": "Katkematu kohalolek",
+      "streaksBody": "saadikut, kes olid kohal kõigil viimasel 8 kohaloleku kontrollil",
       "tightest": "Kitsaimad hääletused",
-      "tightestBody": "6 hääletust, kus poolt/vastu erinevus oli vähim.",
+      "tightestBody": "6 hääletust, kus poolt- ja vastuhäälte vahe oli väikseim.",
       "for": "poolt",
       "against": "vastu"
     },
     "topicRadar": {
       "empty": "Saadik ei ole eelnõusid algatanud.",
-      "footer": "{{count}} algatatud eelnõu · Eurovoc teemad"
+      "footer": "{{count}} algatatud eelnõu · EuroVoci teemad"
     },
     "deviations": {
-      "subtitle": "12 kuud · {{from}} — {{to}}",
-      "summary": "{{dev}} kõrvalekallet {{elig}} kvalifitseeruvast hääletusest ({{pct}}%)",
+      "subtitle": "12 kuud · {{from}}–{{to}}",
+      "summary": "{{dev}} kõrvalekallet {{elig}} arvesse läinud hääletusest ({{pct}}%)",
       "tooltipUnit": "kõrvalekallet",
       "legendNoData": "Andmeid pole",
       "legendWithMajority": "Kooskõlas enamusega",
@@ -451,17 +453,17 @@
       "legendManyDev": "Mitu kõrvalekallet"
     },
     "similarPeers": {
-      "empty": "Ei ole piisavalt hääletusi paariviisiliseks võrdluseks.",
+      "empty": "Võrdlemiseks ei ole piisavalt ühiseid hääletusi.",
       "mostSimilar": "Sarnaseimad hääletajad",
-      "mostSimilarNote": "Saadikud, kes kõige sagedamini valivad sama.",
-      "mostOpposite": "Vastupidised hääletajad",
-      "mostOppositeNote": "Saadikud, kellega saadik kõige harvemini kokku langeb.",
+      "mostSimilarNote": "Saadikud, kes hääletavad kõige sagedamini samamoodi.",
+      "mostOpposite": "Kõige erinevamad hääletajad",
+      "mostOppositeNote": "Saadikud, kelle hääl langeb selle saadiku omaga kõige harvem kokku.",
       "overlap": "kattuvat häält"
     },
     "defectors": {
       "title": "Fraktsioonide enamus selles hääletuses",
       "subtitle": "Kes hääletas oma fraktsiooni enamusest erinevalt",
-      "noDefectors": "Ükski fraktsioon ei näinud kõrvalekaldeid — kõik hääletasid oma rühma enamusega.",
+      "noDefectors": "Kõrvalekaldeid ei olnud — kõik hääletasid oma fraktsiooni enamusega.",
       "majorityChose": "Enamus valis",
       "withMajority": "enamusega",
       "defected": "kõrvale kaldunud",
@@ -471,20 +473,20 @@
     },
     "nightVotes": {
       "metrics": {
-        "total": "Nimelisi hääli kokku",
+        "total": "Nimelisi hääletusi kokku",
         "totalHint": "Kõik registreeritud nimelised hääletused.",
         "night": "Öised",
         "nightHint": "{{pct}}% väljaspool tavapärast tööaega.",
         "weekend": "Nädalavahetusel",
-        "weekendHint": "Laupäeval või pühapäeval toimunud hääled.",
+        "weekendHint": "Laupäeval või pühapäeval toimunud hääletused.",
         "late": "Süvaöised",
-        "lateHint": "Kella 22:00 – 06:00 vahel."
+        "lateHint": "Kella 22:00 ja 06:00 vahel."
       },
-      "distributionLabel": "Jaotus tundide kaupa (töö-aken {{start}}:00–{{end}}:00, Europe/Tallinn)",
-      "workhours": "Tööpäev, tööaken",
-      "nightWeekday": "Öine tööpäev",
+      "distributionLabel": "Jaotus tundide kaupa (tööaeg {{start}}:00–{{end}}:00, Tallinna aeg)",
+      "workhours": "Tööpäev, tööajal",
+      "nightWeekday": "Tööpäev, väljaspool tööaega",
       "weekendCell": "Nädalavahetus",
-      "listTitle": "Öised hääletused — konkreetsed juhtumid",
+      "listTitle": "Öised hääletused ükshaaval",
       "emptyList": "Öiseid hääletusi ei ole registreeritud.",
       "tagNight": "Öine",
       "tagLateNight": "Süvaöine",
@@ -502,18 +504,18 @@
       "kicker": "Kaks saadikut kõrvuti"
     },
     "profile": {
-      "topicRadarHeading": "Teemad, mida algatab"
+      "topicRadarHeading": "Algatatud eelnõude teemad"
     },
     "profileEnh": {
       "deviationsTitle": "Kõrvalekallete kalender",
       "similarPeersTitle": "Kõige sarnasemad ja vastupidised saadikud",
-      "similarPeersLede": "Arvutatud kõikide nimeliste hääletuste põhjal, kus mõlemad saadikud tegid võrreldava valiku. Kliki, et võrrelda paarina."
+      "similarPeersLede": "Arvutatud kõikide nimeliste hääletuste põhjal, kus mõlemad saadikud tegid võrreldava valiku. Kliki, et neid kõrvuti võrrelda."
     },
     "voteDetail": {
-      "margin": "Marginaal",
+      "margin": "Häälte vahe",
       "voteWord": "häält",
       "quorum": "Kvoorum 51",
-      "tightNote": "Napp hääletus — 5 saadikut oleks tulemust muutnud.",
+      "tightNote": "Napp hääletus — 5 saadiku teistsugune hääl oleks tulemuse muutnud.",
       "forShort": "Poolt",
       "againstShort": "Vastu"
     }
@@ -539,8 +541,8 @@
     "source": "Erakonnaajalugu: Wikidata (CC0). Erakond ≠ fraktsioon ≠ valimisnimekiri."
   },
   "affiliation": {
-    "title": "Väline liikmete-ajajoon (mitte Riigikogu allikas)",
-    "disclaimer": "Käesolev ajajoon EI pärine Riigikogu ametlikest andmetest. See on toimetuse poolt käsitsi kureeritud kokkuvõte saadiku parteilistest sidemetest väljaspool parlamendifraktsiooni, iga kanne kannab kontrollitavat välist allikat.",
+    "title": "Erakondliku kuuluvuse ajajoon (väline allikas, mitte Riigikogu)",
+    "disclaimer": "See ajajoon EI pärine Riigikogu ametlikest andmetest. See on toimetuse käsitsi koostatud kokkuvõte saadiku erakondlikest sidemetest väljaspool fraktsiooni; iga kande juures on kontrollitav väline allikas.",
     "current": "Praegu",
     "present": "Praegu",
     "source": "Allikas",
@@ -599,13 +601,13 @@
     "searchBills": "Otsi eelnõu pealkirja järgi",
     "searchGroups": "Otsi rühma nime järgi",
     "result": "Tulemus",
-    "individualVotes": "Individuaalsed hääled",
+    "individualVotes": "Saadikute hääled",
     "metrics": "Näitajad",
-    "opensNewTab": "avaneb uues aknas"
+    "opensNewTab": "avaneb uuel vahelehel"
   },
   "errors": {
     "boundaryTitle": "Midagi läks valesti",
-    "boundaryBody": "See lehe osa ei laadinud. Tavaliselt aitab lehe uuesti laadimine.",
+    "boundaryBody": "Selle lehe osa laadimine ebaõnnestus. Tavaliselt aitab lehe uuesti laadimine.",
     "reload": "Laadi uuesti"
   },
   "sections": {
@@ -698,7 +700,7 @@
   "profile": {
     "electoralDistrict": "Valimisringkond: {{name}}",
     "formerMp": "Endine saadik",
-    "formerMpTooltip": "See isik ei ole enam praeguse Riigikogu liige. Tema varasemad hääletused ja eelnõud on endiselt kuvatud.",
+    "formerMpTooltip": "See isik ei ole enam praeguse Riigikogu liige. Tema varasemad hääletused ja eelnõud on endiselt nähtavad.",
     "wikipedia": "Vikipeedia",
     "wikipediaTooltip": "Vikipeedia artikkel selle saadiku kohta (CC BY-SA)",
     "wikipediaLangs": "{{langs}} keeles",
@@ -719,7 +721,7 @@
       "checkHint": "{{present}} / {{total}} kontrollist",
       "seniority": "Parlamendistaaž",
       "seniorityYears": "{{years}} aastat",
-      "seniorityHint": "Riigikogu andmetel parlamenditeenistuse päevad"
+      "seniorityHint": "Riigikogu liikmena oldud aeg Riigikogu andmetel"
     },
     "election": {
       "title": "Kuidas mandaat saadi",
@@ -733,18 +735,18 @@
         "COMPENSATION": "Kompensatsioonimandaat",
         "SUBSTITUTE": "Asendusliige"
       },
-      "substituteNote": "Sisenes Riigikokku asendusliikmena: kandideeris 2023, kuid ei osutunud otse valituks — asus lahkunud liikme (ministriks saanud või mandaadist loobunu) kohale.",
-      "substituteUnknown": "Asendusliige — ei sisenenud Riigikokku 2023. aasta otsevalimise teel."
+      "substituteNote": "Asus Riigikokku asendusliikmena: kandideeris 2023. aastal, kuid ei osutunud valituks ning asendab liiget, kelle volitused on peatunud (nt ministriks nimetamise tõttu) või lõppenud.",
+      "substituteUnknown": "Asendusliige — ei osutunud 2023. aasta valimistel valituks."
     },
     "otherElections": {
       "title": "Osalemine teistel valimistel",
-      "matchNote": "Kandideerimised teistel avaldatud valimistel (Euroopa Parlament, kohalikud). Sobitatud nime järgi; allikas: Riigi Valimisteenistus, opendata.valimised.ee (CC BY 4.0).",
+      "matchNote": "Kandideerimised muudel valimistel, mille andmed on avaldatud (Euroopa Parlamendi ja kohalikud valimised). Seotud nime järgi; allikas: Riigi Valimisteenistus, opendata.valimised.ee (CC BY 4.0).",
       "personalVotes": "Isiklikke hääli",
       "ranAs": "Nimekiri",
       "source": "Ametlik valimistulemus",
       "type": {
-        "RK": "Riigikogu",
-        "EP": "Euroopa Parlament",
+        "RK": "Riigikogu valimised",
+        "EP": "Europarlamendi valimised",
         "KOV": "Kohalikud valimised"
       },
       "result": {
@@ -757,11 +759,11 @@
       "lead": "Varasemad Riigikogu kandideerimised, sobitatud sünniaja järgi.",
       "district": "Ringkond",
       "credit": "Andmed: Martin Mölder,",
-      "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi »Arengud ja vastuolud Eesti poliitilisel maastikul 2011-2023 läbi tekstiliste suurandmete analüüsi« (POST36) raames."
+      "grantNote": "Andmete kogumine toimus Postimehe Fondi rahastatud grandi „Arengud ja vastuolud Eesti poliitilisel maastikul 2011–2023 läbi tekstiliste suurandmete analüüsi“ (POST36) raames."
     },
     "factionHistory": {
       "title": "Fraktsioonide ajalugu",
-      "lead": "Kuulumine Riigikogu fraktsioonidesse ajas.",
+      "lead": "Kuulumine Riigikogu fraktsioonidesse aja jooksul.",
       "present": "praegu"
     },
     "press": {
@@ -771,7 +773,7 @@
       "showLess": "Näita vähem",
       "moreOnOfficial": "Kokku {{total}} kajastust. Ülejäänud Riigikogu ametlikul profiilil:",
       "printOnly": "trükis, lingita",
-      "sourceNote": "Allikas: Riigikogu Ajakirjandustegevuse register. Kui mõni kajastus puudub või pole kõige värskem, siis seda pole (veel) ka Riigikogul - me kuvame andmed muutmata kujul."
+      "sourceNote": "Allikas: Riigikogu Ajakirjandustegevuse register. Kui mõni kajastus puudub või pole kõige värskem, siis seda pole (veel) ka Riigikogul — me kuvame andmed muutmata kujul."
     },
     "affiliations": {
       "title": "Rühmad ja delegatsioonid",
@@ -782,7 +784,7 @@
     },
     "oversight": {
       "title": "Järelevalve: küsimused ministritele",
-      "lead": "Saadiku kirjalikud küsimused ja arupärimised ministritele ning kas/millal neile vastati.",
+      "lead": "Saadiku kirjalikud küsimused ja arupärimised ministritele ning see, kas ja millal neile vastati.",
       "kind": {
         "WRITTEN_QUESTION": "Kirjalik küsimus",
         "INTERPELLATION": "Arupärimine"
@@ -804,25 +806,25 @@
       "speeches": "Sõnavõtud stenogrammis",
       "questions": "Esitatud küsimused",
       "interpellations": "Arupärimised",
-      "interpellationsHint": "Ametlik nõue, millele minister peab istungil vastama, ja sellele järgnev arutelu.",
+      "interpellationsHint": "Ametlik küsimus valitsusliikmele, millele too peab täiskogu istungil vastama; vastusele järgneb läbirääkimine.",
       "writtenQuestions": "Kirjalikud küsimused",
       "source": "Riigikogu lehel",
-      "allSpeeches": "Kõik sõnavõtud otsinguga",
-      "note": "Sõnavõtud ja küsimused on Riigikogu stenogrammide andmetest jooksva koosseisu kohta ja hõlmavad kõiki sõnavõtte täiskogu istungitel, ka repliike. Riigikogu statistika liigitab sõnavõtte teisiti, seega võivad seal olevad arvud erineda."
+      "allSpeeches": "Otsi kõigist sõnavõttudest",
+      "note": "Sõnavõttude ja küsimuste arv on võetud jooksva koosseisu stenogrammidest ning hõlmab kõiki täiskogu istungitel peetud sõnavõtte, sh repliike. Riigikogu statistika liigitab sõnavõtte teisiti, seega võivad sealsed arvud erineda."
     },
     "bio": {
       "title": "Haridus ja karjäär",
       "lede": "Kus saadik on õppinud ja millistel avalikel ametikohtadel ta on olnud.",
       "education": "Haridus",
       "positions": "Peetud ametid",
-      "source": "Allikas: Wikidata (CC0). Nimetused eesti keeles; ametite nimetused on Wikidata praegused nimetused ja võivad erineda sellest, kuidas ametit tol ajal nimetati."
+      "source": "Allikas: Wikidata (CC0). Nimetused on eesti keeles ja vastavad Wikidata praegusele kujule; ameti tollane nimetus võis olla teistsugune."
     },
     "declaration": {
       "title": "Huvide deklaratsioon",
       "body": "Iga Riigikogu liige esitab kord aastas huvide deklaratsiooni — majanduslikud huvid, kõrvaltegevused, kohustused. Selle avalik osa on igaühele nähtav pärast autentimist riiklikus registris. Registrit ei avaldata avaandmetena, seega me seda siin ei peegelda — deklaratsiooni saab vaadata otse.",
       "link": "Vaata registris (vajab autentimist)"
     },
-    "groupAlignmentDetail": "{{matches}} / {{eligible}} kvalifitseeruvat hääletust vastasid fraktsiooni enamuse valikule.",
+    "groupAlignmentDetail": "{{matches}} / {{eligible}} arvesse läinud hääletusel langes saadiku valik kokku fraktsiooni enamuse valikuga.",
     "recentDeviations": "Hiljutised kõrvalekalded",
     "mpChoice": "Saadik",
     "factionChoice": "Fraktsioon",
@@ -840,7 +842,7 @@
     "breakdown": "Jaotus fraktsioonide kaupa",
     "membersShort_one": "{{count}} saadik",
     "membersShort_other": "{{count}} saadikut",
-    "individual": "Individuaalsed hääled ({{count}})",
+    "individual": "Saadikute hääled ({{count}})",
     "chip": {
       "filters": "Aktiivsed filtrid",
       "hour": "Tund",
@@ -871,7 +873,7 @@
     "rtCurrent": "Kehtiv redaktsioon",
     "votesTitle": "Nimelised hääletused eelnõu üle",
     "debatesTitle": "Arutelu ja stenogrammid",
-    "debatesNote": "Seotud päevakorrapunkti eelnõu koodi (nt 644 SE) järgi. Vaata neid Sõnavõttude vahelehel, filtreerituna sellele eelnõule.",
+    "debatesNote": "Sõnavõtud on eelnõuga seotud päevakorrapunkti pealkirjas oleva eelnõu numbri (nt 644 SE) järgi. Vaata neid sõnavõttude vahelehel selle eelnõu filtriga.",
     "debatesLink": "Vaata selle eelnõu sõnavõtte ({{count}})",
     "debatesNotFoundLead": "Stenogrammi ei ole registreeritud",
     "debatesNotFound": "Selle eelnõu kohta ei leitud ühtegi seotud sõnavõttu. Sõnavõtud seotakse eelnõuga päevakorrapunkti pealkirjas oleva eelnõu koodi (nt 737 SE) järgi — kui arutelu toimus mittestandardse pealkirja all ilma koodita või eelnõu pole veel saalis arutatud, seost ei ole.",
@@ -884,7 +886,8 @@
     "relatedInitiatives_other": "Seotud kollektiivsed pöördumised",
     "amendmentsTitle": "Muudatusettepanekud",
     "amendmentsNote": "Eelnõu kohta esitatud muudatusettepanekud. Pealkiri nimetab ettepaneku esitaja (fraktsioon või saadik); fail avab ettepaneku teksti.",
-    "amendmentsFile": "Ettepaneku fail"
+    "amendmentsFile": "Ettepaneku fail",
+    "topicsLabel": "Teemad"
   },
   "committees": {
     "title": "Komisjonid",
@@ -952,7 +955,7 @@
       "solve-differently": "Lahendatud muul viisil",
       "forward": "Edastatud",
       "forward-to-government": "Edastatud Vabariigi Valitsusele",
-      "draft-act-or-national-matter": "Eelnõu või riiklikult tähtis küsimus"
+      "draft-act-or-national-matter": "Eelnõu või olulise tähtsusega riiklik küsimus"
     },
     "timeline": {
       "thresholdReached": "Lävend täidetud",
@@ -979,7 +982,7 @@
         "threshold": "Allkirjade lävend täitunud",
         "sent": "Riigikogusse saadetud",
         "decided": "Otsustatud",
-        "draftAct": "Võeti menetlusse eelnõuna või riikliku küsimusena"
+        "draftAct": "Võeti menetlusse eelnõuna või olulise riikliku küsimusena"
       },
       "openStep_one": "{{label}}: {{count}} pöördumine, ava filtreeritud loend",
       "openStep_other": "{{label}}: {{count}} pöördumist, ava filtreeritud loend",
@@ -989,24 +992,24 @@
         "headline": "Riigikogule suunatud {{targeted}} kollektiivsest pöördumisest võeti {{draftAct}} menetlusse eelnõuna või olulise tähtsusega riikliku küsimusena. Allikas käsitleb neid kui üht tulemust ega ütle, kumb neist kahest üksikjuhtumil tegelikult toimus.",
         "neverSent_one": "{{count}} pöördumine kogus nõutud 1000 allkirja (MSVS § 7¹), kuid seda Riigikogule kunagi ei saadetud.",
         "neverSent_other": "{{count}} pöördumist kogus nõutud 1000 allkirja (MSVS § 7¹), kuid neid Riigikogule kunagi ei saadetud.",
-        "belowThreshold_one": "{{count}} pöördumine saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
-        "belowThreshold_other": "{{count}} pöördumist saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
+        "belowThreshold_one": "{{count}} pöördumine saadeti Riigikogusse, ehkki andmete järgi allkirjade lävend ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
+        "belowThreshold_other": "{{count}} pöördumist saadeti Riigikogusse, ehkki andmete järgi allkirjade lävend ei täitunud. Allikas ei selgita, miks — me ei spekuleeri.",
         "median": "Mediaan otsuseni: {{days}} päeva (n = {{n}})."
       }
     }
   },
   "compare": {
-    "disagreementsLede": "Kronoloogiline logi hääletustest, kus need kaks saadikut valisid võrreldavatest võimalustest erinevalt. Iga rida on kliki kaugusel originaalvormist.",
+    "disagreementsLede": "Hääletused ajalises järjekorras, kus need kaks saadikut valisid võrreldavatest võimalustest erineva. Iga rea juurest pääseb ühe klõpsuga algallikani.",
     "title": "Võrdlus",
     "leftMp": "Vasak saadik",
     "rightMp": "Parem saadik",
     "prompt": "Vali kaks saadikut, et näha, kuidas nad hääletavad.",
     "computing": "Arvutan…",
-    "groupAlignmentLine": "Rühmakuuluvus:",
+    "groupAlignmentLine": "Kokkulangevus fraktsiooniga:",
     "groupAlignmentCounts": "({{matches}}/{{eligible}})",
     "voteAgreement": "Hääletuste kokkulangevus",
     "recentDisagreements": "Hiljutised erimeelsused ({{count}})",
-    "noDisagreements": "Praeguses ajaaknas võrreldavaid erimeelsusi ei ole.",
+    "noDisagreements": "Valitud ajavahemikus võrreldavaid erimeelsusi ei ole.",
     "left": "Vasak",
     "right": "Parem",
     "addToTray": "Lisa võrdlusse",
@@ -1025,7 +1028,7 @@
     },
     "agreement": "kokkulangevus",
     "overlap": "{{same}} / {{total}} kattus",
-    "disagreements": "Hiljutised lahknemised",
+    "disagreements": "Hiljutised erimeelsused",
     "noOverlap": "Võrdluseks pole piisavalt ühiseid hääletusi.",
     "pickParty": "Vali fraktsioon…",
     "pickMp": "Vali saadik…",
@@ -1037,7 +1040,7 @@
     "selected": "Valitud: {{slug}}"
   },
   "agreement": {
-    "noOverlap": "Võrreldavat kattuvust pole.",
+    "noOverlap": "Võrreldavaid ühiseid hääletusi pole.",
     "same": "Sama",
     "different": "Erinev",
     "oneNotParticipating": "Vähemalt üks ei osalenud",
@@ -1058,8 +1061,8 @@
     "recordsCount_one": "{{count}} kirje",
     "recordsCount_other": "{{count}} kirjet",
     "cadence": {
-      "SIX_HOURLY": "iga 6 t",
-      "DAILY": "iga päev, ~04:30",
+      "SIX_HOURLY": "iga 6 tunni järel",
+      "DAILY": "iga päev u kell 4.30",
       "GENERIC": "ajakava järgi"
     }
   },
@@ -1174,22 +1177,22 @@
   "notFound": {
     "kicker": "Lehte ei leitud",
     "title": "Seda lehte ei ole",
-    "body": "URL, mida jälgisid, on kas valesti kirjutatud, aegunud või teisaldatud. Proovi ühte peamistest sektsioonidest all või mine algusesse tagasi.",
+    "body": "Link, mida kasutasid, on valesti kirjutatud või aegunud või on leht teisaldatud. Vali allpool mõni põhirubriik või mine avalehele.",
     "home": "Tagasi algusesse"
   },
   "apiErrors": {
     "generic": "Andmete laadimisel tekkis viga. Proovi uuesti.",
-    "notFound": "Kirjet ei leitud. See võib olla eemaldatud või ümber nimetatud allikas.",
-    "unauthorized": "Sul ei ole seda vaadata õigust. Kui vajad, logi sisse administraatorina.",
+    "notFound": "Kirjet ei leitud. Võimalik, et see on allikas eemaldatud või ümber nimetatud.",
+    "unauthorized": "Sul ei ole õigust seda vaadata. Vajaduse korral logi sisse administraatorina.",
     "rateLimited": "Liiga palju päringuid — oota hetk ja proovi uuesti.",
     "badRequest": "Päring oli vigane. Kui link tõi sind siia, palun teata sellest.",
-    "serverError": "Serveril oli raskusi vastamisega. Värskenda minuti pärast; kui probleem püsib, teata."
+    "serverError": "Server ei suutnud päringule vastata. Proovi minuti pärast uuesti; kui viga kordub, anna sellest teada."
   },
   "about": {
     "title": "Riigiluubist",
-    "intro": "Riigiluup on avalik ja avatud lähtekoodiga tööriist, mis teeb Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi avaandmed ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Põhiosas on praegune, XV Riigikogu koosseis (2023–2027): saadikud, nimelised hääletused alates aprillist 2023, täiskogu stenogrammid, arupärimised ja kirjalikud küsimused ministritele. Lisaks on eelnõud alates 1992. aastast, varasemate valimiste andmed, erakondade rahastamine ja kollektiivsed pöördumised. Iga näitaja viitab ametlikule allikale.",
+    "intro": "Riigiluup on avalik ja avatud lähtekoodiga tööriist, mis teeb Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi avaandmed ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Põhirõhk on praegusel, XV Riigikogu koosseisul (2023–2027): saadikud, nimelised hääletused alates aprillist 2023, täiskogu stenogrammid, arupärimised ja kirjalikud küsimused ministritele. Lisaks on eelnõud alates 1992. aastast, varasemate valimiste andmed, erakondade rahastamine ja kollektiivsed pöördumised. Iga näitaja viitab ametlikule allikale.",
     "editorial": "Toimetuse hoiak",
-    "editorialBody": "Teenus ei omista ideoloogilisi silte ega moraalseid hindeid: see on peegel, mitte tõlgendaja. See esitab faktilisi arve ja osakaale ning jätab järeldused teile. Kui loetelu on järjestatud, näitab järjekord ainult mõõdetud arvu suurust, mitte hinnangut. Kui näitajat võib valesti mõista, kirjeldame valemit, mida arvestatakse, mis jääb välja ja millised on teadaolevad piirangud. Arvu ei esitata hea ega halvana, see ainult kirjeldatakse ja lingitakse, et saaksite seda ametliku allikaga võrrelda.",
+    "editorialBody": "Teenus ei omista ideoloogilisi silte ega moraalseid hindeid: see on peegel, mitte tõlgendaja. See esitab faktilisi arve ja osakaale ning jätab järeldused teile. Kui loetelu on järjestatud, näitab järjekord ainult mõõdetud arvu suurust, mitte hinnangut. Kui näitajat võib valesti mõista, kirjeldame valemit: mida arvestatakse, mis jääb välja ja millised on teadaolevad piirangud. Arvu ei esitata hea ega halvana: seda üksnes kirjeldatakse ja sellele lisatakse link, et saaksite seda ametliku allikaga võrrelda.",
     "funding": "Sõltumatus ja rahastus",
     "fundingBody": "Riigiluubi on loonud ja seda haldab üks inimene — asutaja — oma isiklike vahendite ja ajaga. Projekti taga ei ole ühtki erakonda, ettevõtet, granti ega huvirühma. Tegu on kodanikualgatusega, mitte äri- ega poliitilise projektiga. Kui rahastusmudel peaks kunagi muutuma, uuendame seda osa.",
     "whatPublic": "Mis on siin avalik",
@@ -1204,7 +1207,7 @@
     },
     "dataSource": "Andmeallikas",
     "dataSourceBody": "Peamine allikas on Riigikogu avaandmete API aadressil ",
-    "dataSourceSuffix": " litsentsi CC BY-SA 3.0 alusel.",
+    "dataSourceSuffix": ", mille andmed on avaldatud litsentsi CC BY-SA 3.0 alusel.",
     "contact": "Kontakt",
     "contactBody": "Vead, parandused, küsimused: ",
     "dataSourceAll": "Kõik allikad, litsentsid ja uuendamise sagedus: "
@@ -1212,89 +1215,89 @@
   "methodology": {
     "index": {
       "title": "Metoodika",
-      "intro": "Iga näitaja sellel saidil järgib selget valemit. Alltoodud lehed kirjeldavad, kuidas arve arvutatakse, mida arvestatakse, mida välistatakse ja mida need arvud EI ütle.",
-      "participation": "Hääletustel osalemine ja kohaloleku kontrolli osalus",
-      "alignment": "Rühmakuuluvus",
-      "agreement": "Paariviisiline hääletuste kokkulangevus",
+      "intro": "Iga selle saidi näitaja põhineb kindlal valemil. Allolevad lehed kirjeldavad, kuidas arve arvutatakse, mida arvestatakse, mis jäetakse välja ja mida need arvud EI ütle.",
+      "participation": "Hääletustel osalemine ja kohalolek kohaloleku kontrollidel",
+      "alignment": "Kokkulangevus fraktsiooni enamusega",
+      "agreement": "Kahe saadiku hääletuste kokkulangevus",
       "analytics": "Analüütika töölaud — iga graafiku valem"
     },
     "agreement": {
-      "title": "Paariviisilise kokkulangevuse metoodika",
-      "intro": "Paariviisiline kokkulangevus näitab, kui sageli teevad kaks saadikut sama võrreldava valiku hääletustel, kus mõlemad tegelikult hääletasid.",
+      "title": "Kahe saadiku kokkulangevuse metoodika",
+      "intro": "Kahe saadiku kokkulangevus näitab, kui sageli teevad kaks saadikut sama võrreldava valiku hääletustel, kus mõlemad tegelikult hääletasid.",
       "formulaHeading": "Kuidas arvutatakse",
       "formula": "Kokkulangevuse näitaja on nende võrreldavate hääletuste osakaal, kus mõlemad saadikud valisid sama variandi.",
-      "sameDiffHeading": "Mis loeb \"samaks\" või \"erinevaks\"",
-      "same": "Sama: mõlemad saadikud hääletasid ühtemoodi — mõlemad poolt, mõlemad vastu või mõlemad erapooletu.",
+      "sameDiffHeading": "Mis loeb „samaks“ või „erinevaks“",
+      "same": "Sama: mõlemad saadikud hääletasid ühtemoodi — mõlemad poolt, mõlemad vastu või jäid mõlemad erapooletuks.",
       "different": "Erinev: mõlemad tegid võrreldavad valikud, kuid need erinevad.",
-      "separateHeading": "Mis kajastatakse eraldi ja EI ole määras",
+      "separateHeading": "Mida näidatakse eraldi ja mis EI lähe määra arvesse",
       "separate": "Vähemalt üks saadik ei osalenud (ei hääletanud, puudus, kohaloleku kontroll).",
       "interpretationHeading": "Tõlgendus",
-      "interpretation": "Kõrge kokkulangevus tähendab, et kaks saadikut valisid mõlema hääletamise korral enamasti sama. See ei mõõda ideoloogilist sarnasust üldiselt; see mõõdab ainult kattuvust just selle hääletuste komplekti ja ajaakna piires."
+      "interpretation": "Kõrge kokkulangevus tähendab, et kui mõlemad hääletasid, valisid nad enamasti sama variandi. See ei mõõda ideoloogilist sarnasust üldiselt, vaid ainult kattuvust nende hääletuste ja selle ajavahemiku piires."
     },
     "alignment": {
-      "title": "Rühmakuuluvuse metoodika",
-      "intro": "Rühmakuuluvus näitab, kui sageli saadiku hääl langeb kokku tema parlamendirühma enamuse seisukohaga. See on faktiline võrdlus, mitte hinnang lojaalsusele või sõltumatusele.",
+      "title": "Fraktsiooni enamusega kokkulangevuse metoodika",
+      "intro": "Kokkulangevus fraktsiooni enamusega näitab, kui sageli langeb saadiku hääl kokku tema fraktsiooni enamuse seisukohaga. See on faktiline võrdlus, mitte hinnang lojaalsusele ega sõltumatusele.",
       "formulaHeading": "Kuidas arvutatakse",
-      "formula": "Ühtelangevuse näitaja on nende arvestatud hääletuste osakaal, kus saadik hääletas samamoodi nagu tema rühma enamus.",
-      "eligibleHeading": "Mis loeb \"kvalifitseeruvaks\"",
+      "formula": "Kokkulangevuse näitaja on nende arvestatud hääletuste osakaal, kus saadik hääletas samamoodi nagu tema fraktsiooni enamus.",
+      "eligibleHeading": "Mis läheb arvesse",
       "eligible1": "Saadik tegelikult hääletas — poolt, vastu või erapooletu.",
-      "eligible2": "Saadiku rühm tegi vähemalt ühe võrreldava valiku.",
-      "eligible3": "Rühmal oli selge enamus — üks valik ületas teisi rangelt. Viik EI ole selge enamus.",
-      "matchHeading": "Mis loeb \"kokkulangevuseks\"",
-      "matchBody": "Kvalifitseeruvate hääletuste seas võrdub saadiku valik rühma enamuse valikuga.",
+      "eligible2": "Saadiku fraktsioon tegi vähemalt ühe võrreldava valiku.",
+      "eligible3": "Fraktsioonil oli selge enamus: ühte varianti valis rohkem liikmeid kui ühtegi teist. Viik EI ole selge enamus.",
+      "matchHeading": "Mis loeb „kokkulangevuseks“",
+      "matchBody": "Arvesse minevas hääletuses on saadiku valik sama mis fraktsiooni enamusel.",
       "excludedHeading": "Mis on tahtlikult määrast välja jäetud",
-      "excluded1": "Ei-hääletanud ja puudus — kuvatakse eraldi \"hiljutiste kõrvalekalletena\" ja hääletustel osalemise kaudu.",
-      "excluded2": "Hääletused, kus rühm jagunes võrdselt (selge enamus puudub).",
+      "excluded1": "„Ei hääletanud“ ja „puudus“ — kuvatakse eraldi hiljutiste kõrvalekallete loendis ja hääletustel osalemise näitajas.",
+      "excluded2": "Hääletused, kus fraktsioon jagunes võrdselt (selge enamus puudub).",
       "excluded3": "Kohaloleku kontrollid ja salajased hääletused.",
       "interpretationHeading": "Tõlgendus",
-      "interpretation": "Kõrge rühmakuuluvus tähendab, et saadik hääletas samamoodi kui enamik tema rühmast, kui enamuse seisukoht eksisteeris. See ei tähenda, et saadik nõustub iga rühma seisukohaga, ega ütle, kas rühma seisukoht on õige või vale. Madal kuuluvus tähendab lihtsalt, et saadik hälbis mõnel selge enamusega hääletusel; kõrvalekallete loend näitab, millistel."
+      "interpretation": "Kõrge kokkulangevus tähendab, et saadik hääletas samamoodi kui enamik tema fraktsioonist, kui fraktsioonil oli enamuse seisukoht. See ei tähenda, et saadik nõustub iga fraktsiooni seisukohaga, ega ütle, kas fraktsiooni seisukoht on õige või vale. Madal kokkulangevus tähendab lihtsalt, et saadik hääletas mõnel selge enamusega hääletusel teisiti; kõrvalekallete loend näitab, millistel."
     },
     "participation": {
       "title": "Osaluse metoodika",
       "votingHeading": "Hääletustel osalemine",
       "votingFormula": "Nende nimeliste hääletuste osakaal, milles saadik oleks saanud osaleda ja tegelikult hääletas — poolt, vastu või erapooletu.",
-      "participatedBody": "Osales loeb iga nimelist hääletust, kus saadik hääletas poolt, vastu või erapooletu.",
+      "participatedBody": "Osalemiseks loetakse iga nimelist hääletust, kus saadik hääletas poolt või vastu või jäi erapooletuks.",
       "excludedNumerator": "Lugejast välja jäetud:",
       "excludedN1": "Ei hääletanud (oli kohal, kuid ei vajutanud nuppu).",
       "excludedN2": "Puudus istungilt.",
       "excludedN3": "Neutraalne (harv menetlusstaatus Riigikogu API-s).",
       "excludedBoth": "Nii lugejast KUI ka nimetajast välja jäetud:",
-      "excludedB1": "Kohaloleku kontrolli \"hääled\" (need pole nimelised hääletused).",
+      "excludedB1": "Kohaloleku kontrolli „hääled“ (need pole nimelised hääletused).",
       "excludedB2": "Salajased hääletused (individuaalseid kirjeid ei avaldata).",
       "excludedB3": "Hääletused, kus saadikul polnud aktiivset mandaati.",
       "votingSourceLine": "Arvutatakse Riigikogust laaditud nimelistest hääletustest — samad, mis on loetletud jaotises Hääletused. Iga hääle esmane allikas on otspunkt ",
       "sittingHeading": "Kohalolek istungitel (Riigikogu ametlik statistika)",
       "sittingFormula": "Perioodi istungite osakaal, millel saadik osales.",
-      "sittingBody": "See on ametlik osalusnäitaja, mille Riigikogu avaldab oma andmete põhjal (väli \"sittings\"). Näitame seda muutmata kujul, ilma ümberarvutamata. See kajastab, kas saadiku kohalolek istungil registreeriti, ega ole täistööaja näitaja.",
+      "sittingBody": "See on ametlik osalusnäitaja, mille Riigikogu avaldab oma andmete põhjal (väli „sittings“). Näitame seda muutmata kujul, ilma ümberarvutamata. See kajastab, kas saadiku kohalolek istungil registreeriti, ega ole täistööaja näitaja.",
       "sittingSourceLine": "Allikas: Riigikogu API otspunkt ",
       "attendanceHeading": "Kohaloleku kontroll",
-      "attendanceFormula": "Nende kohaloleku kontrollide osakaal, kus saadik on märgitud kohal või puudu, mille juures ta oli kohal.",
+      "attendanceFormula": "Nende kohaloleku kontrollide osakaal, kus saadik oli kohal, kõigist kontrollidest, kus ta on märgitud kas kohalolijaks või puudujaks.",
       "attendanceBody1a": "Kohaloleku kontroll on Riigikogus konkreetne protseduur, kus liikmed registreerivad end istungil kohalolijaks. ",
       "attendanceBody1b": "See EI ole töötundide arv ega täispäeva kohaloleku näitaja.",
       "attendanceBody2": "Kõrge kohaloleku määr ei tähenda, et saadik viibib kogu istungil või igas komisjonis. Madal määr ei tähenda, et saadik puudus kogu tööst — ta võis olla komisjonide koosolekutel, ametireisidel või puhkusel.",
-      "attendanceWhyDiff": "See on tavaliselt madalam kui kohalolek istungitel: saadik võib istungil viibida, kuid jääda vahele konkreetsest hetkelisest kohaloleku kontrollist (lahkus saalist, töötab komisjonis). See on rangem, hetkepõhine mõõt.",
+      "attendanceWhyDiff": "See on tavaliselt madalam kui kohalolek istungitel: saadik võib istungil viibida, kuid jääda konkreetsel kohaloleku kontrollil registreerimata (nt oli saalist väljas või komisjonis). See on rangem, hetkepõhine mõõt.",
       "attendanceSourceLine": "Arvutatakse meie laaditud kohaloleku kontrolli kirjetest. Iga kontrolli esmane allikas on otspunkt ",
       "periodHeading": "Ajavahemik",
-      "periodBody": "Saadikute profiilide näitajad on vaikimisi jooksva Riigikogu koosseisu kohta — XV Riigikogu, mis algas 10.04.2023. Kui Riigikogu tagastab \"0 / 0\", kuvatakse määr mõttekriipsuna (\"—\") mitte 0%."
+      "periodBody": "Saadikute profiilide näitajad on vaikimisi jooksva Riigikogu koosseisu kohta — XV Riigikogu, mis algas 10.04.2023. Kui Riigikogu tagastab „0 / 0“, kuvatakse määr mõttekriipsuna („—“), mitte 0%."
     },
     "analytics": {
       "title": "Analüütika metoodika",
-      "intro": "Iga graafik lehel /analytics on lihtne loendus või keskmine ametlike Riigikogu andmete põhjal — midagi ei arvata, ei hinnata pealtnäha ega genereeri tehisintellekt. Allpool on iga graafik selgitatud igapäevases keeles: mida see näitab, mis jääb välja ja mida see EI ütle.",
+      "intro": "Iga graafik lehel /analytics on lihtne loendus või keskmine ametlike Riigikogu andmete põhjal — midagi ei oletata, ei hinnata silma järgi ega looda tehisintellektiga. Allpool on iga graafik selgitatud lihtsas keeles: mida see näitab, mis jääb välja ja mida see EI ütle.",
       "noteLabel": "Märkus.",
       "velocity": {
-        "heading": "Kui kaua eelnõud võtavad",
-        "body": "Iga seaduseks saanud eelnõu puhul loeme päevade arvu algatamise päevast vastuvõtmise päevani ja jaotame need vahemikesse — alla nädala, alla kuu ja nii edasi. \"Tüüpiline\" aeg on keskmine väärtus: pooled eelnõud olid kiiremad, pooled aeglasemad. \"9 kümnest\" näitaja on aeg, mille jooksul võeti vastu üheksa eelnõu kümnest.",
-        "note": "See ei mõõda, kui kiiresti üksik samm läks — ainult kogu teekonda algatamisest lõpliku vastuvõtmiseni. Tagasi võetud, tagasi lükatud ja veel pooleliolevad eelnõud jäävad välja."
+        "heading": "Kui kaua eelnõude menetlus kestab",
+        "body": "Iga seaduseks saanud eelnõu puhul loeme päevade arvu algatamise päevast vastuvõtmise päevani ja jaotame need vahemikesse — alla nädala, alla kuu ja nii edasi. Mediaan on keskmine väärtus: pooled eelnõud olid kiiremad, pooled aeglasemad. P90 on aeg, mille jooksul võeti vastu üheksa eelnõu kümnest.",
+        "note": "See ei mõõda, kui kaua kestis üksik menetlusetapp — ainult kogu teekonda algatamisest lõpliku vastuvõtmiseni. Tagasi võetud, tagasi lükatud ja veel pooleliolevad eelnõud jäävad välja."
       },
       "flow": {
         "heading": "Eelnõu teekond",
-        "body": "Loeme, kui palju eelnõusid jõudis igasse etappi — algatatud, komisjoni saadetud, esimene, teine ja kolmas lugemine ning lõpuks vastu võetud, tagasi lükatud või tagasi võetud — ja kui palju liikus ühest etapist järgmisse. Iga eelnõu loetakse etapi kohta üks kord, isegi kui samm juhtus mitu korda.",
+        "body": "Loeme, kui palju eelnõusid jõudis igasse etappi — algatatud, komisjoni saadetud, esimene, teine ja kolmas lugemine ning lõpuks vastu võetud, tagasi lükatud või tagasi võetud — ja kui palju liikus ühest etapist järgmisse. Iga eelnõu loetakse igas etapis üks kord, isegi kui see etapp kordus.",
         "note": "See on hetkeseis sellest, kui palju eelnõusid on igas etapis, mitte üksikute eelnõude samm-sammuline jälg. Osa lülisid on ligikaudsed, sest parlamendi andmed ei seo alati tulemust konkreetse lugemisega."
       },
       "factionAgreement": {
         "heading": "Kui sageli fraktsioonid hääletavad ühtemoodi",
-        "body": "Iga hääletuse puhul, kus mõlemad fraktsioonid võtsid selge seisukoha, kontrollime, kas nad jäid samale poolele. Kokkulangevuse näitaja on nende hääletuste osakaal, kus nad hääletasid ühtemoodi. Fraktsioonil on \"selge seisukoht\", kui enamik selle liikmeid valis sama variandi — poolt, vastu või erapooletu; võrdselt jagunenud hääletused ja kohaloleku kontrollid jäävad välja.",
-        "note": "Kõrge näitaja tähendab, et kahe fraktsiooni enamused sattusid kokku, mitte et nad on ideoloogiliselt ühel meelel — paljud kokkulangevused on protseduurilistel või vaidlusteta hääletustel."
+        "body": "Iga hääletuse puhul, kus mõlemad fraktsioonid võtsid selge seisukoha, kontrollime, kas nad jäid samale poolele. Kokkulangevuse näitaja on nende hääletuste osakaal, kus nad hääletasid ühtemoodi. Fraktsioonil on „selge seisukoht“, kui enamik selle liikmeid valis sama variandi — poolt, vastu või erapooletu; võrdselt jagunenud hääletused ja kohaloleku kontrollid jäävad välja.",
+        "note": "Kõrge näitaja tähendab, et kahe fraktsiooni enamused langesid kokku, mitte et nad on ideoloogiliselt ühel meelel — paljud kokkulangevused on protseduurilistel või vaidlusteta hääletustel."
       },
       "discipline": {
         "heading": "Fraktsiooni enamusest erinevad hääled",
@@ -1302,12 +1305,12 @@
       },
       "attendance": {
         "heading": "Kohalolek kontrollidel",
-        "body1": "Iga saadiku puhul vaatame parlamendi kohaloleku kontrolle: kui mitmel ta oli märgitud kohalolijaks — kõigist kontrollidest, kus tal üldse kirje oli. Kontrollid, kus sellel saadikul kirjet pole, näidatakse kui \"—\" ja neid ei arvestata kummalegi poole.",
-        "body2": "Saadikud, kes olid kohal alla viiendiku perioodist — asendajad, ministrid või puhkusel olijad — jäetakse välja, et lühike periood ei näiks eksitavalt madala kohalolekuna."
+        "body1": "Iga saadiku puhul vaatame parlamendi kohaloleku kontrolle: kui mitmel ta oli märgitud kohalolijaks — kõigist kontrollidest, kus tal üldse kirje oli. Kontrollid, kus sellel saadikul kirjet pole, näidatakse kui „—“ ja neid ei arvestata kummalegi poole.",
+        "body2": "Saadikud, kes olid ametis alla viiendiku perioodist — asendusliikmed, ministrid või puhkusel olijad — jäetakse välja, et lühike ametiaeg ei näiks eksitavalt madala kohalolekuna."
       },
       "timing": {
         "heading": "Millal parlament hääletab",
-        "body": "Iga hääletus paigutatakse ruudustikku nädalapäeva ja kellaaja järgi (Tallinna aeg) ning loeme, kui palju langeb igasse ruutu — see näitab, millal parlament kipub hääletama."
+        "body": "Paigutame iga hääletuse ruudustikku nädalapäeva ja kellaaja järgi (Tallinna aeg) ning loeme, mitu hääletust igasse ruutu langeb — see näitab, millal parlament kipub hääletama."
       },
       "night": {
         "heading": "Hääletused väljaspool tööaega",
@@ -1315,50 +1318,50 @@
       },
       "topics": {
         "heading": "Millest eelnõud räägivad",
-        "body": "Iga teemavaldkonna puhul loeme, kui mitu eraldi eelnõu seda puudutas — eelnõu võib kuuluda mitmesse valdkonda ja loeb igas. \"Vastuvõtmise määr\" on nende eelnõude osakaal, mis said seaduseks. Teemade nimetused pärinevad standardsest Euroopa teemade loetelust, mille parlament igale eelnõule lisab."
+        "body": "Iga teemavaldkonna puhul loeme, kui mitu eraldi eelnõu seda puudutas — eelnõu võib kuuluda mitmesse valdkonda ja see loetakse igas neist. „Vastuvõtmise määr“ on nende eelnõude osakaal, mis said seaduseks. Teemade nimetused pärinevad Euroopa Liidu teemasõnastikust EuroVoc, mille märksõnad Riigikogu igale eelnõule lisab."
       },
       "scatter": {
         "heading": "Kus iga saadik asub",
-        "body1": "Iga saadik saab kaks skoori, kumbki skaalal −1 kuni +1. Vasakult paremale näitab, kas ta hääletab sagedamini samamoodi kui koalitsioonifraktsioonide enamus (+1) või opositsioonifraktsioonide enamus (−1). Iga hääletust võrreldakse sel päeval kehtinud koalitsiooniga: XV Riigikogus kuulusid valitsusse Reformierakond, Eesti 200 ja SDE kuni 11.03.2025, pärast seda Reformierakond ja Eesti 200. Alt üles näitab, kui sageli ta hääletab samamoodi kui tema oma fraktsiooni enamus: ülal peaaegu alati, all harva.",
-        "body2": "Punkte nihutatakse pisikese fikseeritud summa võrra, et identsete skooridega saadikud ei istuks täpselt üksteise peal ja jääksid klõpsatavaks. Mujal saidil kasutatavad tegelikud arvud on nihketa.",
-        "note": "See on lihtne kahemõõtmeline pilt, mitte ideoloogiline paigutus. Kaks saadikut samas kohas hääletasid üldiselt sarnaselt — nad võivad ikkagi ühes konkreetses küsimuses eri arvamust olla."
+        "body1": "Iga saadik saab kaks skoori, kumbki skaalal −1 kuni +1. Horisontaaltelg näitab, kas ta hääletab sagedamini samamoodi kui koalitsioonifraktsioonide enamus (+1) või opositsioonifraktsioonide enamus (−1). Iga hääletust võrreldakse sel päeval kehtinud koalitsiooniga: XV Riigikogus kuulusid valitsusse Reformierakond, Eesti 200 ja SDE kuni 11.03.2025, pärast seda Reformierakond ja Eesti 200. Vertikaaltelg näitab, kui sageli ta hääletab samamoodi kui tema oma fraktsiooni enamus: ülal peaaegu alati, all harva.",
+        "body2": "Punkte nihutatakse väikese kindla vahemaa võrra, et samade skooridega saadikud ei kattuks täielikult ja jääksid klõpsatavaks. Mujal saidil kasutatavad tegelikud arvud on nihketa.",
+        "note": "See on lihtne kahemõõtmeline pilt, mitte ideoloogiline paigutus. Kaks samas kohas asuvat saadikut hääletasid üldiselt sarnaselt, kuid võivad mõnes konkreetses küsimuses siiski eri arvamusel olla."
       },
       "cosponsorship": {
-        "heading": "Kes esitavad eelnõusid koos",
-        "body": "Kaht saadikut seob sama eelnõude ühine esitamine; mida rohkem eelnõusid nad koos esitasid, seda tugevam on side. Loevad ainult saadikute endi esitatud eelnõud — komisjonide, valitsuse või fraktsioonide ettepanekud jäävad välja. Ainult ühe ühise eelnõuga sidemed on peidetud, et pilt jääks loetavaks."
+        "heading": "Kes algatavad eelnõusid koos",
+        "body": "Kaks saadikut on seotud, kui nad on koos eelnõu algatanud; mida rohkem eelnõusid nad on koos algatanud, seda tugevam on seos. Arvesse lähevad ainult saadikute algatatud eelnõud — komisjonide, valitsuse või fraktsioonide ettepanekud jäävad välja. Ainult ühe ühise eelnõuga sidemed on peidetud, et pilt jääks loetavaks."
       },
       "streaks": {
-        "heading": "Täiusliku kohaloleku seeriad",
-        "body": "Saadikul on \"täiuslik seeria\", kui ta oli märgitud kohalolijaks igal viimasel mõnel kohaloleku kontrollil. Saadikud, kes ei viibinud kohal kogu perioodi, jäetakse välja, mitte ei näidata katkenud seeriaga."
+        "heading": "Katkematu kohalolek",
+        "body": "Saadiku kohalolek on katkematu, kui ta oli märgitud kohalolijaks kõigil viimastel kohaloleku kontrollidel. Saadikud, kes ei viibinud kohal kogu perioodi, jäetakse välja, mitte ei näidata katkenud seeriaga."
       },
       "tight": {
-        "heading": "Kõige tihedamad hääletused",
-        "body": "Kui tihe hääletus oli — vahe poolt ja vastu häälte arvu vahel. Mida väiksem vahe, seda tihedam hääletus. Üksmeelsed hääletused ja kohaloleku kontrollid jäävad välja, sest nende vahe on alati null või tühine."
+        "heading": "Kõige napimad hääletused",
+        "body": "Hääletuse tasavägisust mõõdame poolt- ja vastuhäälte vahega. Mida väiksem vahe, seda napim tulemus. Üksmeelsed hääletused ja kohaloleku kontrollid jäävad välja, sest nende vahe on alati null või tühine."
       },
       "exclusions": {
         "heading": "Mida me kõikjal välja jätame",
-        "item1": "Kohaloleku kontrollid on välja jäetud kõigest, mida nimetatakse \"hääletuseks\" — need vaid registreerivad, kes oli saalis, ega otsusta seaduste üle.",
-        "item2": "Salajased hääletused ei avalda saadiku-põhiseid kirjeid, seega ei lisa nad ühelegi isiklikule näitajale midagi.",
+        "item1": "Kohaloleku kontrollid on välja jäetud kõigest, mida nimetatakse „hääletuseks“ — need vaid registreerivad, kes oli saalis, ega otsusta seaduste üle.",
+        "item2": "Salajaste hääletuste kohta ei avaldata saadikupõhiseid kirjeid, seega ei lisa nad ühelegi isiklikule näitajale midagi.",
         "item3": "Kui fraktsioon on võrdselt jagunenud ja selget enamust pole, jäetakse see hääletus kokkulangevuse ja ühtelangevuse näitajatest välja.",
         "item4": "Osalise mandaadiga saadikud (asendusliikmed, ministrid, puhkusel olijad) jäetakse välja paneelidelt, kus nende arvestamine oleks eksitav (kohalolek, fraktsiooni enamusest erinevad hääled).",
         "item5": "Hääli, mille saadik andis ajal, mil ta ei kuulunud ühtegi fraktsiooni, ei võrrelda „fraktsiooni enamusega“: fraktsiooni mittekuuluvad saadikud ei ole fraktsioon ja neil pole ühist seisukohta."
       },
       "period": {
         "heading": "Ajavahemik",
-        "body": "Kui paneelil pole oma kuupäevavalijat, kasutab iga graafik kogu andmete hulka, mis meil on. Kohaloleku ruudustik kasutab viimaseid kohaloleku kontrolle (vaikimisi 40), sõltumata kalendri kuupäevast."
+        "body": "Kui joonisel pole oma kuupäevavalikut, kasutatakse kõiki meil olemasolevaid andmeid. Kohaloleku ruudustik kasutab viimaseid kohaloleku kontrolle (vaikimisi 40), sõltumata kalendri kuupäevast."
       },
       "repro": {
         "heading": "Reprodutseeritavus",
-        "body": "Iga arv lehel /analytics on ühe deterministliku päringu väljund: samad sisendandmed annavad alati sama tulemuse. Kui sama paneeli kaks käivitust muutumata andmetel annavad erinevad arvud, on see viga — palun teata sellest kaudu"
+        "body": "Iga arv lehel /analytics on ühe deterministliku päringu väljund: samad sisendandmed annavad alati sama tulemuse. Kui sama joonis annab muutumata andmete korral kahel korral erinevad arvud, on see viga — palun anna sellest teada:"
       },
       "activity": {
         "heading": "Kõige aktiivsemad saadikud",
-        "body": "Sõnavõtud ja küsimused täiskogu istungitel pärinevad Riigikogu stenogrammide andmetest jooksva koosseisu kohta (alates 10.04.2023) ja hõlmavad kõiki sõnavõtte, ka repliike. Arupärimiste ja kirjalike küsimuste arv on Riigikogu dokumendiregistrist iga saadiku kohta. Andmeid uuendatakse kord nädalas. Näidatakse 15 saadikut valitud mõõdiku järgi.",
+        "body": "Sõnavõtud ja küsimused täiskogu istungitel pärinevad Riigikogu stenogrammide andmetest jooksva koosseisu kohta (alates 10.04.2023) ja hõlmavad kõiki sõnavõtte, ka repliike. Iga saadiku arupärimiste ja kirjalike küsimuste arv pärineb Riigikogu dokumendiregistrist. Andmeid uuendatakse kord nädalas. Näidatakse valitud mõõdiku järgi 15 esimest saadikut.",
         "note": "Arvud näitavad aktiivsuse mahtu, mitte sisu ega kvaliteeti. Riigikogu enda statistika liigitab sõnavõtte teisiti (eraldi sõnavõtud, küsimused ja protseduurilised märkused), seega võivad arvud seal erineda. Ministrid ja lühikest aega ametis olnud asendusliikmed saavad paratamatult väiksemad arvud."
       },
       "elections": {
         "heading": "Isiklikud hääled valimistel",
-        "body": "Iga praegune saadik 2023. aasta Riigikogu valimistel saadud isiklike häälte arvu järgi, Riigi Valimisteenistuse andmetest. Mandaadi liik näitab, kuidas koht saadi: isikumandaadi saab kandidaat, kelle isiklike häälte arv ületab ringkonna lihtkvoodi; ringkonnamandaadid jagatakse nimekirja ringkonnas saadud häälte alusel ja kompensatsioonimandaadid üleriigiliselt erakondade häälte alusel.",
+        "body": "Iga praegune saadik 2023. aasta Riigikogu valimistel saadud isiklike häälte arvu järgi, Riigi Valimisteenistuse andmetest. Mandaadi liik näitab, kuidas koht saadi: isikumandaadi saab kandidaat, kelle isiklike häälte arv on lihtkvoodiga võrdne või ületab seda; ringkonnamandaadid jagatakse nimekirja ringkonnas saadud häälte alusel ja kompensatsioonimandaadid üleriigiliselt erakondade häälte alusel.",
         "note": "Asendusliikmeid, kes ei saanud kohta valimistulemuse põhjal, ei näidata. Isiklike häälte arv sõltub ka ringkonna suurusest."
       },
       "finance": {
@@ -1374,13 +1377,13 @@
       "initiatives": {
         "heading": "Kollektiivsed pöördumised",
         "body": "Iga Rahvaalgatus.ee kaudu Riigikogule suunatud kollektiivne pöördumine, esimesest kavandist lõpliku otsuseni. Loeme, mitu pöördumist jõudis igasse etappi: allkirjade kogumine, 1000 allkirja lävend (MSVS § 7¹), Riigikogule saatmine, otsus ja menetlusse võtmine eelnõuna või olulise tähtsusega riikliku küsimusena. Mediaanaeg näitab, mitu päeva kulus Riigikogusse saatmisest otsuseni.",
-        "note": "Andmestiku lüngad on näidatud sellisena, nagu need on: pöördumised, mis kogusid lävendi, kuid mida ei saadetud, ja pöördumised, mis saadeti ilma andmete järgi lävendit täitmata. Allikas ei selgita nende põhjusi ja me ei oleta."
+        "note": "Andmestiku lüngad on näidatud sellisena, nagu need on: pöördumised, mis kogusid vajaliku arvu allkirju, kuid mida ei saadetud, ja pöördumised, mis saadeti ilma andmete järgi lävendit täitmata. Allikas ei selgita nende põhjusi ja me ei oleta."
       }
     }
   },
   "sources": {
     "title": "Andmeallikad",
-    "intro": "Kõik poliitilised andmed Riigiluup's on imporditud Riigikogu ametlikest avaandmetest. Midagi ei kraabita, ei toimetata ega osteta.",
+    "intro": "Kõik Riigiluubi poliitilised andmed on imporditud ametlikest avaandmetest. Midagi ei kraabita, ei toimetata ega osteta.",
     "primary": "Peamine allikas",
     "primaryPre": "Riigikogu avaandmete API aadressil ",
     "primaryMid": " (OpenAPI spetsifikatsioon aadressil ",
@@ -1390,7 +1393,7 @@
     "ep1b": " — saadikud ja nende mandaadi detailid.",
     "ep2": " — fraktsioonid, komisjonid, delegatsioonid, ühendused.",
     "ep3a": " ja ",
-    "ep3b": " — istungid, hääletused, saadikupõhised otsused.",
+    "ep3b": " — istungid, hääletused, saadikute hääled.",
     "ep4a": " ja ",
     "ep4b": " — eelnõud, etapid, algatajad, teemad.",
     "ep5a": " ja ",
@@ -1401,7 +1404,7 @@
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
     "licenseBody1c": " alusel. Selle saidi enda koondsisu on avaldatud sama litsentsi alusel, et taaskasutus oleks lihtne. Lähtekood on avaldatud Euroopa Liidu avaliku litsentsi (EUPL-1.2) alusel.",
     "updateFrequency": "Uuendussagedus",
-    "updateBody": "Hääletused sünkroonitakse iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), nii et uued nimelised hääletused ilmuvad samal päeval. Saadikud, fraktsioonid, profiilide detailid ja eelnõud värskenduvad kord ööpäevas (04:30 Europe/Tallinn): need muutuvad aeglaselt ning varasemad andmed on muutumatud ega laadita uuesti. Päise \"Viimane sünkroonimine\" märgis näitab viimase eduka värskenduse ajatemplit.",
+    "updateBody": "Hääletused sünkroonitakse iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn), nii et uued nimelised hääletused ilmuvad samal päeval. Saadikud, fraktsioonid, profiilide detailid ja eelnõud värskenduvad kord ööpäevas (04:30 Europe/Tallinn): need muutuvad aeglaselt ning varasemaid andmeid ei muudeta ega laadita uuesti. Päises olev märge „Viimane sünkroonimine“ näitab viimase eduka värskenduse aega.",
     "additional": "Muud allikad",
     "rahvaalgatus": {
       "title": "Kollektiivsed pöördumised",
@@ -1409,13 +1412,13 @@
       "mid": ", mida haldab ",
       "operator": "SA Eesti Koostöö Kogu",
       "suffix": ".",
-      "what": "Riigiluup impordib kollektiivsete pöördumiste CSV-väljavõtte, mis katab kõik etapid — koostamisest ja allkirjade kogumisest kuni Riigikogu ja valitsuse menetluseni.",
+      "what": "Riigiluup impordib kollektiivsete pöördumiste CSV-väljavõtte, mis hõlmab kõiki etappe — koostamisest ja allkirjade kogumisest kuni Riigikogu ja valitsuse menetluseni.",
       "cadence": "Värskendatakse iga päev kell 05:40 (Europe/Tallinn)."
     },
-    "ep7": " — dokumendiregister: kirjalikud küsimused ja arupärimised ministritele (jaotis «Kontroll»).",
+    "ep7": " — dokumendiregister: kirjalikud küsimused ja arupärimised ministritele (jaotis „Kontroll“).",
     "wikidata": {
       "title": "Wikidata",
-      "pre": "Saadikute erakondlik kuuluvus, Wikidata identifikaatorid (Q-ID) ja biograafia rikastus pärinevad allikast ",
+      "pre": "Saadikute erakondlik kuuluvus, Wikidata identifikaatorid (Q-ID) ja täiendavad elulooandmed pärinevad allikast ",
       "suffix": " (avaandmed, CC0).",
       "cadence": "Uuendatakse iga kahe päeva tagant."
     },
@@ -1430,8 +1433,8 @@
       "suffix": "."
     },
     "molder": {
-      "title": "Ajalooline valimisajalugu (kuni 2023)",
-      "pre": "Saadikute kandideerimised Riigikokku 1992-2019 on esitanud Martin Mölder (",
+      "title": "Varasemad valimised (kuni 2023)",
+      "pre": "Andmed saadikute kandideerimise kohta Riigikokku aastatel 1992–2019 on koondanud Martin Mölder (",
       "suffix": "). Andmete kogumine toimus Postimehe Fondi grandi (POST36) raames."
     },
     "partyfinance": {
@@ -1444,7 +1447,7 @@
       "title": "Märkused",
       "interpellations": "Arupärimistele vastatakse suuliselt istungil, mistõttu neil ei kuvata vastuse staatust - erinevalt kirjalikest küsimustest.",
       "amendments": "Muudatusettepanekud on laaditud käesoleva koosseisu (XV Riigikogu) kohta.",
-      "press": "«Ajakirjandustegevus» kuvatakse Riigikogu registrist muutmata kujul; kajastuse puudumine tähendab, et seda pole (veel) ka Riigikogul.",
+      "press": "„Ajakirjandustegevus“ kuvatakse Riigikogu registrist muutmata kujul; kajastuse puudumine tähendab, et seda pole (veel) ka Riigikogul.",
       "party": "Erakondlik kuuluvus pärineb Wikidatast ja võib olla puudulik; praegune erakond tuletatakse alati saadiku fraktsioonist."
     }
   },
@@ -1452,9 +1455,9 @@
     "kicker": "Läbipaistvus · Sünkroonimine",
     "cadenceTitle": "Sünkroonimine iga 6 tunni tagant",
     "title": "Andmete värskus",
-    "intro": "Riigiluup värskendab Riigikogu andmeid iga 6 tunni tagant (03:05, 09:05, 15:05, 21:05 Europe/Tallinn). Alltoodud tabel loetleb iga sissetuleku töö viimased edukad käivitused.",
+    "intro": "Riigiluup värskendab hääletusi ja stenogramme iga 6 tunni järel (kell 3.05, 9.05, 15.05 ja 21.05 Tallinna aja järgi); saadikute, eelnõude ja arupärimiste andmeid uuendatakse iga öö, muid allikaid harvemini. Allolev tabel näitab iga andmeimporditöö viimaseid käivitusi.",
     "empty": "Edukaid käivitusi pole veel registreeritud.",
-    "tableCaption": "Viimased sissetuleku tööde käivitused",
+    "tableCaption": "Andmeimporditööde viimased käivitused",
     "col": {
       "source": "Allikas",
       "job": "Töö",
@@ -1464,46 +1467,46 @@
     },
     "limitationsHeading": "Teadaolevad piirangud",
     "lim1": "Riigikogu ise avaldab mõnikord hääletuste või eelnõude kirjeid mõne tunni viivitusega.",
-    "lim2": "Riigikogu statistikaotspunktid nõuavad kuupäevaakent; sait pärib neid laisalt ja puhverdab tulemused saadiku × kuupäevavahemiku kaupa.",
-    "lim3": "Salajastel hääletustel pole ülesvoolu saadikupõhiseid kirjeid ja need ilmuvad ainult koondloenduritena."
+    "lim2": "Riigikogu statistikaotspunktid nõuavad kuupäevavahemikku; sait pärib neid alles vajaduse korral ja puhverdab tulemused saadiku ja kuupäevavahemiku kaupa.",
+    "lim3": "Salajaste hääletuste kohta ei ole allikas saadikupõhiseid kirjeid; need on nähtavad ainult koondarvudena."
   },
   "privacy": {
     "title": "Privaatsus",
     "aboutVisitorsHeading": "Mida Riigiluup salvestab külastajate kohta",
-    "aboutVisitors": "Midagi teie isikuga seotut. Sisselogimist pole, jälitusküpsiseid pole, reklaami pole ega kolmandate osapoolte jälgijaid. Analüütika on ainult meie enda, privaatne: ilma küpsiste ja isikuandmeteta (täpsemalt allpool).",
-    "logs": "Nginxi pöördproxy kirjutab tavapäraseid HTTP-juurdepääsu logisid (IP-aadress, päringu URL, kasutajaagent, ajatempel) töötluse eesmärkidel. Logisid säilitatakse kuni 30 päeva ja seejärel rotateeritakse.",
+    "aboutVisitors": "Mitte midagi, mis oleks seotud teie isikuga. Sisselogimist, jälitusküpsiseid, reklaami ega kolmandate osapoolte jälgijaid ei ole. Kasutame ainult oma serveris töötavat analüütikat, ilma küpsiste ja isikuandmeteta (täpsemalt allpool).",
+    "logs": "Nginxi pöördpuhverserver kirjutab tavapäraseid HTTP-juurdepääsulogisid (IP-aadress, päringu URL, kasutajaagent, ajatempel) serveri käitamiseks. Logisid säilitatakse kuni 30 päeva ja seejärel kustutatakse.",
     "analyticsHeading": "Analüütika",
-    "analyticsBody": "Külastatavuse mõistmiseks kasutame Umamit — avatud lähtekoodiga analüütikat, mis töötab meie enda serveris. See ei kasuta küpsiseid ega jälgi teid saitide vahel. IP-aadressi ei salvestata — seda kasutatakse üksnes hetkeliselt, et lugeda unikaalseid külastusi ja tuvastada riik. Kogutakse ainult anonüümseid koondnäitajaid: külastatud lehed, viitaja, brauseri ja seadme tüüp, riik ja keel. Andmed ei lahku kunagi meie serverist ega jagata kolmandatele osapooltele. Kui teie brauser saadab Do Not Track signaali, siis teie külastusi ei arvestata üldse.",
+    "analyticsBody": "Külastatavuse mõistmiseks kasutame Umamit — avatud lähtekoodiga analüütikat, mis töötab meie enda serveris. See ei kasuta küpsiseid ega jälgi teid saitide vahel. IP-aadressi ei salvestata — seda kasutatakse üksnes hetkeliselt, et lugeda unikaalseid külastusi ja tuvastada riik. Kogutakse ainult anonüümseid koondnäitajaid: külastatud lehed, viitaja, brauseri ja seadme tüüp, riik ja keel. Andmed ei lahku kunagi meie serverist ja neid ei jagata kolmandatele osapooltele. Kui teie brauser saadab „Do Not Track“-signaali, siis teie külastusi ei arvestata üldse.",
     "aboutMpsHeading": "Mida Riigiluup saadikute kohta avaldab",
     "aboutMps": "Ainult seda, mis on juba Riigikogu kaudu avalik: nimi, erakond, fraktsioon, valimisringkond, komisjonide liikmelisus, hääletused, kõnede arv ja saadiku enda või Riigikogu kantselei hallatav elulugu.",
     "notPublishedLine": "Ei avaldata:",
     "np1": "Koduaadress, isiklik telefon, privaatne e-post.",
     "np2": "Pereliikmed.",
     "np3": "Terviseinfo.",
-    "np4": "Sotsiaalmeedia postitused (ainult ametlike pressiviidete arv, kui Riigikogu neid raporteerib).",
+    "np4": "Sotsiaalmeedia postitused (ainult meediakajastuste arv, kui Riigikogu selle avaldab).",
     "rightHeading": "Õigus parandusele",
     "rightBody1": "Vt ",
-    "rightBody2": ". Iga kirje viitab ametlikule allikale; allikas tehtud parandused jõuavad Riigiluup'sse järgmise igapäevase värskenduse käigus.",
+    "rightBody2": ". Iga kirje viitab ametlikule allikale; allikas tehtud parandused jõuavad Riigiluupi järgmise igapäevase värskenduse käigus.",
     "photosHeading": "Fotod",
     "photosBody": "Saadikute fotod puhverdatakse Riigikogu failiotspunktist, et vähendada nende serverite koormust. Need on Riigikogu omand ja neid kasutatakse CC BY-SA 3.0 litsentsi alusel."
   },
   "terms": {
     "title": "Kasutustingimused",
     "licenseHeading": "Litsents",
-    "licenseBody1a": "Riigiluup's kuvatavad koondandmed on avaldatud litsentsi ",
+    "licenseBody1a": "Riigiluubis kuvatavad koondandmed on avaldatud litsentsi ",
     "licenseBody1b": "Creative Commons Attribution-ShareAlike 3.0",
-    "licenseBody1c": " alusel, mis on sama litsents, mida kasutavad Riigikogu avaandmed. Võite neid taaskasutada — sealhulgas ärilistel eesmärkidel — tingimusel, et (a) viitate Riigiluup'le ja Riigikogule kui allikatele ning (b) avaldate tuletatud andmed sama litsentsi alusel.",
+    "licenseBody1c": " alusel, mis on sama litsents, mida kasutavad Riigikogu avaandmed. Võite neid taaskasutada — sealhulgas ärilistel eesmärkidel — tingimusel, et (a) viitate Riigiluubile ja Riigikogule kui allikatele ning (b) avaldate tuletatud andmed sama litsentsi alusel.",
     "licenseBody2": "Saidi lähtekood on avaldatud Euroopa Liidu avaliku litsentsi (EUPL-1.2) alusel — see on OSI heakskiidetud vaba tarkvara litsents.",
     "warrantyHeading": "Garantii puudub",
-    "warrantyBody": "Riigiluup pakutakse \"nagu on\". Iga fakt pärineb avalikust API-st ja võib ilma ette teatamata muutuda. Sait püüab olla täpne, kuid ei garanteeri seda. Enne otsuste tegemist kontrollige originaali linki \"Allikas ↗\" igal kaardil, graafikul või näitajal.",
+    "warrantyBody": "Riigiluupi pakutakse „nagu on“. Iga fakt pärineb avalikust API-st ja võib ette teatamata muutuda. Sait püüab olla täpne, kuid ei garanteeri seda. Enne otsuste tegemist kontrollige andmeid algallikast lingi „Allikas ↗“ kaudu, mis on igal kaardil, graafikul ja näitajal.",
     "neutralityHeading": "Toimetuse neutraalsus",
-    "neutralityBody": "Riigiluup ei toeta erakondi, fraktsioone ega üksikuid liikmeid. Ta ei kuva \"parimate\" ega \"halvimate\" edetabeleid, ideoloogilisi skoore ega meelestatuse analüüsi. Kui arvutatud näitajat võib valesti mõista, kirjeldavad metoodika lehed valemit ja selle piire.",
+    "neutralityBody": "Riigiluup ei toeta erakondi, fraktsioone ega üksikuid liikmeid. Sait ei kuva „parimate“ ega „halvimate“ edetabeleid, ideoloogilisi skoore ega sentimendianalüüsi. Kui arvutatud näitajat võib valesti mõista, kirjeldavad metoodika lehed valemit ja selle piire.",
     "fairUseHeading": "Mõistlik kasutamine",
-    "fairUseBody": "Riigiluup avalike REST-otspunktide automaatne masskorje on mõistlikes piirides lubatud (≤ 1 päring/s IP kohta, sama, mis Riigikogu ülesvoolu piir). Intensiivse programmilise kasutuse korral eelistage otse Riigikogu API-t."
+    "fairUseBody": "Riigiluubi avalike REST-otspunktide automaatne masskorje on mõistlikes piirides lubatud (≤ 1 päring/s IP kohta, sama mis Riigikogu API enda piirang). Intensiivse programmilise kasutuse korral eelistage otse Riigikogu API-t."
   },
   "corrections": {
     "title": "Parandused",
-    "intro": "Riigiluup peegeldab Riigikogu avaandmeid — enamik faktivigu pärineb allikast ja jõuab Riigiluup'sse järgmise igapäevase värskenduse käigus, kui need on allikas parandatud. Kui märkate viga, mida põhjustab just Riigiluup (katkine graafik, vale slug, valesti sildistatud näitaja), andke meile otse teada.",
+    "intro": "Riigiluup peegeldab Riigikogu avaandmeid — enamik faktivigu pärineb allikast ja jõuab Riigiluupi järgmise igapäevase värskenduse käigus, kui need on allikas parandatud. Kui märkate viga, mida põhjustab just Riigiluup (katkine graafik, vale aadress, valesti sildistatud näitaja), andke meile otse teada.",
     "sendHeading": "Saada parandus",
     "emailPrefix": "Saatke e-kiri aadressile ",
     "emailSuffix": ", milles on:",
@@ -1512,22 +1515,22 @@
     "step3": "Allika link kontrollimiseks.",
     "buttonExplainerA": "Allolev nupp ",
     "buttonExplainerB": "Saada parandus",
-    "buttonExplainerC": " avab teie meilikliendi eeltäidetud mallis.",
+    "buttonExplainerC": " avab teie e-posti programmis eeltäidetud kirja.",
     "sendButton": "Saada parandus",
     "whatWeDoHeading": "Mida me teeme",
-    "whatWeDo": "Iga usaldusväärse teate vaatab hoidja üle 7 päeva jooksul. Kui probleem on Riigiluup enda esituses, parandatakse see ja avaldatakse. Kui probleem on ülesvoolu Riigikogu andmetes, edastame selle Riigikogu andmemeeskonnale ja märgime teate sellel lehel.",
+    "whatWeDo": "Iga usaldusväärse teate vaatab haldaja üle 7 päeva jooksul. Kui probleem on Riigiluubi enda esituses, parandatakse see ja avaldatakse. Kui probleem on Riigikogu lähteandmetes, edastame selle Riigikogu andmemeeskonnale ja märgime teate sellel lehel.",
     "whatWeDontHeading": "Mida me ei tee",
     "wnd1": "Ei tühista avalikke hääletuste kirjeid — hääl on avalik fakt.",
-    "wnd2": "Ei märgista saadikuid või erakondi soovi peale ümber.",
-    "wnd3": "Ei omista ega eemalda \"aktiivsuse skoore\" — sait neid ei arvuta.",
-    "mailSubject": "Riigiluup parandus",
+    "wnd2": "Me ei muuda saadikute ega erakondade silte nende soovil.",
+    "wnd3": "Ei koosta ega muuda koondhinnanguid („aktiivsuse skoore“). Aktiivsuse loetelu näitab ainult loendatud sõnavõtte ja küsimusi, mitte hinnangut saadiku tööle.",
+    "mailSubject": "Parandus Riigiluubile",
     "mailTemplate": "Milline kirje on vale? (URL või ID)\n\nMis on parandus?\n\nKus saab kontrollida (Riigikogu link või muu ametlik allikas)?\n\nTeie nimi (valikuline):\n"
   },
   "groups": {
     "title": "Rühmad ja delegatsioonid",
     "lede": "Riigikogu liikmete parlamendirühmad, toetusrühmad ja delegatsioonid - ja kes neisse kuulub.",
     "members": "Liikmeid: {{count}}",
-    "searchPlaceholder": "Otsi rühma...",
+    "searchPlaceholder": "Otsi rühma…",
     "backToList": "Tagasi rühmade juurde",
     "category": {
       "FRIENDSHIP": "Parlamendirühmad",

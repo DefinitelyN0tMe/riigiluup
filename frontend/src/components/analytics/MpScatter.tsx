@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { MpSimilarity } from "../../api/analytics";
+import { localizeFactionShort } from "../../lib/factionName";
 
 /**
  * 2D scatter: X = opposition (-1) ↔ coalition (+1); Y = faction loyalty (+1) ↔ dissenter (-1).
@@ -118,7 +119,7 @@ export default function MpScatter({ data }: { data: MpSimilarity }) {
                 {highlighted.name}
               </text>
               <text x={textX} y={cy + 2} fontFamily={LABEL} fontSize={10} fill="#6BB4F0" letterSpacing="0.06em">
-                {highlighted.factionShortName ?? "—"} · {highlighted.totalComparableVotes} {t("viz.scatter.tooltipVotes")}
+                {localizeFactionShort(highlighted.factionShortName, t)} · {highlighted.totalComparableVotes} {t("viz.scatter.tooltipVotes")}
               </text>
               <text x={textX} y={cy + 18} fontFamily={LABEL} fontSize={10} fill="#FFFFFF" opacity={0.7} letterSpacing="0.06em">
                 {highlighted.deviations} {t("viz.scatter.tooltipDev")}

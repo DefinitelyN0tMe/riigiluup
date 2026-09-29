@@ -36,7 +36,7 @@ export default function ComparisonPanel({
 
   return (
     <div className="space-y-6">
-      <section aria-label="Header" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <section aria-label={t("compare.title")} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Position is the identity here (left vs right panel); slug alone can collide
             when a crafted URL compares a politician with themselves. */}
         {[data.left, data.right].map((side, i) => (
@@ -62,7 +62,7 @@ export default function ComparisonPanel({
         ))}
       </section>
 
-      <section aria-label="Agreement">
+      <section aria-label={t("compare.voteAgreement")}>
         <h3 className="text-lg font-semibold text-ink mb-2">{t("compare.voteAgreement")}</h3>
         <p className="text-3xl font-semibold text-ink mb-2">{pct(data.agreement.agreementRate)}</p>
         <AgreementBar
@@ -73,7 +73,7 @@ export default function ComparisonPanel({
         <p className="text-xs text-slate-500 mt-2">{data.agreement.methodologyNote}</p>
       </section>
 
-      <section aria-label="Recent disagreements">
+      <section aria-label={t("compare.disagreements")}>
         <h3 className="font-display font-bold text-[22px] tracking-[-0.02em] mb-1">
           {t("compare.recentDisagreements", { count: data.recentDisagreements.length })}
         </h3>

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { MpSimilarPeers, PeerAgreement } from "../../api/analytics";
 import { formatPercent } from "../../lib/formatNumber";
+import { localizeFactionShort } from "../../lib/factionName";
 
 export default function SimilarPeers({ data, currentSlug }: { data: MpSimilarPeers; currentSlug: string }) {
   const { t } = useTranslation();
@@ -53,7 +54,7 @@ function PeerList({
                 <div className="font-display font-bold text-[14px] tracking-[-0.015em] truncate">{p.name}</div>
                 <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase text-muted mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: p.factionColorHex ?? "#0072CE" }} />
-                  {p.factionShortName ?? "—"} · {p.overlap} {t("viz.similarPeers.overlap")}
+                  {localizeFactionShort(p.factionShortName, t)} · {p.overlap} {t("viz.similarPeers.overlap")}
                 </div>
               </div>
               <div className="flex flex-col items-end gap-1 min-w-[80px]">

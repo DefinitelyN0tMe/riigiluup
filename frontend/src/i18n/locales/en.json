@@ -43,7 +43,9 @@
       "transparencyDesc": "How every metric is computed, the full list of sources and endpoints, the data-freshness log, and a way to report corrections.",
       "citizen": "For citizens",
       "citizenDesc": "What this project is and why it exists, the privacy policy, terms of use, and direct access to the Riigikogu API.",
-      "riigikoguApi": "Riigikogu API ↗"
+      "riigikoguApi": "Riigikogu API ↗",
+      "codeLicense": "CODE",
+      "dataLicense": "DATA © RIIGIKOGU,"
     }
   },
   "homePage": {
@@ -884,7 +886,8 @@
     "relatedInitiatives_other": "Related citizen initiatives",
     "amendmentsTitle": "Amendments",
     "amendmentsNote": "Amendment proposals submitted to the bill. The title names the proposer (faction or MP); the file opens the amendment text.",
-    "amendmentsFile": "Amendment file"
+    "amendmentsFile": "Amendment file",
+    "topicsLabel": "Topics"
   },
   "committees": {
     "title": "Committees",
@@ -1452,7 +1455,7 @@
     "kicker": "Transparency · Sync",
     "cadenceTitle": "Sync runs every 6 hours",
     "title": "Data freshness",
-    "intro": "Riigiluup refreshes upstream Riigikogu data every 6 hours (03:05, 09:05, 15:05, 21:05 Europe/Tallinn). The table below lists the most recent successful runs of each ingestion job.",
+    "intro": "Riigiluup refreshes votes and stenograms every 6 hours (03:05, 09:05, 15:05 and 21:05 Tallinn time); MPs, bills and questions to ministers are refreshed nightly and other sources less often. The table below lists the most recent runs of each ingestion job.",
     "empty": "No successful runs recorded yet.",
     "tableCaption": "Latest ingestion job runs",
     "col": {
@@ -1519,7 +1522,7 @@
     "whatWeDontHeading": "What we do not do",
     "wnd1": "Retract public voting records — a vote is a public fact.",
     "wnd2": "Re-label MPs or parties on request.",
-    "wnd3": "Assign or remove \"activity scores\" — the site does not compute them.",
+    "wnd3": "Create or change composite \"activity scores\". The activity list only shows counted speeches and questions, not an assessment of an MP's work.",
     "mailSubject": "Riigiluup correction",
     "mailTemplate": "Which record is wrong? (URL or ID)\n\nWhat is the correction?\n\nWhere can we verify (Riigikogu link or other official source)?\n\nYour name (optional):\n"
   },

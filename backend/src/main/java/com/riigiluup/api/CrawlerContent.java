@@ -83,7 +83,7 @@ final class CrawlerContent {
                     + " (" + p.participation().attended() + " / " + p.participation().totalSittings() + " istungist)"));
         }
         if (p.attendanceChecks() != null && p.attendanceChecks().totalSittings() > 0) {
-            b.append(li("Kohaloleku kontrollil kohal: " + pct(p.attendanceChecks().participationRate(), Locale.forLanguageTag("et"))
+            b.append(li("Kohalolek kohaloleku kontrollidel: " + pct(p.attendanceChecks().participationRate(), Locale.forLanguageTag("et"))
                     + " (" + p.attendanceChecks().attended() + " / " + p.attendanceChecks().totalSittings() + ")"));
         }
         if (p.activity() != null) {
@@ -447,11 +447,11 @@ final class CrawlerContent {
     private static final Map<String, String> FUNNEL_ET = Map.of(
             "targeted", "Riigikogule suunatud", "signing", "Allkirjade kogumisel", "threshold", "Allkirjade lävend täitunud",
             "sent", "Riigikogusse saadetud", "decided", "Otsustatud",
-            "draftAct", "Võeti menetlusse eelnõuna või riikliku küsimusena");
+            "draftAct", "Võeti menetlusse eelnõuna või olulise riikliku küsimusena");
     private static final Map<String, String> DECISION_ET = Map.of(
             "return", "Tagastatud esitajale", "reject", "Tagasi lükatud", "solve-differently", "Lahendatud muul viisil",
             "forward", "Edastatud", "forward-to-government", "Edastatud Vabariigi Valitsusele",
-            "draft-act-or-national-matter", "Eelnõu või riiklikult tähtis küsimus");
+            "draft-act-or-national-matter", "Eelnõu või olulise tähtsusega riiklik küsimus");
     private static final Map<String, String> MANDATE_ET = Map.of(
             "PERSONAL", "Isikumandaat", "DISTRICT", "Ringkonnamandaat", "COMPENSATION", "Kompensatsioonimandaat",
             "SUBSTITUTE", "Asendusliige");
@@ -492,9 +492,9 @@ final class CrawlerContent {
             b.append("<section id=\"vastamise-kiirus\"><h2>XIV. Kes vastab tähtaegselt: ministrite vastamise kiirus</h2>")
              .append("<p>Jooksva koosseisu arupärimised ja kirjalikud küsimused")
              .append(lat.since() != null ? " (alates " + DATE.format(lat.since()) + ")" : "")
-             .append(", mõõdetuna allika enda fikseeritud vastamistähtaja vastu: esitamisest registreeritud kirjaliku ")
-             .append("vastuseni või täiskogu istungini, kus minister arupärimisele vastas. Alla viie küsimusega ministrid ")
-             .append("on peidetud; esitajatele tagastatud küsimused on välja jäetud.</p>")
+             .append(", võrrelduna allikas registreeritud vastamistähtajaga: esitamisest registreeritud kirjaliku ")
+             .append("vastuseni või täiskogu istungini, kus minister arupärimisele vastas. Ministreid, kellele on esitatud alla viie küsimuse, ")
+             .append("ei näidata; esitajatele tagastatud küsimused on välja jäetud.</p>")
              .append("<p>Loetletud ministritele on esitatud kokku ").append(total).append(" küsimust ja arupärimist, neist ")
              .append(answered).append(" on vastatud, ").append(onTime).append(" tähtaegselt")
              .append(answered > 0 ? " (" + Math.round(onTime * 100.0 / answered) + "% vastatutest)" : "")
@@ -515,7 +515,7 @@ final class CrawlerContent {
         var ag = d.agreement();
         if (ag != null && ag.factions() != null && ag.matrix() != null) {
             b.append("<section><h2>I. Kes kellega hääletab: fraktsioonide kokkulangevus</h2>")
-             .append("<p>Kui tihti kaks fraktsiooni jõudsid samale enamuse otsusele. Andmed vaid nimelistelt hääletustelt, ")
+             .append("<p>Kui tihti kahe fraktsiooni enamus hääletas samamoodi. Arvesse on võetud ainult nimelised hääletused, ")
              .append("kus mõlemal fraktsioonil oli selge enamus (kokku ").append(ag.totalVotesConsidered())
              .append(" hääletust).</p><ul>");
             var f = ag.factions();
@@ -581,7 +581,7 @@ final class CrawlerContent {
              .append(" (").append(pct(night.nightRatio(), ET)).append(") toimus enne kella ")
              .append(night.windowStartHour()).append(":00 või pärast ").append(night.windowEndHour())
              .append(":00, neist ").append(night.lateNightVotes()).append(" kella 22:00 ja 06:00 vahel; nädalavahetusel ")
-             .append(night.weekendVotes()).append(". See ei tähenda automaatselt, et midagi on valesti.</p>");
+             .append(night.weekendVotes()).append(". See ei tähenda iseenesest, et midagi oleks valesti.</p>");
             if (night.items() != null && !night.items().isEmpty()) {
                 b.append("<ul>");
                 for (var it : night.items().subList(0, Math.min(10, night.items().size()))) {
@@ -600,8 +600,8 @@ final class CrawlerContent {
         if (act != null && act.items() != null && !act.items().isEmpty()) {
             var ranked = act.items().stream()
                     .sorted((x, y) -> Integer.compare(y.speeches(), x.speeches())).limit(15).toList();
-            b.append("<section><h2>XI. Kõige aktiivsemad saadikud</h2><p>Sõnavõtud ja küsimused täiskogu stenogrammidest, ")
-             .append("pluss arupärimised ja kirjalikud küsimused jooksval koosseisul. 15 enim sõna võtnud saadikut. ")
+            b.append("<section><h2>XI. Kõige aktiivsemad saadikud</h2><p>Sõnavõtud ja küsimused täiskogu stenogrammidest ")
+             .append("ning arupärimised ja kirjalikud küsimused jooksvas koosseisus. 15 enim sõna võtnud saadikut. ")
              .append("Arvud kajastavad aktiivsuse mahtu, mitte selle sisu.</p><ol>");
             for (var m : ranked) {
                 b.append("<li><a href=\"").append(esc(SITE + "/politicians/" + m.memberSlug())).append("\">")
@@ -616,8 +616,8 @@ final class CrawlerContent {
 
         var el = d.elections();
         if (el != null && el.members() != null && !el.members().isEmpty()) {
-            b.append("<section><h2>XII. Kellel on enim isiklikke hääli</h2><p>Istuvad saadikud 2023. aasta ")
-             .append("Riigikogu valimistel saadud isiklike häälte järgi (15 esimest). Asendajaid, keda ise ei valitud, ei ")
+            b.append("<section><h2>XII. Kellel on enim isiklikke hääli</h2><p>Ametis olevad saadikud 2023. aasta ")
+             .append("Riigikogu valimistel saadud isiklike häälte järgi (15 esimest). Asendusliikmeid, kes ise valituks ei osutunud, ei ")
              .append("näidata.</p><ol>");
             for (var m : el.members().subList(0, Math.min(15, el.members().size()))) {
                 b.append("<li><a href=\"").append(esc(SITE + "/politicians/" + m.memberSlug())).append("\">")
@@ -639,9 +639,9 @@ final class CrawlerContent {
 
         var fin = d.finance();
         if (fin != null && fin.parties() != null && !fin.parties().isEmpty()) {
-            b.append("<section><h2>XIII. Kuidas parteid on rahastatud</h2><p>Parlamendierakondade deklareeritud tulud alates ")
+            b.append("<section><h2>XIII. Kuidas erakondi rahastatakse</h2><p>Parlamendierakondade deklareeritud tulud alates ")
              .append(fin.sinceYear()).append(". aastast allikate kaupa, Erakondade Rahastamise Järelevalve Komisjoni (ERJK) ")
-             .append("registrist. Summad on aruandelised, eurodes.</p><ul>");
+             .append("registrist. Summad on eurodes, nii nagu need on aruannetes deklareeritud.</p><ul>");
             for (var p : fin.parties()) {
                 b.append("<li>").append(esc(p.partyName())).append(": kokku ").append(p.total()).append(" €");
                 if (p.buckets() != null && !p.buckets().isEmpty()) {
@@ -672,7 +672,7 @@ final class CrawlerContent {
             }
             if (fu.sentBelowThreshold() > 0) {
                 b.append("<p>").append(fu.sentBelowThreshold())
-                 .append(" pöördumist saadeti Riigikogusse, ehkki andmete järgi allkirjade lävendit ei täitunud.</p>");
+                 .append(" pöördumist saadeti Riigikogusse, ehkki andmete järgi allkirjade lävend ei täitunud.</p>");
             }
             if (fu.medianDaysToDecision() != null) {
                 b.append("<p>Mediaan otsuseni: ").append(Math.round(fu.medianDaysToDecision())).append(" päeva (n = ")
@@ -682,7 +682,7 @@ final class CrawlerContent {
         }
 
         b.append("<p>Ainult interaktiivsena lehel: IV kohalolek istungite kaupa, V hääletuste aeg nädalapäeva ja tunni ")
-         .append("järgi, VI eelnõude teemad, VIII saadikute paiknemine hääletuste põhjal, IX koos algatamise võrgustik.</p>");
+         .append("järgi, VI eelnõude teemad, VIII saadikute paiknemine hääletuste põhjal, IX ühiselt algatatud eelnõude võrgustik.</p>");
         b.append("</article>");
 
         b.append("<section lang=\"en\"><p>Analytics on the Estonian parliament (Riigikogu), computed only from its open data: ")

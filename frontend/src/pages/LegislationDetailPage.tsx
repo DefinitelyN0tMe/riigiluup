@@ -103,7 +103,7 @@ export default function LegislationDetailPage() {
       )}
 
       {data.topics.length > 0 && (
-        <section aria-label="Topics">
+        <section aria-label={t("legislation.topicsLabel")}>
           <div className="flex flex-wrap">
             {data.topics.map((topic) => <TopicChip key={topic.edid} t={topic} />)}
           </div>
@@ -111,13 +111,13 @@ export default function LegislationDetailPage() {
       )}
 
       {data.introduction && (
-        <section aria-label="Introduction">
+        <section aria-label={t("legislation.introduction")}>
           <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.introduction")}</h2>
           <p className="text-sm text-slate-700 whitespace-pre-line">{data.introduction}</p>
         </section>
       )}
 
-      <section aria-label="Sponsors">
+      <section aria-label={t("legislation.sponsors", { count: data.sponsors.length })}>
         <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.sponsors", { count: data.sponsors.length })}</h2>
         <ul className="divide-y divide-slate-200 border border-slate-200 rounded-md">
           {data.sponsors.map((s, idx) => (
@@ -141,7 +141,7 @@ export default function LegislationDetailPage() {
         </ul>
       </section>
 
-      <section aria-label="Timeline">
+      <section aria-label={t("legislation.timeline")}>
         <h2 className="text-lg font-semibold text-ink mb-2">{t("legislation.timeline")}</h2>
         <StageTimeline stages={data.stages} />
       </section>

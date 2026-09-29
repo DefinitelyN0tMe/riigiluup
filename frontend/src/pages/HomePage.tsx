@@ -81,7 +81,7 @@ function Hero({ syncedAt }: { syncedAt: string | null }) {
         </div>
       </div>
 
-      <div className="relative z-[3] pt-8 sm:pt-12 flex justify-end text-white/70 font-mono text-[10px] sm:text-[11px] tracking-[0.06em]">
+      <div className="relative z-[3] pt-8 sm:pt-12 flex justify-end text-white font-mono text-[10px] sm:text-[11px] tracking-[0.06em]">
         <div className="text-right">
           {syncedAt && <>{t("chrome.ticker.sync")} <b className="text-white font-bold">{syncedAt}</b> · </>}{t("homePage.hero.compositionLine")}
         </div>

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { DisciplineBreakers as Data } from "../../api/analytics";
 import { formatDate } from "../../lib/formatDate";
 import { formatDecimal } from "../../lib/formatNumber";
+import { localizeFactionShort } from "../../lib/factionName";
 
 export default function DisciplineBreakers({ data }: { data: Data }) {
   const { t } = useTranslation();
@@ -21,7 +22,7 @@ export default function DisciplineBreakers({ data }: { data: Data }) {
                 <div className="font-display font-bold text-[17px] sm:text-[19px] leading-tight tracking-[-0.02em] truncate">{it.memberName}</div>
                 <div className="flex items-center gap-2 mt-1 font-mono text-[10px] tracking-[0.12em] uppercase text-muted">
                   <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: it.factionColorHex ?? "#0072CE" }} />
-                  {it.factionShortName ?? "—"}
+                  {localizeFactionShort(it.factionShortName, t)}
                 </div>
               </div>
               <div className="hidden md:block min-w-0">

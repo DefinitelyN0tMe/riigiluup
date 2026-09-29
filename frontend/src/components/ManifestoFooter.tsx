@@ -59,8 +59,8 @@ export default function ManifestoFooter() {
       </div>
 
       <div className="relative mt-10 pt-6 border-t border-white/[0.14] font-mono text-[10px] tracking-[0.14em] uppercase text-white/55 flex flex-col sm:flex-row gap-2 sm:justify-between">
-        <span>© 2026 RIIGILUUP.EE · CC BY-SA 3.0</span>
-        <span>ANDMED © RIIGIKOGU</span>
+        <span>© 2026 RIIGILUUP.EE · {t("chrome.foot.codeLicense")} <a href="https://github.com/DefinitelyN0tMe/riigiluup" target="_blank" rel="noreferrer noopener" className="underline underline-offset-2 hover:text-white">EUPL-1.2</a></span>
+        <span>{t("chrome.foot.dataLicense")} <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.et" target="_blank" rel="noreferrer noopener" className="underline underline-offset-2 hover:text-white">CC BY-SA 3.0</a></span>
       </div>
     </footer>
   );

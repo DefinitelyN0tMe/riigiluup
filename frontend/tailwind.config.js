@@ -20,7 +20,7 @@ export default {
         off: "#F4F4F1",
         paper: "#FCFCFA",
         rule: "#E3E3DE",
-        muted: "#7A7A72",
+        muted: "#6B6B63", // ≥ 4.5:1 on paper/white/off (was #7A7A72, 4.2:1, below WCAG AA)
         live: "#4DFF9C",
         hot: "#FF4B3E",
         // Text-safe variants for small text (<18.66px bold / <24px regular) on light

@@ -26,3 +26,12 @@ export const COALITION_PARTIES = ["Reformierakond", "Eesti 200"];
 export function isCoalitionFaction(name: string): boolean {
   return COALITION_PARTIES.includes(factionShortName(name));
 }
+
+/**
+ * The api's short label for the non-attached MPs is the Estonian word "Sõltumatud"; show it in the
+ * reader's language. Any other short label (party names) is a proper name and stays as is.
+ */
+export function localizeFactionShort(short: string | null | undefined, t: (key: string) => string): string {
+  if (!short) return "—";
+  return short === "Sõltumatud" ? t("common.unaffiliated") : short;
+}

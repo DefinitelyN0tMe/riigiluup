@@ -75,7 +75,7 @@ export default function VoteDefectorsPanel({ v }: { v: VoteDetail }) {
   };
 
   return (
-    <section aria-label="Faction discipline waterfall" className="bg-white border border-rule rounded-[22px] p-5 sm:p-6 md:p-7">
+    <section aria-label={t("viz.defectors.title")} className="bg-white border border-rule rounded-[22px] p-5 sm:p-6 md:p-7">
       <div className="flex items-baseline justify-between flex-wrap gap-2 mb-4">
         <h2 className="font-display font-bold text-[20px] sm:text-[22px] tracking-[-0.02em]">
           {t("viz.defectors.title")}

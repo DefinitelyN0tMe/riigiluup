@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { CoSponsorship } from "../../api/analytics";
+import { localizeFactionShort } from "../../lib/factionName";
 
 /**
  * Force-free circular layout: nodes placed around a circle grouped by faction,
@@ -108,7 +109,7 @@ export default function CoSponsorshipGraph({ data }: { data: CoSponsorship }) {
                     {n.name}
                   </text>
                   <text x={textX} y={n.y + 5} fontFamily="'JetBrains Mono', monospace" fontSize={10} fill="#6BB4F0" letterSpacing="0.06em">
-                    {n.factionShortName ?? "—"} · {n.billsSponsored} {t("viz.cospons.tooltipBills")}
+                    {localizeFactionShort(n.factionShortName, t)} · {n.billsSponsored} {t("viz.cospons.tooltipBills")}
                   </text>
                 </>
               )}
