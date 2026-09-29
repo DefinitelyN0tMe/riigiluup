@@ -101,4 +101,28 @@ class GroupAlignmentServiceIntegrationTest extends AbstractIntegrationTest {
         assertThat(deviations).hasSize(1);
         assertThat(deviations.get(0).getVoteEvent().getExternalId()).isEqualTo("gv-2");
     }
+
+    @Test
+    void votes_cast_while_non_attached_are_never_compared_with_a_majority() {
+        // Three non-attached MPs vote; the pseudo-group gets a "majority" row in the alignment
+        // table, but it has no common line, so none of these votes may count for anyone.
+        String na = "Fraktsiooni mittekuuluvad Riigikogu liikmed";
+        PlenaryMember a = memberRepo.save(EntityFactory.member("mp-na1", "Non", "One", na, true));
+        PlenaryMember b = memberRepo.save(EntityFactory.member("mp-na2", "Non", "Two", na, true));
+        PlenaryMember c = memberRepo.save(EntityFactory.member("mp-na3", "Non", "Three", na, true));
+        VoteEvent v = voteEventRepo.save(EntityFactory.voteEvent(
+                "gv-na", Instant.parse("2026-01-20T10:00:00Z"), VoteEventType.OPEN));
+        individualVoteRepo.saveAll(List.of(
+                EntityFactory.individualVote(v, a, VoteChoice.FOR),
+                EntityFactory.individualVote(v, b, VoteChoice.FOR),
+                EntityFactory.individualVote(v, c, VoteChoice.AGAINST)));
+        backfill.recomputeAll();
+
+        GroupAlignmentService.Result r = service.forMember(c, null, null);
+        assertThat(r.eligible()).isZero();
+        assertThat(r.rate()).isNull();
+        assertThat(service.recentDeviations(c, 10)).isEmpty();
+        // The faction members' figures are unaffected.
+        assertThat(service.forMember(target, null, null).eligible()).isEqualTo(3);
+    }
 }
