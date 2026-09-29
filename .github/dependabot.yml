@@ -59,6 +59,9 @@ updates:
       docker-frontend:
         update-types: ["minor", "patch"]
     ignore:
+      # nginx odd minors (1.29, 1.31, ...) are the mainline branch; stay on the stable line.
+      - dependency-name: "nginx"
+        versions: ["1.29.x", "1.31.x", "1.33.x"]
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
 
@@ -72,5 +75,8 @@ updates:
       docker-compose:
         update-types: ["minor", "patch"]
     ignore:
+      # nginx odd minors (1.29, 1.31, ...) are the mainline branch; stay on the stable line.
+      - dependency-name: "nginx"
+        versions: ["1.29.x", "1.31.x", "1.33.x"]
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
