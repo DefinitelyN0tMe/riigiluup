@@ -161,7 +161,7 @@ services:
   certbot:
     # Pinned by digest (certbot:latest as of 2026-08-17): a floating tag here is the highest-risk
     # one - a breaking certbot change would silently stop TLS renewal. Bump deliberately.
-    image: certbot/certbot@sha256:34ee91d2f43008eb78a007d22f23ed4b2eaa9a454cb27ca2c042b49527a695b4
+    image: certbot/certbot@sha256:f70ad0adbb7e117f0fe42a63c553f28ea451edabc0148757b6efcd9735acaa20
     entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
     restart: unless-stopped
     logging:
