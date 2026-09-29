@@ -107,6 +107,8 @@ public class WikidataImporter {
     // Follow-up query for the matched MPs only (VALUES list), so it stays bounded: education
     // institutions (P69) and other offices held (P39, excluding the MP position itself),
     // as "; "-joined Estonian labels. No label service (would clash with GROUP BY).
+    // Offices carry their years from the statement's start/end qualifiers, e.g.
+    // "keskkonnaminister (2020–2021)": without them a six-week post read like a current one.
     private static final String BIO_SPARQL_TEMPLATE = """
             SELECT ?person
               (GROUP_CONCAT(DISTINCT ?eduL; separator="; ") AS ?education)
@@ -114,7 +116,18 @@ public class WikidataImporter {
             WHERE {
               VALUES ?person { %s }
               OPTIONAL { ?person wdt:P69 ?edu. ?edu rdfs:label ?eduL. FILTER(lang(?eduL) = "et") }
-              OPTIONAL { ?person wdt:P39 ?pos. FILTER(?pos != wd:Q21100241) ?pos rdfs:label ?posL. FILTER(lang(?posL) = "et") }
+              OPTIONAL {
+                ?person p:P39 ?posSt. ?posSt ps:P39 ?pos. FILTER(?pos != wd:Q21100241)
+                ?pos rdfs:label ?posName. FILTER(lang(?posName) = "et")
+                OPTIONAL { ?posSt pq:P580 ?posStart. }
+                OPTIONAL { ?posSt pq:P582 ?posEnd. }
+                BIND(IF(BOUND(?posStart), STR(YEAR(?posStart)), "") AS ?ys)
+                BIND(IF(BOUND(?posEnd), STR(YEAR(?posEnd)), "") AS ?ye)
+                BIND(IF(?ys = "" && ?ye = "", "",
+                     IF(?ys = ?ye, CONCAT(" (", ?ys, ")"),
+                     CONCAT(" (", IF(?ys = "", "…", ?ys), "–", ?ye, ")"))) AS ?years)
+                BIND(CONCAT(?posName, ?years) AS ?posL)
+              }
             }
             GROUP BY ?person
             """;

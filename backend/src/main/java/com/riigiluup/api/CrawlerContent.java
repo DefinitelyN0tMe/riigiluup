@@ -88,9 +88,9 @@ final class CrawlerContent {
         }
         if (p.activity() != null) {
             var a = p.activity();
-            b.append(li("Sõnavõtte täiskogus: " + a.speeches() + "; küsimusi: " + a.questions()
+            b.append(li("Sõnavõtte täiskogu stenogrammis: " + a.speeches() + "; küsimusi: " + a.questions()
                     + "; arupärimisi: " + a.interpellations() + "; kirjalikke küsimusi: " + a.writtenQuestions()));
-            descBits.add(a.speeches() + " sõnavõttu");
+            descBits.add(a.speeches() + " sõnavõttu stenogrammis");
         }
         if (p.election() != null && p.election().personalVotes() > 0) {
             b.append(li("Riigikogu valimised 2023: " + p.election().personalVotes() + " isiklikku häält"
@@ -535,14 +535,16 @@ final class CrawlerContent {
         var disc = d.discipline();
         if (disc != null && disc.items() != null && !disc.items().isEmpty()) {
             b.append("<section><h2>II. Kes hääletab erinevalt oma fraktsioonist</h2>")
-             .append("<p>").append(disc.items().size()).append(" saadikut, kes on kõige sagedamini hääletanud vastupidiselt ")
-             .append("oma fraktsiooni selge enamuse valikule. Nimelised hääletused, kus fraktsioonil oli tegelik enamus.</p><ol>");
+             .append("<p>").append(disc.items().size()).append(" saadikut, kelle hääl erines kõige sagedamini nende fraktsiooni ")
+             .append("selge enamuse valikust, järjestatud erinevate häälte osakaalu järgi. Arvesse lähevad nimelised hääletused, ")
+             .append("kus fraktsioonil oli selge enamus; hääli ajast, mil saadik fraktsiooni ei kuulunud, ei arvestata. ")
+             .append("Järjekord näitab ainult osakaalu suurust: erinev hääl ei ole iseenesest hea ega halb.</p><ol>");
             for (var it : disc.items()) {
                 b.append("<li><a href=\"").append(esc(SITE + "/politicians/" + it.memberSlug())).append("\">")
                  .append(esc(it.memberName())).append("</a>")
                  .append(it.factionShortName() != null ? " (" + esc(it.factionShortName()) + ")" : "")
-                 .append(": ").append(pct(it.deviationRate(), ET)).append(", ").append(it.deviations()).append(" / ")
-                 .append(it.eligible()).append(" hääletust fraktsiooni enamusest kõrvale</li>");
+                 .append(": ").append(pct(it.deviationRate(), ET)).append(" (").append(it.deviations()).append(" hääletusel ")
+                 .append(it.eligible()).append("-st fraktsiooni enamusest erinevalt)</li>");
             }
             b.append("</ol></section>");
         }

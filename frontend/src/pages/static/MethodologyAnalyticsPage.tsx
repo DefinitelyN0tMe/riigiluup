@@ -61,6 +61,14 @@ export default function MethodologyAnalyticsPage({ embedded = false }: { embedde
       <h2>{t(`${K}.tight.heading`)}</h2>
       <p>{t(`${K}.tight.body`)}</p>
 
+      {(["activity", "elections", "finance", "latency", "initiatives"] as const).map((sec) => (
+        <section key={sec}>
+          <h2>{t(`${K}.${sec}.heading`)}</h2>
+          <p>{t(`${K}.${sec}.body`)}</p>
+          <Note label={t(`${K}.noteLabel`)}>{t(`${K}.${sec}.note`)}</Note>
+        </section>
+      ))}
+
       <hr />
 
       <h2>{t(`${K}.exclusions.heading`)}</h2>
@@ -69,6 +77,7 @@ export default function MethodologyAnalyticsPage({ embedded = false }: { embedde
         <li>{t(`${K}.exclusions.item2`)}</li>
         <li>{t(`${K}.exclusions.item3`)}</li>
         <li>{t(`${K}.exclusions.item4`)}</li>
+        <li>{t(`${K}.exclusions.item5`)}</li>
       </ul>
 
       <h2>{t(`${K}.period.heading`)}</h2>

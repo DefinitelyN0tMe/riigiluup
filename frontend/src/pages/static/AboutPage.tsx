@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { CORRECTIONS_EMAIL } from "../../config";
 
 export default function AboutPage() {
@@ -16,7 +17,10 @@ export default function AboutPage() {
         <li>{t("about.list.members")}</li>
         <li>{t("about.list.votes")}</li>
         <li>{t("about.list.bills")}</li>
+        <li>{t("about.list.speeches")}</li>
+        <li>{t("about.list.oversight")}</li>
         <li>{t("about.list.rates")}</li>
+        <li>{t("about.list.other")}</li>
       </ul>
       <h2>{t("about.dataSource")}</h2>
       <p>
@@ -27,6 +31,10 @@ export default function AboutPage() {
           api.riigikogu.ee
         </a>
         {t("about.dataSourceSuffix")}
+      </p>
+      <p>
+        {t("about.dataSourceAll")}
+        <Link to="/sources" className="text-estonia hover:underline">/sources</Link>.
       </p>
       <h2>{t("about.contact")}</h2>
       <p>

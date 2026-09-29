@@ -137,9 +137,11 @@ riigiluup:
         pattern: "/api/v1/(?!admin/).*"
         per-minute: 240
   analytics:
-    # Faction name substrings currently in the governing coalition — drives the coalition/
-    # opposition axis of the MP scatter. Update on any change of government (SDE left in 2025).
-    coalition-factions: reform,eesti 200
+    # Coalition composition over time ("from-date=faction-name substrings;..."): drives the
+    # coalition/opposition axis of the MP scatter, each vote compared with the coalition of its day.
+    # XV Riigikogu: Reform + Eesti 200 + SDE until SDE's ministers were dismissed on 11.03.2025.
+    # Append a new period on any change of government (and update frontend lib/factionName.ts).
+    coalition-periods: "2023-04-10=reform,eesti 200,sotsiaal;2025-03-11=reform,eesti 200"
   riigikogu:
     base-url: https://api.riigikogu.ee
     user-agent: "riigiluup/0.0.1 (riigiluup@gmail.com)"

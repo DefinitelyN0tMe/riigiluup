@@ -19,6 +19,11 @@ public class GroupAlignmentService {
     private final EntityManager em;
 
     /**
+     * Votes cast while the MP was non-attached ("Fraktsiooni mittekuuluvad Riigikogu liikmed") are
+     * left out everywhere here: that group is not a faction and has no common line, so "voted with
+     * its majority" would be a meaningless number. A never-attached MP therefore has no rate (null);
+     * one who left a faction keeps the rate of the votes cast inside it.
+     *
      * Per-MP group-alignment rate:
      *   eligible = MP votes where choice is comparable AND the MP's faction had a clear majority
      *   matches  = eligible votes where MP.choice = faction.majorityChoice
@@ -38,6 +43,7 @@ public class GroupAlignmentService {
                   com.riigiluup.vote.VoteChoice.FOR,
                   com.riigiluup.vote.VoteChoice.AGAINST,
                   com.riigiluup.vote.VoteChoice.ABSTAINED)
+              and (iv.factionName is null or lower(iv.factionName) not like '%mittekuuluv%')
               and (cast(:from as instant) is null or iv.voteEvent.startedAt >= :from)
               and (cast(:to as instant) is null or iv.voteEvent.startedAt <= :to)
             """;
@@ -72,6 +78,7 @@ public class GroupAlignmentService {
                   com.riigiluup.vote.VoteChoice.FOR,
                   com.riigiluup.vote.VoteChoice.AGAINST,
                   com.riigiluup.vote.VoteChoice.ABSTAINED)
+              and (iv.factionName is null or lower(iv.factionName) not like '%mittekuuluv%')
               and iv.choice <> a.majorityChoice
             order by ve.startedAt desc
             """;

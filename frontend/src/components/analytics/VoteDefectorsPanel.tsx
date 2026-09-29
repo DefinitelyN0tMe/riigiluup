@@ -47,7 +47,9 @@ export default function VoteDefectorsPanel({ v }: { v: VoteDetail }) {
     nonComp: VoteIndividual[];
   };
   const grouped: Grouped[] = useMemo(() => {
-    return v.factionBreakdowns.map((f) => {
+    // The non-attached MPs are not a faction and have no common line, so "differed from the
+    // majority" is meaningless for them; they stay in the per-faction breakdown further down.
+    return v.factionBreakdowns.filter((f) => !/mittekuuluv/i.test(f.factionName ?? "")).map((f) => {
       const key = f.factionExternalId ?? f.factionName;
       const maj = majorityByFactionExt.get(key)?.choice ?? null;
       const rows = v.individualVotes.filter((iv) => (iv.factionExternalId ?? iv.factionName) === key);

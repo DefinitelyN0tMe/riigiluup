@@ -689,6 +689,7 @@ export default function PoliticianProfilePage() {
             <ActivityStat value={data.activity.interpellations} label={t("profile.activity.interpellations")} hint={t("profile.activity.interpellationsHint")} />
             <ActivityStat value={data.activity.writtenQuestions} label={t("profile.activity.writtenQuestions")} />
           </div>
+          <p className="text-[11px] leading-snug text-muted mt-3">{t("profile.activity.note")}</p>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 items-baseline">
             <Link to={`/speeches?member=${encodeURIComponent(data.slug ?? "")}&memberName=${encodeURIComponent(data.fullName ?? "")}`}
                   className="font-mono text-[11px] text-blue tracking-[0.06em] border-b border-blue pb-0.5">
@@ -797,6 +798,11 @@ export default function PoliticianProfilePage() {
             <p className="text-xs text-slate-500 mt-1">
               {t("profile.groupAlignmentDetail", { matches: data.groupAlignment.matches, eligible: data.groupAlignment.eligible })}
             </p>
+            {/mittekuuluv/i.test(data.faction?.name ?? "") && (
+              <p className="text-xs text-slate-600 mt-2">
+                {data.groupAlignment.eligible === 0 ? t("profile.groupAlignmentNonAttached") : t("profile.groupAlignmentPastFaction")}
+              </p>
+            )}
             <p className="text-xs text-slate-500 mt-2">{data.groupAlignment.methodologyNote}</p>
             {data.groupAlignment.recentDeviations.length > 0 && (
               <div className="mt-3">

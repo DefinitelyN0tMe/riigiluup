@@ -68,12 +68,30 @@ public class AnalyticsService {
     private final com.riigiluup.question.GovernmentQuestionRepository governmentQuestionRepo;
 
     /**
-     * Faction name substrings currently in the governing coalition. Drives the
-     * coalition/opposition axis of the MP scatter — update on any change of government
-     * (config: riigiluup.analytics.coalition-factions). As of 2025 SDE left the coalition.
+     * Coalition composition over time, as "yyyy-MM-dd=name,name;yyyy-MM-dd=name,...": from each date
+     * on, factions whose name contains one of the substrings were in government. The MP scatter
+     * compares every vote with the coalition of that day, so a party that changed sides (SDE left
+     * the government on 11.03.2025) is not scored as opposition for the whole term.
      */
-    @Value("${riigiluup.analytics.coalition-factions:reform,eesti 200}")
-    private List<String> coalitionFactionNames;
+    @Value("${riigiluup.analytics.coalition-periods:2023-04-10=reform,eesti 200,sotsiaal;2025-03-11=reform,eesti 200}")
+    private String coalitionPeriodsSpec;
+
+    record CoalitionPeriod(java.time.LocalDate from, List<String> names) {}
+
+    static List<CoalitionPeriod> parseCoalitionPeriods(String spec) {
+        List<CoalitionPeriod> out = new ArrayList<>();
+        for (String part : spec.split(";")) {
+            String p = part.trim();
+            if (p.isEmpty()) continue;
+            int eq = p.indexOf('=');
+            java.time.LocalDate from = java.time.LocalDate.parse(p.substring(0, eq).trim());
+            List<String> names = java.util.Arrays.stream(p.substring(eq + 1).split(","))
+                    .map(n -> n.trim().toLowerCase()).filter(n -> !n.isEmpty()).toList();
+            out.add(new CoalitionPeriod(from, names));
+        }
+        out.sort(Comparator.comparing(CoalitionPeriod::from));
+        return out;
+    }
 
     /* ============================================================
      *  Faction-agreement matrix
@@ -175,6 +193,7 @@ public class AnalyticsService {
                     com.riigiluup.vote.VoteChoice.FOR,
                     com.riigiluup.vote.VoteChoice.AGAINST,
                     com.riigiluup.vote.VoteChoice.ABSTAINED)
+              AND (iv.factionName IS NULL OR LOWER(iv.factionName) NOT LIKE '%mittekuuluv%')
             GROUP BY iv.plenaryMember
             HAVING COUNT(iv) >= :min
             """;
@@ -192,7 +211,10 @@ public class AnalyticsService {
                     double rate = elig == 0 ? 0 : (double) devs / (double) elig;
                     return new Row(m, (int) devs, (int) elig, rate);
                 })
-                .filter(r -> r.m.isActive() && !isNonAffiliatedGroup(r.m.getFactionName()))
+                // Votes cast while non-attached are excluded in the query (that pseudo-group has no
+                // common line), so an MP who later left a faction is still ranked on the votes cast
+                // inside it, as the methodology says; a never-attached MP has no eligible votes.
+                .filter(r -> r.m.isActive())
                 .sorted(Comparator.<Row>comparingDouble(r -> -r.rate).thenComparingInt(r -> -r.devs))
                 .limit(limit)
                 .toList();
@@ -209,6 +231,13 @@ public class AnalyticsService {
             String factionName = r.m.getFactionName();
             String factionShort = faction != null ? shortenFactionName(faction.getName()) : shortenFactionName(factionName);
             String colorHex = faction != null ? faction.getColorHex() : null;
+            if (isNonAffiliatedGroup(factionName) && example != null && example.getFactionName() != null) {
+                // Now non-attached: label the row with the faction the counted votes were cast in.
+                Group past = factionByExt.get(example.getFactionExternalId());
+                factionName = example.getFactionName();
+                factionShort = shortenFactionName(factionName);
+                colorHex = past != null ? past.getColorHex() : null;
+            }
             items.add(new AnalyticsDto.DisciplineBreaker(
                     r.m.getSlug(), r.m.getFullName(), r.m.getFactionExternalId(),
                     factionName, factionShort, colorHex,
@@ -376,6 +405,7 @@ public class AnalyticsService {
                     com.riigiluup.vote.VoteChoice.AGAINST,
                     com.riigiluup.vote.VoteChoice.ABSTAINED)
               AND iv.choice <> a.majorityChoice
+              AND (iv.factionName IS NULL OR LOWER(iv.factionName) NOT LIKE '%mittekuuluv%')
             ORDER BY iv.voteEvent.startedAt DESC
             """;
         return em.createQuery(jpql, IndividualVote.class)
@@ -679,23 +709,36 @@ public class AnalyticsService {
         // For each MP compute:
         //   x = (agree-with-coalition-majority %) - (agree-with-opposition-majority %) in [-1,1]
         //   y = 2 * group-alignment-rate - 1  in [-1,1]  (party loyalty axis)
-        Map<String, String> partyRole = coalitionRoleMap();
+        // Coalition membership is date-dependent: bucket each vote into the coalition period it fell
+        // in, and give every faction its role per period (see coalitionPeriodsSpec).
+        List<CoalitionPeriod> periods = parseCoalitionPeriods(coalitionPeriodsSpec);
+        StringBuilder periodCase = new StringBuilder("CASE");
+        for (int i = periods.size() - 1; i >= 1; i--) {
+            // Dates come from LocalDate.toString(), so only yyyy-MM-dd ever reaches the SQL text.
+            periodCase.append(" WHEN ve.started_at >= (DATE '").append(periods.get(i).from())
+                    .append("' AT TIME ZONE 'Europe/Tallinn') THEN ").append(i);
+        }
+        periodCase.append(" ELSE 0 END");
+        Map<String, String> factionNames = new HashMap<>();
+        for (Group g : activeFactions()) factionNames.put(g.getExternalId(), g.getName().toLowerCase());
 
         // Bulk fetch per-MP alignment rate against every faction's majority (only where has_clear_majority)
         String sql = """
             SELECT
               iv.plenary_member_id AS mid,
               a.faction_external_id AS fex,
+              %s AS period,
               SUM(CASE WHEN iv.choice = a.majority_choice THEN 1 ELSE 0 END) AS agree,
               COUNT(*) AS total
             FROM individual_vote iv
+            JOIN vote_event ve ON ve.id = iv.vote_event_id
             JOIN vote_faction_alignment a
               ON a.vote_event_id = iv.vote_event_id
              AND a.has_clear_majority = TRUE
              AND a.majority_choice IN ('FOR','AGAINST','ABSTAINED')
             WHERE iv.choice IN ('FOR','AGAINST','ABSTAINED')
-            GROUP BY iv.plenary_member_id, a.faction_external_id
-            """;
+            GROUP BY 1, 2, 3
+            """.formatted(periodCase);
         List<Object[]> rows = em.createNativeQuery(sql).getResultList();
 
         // Aggregate per member: coalition vs opposition
@@ -704,11 +747,14 @@ public class AnalyticsService {
         for (Object[] r : rows) {
             UUID mid = uuidOf(r[0]);
             String fex = (String) r[1];
-            long agree = ((Number) r[2]).longValue();
-            long total = ((Number) r[3]).longValue();
+            int period = ((Number) r[2]).intValue();
+            long agree = ((Number) r[3]).longValue();
+            long total = ((Number) r[4]).longValue();
             if (total == 0) continue;
-            String role = partyRole.get(fex);
-            if (role == null) continue;
+            String name = factionNames.get(fex);
+            if (name == null || isNonAffiliatedGroup(name)) continue; // not a real faction: no role
+            boolean inCoalition = periods.get(period).names().stream().anyMatch(name::contains);
+            String role = inCoalition ? "coalition" : "opposition";
             double[] agg = memberScore.computeIfAbsent(mid, k -> new double[]{0, 0});
             int[] cnt = memberCount.computeIfAbsent(mid, k -> new int[]{0, 0});
             double rate = (double) agree / total;
@@ -1130,6 +1176,7 @@ public class AnalyticsService {
             JOIN vote_event ve ON ve.id = iv.vote_event_id
             WHERE pm.slug = :slug
               AND iv.choice IN ('FOR','AGAINST','ABSTAINED')
+              AND (iv.faction_name IS NULL OR lower(iv.faction_name) NOT LIKE '%mittekuuluv%')
               AND ve.started_at IS NOT NULL
               AND ve.started_at >= :fromTs
             GROUP BY 1
@@ -1243,25 +1290,6 @@ public class AnalyticsService {
         return out;
     }
 
-    /**
-     * Which factions belong to the governing coalition vs opposition. Coalition membership is
-     * config-driven (riigiluup.analytics.coalition-factions) so a change of government is a config
-     * edit, not a code change; every faction not in that set counts as opposition.
-     */
-    private Map<String, String> coalitionRoleMap() {
-        List<String> coalition = coalitionFactionNames.stream()
-                .map(s -> s.trim().toLowerCase())
-                .filter(s -> !s.isEmpty())
-                .toList();
-        Map<String, String> out = new HashMap<>();
-        for (Group g : activeFactions()) {
-            if (isNonAffiliatedGroup(g.getName())) continue; // not a real faction — no coalition/opposition role
-            String n = g.getName().toLowerCase();
-            boolean inCoalition = coalition.stream().anyMatch(n::contains);
-            out.put(g.getExternalId(), inCoalition ? "coalition" : "opposition");
-        }
-        return out;
-    }
 
     /** Short faction label: strip "fraktsioon" suffix + trailing spaces. */
     /**

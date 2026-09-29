@@ -153,19 +153,19 @@
     "sourcePrefix": "Source",
     "hero": {
       "kicker": "Analytics · Riigikogu mirror",
-      "titlePre": "Who is ",
-      "titleEm": "actually",
-      "titlePost": " with whom",
-      "lede": "Visualizations built purely on open data. Every number is traceable to a Riigikogu form. No opinion, no ranking — only what the votes, attendance and bills themselves say.",
-      "toc1": "Party × party",
-      "toc2": "Faction deviations",
+      "titlePre": "What the ",
+      "titleEm": "votes",
+      "titlePost": " show",
+      "lede": "Charts built only on Riigikogu open data; every number can be traced to the official source. No opinions or judgements, only what the votes, attendance and bills show. Where a list is ordered, the order reflects the size of the measured figure, not a judgement.",
+      "toc1": "Faction × faction",
+      "toc2": "Votes differing from the faction majority",
       "toc3": "Bill flow",
       "toc4": "Attendance",
       "toc5": "When they vote",
       "toc6": "What they work on",
       "toc7": "Speed & pattern",
       "toc8": "Political landscape",
-      "toc9": "Real collaboration",
+      "toc9": "Co-sponsored bills",
       "toc10": "Night votes",
       "toc11": "Most active MPs",
       "toc12": "Who got the most votes",
@@ -186,7 +186,7 @@
         "titlePre": "Who votes ",
         "titleEm": "differently",
         "titlePost": " from their faction",
-        "note": "Top-24 MPs who most often voted against their faction's clear majority choice. Named votes where the faction had an actual majority."
+        "note": "The 24 MPs whose vote most often differed from their faction's clear majority, ordered by the share of such votes. Only roll-call votes where the faction had a clear majority count; votes cast while the MP was not in a faction are left out. The order reflects only the size of the share: voting differently is neither good nor bad in itself."
       },
       "flow": {
         "kicker": "The path of bills",
@@ -219,33 +219,33 @@
       "velocity": {
         "kicker": "Speed",
         "titlePre": "How quickly ",
-        "titleEm": "it goes through",
-        "titlePost": "",
-        "note": "Distribution of adopted bills from initiation to acceptance. Left = fast (potentially rushed), right = slow (potentially important and contested)."
+        "titleEm": "bills",
+        "titlePost": " pass",
+        "note": "Adopted bills by the number of days from initiation to adoption. Fast ones on the left, slow ones on the right. Speed can point to haste or to a longer dispute, but speed alone does not prove either: the bill's own proceedings show the fuller picture."
       },
       "scatter": {
         "kicker": "Political landscape",
         "titlePre": "Where ",
         "titleEm": "each MP",
         "titlePost": " sits",
-        "note": "X-axis: how much the MP votes with the coalition (+1) vs opposition (−1). Y-axis: how loyal to their faction (+1) or dissident (−1). Values computed from actual votes, not declared position. MPs with too few comparable votes (e.g. just-seated substitutes) are left off the chart. Non-attached members are not plotted, as faction loyalty is undefined for them."
+        "note": "X-axis: how often the MP votes the same way as the majority of the coalition factions (+1) or of the opposition factions (−1). Each vote is compared with the coalition of that day (SDE was in government until 11.03.2025). Y-axis: how often the MP votes the same way as their own faction's majority (+1 almost always, −1 rarely). Values come from actual votes. MPs with too few comparable votes (e.g. just-seated substitutes) and non-attached MPs, who have no faction majority to compare with, are left off the chart."
       },
       "cospons": {
-        "kicker": "Real collaboration",
+        "kicker": "Co-sponsored bills",
         "titlePre": "Who ",
         "titleEm": "sponsors together",
         "titlePost": "",
-        "note": "Every black edge that cuts through the centre is a bill that united MPs from different parties. Visibility across party lines that would otherwise go unnoticed in statistics."
+        "note": "Every black edge that crosses the centre is a bill co-sponsored by MPs from different parties. It shows cross-party cooperation that ordinary statistics would miss."
       },
       "night": {
-        "kicker": "Night votes · watchdog",
+        "kicker": "Night votes",
         "titlePre": "What gets decided ",
         "titleEm": "after hours",
         "titlePost": "",
-        "note": "Riigikogu's regular sittings run during the day. Named votes cast before 08:00 or after 22:00 — or on weekends — are listed here, with time, margin, and linked bill. It doesn't automatically mean something is wrong, but it's worth a look."
+        "note": "Riigikogu's regular sittings are held in the daytime. Listed here are roll-call votes before 8:00, after 22:00 or at weekends, with time, margin and linked bill. A late hour does not in itself mean something is wrong: often a long sitting simply runs late, for example during a lengthy debate on a bill."
       },
       "activity": {
-        "kicker": "Who does the work",
+        "kicker": "Activity in the plenary",
         "titlePre": "The most ",
         "titleEm": "active",
         "titlePost": " MPs",
@@ -263,7 +263,7 @@
         "titlePre": "How parties are ",
         "titleEm": "funded",
         "titlePost": "",
-        "note": "Declared income of the parliamentary parties since 2023, split by source, from the ERJK financing register. State support is the biggest slice for most, but some parties lean heavily on donations. Figures are reported totals in euros."
+        "note": "Declared income of the parliamentary parties since 2023, by source, from the register of the Political Parties Financing Surveillance Committee (ERJK). State support is the largest source for most parties, while some received more in donations than in state support (see the breakdown below). Amounts as declared in the reports, in euros."
       },
       "latency": {
         "kicker": "Parliamentary oversight",
@@ -287,7 +287,7 @@
       "metricLabel": "Activity metric",
       "interpellationsHint": "A formal demand that a minister answer in the chamber, followed by debate.",
       "metric": {
-        "speeches": "Speeches",
+        "speeches": "Speeches in the stenogram",
         "questions": "Questions",
         "interpellations": "Questions to ministers",
         "writtenQuestions": "Written questions"
@@ -408,14 +408,14 @@
     "scatter": {
       "xRight": "COALITION →",
       "xLeft": "← OPPOSITION",
-      "yUp": "↑ PARTY LOYALTY",
-      "yDown": "↓ DISSIDENT",
-      "qOpLoy": "opposition loyalist",
-      "qCoLoy": "coalition loyalist",
-      "qOpInd": "opposition independent",
-      "qCoInd": "coalition independent",
+      "yUp": "↑ MOSTLY WITH FACTION MAJORITY",
+      "yDown": "↓ OFTEN APART FROM FACTION",
+      "qOpLoy": "opposition, with faction",
+      "qCoLoy": "coalition, with faction",
+      "qOpInd": "opposition, often apart",
+      "qCoInd": "coalition, often apart",
       "tooltipVotes": "votes",
-      "tooltipDev": "faction deviations",
+      "tooltipDev": "votes apart from faction majority",
       "openProfile": "Open {{name}} profile →"
     },
     "cospons": {
@@ -459,8 +459,8 @@
       "overlap": "shared votes"
     },
     "defectors": {
-      "title": "Faction discipline in this vote",
-      "subtitle": "Who broke ranks with their faction majority",
+      "title": "Faction majorities in this vote",
+      "subtitle": "Who voted differently from their faction majority",
       "noDefectors": "No faction saw any defectors — every MP voted with their group's majority.",
       "majorityChose": "Majority chose",
       "withMajority": "with majority",
@@ -801,20 +801,21 @@
     },
     "activity": {
       "title": "Activity in parliament",
-      "speeches": "Speeches",
+      "speeches": "Speeches in the stenogram",
       "questions": "Questions asked",
       "interpellations": "Questions to ministers",
       "interpellationsHint": "A formal demand that a minister answer in the chamber, followed by debate.",
       "writtenQuestions": "Written questions",
       "source": "On the Riigikogu site",
-      "allSpeeches": "All speeches, searchable"
+      "allSpeeches": "All speeches, searchable",
+      "note": "Speeches and questions come from the Riigikogu stenogram data for the current term and include every speech in plenary sittings, replies included. Riigikogu's own statistics classify speeches differently, so the numbers shown there can differ."
     },
     "bio": {
       "title": "Education & career",
       "lede": "Where this MP studied and the public offices they have held.",
       "education": "Education",
       "positions": "Offices held",
-      "source": "Source: Wikidata (CC0). Labels shown in Estonian."
+      "source": "Source: Wikidata (CC0). Labels shown in Estonian; office names are Wikidata's current labels and may differ from what the office was called at the time."
     },
     "declaration": {
       "title": "Declaration of interests",
@@ -825,7 +826,9 @@
     "recentDeviations": "Recent deviations",
     "mpChoice": "MP",
     "factionChoice": "Faction",
-    "currentMandateFrom": "In the current composition since {{date}}"
+    "currentMandateFrom": "In the current composition since {{date}}",
+    "groupAlignmentNonAttached": "Non-attached MPs have no common faction position to compare their votes with, so this figure is not calculated.",
+    "groupAlignmentPastFaction": "The MP is not currently in any faction. Only votes cast while the MP was in a faction are counted."
   },
   "votes": {
     "title": "Recent votes",
@@ -1184,23 +1187,27 @@
   },
   "about": {
     "title": "About Riigiluup",
-    "intro": "Riigiluup is a public, open-source tool that makes the work of the Estonian Riigikogu easier to follow. It aggregates the parliament's own open data — MPs, roll-call votes, and bills — and presents it as neutral profiles, timelines, comparisons, and analytics. It covers the current Riigikogu (2023–2027), with roll-call voting records from April 2023 onward, and every figure links back to the official Riigikogu source.",
+    "intro": "Riigiluup is a public, open-source tool that makes the work of the Estonian Riigikogu easier to follow. It brings together the parliament's open data and presents it as neutral profiles, timelines, comparisons and analytics. At its core is the current, XV Riigikogu (2023–2027): MPs, roll-call votes since April 2023, plenary stenograms, interpellations and written questions to ministers. It also covers bills since 1992, past election data, party finance and collective addresses. Every figure links to its official source.",
     "editorial": "Editorial stance",
-    "editorialBody": "The service does not assign ideological labels, moral scores, or rankings — it is a mirror, not an interpreter. It reports factual counts and rates and lets you draw your own conclusions. Where a metric could be misread, we document the formula, what is included, what is excluded, and the known limitations; a figure is never framed as good or bad, only described and linked back so you can check it against the original Riigikogu form.",
+    "editorialBody": "The service does not assign ideological labels or moral scores: it is a mirror, not an interpreter. It reports factual counts and shares and leaves the conclusions to you. Where a list is ordered, the order reflects only the size of the measured figure, not a judgement. Where a metric could be misread, we document the formula, what is included, what is left out and the known limitations. A figure is never framed as good or bad, only described and linked so you can check it against the official source.",
     "funding": "Independence and funding",
     "fundingBody": "Riigiluup is built and run by one person — its founder — with their own money and time. There is no party, company, grant, or interest group behind it. It is a civic initiative, not a business or a political project. If the funding model ever changes, we will update this section.",
     "whatPublic": "What is public here",
     "list": {
-      "members": "Member profiles, faction, committees, electoral district.",
+      "members": "Member profiles, faction and faction changes, committees, electoral district and election results.",
       "votes": "Roll-call votes and attendance checks.",
-      "bills": "Bills (eelnõu), their stages, sponsors, and Eurovoc topic tags.",
-      "rates": "Statistical rates (participation, alignment, pairwise agreement)."
+      "bills": "Bills since 1992, their stages, sponsors, amendments and Eurovoc topics.",
+      "speeches": "Plenary stenograms, linked to the bill under debate.",
+      "oversight": "Interpellations and written questions to ministers, and how quickly they are answered.",
+      "rates": "Statistical rates (participation, alignment with the faction majority, agreement between factions).",
+      "other": "Party finance (ERJK), collective addresses (Rahvaalgatus.ee) and past election data."
     },
     "dataSource": "Data source",
-    "dataSourceBody": "Riigikogu Open Data API at ",
-    "dataSourceSuffix": " under CC BY-SA 3.0.",
+    "dataSourceBody": "The main source is the Riigikogu open data API at ",
+    "dataSourceSuffix": " under the CC BY-SA 3.0 licence.",
     "contact": "Contact",
-    "contactBody": "Errors, corrections, questions: "
+    "contactBody": "Errors, corrections, questions: ",
+    "dataSourceAll": "All sources, licences and update frequency: "
   },
   "methodology": {
     "index": {
@@ -1290,8 +1297,8 @@
         "note": "A high figure means the two factions' majorities happened to coincide, not that they agree ideologically — many overlaps are on procedural or uncontested motions."
       },
       "discipline": {
-        "heading": "MPs who break ranks",
-        "body": "For each MP we count how often they voted against their own faction's majority, out of all the votes where their faction had a clear position. A higher share means they broke ranks more often. MPs with very few such votes are left out so the ranking isn't based on one or two cases. If an MP switched factions during the term, the rate spans the whole term and is measured against whichever faction they were in at each vote, though the table shows them under their current one."
+        "heading": "Votes that differ from the faction majority",
+        "body": "For each MP we count how often their vote differed from their own faction's majority, out of all the votes where their faction had a clear position. A higher share means they voted differently from the majority more often. MPs with very few such votes are left out so the order isn't based on one or two cases. If an MP switched factions during the term, each vote is measured against the faction they were in at the time. Votes cast while the MP was in no faction are left out, since non-attached MPs have no common position. An MP who is currently non-attached is shown under the faction in which the counted votes were cast."
       },
       "attendance": {
         "heading": "Presence at checks",
@@ -1304,7 +1311,7 @@
       },
       "night": {
         "heading": "Votes outside working hours",
-        "body": "The share of recorded votes that happened outside normal working hours — before 8:00 in the morning or after 22:00 at night (Tallinn time). Presence checks are not counted, only actual votes."
+        "body": "The share of recorded votes held outside normal working hours: before 8:00, after 22:00 (Tallinn time) or at weekends. \"Late night\" means between 22:00 and 6:00. Presence checks are not counted, only actual votes."
       },
       "topics": {
         "heading": "What bills are about",
@@ -1312,7 +1319,7 @@
       },
       "scatter": {
         "heading": "Where each MP stands",
-        "body1": "Each MP gets two scores, each on a scale from −1 to +1. Left-to-right shows whether they more often side with the coalition (+1) or the opposition (−1). Bottom-to-top shows how closely they stick to their own faction: near the top they almost always vote with their group, near the bottom they almost always go their own way.",
+        "body1": "Each MP gets two scores, each on a scale from −1 to +1. Left to right: whether they more often vote the same way as the majority of the coalition factions (+1) or of the opposition factions (−1). Each vote is compared with the coalition of that day: in the XV Riigikogu the government was Reform, Eesti 200 and SDE until 11.03.2025, then Reform and Eesti 200. Bottom to top: how often they vote the same way as their own faction's majority: near the top almost always, near the bottom rarely.",
         "body2": "Points are nudged by a tiny, fixed amount so that MPs with identical scores don't sit exactly on top of one another and stay clickable. The actual numbers used elsewhere on the site are not nudged.",
         "note": "This is a simple two-way picture, not an ideological placement. Two MPs in the same spot voted similarly overall — they may still disagree on any single issue."
       },
@@ -1333,7 +1340,8 @@
         "item1": "Presence checks are left out of anything called a \"vote\" — they only record who was in the room, they don't decide legislation.",
         "item2": "Secret ballots publish no per-MP record, so they add nothing to any individual figure.",
         "item3": "When a faction is evenly split with no clear majority, that vote is dropped from agreement and alignment figures.",
-        "item4": "MPs on partial mandates — substitutes, ministers, those on leave — are left out of panels where counting them would be misleading (attendance, breaking ranks)."
+        "item4": "MPs on partial mandates (substitutes, ministers, those on leave) are left out of panels where counting them would be misleading (attendance, votes differing from the faction majority).",
+        "item5": "Votes an MP cast while in no faction are not compared with a \"faction majority\": non-attached MPs are not a faction and have no common position."
       },
       "period": {
         "heading": "Time period",
@@ -1342,6 +1350,31 @@
       "repro": {
         "heading": "Reproducibility",
         "body": "Every number on /analytics is the output of a single deterministic query over the ingested data — identical inputs always yield identical results. If two runs of the same panel return different numbers with unchanged data, that is a bug — please report it via"
+      },
+      "activity": {
+        "heading": "Most active MPs",
+        "body": "Speeches and questions in plenary sittings come from the Riigikogu stenogram data for the current term (since 10.04.2023) and include every speech, replies included. Interpellations and written questions are counted per MP from the Riigikogu document register. The data is refreshed weekly. The 15 MPs with the highest value of the chosen measure are shown.",
+        "note": "The numbers show the volume of activity, not its content or quality. Riigikogu's own statistics classify speeches differently (speeches, questions and procedural remarks separately), so its numbers can differ. Ministers and briefly seated substitutes inevitably have lower numbers."
+      },
+      "elections": {
+        "heading": "Personal votes in the election",
+        "body": "Every sitting MP by the number of personal votes received in the 2023 Riigikogu election, from State Electoral Office data. The mandate type shows how the seat was won: a personal mandate goes to a candidate whose personal votes exceed the district's simple quota; district mandates are allocated by the list's votes in the district, and compensation mandates nationwide by the parties' votes.",
+        "note": "Substitutes who did not win their seat through the election result are not shown. The number of personal votes also depends on the size of the district."
+      },
+      "finance": {
+        "heading": "Party finance",
+        "body": "Income of the parliamentary parties since 2023 as the parties declared it to the Political Parties Financing Surveillance Committee (ERJK), split by source: state support, donations, membership fees, loans and other income.",
+        "note": "Amounts are as declared in the reports. Loans are shown separately: they have to be repaid and are not income in the same sense as a donation or state support."
+      },
+      "latency": {
+        "heading": "How quickly ministers answer",
+        "body": "Interpellations and written questions to ministers in the current term, from the Riigikogu document register. For each question we compare the answer with the deadline recorded in the source. An answer is the registered written reply or, for an interpellation, the plenary sitting where the minister answered. For each minister we show the number of questions, the share answered on time, the median days to answer and the number of unanswered questions now past their deadline.",
+        "note": "Ministers with fewer than five questions are not shown and questions returned to their authors are left out. The deadline is the one the source recorded; we do not know of schedule changes that the register does not note."
+      },
+      "initiatives": {
+        "heading": "Collective addresses",
+        "body": "Every collective address sent to the Riigikogu through Rahvaalgatus.ee, from first draft to final decision. We count how many addresses reached each stage: signature collection, the 1,000-signature threshold (MSVS § 7¹), sending to the Riigikogu, decision, and being taken up as a bill or a matter of national importance. The median time is the number of days from sending to the Riigikogu to the decision.",
+        "note": "Gaps in the data are shown as they are: addresses that reached the threshold but were never sent, and addresses sent without meeting the threshold according to the data. The source gives no reasons and we do not guess."
       }
     }
   },

@@ -153,23 +153,23 @@
     "sourcePrefix": "Allikas",
     "hero": {
       "kicker": "Analüütika · Riigikogu peegel",
-      "titlePre": "Kes on ",
-      "titleEm": "tegelikult",
-      "titlePost": " kellega",
-      "lede": "Visualisatsioonid ainult avaandmete peal. Iga arv on jälgitav Riigikogu vormini. Ei arvamust, ei pingerida — ainult see, mida hääletused, kohalolekud ja eelnõud ise ütlevad.",
-      "toc1": "Partei × partei",
-      "toc2": "Kõrvalekalded fraktsioonist",
+      "titlePre": "Mida ",
+      "titleEm": "hääletused",
+      "titlePost": " näitavad",
+      "lede": "Joonised põhinevad ainult Riigikogu avaandmetel ja iga arv on jälgitav ametliku allikani. Arvamusi ega hinnanguid siin ei ole, ainult see, mida näitavad hääletused, kohalolek ja eelnõud. Kui loetelu on järjestatud, näitab järjekord ainult mõõdetud arvu suurust, mitte hinnangut.",
+      "toc1": "Fraktsioon × fraktsioon",
+      "toc2": "Fraktsiooni enamusest erinevad hääled",
       "toc3": "Eelnõude vool",
       "toc4": "Kohalolek",
       "toc5": "Millal hääletatakse",
       "toc6": "Millega tegeletakse",
       "toc7": "Menetluse kiirus",
       "toc8": "Poliitiline maastik",
-      "toc9": "Reaalne koostöö",
-      "toc10": "Öised hääled",
+      "toc9": "Ühiselt algatatud eelnõud",
+      "toc10": "Öised hääletused",
       "toc11": "Kõige aktiivsemad saadikud",
       "toc12": "Kes sai enim hääli",
-      "toc13": "Parteide rahastamine",
+      "toc13": "Erakondade rahastamine",
       "toc14": "Vastamise kiirus",
       "toc15": "Kollektiivsed pöördumised"
     },
@@ -186,7 +186,7 @@
         "titlePre": "Kes hääletab ",
         "titleEm": "erinevalt",
         "titlePost": " oma fraktsioonist",
-        "note": "Top-24 saadikut, kes on kõige sagedamini hääletanud vastupidiselt oma fraktsiooni selge enamuse valikule. Nimelised hääletused, kus fraktsioonil oli tegelik enamus."
+        "note": "24 saadikut, kelle hääl erines kõige sagedamini nende fraktsiooni selge enamuse valikust, järjestatud erinevate häälte osakaalu järgi. Arvesse lähevad nimelised hääletused, kus fraktsioonil oli selge enamus; hääli ajast, mil saadik fraktsiooni ei kuulunud, ei arvestata. Järjekord näitab ainult osakaalu suurust: erinev hääl ei ole iseenesest hea ega halb."
       },
       "flow": {
         "kicker": "Eelnõude teekond",
@@ -219,33 +219,33 @@
       "velocity": {
         "kicker": "Kiirus",
         "titlePre": "Kui kiiresti ",
-        "titleEm": "läheb läbi",
-        "titlePost": "",
-        "note": "Vastu võetud eelnõude jaotus initsiatiivist vastuvõtmiseni. Vasak = kiired (potentsiaalselt kiirustades), parem = venivad (potentsiaalselt tähtsad ja vaidlusega)."
+        "titleEm": "eelnõud",
+        "titlePost": " vastu võetakse",
+        "note": "Vastu võetud eelnõude jaotus algatamisest vastuvõtmiseni kulunud päevade järgi. Vasakul on kiiresti, paremal kaua menetletud eelnõud. Kiire menetlus võib viidata kiirustamisele ja pikk suuremale vaidlusele, kuid kiirus üksi seda ei tõenda: täpsema pildi annab eelnõu enda menetluskäik."
       },
       "scatter": {
         "kicker": "Poliitiline maastik",
         "titlePre": "Kus ",
         "titleEm": "iga saadik",
         "titlePost": " paikneb",
-        "note": "X-telg: kui palju saadik hääletab koalitsiooniga (+1) vs opositsiooniga (−1). Y-telg: kui lojaalne on oma fraktsioonile (+1) või dissident (−1). Väärtused arvutatud tegelikest hääletustest, mitte deklaratiivsest positsioonist. Liiga väheste võrreldavate hääletustega saadikud (nt äsja ametisse asunud asendajad) jäetakse kaardilt välja. Fraktsioonita saadikud ei ole kaardil, sest fraktsioonilojaalsust ei saa neile määratleda."
+        "note": "X-telg: kui sageli saadik hääletab samamoodi kui koalitsioonifraktsioonide enamus (+1) või opositsioonifraktsioonide enamus (−1). Iga hääletust võrreldakse sel päeval kehtinud koalitsiooniga (SDE kuulus valitsusse kuni 11.03.2025). Y-telg: kui sageli saadik hääletab samamoodi kui tema fraktsiooni enamus (+1 peaaegu alati, −1 harva). Väärtused on arvutatud tegelikest hääletustest. Liiga väheste võrreldavate hääletustega saadikud (nt äsja ametisse asunud asendusliikmed) ja fraktsiooni mittekuuluvad saadikud, kellel pole fraktsiooni enamust, millega võrrelda, jäävad kaardilt välja."
       },
       "cospons": {
-        "kicker": "Reaalne koostöö",
+        "kicker": "Ühiselt algatatud eelnõud",
         "titlePre": "Kes ",
         "titleEm": "koos algatab",
         "titlePost": "",
-        "note": "Iga must serv, mis lõikab läbi keskuse, on eelnõu, mis liitis erinevate parteide saadikud. Nähtavus üle parteijoonte, mis muidu jääks statistikas märkamatuks."
+        "note": "Iga must joon, mis läbib keskosa, tähistab eelnõu, mille algatasid koos eri erakondade saadikud. Nii on näha erakondadeülene koostöö, mis tavalises statistikas jääks märkamata."
       },
       "night": {
-        "kicker": "Öised hääled · järelevalve",
+        "kicker": "Öised hääletused",
         "titlePre": "Mida ",
         "titleEm": "öösel",
         "titlePost": " otsustatakse",
-        "note": "Riigikogu tavalised istungid toimuvad päeval. Nimelised hääletused enne 08:00 või pärast 22:00 — või nädalavahetusel — on siin loetletud, koos kellaaja, marginaali ja seotud eelnõuga. See ei tähenda automaatselt, et midagi on valesti, aga tasub vaadata."
+        "note": "Riigikogu tavalised istungid toimuvad päeval. Siin on loetletud nimelised hääletused enne kella 8 või pärast kella 22 ja nädalavahetusel, koos kellaaja, häältevahe ja seotud eelnõuga. Hiline kellaaeg ei tähenda iseenesest, et midagi oleks valesti: sageli venib nii pikk istung, näiteks kui eelnõu arutelu kestab kaua."
       },
       "activity": {
-        "kicker": "Kes teeb tööd",
+        "kicker": "Aktiivsus täiskogus",
         "titlePre": "Kõige ",
         "titleEm": "aktiivsemad",
         "titlePost": " saadikud",
@@ -260,10 +260,10 @@
       },
       "finance": {
         "kicker": "Raha poliitikas",
-        "titlePre": "Kuidas parteid on ",
-        "titleEm": "rahastatud",
+        "titlePre": "Kuidas erakondi ",
+        "titleEm": "rahastatakse",
         "titlePost": "",
-        "note": "Parlamendiparteide deklareeritud tulud alates 2023. aastast allikate kaupa, ERJK rahastamisregistrist. Enamikul on suurim osa riigitoetus, kuid mõned toetuvad tugevalt annetustele. Summad on aruandelised, eurodes."
+        "note": "Parlamendierakondade deklareeritud tulud alates 2023. aastast allikate kaupa, Erakondade Rahastamise Järelevalve Komisjoni (ERJK) registrist. Enamikul erakondadest on suurim tuluallikas riigitoetus, mõnel on aga annetusi rohkem kui riigitoetust (vt jaotust allpool). Summad on aruannetes deklareeritud, eurodes."
       },
       "latency": {
         "kicker": "Parlamentaarne järelevalve",
@@ -287,7 +287,7 @@
       "metricLabel": "Aktiivsuse mõõt",
       "interpellationsHint": "Ametlik nõue, millele minister peab istungil vastama, ja sellele järgnev arutelu.",
       "metric": {
-        "speeches": "Sõnavõtud",
+        "speeches": "Sõnavõtud stenogrammis",
         "questions": "Küsimused",
         "interpellations": "Arupärimised",
         "writtenQuestions": "Kirjalikud küsimused"
@@ -408,14 +408,14 @@
     "scatter": {
       "xRight": "KOALITSIOON →",
       "xLeft": "← OPOSITSIOON",
-      "yUp": "↑ PARTEILOJAALSUS",
-      "yDown": "↓ DISSIDENT",
-      "qOpLoy": "opositsiooni lojalist",
-      "qCoLoy": "koalitsiooni lojalist",
-      "qOpInd": "opositsiooni sõltumatu",
-      "qCoInd": "koalitsiooni sõltumatu",
+      "yUp": "↑ SAGELI FRAKTSIOONI ENAMUSEGA",
+      "yDown": "↓ SAGELI ENAMUSEST ERINEVALT",
+      "qOpLoy": "opositsioon, fraktsiooniga",
+      "qCoLoy": "koalitsioon, fraktsiooniga",
+      "qOpInd": "opositsioon, sageli erinevalt",
+      "qCoInd": "koalitsioon, sageli erinevalt",
       "tooltipVotes": "hääletust",
-      "tooltipDev": "kõrvalekallet fraktsioonist",
+      "tooltipDev": "fraktsiooni enamusest erinevat häält",
       "openProfile": "Ava {{name}} profiil →"
     },
     "cospons": {
@@ -423,7 +423,7 @@
       "bills_one": "{{count}} eelnõu",
       "bills_other": "{{count}} eelnõu",
       "tooltipBills": "eelnõu",
-      "note": "Sõlm = saadik (raadius = spondeeritud eelnõude arv). Serv = mitu korda saadikud olid ühise eelnõu algatajad. Musta ristfraktsiooni serv = alliansid üle parteipiiride."
+      "note": "Punkt on saadik (suurus näitab tema algatatud eelnõude arvu). Joon näitab, mitu korda kaks saadikut on koos eelnõu algatanud. Must joon ühendab eri fraktsioonide saadikuid."
     },
     "highlights": {
       "partyOfWeek": "Nädala partei",
@@ -459,8 +459,8 @@
       "overlap": "kattuvat häält"
     },
     "defectors": {
-      "title": "Fraktsioonidistsipliin selles hääletuses",
-      "subtitle": "Kes läks vastu oma fraktsiooni enamusele",
+      "title": "Fraktsioonide enamus selles hääletuses",
+      "subtitle": "Kes hääletas oma fraktsiooni enamusest erinevalt",
       "noDefectors": "Ükski fraktsioon ei näinud kõrvalekaldeid — kõik hääletasid oma rühma enamusega.",
       "majorityChose": "Enamus valis",
       "withMajority": "enamusega",
@@ -612,7 +612,7 @@
     "committees": "Komisjonid",
     "recentVotes": "Hiljutised hääletused",
     "recentBills": "Algatatud eelnõud",
-    "groupAlignment": "Rühmakuuluvus",
+    "groupAlignment": "Kokkulangevus fraktsiooni enamusega",
     "biography": "Elulugu"
   },
   "choice": {
@@ -801,20 +801,21 @@
     },
     "activity": {
       "title": "Aktiivsus parlamendis",
-      "speeches": "Sõnavõtud",
+      "speeches": "Sõnavõtud stenogrammis",
       "questions": "Esitatud küsimused",
       "interpellations": "Arupärimised",
       "interpellationsHint": "Ametlik nõue, millele minister peab istungil vastama, ja sellele järgnev arutelu.",
       "writtenQuestions": "Kirjalikud küsimused",
       "source": "Riigikogu lehel",
-      "allSpeeches": "Kõik sõnavõtud otsinguga"
+      "allSpeeches": "Kõik sõnavõtud otsinguga",
+      "note": "Sõnavõtud ja küsimused on Riigikogu stenogrammide andmetest jooksva koosseisu kohta ja hõlmavad kõiki sõnavõtte täiskogu istungitel, ka repliike. Riigikogu statistika liigitab sõnavõtte teisiti, seega võivad seal olevad arvud erineda."
     },
     "bio": {
       "title": "Haridus ja karjäär",
       "lede": "Kus saadik on õppinud ja millistel avalikel ametikohtadel ta on olnud.",
       "education": "Haridus",
       "positions": "Peetud ametid",
-      "source": "Allikas: Wikidata (CC0). Nimetused eesti keeles."
+      "source": "Allikas: Wikidata (CC0). Nimetused eesti keeles; ametite nimetused on Wikidata praegused nimetused ja võivad erineda sellest, kuidas ametit tol ajal nimetati."
     },
     "declaration": {
       "title": "Huvide deklaratsioon",
@@ -825,7 +826,9 @@
     "recentDeviations": "Hiljutised kõrvalekalded",
     "mpChoice": "Saadik",
     "factionChoice": "Fraktsioon",
-    "currentMandateFrom": "Praeguses koosseisus alates {{date}}"
+    "currentMandateFrom": "Praeguses koosseisus alates {{date}}",
+    "groupAlignmentNonAttached": "Fraktsiooni mittekuuluvatel saadikutel ei ole ühist fraktsiooni seisukohta, millega nende hääletusi võrrelda. Seetõttu seda näitajat ei arvutata.",
+    "groupAlignmentPastFaction": "Saadik ei kuulu praegu ühtegi fraktsiooni. Arvesse on võetud ainult hääletused ajast, mil ta kuulus fraktsiooni."
   },
   "votes": {
     "title": "Hiljutised hääletused",
@@ -1183,24 +1186,28 @@
     "serverError": "Serveril oli raskusi vastamisega. Värskenda minuti pärast; kui probleem püsib, teata."
   },
   "about": {
-    "title": "Riigiluup'st",
-    "intro": "Riigiluup on avalik, avatud lähtekoodiga tööriist, mis muudab Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi enda avaandmed — saadikud, nimelised hääletused ja eelnõud — ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Kaetud on praegune Riigikogu koosseis (2023–2027) ning nimelised hääletused alates 2023. aasta aprillist; iga näitaja viitab ametlikule Riigikogu allikale.",
+    "title": "Riigiluubist",
+    "intro": "Riigiluup on avalik ja avatud lähtekoodiga tööriist, mis teeb Eesti Riigikogu töö jälgimise lihtsamaks. See koondab parlamendi avaandmed ning esitab need neutraalsete profiilide, ajajoonte, võrdluste ja analüütikana. Põhiosas on praegune, XV Riigikogu koosseis (2023–2027): saadikud, nimelised hääletused alates aprillist 2023, täiskogu stenogrammid, arupärimised ja kirjalikud küsimused ministritele. Lisaks on eelnõud alates 1992. aastast, varasemate valimiste andmed, erakondade rahastamine ja kollektiivsed pöördumised. Iga näitaja viitab ametlikule allikale.",
     "editorial": "Toimetuse hoiak",
-    "editorialBody": "Teenus ei omista ideoloogilisi silte, moraalseid hindeid ega edetabeleid — see on peegel, mitte tõlgendaja. See esitab faktilisi arve ja suhtarve ning jätab järeldused teile. Kui näitajat võib valesti mõista, kirjeldame valemit, mis on arvestatud, mis välja jäetud ja teadaolevad piirangud; arvu ei esitata kunagi hea ega halvana — üksnes kirjeldatakse ja lingitakse, et saaksite selle Riigikogu algvormiga võrrelda.",
+    "editorialBody": "Teenus ei omista ideoloogilisi silte ega moraalseid hindeid: see on peegel, mitte tõlgendaja. See esitab faktilisi arve ja osakaale ning jätab järeldused teile. Kui loetelu on järjestatud, näitab järjekord ainult mõõdetud arvu suurust, mitte hinnangut. Kui näitajat võib valesti mõista, kirjeldame valemit, mida arvestatakse, mis jääb välja ja millised on teadaolevad piirangud. Arvu ei esitata hea ega halvana, see ainult kirjeldatakse ja lingitakse, et saaksite seda ametliku allikaga võrrelda.",
     "funding": "Sõltumatus ja rahastus",
     "fundingBody": "Riigiluubi on loonud ja seda haldab üks inimene — asutaja — oma isiklike vahendite ja ajaga. Projekti taga ei ole ühtki erakonda, ettevõtet, granti ega huvirühma. Tegu on kodanikualgatusega, mitte äri- ega poliitilise projektiga. Kui rahastusmudel peaks kunagi muutuma, uuendame seda osa.",
     "whatPublic": "Mis on siin avalik",
     "list": {
-      "members": "Saadikute profiilid, fraktsioon, komisjonid, valimisringkond.",
+      "members": "Saadikute profiilid, fraktsioon ja selle muutused, komisjonid, valimisringkond ja valimistulemused.",
       "votes": "Nimelised hääletused ja kohaloleku kontrollid.",
-      "bills": "Eelnõud, nende etapid, algatajad ja Eurovoci teemasildid.",
-      "rates": "Statistilised näitajad (osalus, rühmakuuluvus, paariviisiline kokkulangevus)."
+      "bills": "Eelnõud alates 1992. aastast, nende menetluse etapid, algatajad, muudatusettepanekud ja Eurovoci teemad.",
+      "speeches": "Täiskogu stenogrammid, seotud arutatava eelnõuga.",
+      "oversight": "Arupärimised ja kirjalikud küsimused ministritele ning vastamise kiirus.",
+      "rates": "Statistilised näitajad (osalus, kokkulangevus fraktsiooni enamusega, fraktsioonide kokkulangevus).",
+      "other": "Erakondade rahastamine (ERJK), kollektiivsed pöördumised (Rahvaalgatus.ee) ja varasemate valimiste andmed."
     },
     "dataSource": "Andmeallikas",
-    "dataSourceBody": "Riigikogu avaandmete API aadressil ",
+    "dataSourceBody": "Peamine allikas on Riigikogu avaandmete API aadressil ",
     "dataSourceSuffix": " litsentsi CC BY-SA 3.0 alusel.",
     "contact": "Kontakt",
-    "contactBody": "Vead, parandused, küsimused: "
+    "contactBody": "Vead, parandused, küsimused: ",
+    "dataSourceAll": "Kõik allikad, litsentsid ja uuendamise sagedus: "
   },
   "methodology": {
     "index": {
@@ -1290,8 +1297,8 @@
         "note": "Kõrge näitaja tähendab, et kahe fraktsiooni enamused sattusid kokku, mitte et nad on ideoloogiliselt ühel meelel — paljud kokkulangevused on protseduurilistel või vaidlusteta hääletustel."
       },
       "discipline": {
-        "heading": "Saadikud, kes lähevad fraktsioonist lahku",
-        "body": "Iga saadiku puhul loeme, kui sageli ta hääletas oma fraktsiooni enamuse vastu — kõigist hääletustest, kus tema fraktsioonil oli selge seisukoht. Mida suurem osakaal, seda sagedamini ta läks omadele vastu. Saadikud, kellel on väga vähe selliseid hääletusi, jäetakse välja, et edetabel ei põhineks ühel-kahel juhtumil. Kui saadik on ametiaja jooksul fraktsiooni vahetanud, hõlmab määr kogu ametiaega ja on iga hääletuse puhul arvutatud tema tollase fraktsiooni suhtes, ehkki tabelis kuvatakse ta praeguse fraktsiooni all."
+        "heading": "Fraktsiooni enamusest erinevad hääled",
+        "body": "Iga saadiku puhul loeme, kui sageli tema hääl erines tema fraktsiooni enamuse valikust, kõigist hääletustest, kus fraktsioonil oli selge seisukoht. Mida suurem osakaal, seda sagedamini hääletas ta enamusest erinevalt. Saadikud, kellel on selliseid hääletusi väga vähe, jäetakse välja, et järjestus ei põhineks ühel-kahel juhtumil. Kui saadik on koosseisu jooksul fraktsiooni vahetanud, arvestatakse iga hääletust tema tollase fraktsiooni suhtes. Hääli ajast, mil saadik ei kuulunud ühtegi fraktsiooni, ei arvestata, sest fraktsiooni mittekuuluvatel saadikutel pole ühist seisukohta. Kui saadik praegu fraktsiooni ei kuulu, näidatakse teda tabelis selle fraktsiooni all, mille liikmena ta arvestatud hääled andis."
       },
       "attendance": {
         "heading": "Kohalolek kontrollidel",
@@ -1304,7 +1311,7 @@
       },
       "night": {
         "heading": "Hääletused väljaspool tööaega",
-        "body": "Nende arvestatud hääletuste osakaal, mis toimusid väljaspool tavalist tööaega — enne kella 8:00 hommikul või pärast 22:00 (Tallinna aeg). Kohaloleku kontrolle ei loeta, ainult tegelikke hääletusi."
+        "body": "Nende arvestatud hääletuste osakaal, mis toimusid väljaspool tavalist tööaega: enne kella 8 hommikul, pärast kella 22 õhtul (Tallinna aeg) või nädalavahetusel. „Süvaöised“ on hääletused kella 22 ja 6 vahel. Kohaloleku kontrolle ei loeta, ainult tegelikke hääletusi."
       },
       "topics": {
         "heading": "Millest eelnõud räägivad",
@@ -1312,7 +1319,7 @@
       },
       "scatter": {
         "heading": "Kus iga saadik asub",
-        "body1": "Iga saadik saab kaks skoori, kumbki skaalal −1 kuni +1. Vasakult paremale näitab, kas ta pooldab pigem koalitsiooni (+1) või opositsiooni (−1). Alt üles näitab, kui tihedalt ta hoiab oma fraktsiooni: ülal hääletab ta peaaegu alati oma rühmaga, all läheb peaaegu alati oma teed.",
+        "body1": "Iga saadik saab kaks skoori, kumbki skaalal −1 kuni +1. Vasakult paremale näitab, kas ta hääletab sagedamini samamoodi kui koalitsioonifraktsioonide enamus (+1) või opositsioonifraktsioonide enamus (−1). Iga hääletust võrreldakse sel päeval kehtinud koalitsiooniga: XV Riigikogus kuulusid valitsusse Reformierakond, Eesti 200 ja SDE kuni 11.03.2025, pärast seda Reformierakond ja Eesti 200. Alt üles näitab, kui sageli ta hääletab samamoodi kui tema oma fraktsiooni enamus: ülal peaaegu alati, all harva.",
         "body2": "Punkte nihutatakse pisikese fikseeritud summa võrra, et identsete skooridega saadikud ei istuks täpselt üksteise peal ja jääksid klõpsatavaks. Mujal saidil kasutatavad tegelikud arvud on nihketa.",
         "note": "See on lihtne kahemõõtmeline pilt, mitte ideoloogiline paigutus. Kaks saadikut samas kohas hääletasid üldiselt sarnaselt — nad võivad ikkagi ühes konkreetses küsimuses eri arvamust olla."
       },
@@ -1333,7 +1340,8 @@
         "item1": "Kohaloleku kontrollid on välja jäetud kõigest, mida nimetatakse \"hääletuseks\" — need vaid registreerivad, kes oli saalis, ega otsusta seaduste üle.",
         "item2": "Salajased hääletused ei avalda saadiku-põhiseid kirjeid, seega ei lisa nad ühelegi isiklikule näitajale midagi.",
         "item3": "Kui fraktsioon on võrdselt jagunenud ja selget enamust pole, jäetakse see hääletus kokkulangevuse ja ühtelangevuse näitajatest välja.",
-        "item4": "Osalise mandaadiga saadikud — asendajad, ministrid, puhkusel olijad — jäetakse välja paneelidelt, kus nende arvestamine oleks eksitav (kohalolek, fraktsioonist lahkuminek)."
+        "item4": "Osalise mandaadiga saadikud (asendusliikmed, ministrid, puhkusel olijad) jäetakse välja paneelidelt, kus nende arvestamine oleks eksitav (kohalolek, fraktsiooni enamusest erinevad hääled).",
+        "item5": "Hääli, mille saadik andis ajal, mil ta ei kuulunud ühtegi fraktsiooni, ei võrrelda „fraktsiooni enamusega“: fraktsiooni mittekuuluvad saadikud ei ole fraktsioon ja neil pole ühist seisukohta."
       },
       "period": {
         "heading": "Ajavahemik",
@@ -1342,6 +1350,31 @@
       "repro": {
         "heading": "Reprodutseeritavus",
         "body": "Iga arv lehel /analytics on ühe deterministliku päringu väljund: samad sisendandmed annavad alati sama tulemuse. Kui sama paneeli kaks käivitust muutumata andmetel annavad erinevad arvud, on see viga — palun teata sellest kaudu"
+      },
+      "activity": {
+        "heading": "Kõige aktiivsemad saadikud",
+        "body": "Sõnavõtud ja küsimused täiskogu istungitel pärinevad Riigikogu stenogrammide andmetest jooksva koosseisu kohta (alates 10.04.2023) ja hõlmavad kõiki sõnavõtte, ka repliike. Arupärimiste ja kirjalike küsimuste arv on Riigikogu dokumendiregistrist iga saadiku kohta. Andmeid uuendatakse kord nädalas. Näidatakse 15 saadikut valitud mõõdiku järgi.",
+        "note": "Arvud näitavad aktiivsuse mahtu, mitte sisu ega kvaliteeti. Riigikogu enda statistika liigitab sõnavõtte teisiti (eraldi sõnavõtud, küsimused ja protseduurilised märkused), seega võivad arvud seal erineda. Ministrid ja lühikest aega ametis olnud asendusliikmed saavad paratamatult väiksemad arvud."
+      },
+      "elections": {
+        "heading": "Isiklikud hääled valimistel",
+        "body": "Iga praegune saadik 2023. aasta Riigikogu valimistel saadud isiklike häälte arvu järgi, Riigi Valimisteenistuse andmetest. Mandaadi liik näitab, kuidas koht saadi: isikumandaadi saab kandidaat, kelle isiklike häälte arv ületab ringkonna lihtkvoodi; ringkonnamandaadid jagatakse nimekirja ringkonnas saadud häälte alusel ja kompensatsioonimandaadid üleriigiliselt erakondade häälte alusel.",
+        "note": "Asendusliikmeid, kes ei saanud kohta valimistulemuse põhjal, ei näidata. Isiklike häälte arv sõltub ka ringkonna suurusest."
+      },
+      "finance": {
+        "heading": "Erakondade rahastamine",
+        "body": "Parlamendierakondade tulud alates 2023. aastast nii, nagu erakonnad need Erakondade Rahastamise Järelevalve Komisjonile (ERJK) deklareerisid, jagatuna allikate järgi: riigitoetus, annetused, liikmemaksud, laenud ja muu tulu.",
+        "note": "Summad on aruannetes deklareeritud kujul. Laenud on näidatud eraldi: need tuleb tagasi maksta ega ole tulu samas mõttes kui annetus või riigitoetus."
+      },
+      "latency": {
+        "heading": "Kui kiiresti ministrid vastavad",
+        "body": "Jooksva koosseisu arupärimised ja kirjalikud küsimused ministritele Riigikogu dokumendiregistrist. Iga küsimuse puhul võrdleme vastust allikas registreeritud vastamistähtajaga. Vastuseks loeme registreeritud kirjaliku vastuse või, arupärimise puhul, täiskogu istungi, kus minister vastas. Näitame iga ministri kohta küsimuste arvu, tähtaegselt vastatute osakaalu, vastamise mediaanaega päevades ja praegu tähtaja ületanud vastamata küsimuste arvu.",
+        "note": "Alla viie küsimusega ministreid ei näidata ning esitajatele tagastatud küsimused jäetakse välja. Tähtaeg on see, mille allikas on registreerinud; ajakava muutusi, millest registris märget pole, me ei tea."
+      },
+      "initiatives": {
+        "heading": "Kollektiivsed pöördumised",
+        "body": "Iga Rahvaalgatus.ee kaudu Riigikogule suunatud kollektiivne pöördumine, esimesest kavandist lõpliku otsuseni. Loeme, mitu pöördumist jõudis igasse etappi: allkirjade kogumine, 1000 allkirja lävend (MSVS § 7¹), Riigikogule saatmine, otsus ja menetlusse võtmine eelnõuna või olulise tähtsusega riikliku küsimusena. Mediaanaeg näitab, mitu päeva kulus Riigikogusse saatmisest otsuseni.",
+        "note": "Andmestiku lüngad on näidatud sellisena, nagu need on: pöördumised, mis kogusid lävendi, kuid mida ei saadetud, ja pöördumised, mis saadeti ilma andmete järgi lävendit täitmata. Allikas ei selgita nende põhjusi ja me ei oleta."
       }
     }
   },
