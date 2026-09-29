@@ -33,13 +33,13 @@ dependencies {
     // bucket4j starter removed 2026-07-13 — 0.12.x SPI required a specific cache-backend module
     // that never resolved cleanly with our Caffeine setup. Replaced by com.riigiluup.api.RateLimitFilter
     // (60 lines, Caffeine window, per-IP).
-    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.16.0")
     // Sanitizes Riigikogu biography HTML at ingest — it is rendered raw on the profile page.
-    implementation("org.jsoup:jsoup:1.18.3")
+    implementation("org.jsoup:jsoup:1.23.2")
     // CSV with multi-line quoted values (rahvaalgatus title / parliament_committees).
     // Version managed by the Spring Boot BOM; Jackson is already on the classpath.
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
@@ -47,15 +47,15 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("org.mapstruct:mapstruct:1.6.2")
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.2")
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
-    testImplementation("org.wiremock:wiremock-standalone:3.9.1")
+    testImplementation("org.wiremock:wiremock-standalone:3.13.2")
     testImplementation("org.assertj:assertj-core")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
