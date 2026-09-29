@@ -23,17 +23,17 @@
 
 For every member of parliament you can see:
 
-- 🗳️ **How they voted** — every roll-call vote, including the times they broke with their own faction; close and late-night votes are flagged
+- 🗳️ **How they voted** — every roll-call vote, including votes that differed from their faction's majority; close and late-night votes are marked
 - 📜 **What they proposed** — bills sponsored and where each one sits in the legislative pipeline, with amendments and links to the acts they became
 - 🎤 **What they said** — full-text searchable plenary speeches (100k+ and counting), linked to the bill under debate
 - 🏛️ **Where they sit** — committees, factions, party-membership history, plus friendship groups and delegations
 - 🗺️ **Where they ran** — full electoral history (Riigikogu since 1992, plus recent European and local elections) with personal-vote results
-- ✉️ **How ministers answer them** — written questions and interpellations, with each minister's response time measured against the legal deadline (who answers, who stalls)
+- ✉️ **How ministers answer them** — written questions and interpellations, with each minister's response time measured against the deadline recorded by the source
 - 🌍 **How widely they are known** — linked Wikidata item and Wikipedia reach (article languages + 90-day pageviews)
 - 💶 **Who funds their party** — political-party financing from the ERJK register
 - ⚖️ **Side-by-side comparison** — pick any two MPs and compare their voting records directly
 
-Plus an analytics section: voting similarity between MPs, faction discipline and deviations, attendance patterns, ministerial response latency, topic breakdowns, co-sponsorship networks, legislative velocity, the citizens' initiative funnel, and more. Everything is available in **Estonian, English, and Russian**.
+Plus an analytics section: voting similarity between MPs, votes that differ from the faction majority, attendance patterns, ministerial response latency, topic breakdowns, co-sponsorship networks, legislative velocity, the citizens' initiative funnel, and more. Everything is available in **Estonian, English, and Russian**.
 
 No accounts, no tracking, no paywall — just public data presented honestly. Where numbers are shown, they link back to the underlying votes so you can check the work, and every derived metric has a stated methodology.
 
@@ -48,7 +48,7 @@ No accounts, no tracking, no paywall — just public data presented honestly. Wh
 | valimised.ee + [M. Mölder dataset](https://www.eestipoliitika.ee) | Election results, and historical candidate / electoral history from 1992 onward |
 | ERJK | Party-financing reports |
 
-Importers are polite by design: requests to the parliament API are throttled to ~1 rps, raw payloads are snapshotted with change-detection, and every import run is journaled.
+Importers are polite by design: requests to the parliament API are throttled to one every 1.6 s, raw payloads are snapshotted with change-detection, and every import run is journaled.
 
 ---
 
@@ -116,8 +116,8 @@ MPs and factions appear within minutes; the full history of votes and speeches t
 ```bash
 ./gradlew test              # fast unit suite (no Docker needed)
 ./gradlew integrationTest   # @Tag("integration") against a real Postgres 16 (Testcontainers)
-cd frontend && npx tsc --noEmit && npm run build && npx eslint src
-cd frontend && npx playwright test   # e2e smoke suite
+cd frontend && npm ci && npx tsc --noEmit && npx eslint src && npm run build
+cd frontend && npx playwright test   # e2e smoke suite, needs the dev stack running (not yet in CI)
 ```
 
 HTTP clients are tested against WireMock; repositories against a real Postgres via Testcontainers (a pre-started database can be injected with `RIIGILUUP_IT_JDBC_URL` — see `backend/build.gradle.kts` for the Windows escape hatch).
@@ -141,7 +141,7 @@ GOOGLE_OAUTH_CLIENT_SECRET=<from Google Cloud Console>
 RIIGILUUP_ADMIN_ALLOWED_EMAILS=you@example.com
 ```
 
-Then `docker compose -f docker-compose.prod.yml up -d`. A site-wide private-beta gate (nginx basic auth + `noindex`) is available for pre-launch testing.
+Then `docker compose -f docker-compose.prod.yml up -d`. The full production runbook (first deploy, routine deploys, nginx changes, backups) is in [`deploy/DEPLOY.md`](deploy/DEPLOY.md).
 
 Serving extras handled at the edge: a dynamically generated `/sitemap.xml` (per-entity URLs), per-entity social-preview cards for crawlers, and `Organization` + `WebSite` JSON-LD. Operations are watched by a container health check (`/healthz`), a Docker autoheal sidecar, an external uptime monitor, and Telegram alerts on failed refreshes or a full disk.
 
@@ -151,8 +151,12 @@ Serving extras handled at the edge: a dynamically generated `/sitemap.xml` (per-
 backend/    Spring Boot API — importers, domain, analytics, admin
 frontend/   React SPA — pages, components, i18n (et/en/ru)
 deploy/     production compose, nginx, TLS & backup scripts, alerts
-.github/    CI: unit + integration tests, frontend build, bundle report
+.github/    CI: unit + integration tests, frontend build, bundle report; CodeQL; Dependabot
 ```
+
+## Reporting a vulnerability
+
+Please do not open a public issue for a security problem. Use GitHub's private **"Report a vulnerability"** button on the repository's Security tab, or write to riigiluup@gmail.com. You will get an answer within a week.
 
 ## Contributing
 
@@ -161,6 +165,6 @@ Issues and pull requests are welcome. The short version: keep the fast test suit
 ## Licence
 
 - **Code** — [European Union Public Licence v1.2 (EUPL-1.2)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12), a copyleft licence with network coverage, available in all official EU languages. See [`LICENSE`](LICENSE).
-- **Data** — Parliamentary data © Riigikogu, republished under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Historical electoral data © Martin Mölder ([eestipoliitika.ee](https://www.eestipoliitika.ee), collected with support from the Postimees Foundation grant POST36), used with permission and attribution.
+- **Data** — Parliamentary data © Riigikogu, republished under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Historical electoral data © Martin Mölder ([eestipoliitika.ee](https://www.eestipoliitika.ee), collected with support from the Postimees Foundation grant POST36), used with permission and attribution. That dataset (`backend/src/main/resources/election/rk_history_1992_2019.csv`) is **not** covered by the EUPL; see [`NOTICE`](NOTICE).
 
 This project displays and aggregates public data with attribution; verify anything important against the primary sources linked throughout the UI.

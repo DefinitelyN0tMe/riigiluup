@@ -39,11 +39,8 @@ systemctl enable --now fail2ban
 # 5. Prepare deploy dir
 mkdir -p /opt/riigiluup/backups
 
-# 6. Substitute the domain into nginx conf. The repo layout keeps it under deploy/nginx/.
-NGINX_CONF="$(dirname "$0")/../nginx/riigiluup.conf"
-if [ -f "$NGINX_CONF" ]; then
-  sed -i "s/RIIGILUUP_DOMAIN/${DOMAIN}/g" "$NGINX_CONF"
-fi
+# 6. (The nginx config names the production host directly; for another domain, edit
+#    deploy/nginx/riigiluup.conf by hand. Nothing to substitute here any more.)
 
 # 7. Scheduled backups + weekly cert renewal + weekly Docker build-cache prune (idempotent —
 #    drop any prior line, then re-add). The prune keeps `docker compose --build` deploys from
@@ -63,6 +60,6 @@ cp /opt/riigiluup/deploy/logrotate/riigiluup /etc/logrotate.d/riigiluup 2>/dev/n
   || echo "  (logrotate config not installed — copy deploy/logrotate/riigiluup to /etc/logrotate.d/ manually)"
 
 echo "Server ready. Next steps:"
-echo "  1. Fill /opt/riigiluup/.env with production secrets."
-echo "  2. Bring the stack up:  cd /opt/riigiluup && docker compose -f docker-compose.prod.yml up -d"
-echo "  3. Issue a certificate:  bash scripts/issue-cert.sh $DOMAIN admin@example.com"
+echo "  1. Fill /opt/riigiluup/deploy/.env with production secrets (cp deploy/.env.production.example deploy/.env)."
+echo "  2. Issue a certificate:  cd /opt/riigiluup/deploy && bash scripts/issue-cert.sh $DOMAIN you@example.com"
+echo "  3. Bring the stack up:  cd /opt/riigiluup/deploy && docker compose -f docker-compose.prod.yml up -d --build"

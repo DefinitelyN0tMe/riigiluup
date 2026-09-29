@@ -111,8 +111,8 @@ services:
         condition: service_started
 
   # Privacy-first analytics (no cookies, no personal data, self-hosted). Reuses the
-  # existing Postgres (separate `umami` database) and is served on its own origin,
-  # analytics.<domain>, via nginx (the prebuilt image only serves from the root path).
+  # existing Postgres (separate `umami` database). Internal only: the edge nginx exposes just the
+  # tracker (/stats.js) and its beacon (/api/send); the dashboard is read via the admin panel.
   umami:
     # Pinned by digest (postgresql-latest as of 2026-08-17) for reproducibility; a floating tag
     # could silently swap in a breaking version on redeploy. Bump deliberately when upgrading.
@@ -133,7 +133,7 @@ services:
         condition: service_healthy
 
   nginx:
-    image: nginx:1.27-alpine
+    image: nginx:1.28-alpine
     restart: unless-stopped
     logging:
       driver: json-file

@@ -1,6 +1,8 @@
 # Monthly dependency + base-image update PRs so security fixes surface on a site that runs
-# unattended for months, without flooding a solo maintainer. Each ecosystem is grouped into a
-# single PR (all update types) to keep noise minimal; security updates are always raised.
+# unattended for months, without flooding a solo maintainer. Each ecosystem gets ONE grouped PR of
+# minor and patch updates only: mixing a major (e.g. Spring Boot 4, Vite 8) into the same PR made
+# every group PR fail and nothing could be merged. Majors are ignored here and upgraded by hand,
+# with the full test suite. Security updates are raised separately regardless.
 version: 2
 updates:
   - package-ecosystem: "npm"
@@ -10,7 +12,10 @@ updates:
     open-pull-requests-limit: 5
     groups:
       frontend:
-        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "gradle"
     directory: "/backend"
@@ -19,7 +24,10 @@ updates:
     open-pull-requests-limit: 5
     groups:
       backend:
-        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -37,7 +45,10 @@ updates:
     open-pull-requests-limit: 5
     groups:
       docker-backend:
-        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "docker"
     directory: "/frontend"
@@ -46,4 +57,20 @@ updates:
     open-pull-requests-limit: 5
     groups:
       docker-frontend:
-        patterns: ["*"]
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Images pinned in the production compose file (edge nginx, postgres, umami, certbot, autoheal).
+  - package-ecosystem: "docker-compose"
+    directory: "/deploy"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      docker-compose:
+        update-types: ["minor", "patch"]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

@@ -1,0 +1,17 @@
+Riigiluup
+Copyright (c) 2026 Maksim Jatmanov
+
+The source code of this project is licensed under the European Union Public Licence v1.2
+(EUPL-1.2), see LICENSE.
+
+The following files are NOT covered by the EUPL and keep their own terms:
+
+- backend/src/main/resources/election/rk_history_1992_2019.csv
+  Historical Riigikogu candidacy and election data 1992-2019, compiled by Martin Mölder
+  (eestipoliitika.ee), collected with support from the Postimees Foundation grant POST36.
+  Used and redistributed here with the author's permission, with attribution. Ask the author
+  before reusing it outside this project.
+
+- Parliamentary data fetched at runtime from api.riigikogu.ee is (c) Riigikogu and published under
+  CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/). Data the site derives from it is
+  shared under the same licence.

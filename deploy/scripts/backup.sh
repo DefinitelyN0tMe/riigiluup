@@ -35,6 +35,19 @@ fi
 # for real disaster recovery — retention here shares the DB's disk.
 ls -1t ./backups/riigiluup-*.dump 2>/dev/null | tail -n +15 | xargs -r rm -f
 
+# Umami's database (visit history, not re-derivable from any source). Best-effort: a failure here
+# is reported but does not fail the main backup. Superuser POSTGRES_USER can dump it.
+UMAMI_OUT="./backups/umami-${STAMP}.dump"
+if docker compose -f docker-compose.prod.yml exec -T db psql -U "${POSTGRES_USER:?}" -d "${POSTGRES_DB:?}" -tAc \
+     "select 1 from pg_database where datname='umami'" 2>/dev/null | grep -q 1; then
+  if ! docker compose -f docker-compose.prod.yml exec -T db \
+       pg_dump -U "${POSTGRES_USER:?}" -d umami -Fc > "${UMAMI_OUT}"; then
+    rm -f "${UMAMI_OUT}"
+    ./scripts/tg-notify.sh "🟠 RiigiLuup: Umami pg_dump failed ($(date -u +%FT%TZ)); main backup is fine."
+  fi
+  ls -1t ./backups/umami-*.dump 2>/dev/null | tail -n +15 | xargs -r rm -f
+fi
+
 # Dead-man ping on success (optional): if HEALTHCHECK_BACKUP_URL is set, a missing ping alerts you
 # that the backup cron didn't run at all — the one thing Telegram-on-failure can't tell you.
 [ -n "${HEALTHCHECK_BACKUP_URL:-}" ] && curl -fsS --max-time 10 "${HEALTHCHECK_BACKUP_URL}" >/dev/null 2>&1 || true

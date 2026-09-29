@@ -1,8 +1,8 @@
 plugins {
     java
     jacoco
-    id("org.springframework.boot") version "3.3.13"
-    id("io.spring.dependency-management") version "1.1.6"
+    id("org.springframework.boot") version "3.5.16"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 jacoco { toolVersion = "0.8.12" }
@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0")
+    implementation("io.github.resilience4j:resilience4j-spring-boot3:2.4.0")
     // bucket4j starter removed 2026-07-13 — 0.12.x SPI required a specific cache-backend module
     // that never resolved cleanly with our Caffeine setup. Replaced by com.riigiluup.api.RateLimitFilter
     // (60 lines, Caffeine window, per-IP).
@@ -37,11 +37,11 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
-    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.7.7")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.16.0")
     // Sanitizes Riigikogu biography HTML at ingest — it is rendered raw on the profile page.
     implementation("org.jsoup:jsoup:1.18.3")
-    // CSV с многострочными полями внутри значений (rahvaalgatus title / parliament_committees).
-    // Версия управляется Spring Boot BOM — Jackson уже в проекте транзитивно.
+    // CSV with multi-line quoted values (rahvaalgatus title / parliament_committees).
+    // Version managed by the Spring Boot BOM; Jackson is already on the classpath.
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv")
 
     compileOnly("org.projectlombok:lombok")
