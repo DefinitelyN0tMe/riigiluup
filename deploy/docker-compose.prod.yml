@@ -25,7 +25,7 @@ services:
   # backend image) before api starts, so the persistent disk photo cache can actually be written.
   # Idempotent — runs on every `up`, so fresh deploys work without a manual chown.
   files-cache-init:
-    image: alpine:3.20
+    image: alpine:3.24
     command: sh -c "chown -R 100:101 /cache"
     restart: "no"
     volumes:
@@ -133,7 +133,7 @@ services:
         condition: service_healthy
 
   nginx:
-    image: nginx:1.28-alpine
+    image: nginx:1.29-alpine
     restart: unless-stopped
     logging:
       driver: json-file
