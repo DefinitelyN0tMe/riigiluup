@@ -6,7 +6,7 @@ import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ApiError } from "./api/client";
 import "./styles.css";
-import "./i18n";
+import { i18nReady } from "./i18n";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
   }
 });
 
-createRoot(document.getElementById("root")!).render(
+void i18nReady.finally(() => createRoot(document.getElementById("root")!).render(
   <StrictMode>
     {/* Outermost boundary: catches render errors outside Layout's inner boundary
         (chrome, providers). Nested boundaries are fine — the closest one wins. */}
@@ -41,4 +41,4 @@ createRoot(document.getElementById("root")!).render(
       </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>
-);
+));

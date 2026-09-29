@@ -6,6 +6,7 @@ import com.riigiluup.person.PlenaryMemberRepository;
 import com.riigiluup.vote.VoteEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,50 +68,79 @@ public class OgShellController {
     private volatile long cachedAt;
 
     @GetMapping(value = "/politicians/{slug}", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String politician(@PathVariable String slug) {
+    public ResponseEntity<String> politician(@PathVariable String slug) {
         String path = "/politicians/" + slug;
-        return rendered(path, () -> {
+        var member = memberRepo.findBySlug(slug);
+        if (member.isEmpty()) return notFound(path);
+        return ResponseEntity.ok(rendered(path, () -> {
             var dto = profileApi.get(slug).getBody();
             return dto == null ? null : CrawlerContent.politician(dto);
-        }, () -> memberRepo.findBySlug(slug)
-                .map(m -> shell(m.getFullName(),
-                        m.getFactionName() != null ? m.getFactionName() : "Riigikogu liige", path))
-                .orElseGet(() -> shell(null, null, path)));
+        }, () -> shell(member.get().getFullName(),
+                member.get().getFactionName() != null ? member.get().getFactionName() : "Riigikogu liige", path)));
     }
 
     @GetMapping(value = "/votes/{id}", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String vote(@PathVariable UUID id) {
+    public ResponseEntity<String> vote(@PathVariable String id) {
         String path = "/votes/" + id;
-        return rendered(path, () -> {
-            var dto = voteApi.detail(id).getBody();
+        UUID uuid = parseUuid(id);
+        if (uuid == null) return notFound(path);
+        var vote = voteRepo.findById(uuid);
+        if (vote.isEmpty()) return notFound(path);
+        return ResponseEntity.ok(rendered(path, () -> {
+            var dto = voteApi.detail(uuid).getBody();
             return dto == null ? null : CrawlerContent.vote(dto);
-        }, () -> voteRepo.findById(id)
-                .map(v -> shell(v.getDescription(), "Nimeline hääletus Riigikogus", path))
-                .orElseGet(() -> shell(null, null, path)));
+        }, () -> shell(vote.get().getDescription(), "Nimeline hääletus Riigikogus", path)));
     }
 
     @GetMapping(value = "/legislation/{id}", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String legislation(@PathVariable UUID id) {
+    public ResponseEntity<String> legislation(@PathVariable String id) {
         String path = "/legislation/" + id;
-        return rendered(path, () -> {
-            var dto = legislationApi.detail(id).getBody();
+        UUID uuid = parseUuid(id);
+        if (uuid == null) return notFound(path);
+        var item = itemRepo.findById(uuid);
+        if (item.isEmpty()) return notFound(path);
+        return ResponseEntity.ok(rendered(path, () -> {
+            var dto = legislationApi.detail(uuid).getBody();
             return dto == null ? null : CrawlerContent.legislation(dto);
-        }, () -> itemRepo.findById(id)
-                .map(i -> shell(i.getTitle(), "Eelnõu menetlus Riigikogus", path))
-                .orElseGet(() -> shell(null, null, path)));
+        }, () -> shell(item.get().getTitle(), "Eelnõu menetlus Riigikogus", path)));
     }
 
     @GetMapping(value = "/initiatives/{id}", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String initiative(@PathVariable Long id) {
+    public ResponseEntity<String> initiative(@PathVariable String id) {
         String path = "/initiatives/" + id;
-        return rendered(path, () -> initiativeRepo.findById(id).map(CrawlerContent::initiative).orElse(null),
-                () -> shell(null, null, path));
+        Long num;
+        try {
+            num = Long.valueOf(id);
+        } catch (NumberFormatException e) {
+            return notFound(path);
+        }
+        var initiative = initiativeRepo.findById(num);
+        if (initiative.isEmpty()) return notFound(path);
+        return ResponseEntity.ok(rendered(path, () -> CrawlerContent.initiative(initiative.get()),
+                () -> shell(null, null, path)));
     }
 
+    /**
+     * An id that does not exist (or is malformed) is a real 404 with noindex, not a 200 generic
+     * shell: otherwise every mistyped or stale link is indexed as a duplicate of the home page. The
+     * body is still the SPA, so a browser that ends up here renders the site's own "not found" page.
+     */
+    private ResponseEntity<String> notFound(String path) {
+        String html = shell("Lehte ei leitud", "Seda lehte Riigiluubis ei ole.", path);
+        html = html.replaceFirst("(?i)<link rel=\"canonical\"[^>]*>", "");
+        if (html.contains("</head>")) {
+            html = html.replace("</head>", "  <meta name=\"robots\" content=\"noindex\" />\n  </head>");
+        }
+        return ResponseEntity.status(404).contentType(org.springframework.http.MediaType.TEXT_HTML).body(html);
+    }
+
+    private static UUID parseUuid(String s) {
+        try {
+            return UUID.fromString(s);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 
     // ---------------------------------------------------------------- hub pages (crawlers only, via nginx)
 
@@ -175,19 +205,21 @@ public class OgShellController {
     }
 
     @GetMapping(value = "/committees/{externalId}", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String committee(@PathVariable String externalId) {
+    public ResponseEntity<String> committee(@PathVariable String externalId) {
         String path = "/committees/" + externalId;
-        return rendered(path, () -> committeeService.detail(externalId).map(CrawlerContent::committee).orElse(null),
-                () -> shell(null, null, path));
+        var detail = committeeService.detail(externalId);
+        if (detail.isEmpty()) return notFound(path);
+        return ResponseEntity.ok(rendered(path, () -> CrawlerContent.committee(detail.get()),
+                () -> shell(null, null, path)));
     }
 
     @GetMapping(value = "/groups/{externalId}", produces = "text/html;charset=UTF-8")
-    @ResponseBody
-    public String group(@PathVariable String externalId) {
+    public ResponseEntity<String> group(@PathVariable String externalId) {
         String path = "/groups/" + externalId;
-        return rendered(path, () -> groupService.detail(externalId).map(CrawlerContent::group).orElse(null),
-                () -> shell(null, null, path));
+        var detail = groupService.detail(externalId);
+        if (detail.isEmpty()) return notFound(path);
+        return ResponseEntity.ok(rendered(path, () -> CrawlerContent.group(detail.get()),
+                () -> shell(null, null, path)));
     }
 
     private List<CrawlerContent.BillLink> recentBills() {

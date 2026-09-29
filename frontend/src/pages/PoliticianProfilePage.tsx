@@ -19,6 +19,8 @@ import SimilarPeers from "../components/analytics/SimilarPeers";
 import { fetchMpTopicRadar, fetchMpDeviationsTimeline, fetchMpSimilarPeers } from "../api/analytics";
 import { formatDate } from "../lib/formatDate";
 import { formatPercent, formatCompact } from "../lib/formatNumber";
+import { useEntityTitle } from "../lib/useEntityTitle";
+import EntityLoadError from "../components/EntityLoadError";
 
 function pct(v: number | null): string {
   if (v == null) return "—";
@@ -388,9 +390,10 @@ export default function PoliticianProfilePage() {
     queryFn: () => fetchProfile(slug!),
     enabled: !!slug,
   });
+  useEntityTitle(data?.fullName);
 
   if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
-  if (error) return <LoadFailed error={error} className="text-red-600" />;
+  if (error) return <EntityLoadError error={error} backTo="/politicians" backLabel={t("nav.mps")} />;
   if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
 
   return (

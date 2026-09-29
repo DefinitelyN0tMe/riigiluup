@@ -6,6 +6,13 @@ export function resolveMediaUrl(path: string | null | undefined): string | undef
   return `${BASE}${path}`;
 }
 
+/** A small (96 px) version of a proxied portrait, for avatars shown at 44 px or so. */
+export function thumbMediaUrl(path: string | null | undefined): string | undefined {
+  const url = resolveMediaUrl(path);
+  if (!url || !url.includes("/api/v1/files/")) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}w=96`;
+}
+
 /**
  * Structured API error. UIs can inspect {@link status} and use {@link i18nKey}
  * to render a translated message instead of the raw HTTP text.

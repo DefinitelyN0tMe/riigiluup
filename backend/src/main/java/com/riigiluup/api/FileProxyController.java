@@ -63,8 +63,16 @@ public class FileProxyController {
         this(loader, id -> true);
     }
 
+    /** Only these thumbnail widths are served, so the resize cache cannot be flooded with sizes. */
+    private static final java.util.Set<Integer> THUMB_WIDTHS = java.util.Set.of(96, 192);
+
+    /** Resized portraits (a list page shows 50+ photos at 44 px; the originals are 270 px). */
+    private final com.github.benmanes.caffeine.cache.Cache<String, byte[]> thumbs =
+            com.github.benmanes.caffeine.cache.Caffeine.newBuilder().maximumSize(600).build();
+
     @GetMapping("/{uuid}")
-    public ResponseEntity<byte[]> download(@PathVariable String uuid) {
+    public ResponseEntity<byte[]> download(@PathVariable String uuid,
+                                           @org.springframework.web.bind.annotation.RequestParam(required = false) Integer w) {
         // Reject junk keys up front — no loader/cache/upstream involvement at all.
         if (!isValidUuid(uuid)) return ResponseEntity.badRequest().build();
         if (!knownId.test(uuid)) return ResponseEntity.notFound().build();
@@ -83,10 +91,43 @@ public class FileProxyController {
             log.warn("file proxy failed for {}: {}", uuid, e.toString());
             return ResponseEntity.status(502).build();
         }
+        if (w != null && THUMB_WIDTHS.contains(w)) {
+            byte[] original = bytes;
+            bytes = thumbs.get(uuid + "@" + w, k -> thumbnail(original, w));
+        }
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePublic())
                 .body(bytes);
+    }
+
+    /**
+     * Downscale a portrait to {@code width} px (aspect kept) as JPEG. Any failure (an unreadable
+     * image, a missing imaging codec) falls back to the original bytes: a thumbnail is an
+     * optimisation, never a reason to show no photo.
+     */
+    static byte[] thumbnail(byte[] original, int width) {
+        try {
+            java.awt.image.BufferedImage src = javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(original));
+            if (src == null || src.getWidth() <= width) return original;
+            int height = Math.max(1, Math.round(src.getHeight() * (width / (float) src.getWidth())));
+            java.awt.image.BufferedImage dst = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            java.awt.Graphics2D g = dst.createGraphics();
+            try {
+                g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                g.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+                g.drawImage(src, 0, 0, width, height, java.awt.Color.WHITE, null);
+            } finally {
+                g.dispose();
+            }
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            if (!javax.imageio.ImageIO.write(dst, "jpg", out)) return original;
+            byte[] result = out.toByteArray();
+            return result.length > 0 && result.length < original.length ? result : original;
+        } catch (Exception | Error e) {
+            log.debug("thumbnail failed, serving original: {}", e.toString());
+            return original;
+        }
     }
 
     static boolean isValidUuid(String s) {

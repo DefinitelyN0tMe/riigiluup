@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Suspense, lazy, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import Layout from "./components/Layout";
@@ -62,6 +62,18 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = i18n.resolvedLanguage ?? "en";
   }, [i18n.resolvedLanguage]);
+
+  // Keep a non-default language in the address across in-app navigation (links do not carry
+  // ?lng=), so whatever URL a reader copies or shares opens in the language they are reading.
+  const navigate = useNavigate();
+  useEffect(() => {
+    const lang = i18n.resolvedLanguage;
+    if (!lang || lang === "et") return;
+    const params = new URLSearchParams(location.search);
+    if (params.get("lng") === lang) return;
+    params.set("lng", lang);
+    navigate({ pathname: location.pathname, search: `?${params.toString()}`, hash: location.hash }, { replace: true });
+  }, [location.pathname, location.search, location.hash, i18n.resolvedLanguage, navigate]);
 
   // Per-route, per-locale document title. index.html <title> stays as the fallback.
   useEffect(() => {

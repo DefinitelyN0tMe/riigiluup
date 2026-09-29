@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Politician } from "../types";
-import { resolveMediaUrl } from "../api/client";
+import { thumbMediaUrl } from "../api/client";
 import { partyColor } from "../lib/partyColors";
 import { factionShortName } from "../lib/factionName";
 
@@ -18,7 +18,7 @@ export default function PoliticianCard({
 }) {
   const { t } = useTranslation();
   const initials = `${p.firstName?.[0] ?? ""}${p.lastName?.[0] ?? ""}`.toUpperCase();
-  const photoSrc = resolveMediaUrl(p.photoUrl);
+  const photoSrc = thumbMediaUrl(p.photoUrl);
   const color = partyColor(p.factionName);
   const canToggle = onToggleCompare && (!compareDisabled || compareActive);
   return (

@@ -26,7 +26,7 @@ class FileProxyControllerTest {
         FileProxyController controller = new FileProxyController(loader);
 
         for (String junk : new String[]{"not-a-uuid", "../../etc/passwd", "12345", "", "zzzzzzzz-e89b-12d3-a456-426614174000"}) {
-            ResponseEntity<byte[]> res = controller.download(junk);
+            ResponseEntity<byte[]> res = controller.download(junk, null);
             assertThat(res.getStatusCode().value()).isEqualTo(400);
         }
         verifyNoInteractions(loader);
@@ -45,7 +45,7 @@ class FileProxyControllerTest {
         when(loader.load(VALID_UUID)).thenThrow(new FileProxyController.UpstreamBusyException());
         FileProxyController controller = new FileProxyController(loader);
 
-        ResponseEntity<byte[]> res = controller.download(VALID_UUID);
+        ResponseEntity<byte[]> res = controller.download(VALID_UUID, null);
         assertThat(res.getStatusCode().value()).isEqualTo(503);
         assertThat(res.getHeaders().getFirst("Retry-After")).isEqualTo("5");
     }
@@ -85,7 +85,7 @@ class FileProxyControllerTest {
         FileProxyController.Loader loader = mock(FileProxyController.Loader.class);
         when(loader.load(VALID_UUID)).thenThrow(new FileProxyController.EmptyUpstreamException());
         FileProxyController controller = new FileProxyController(loader);
-        assertThat(controller.download(VALID_UUID).getStatusCode().value()).isEqualTo(404);
+        assertThat(controller.download(VALID_UUID, null).getStatusCode().value()).isEqualTo(404);
     }
 
     /**
@@ -122,7 +122,23 @@ class FileProxyControllerTest {
     void unknown_file_id_is_404_without_any_upstream_call() {
         FileProxyController.Loader loader = mock(FileProxyController.Loader.class);
         FileProxyController controller = new FileProxyController(loader, id -> false);
-        assertThat(controller.download(VALID_UUID).getStatusCode().value()).isEqualTo(404);
+        assertThat(controller.download(VALID_UUID, null).getStatusCode().value()).isEqualTo(404);
         verifyNoInteractions(loader);
+    }
+
+    @Test
+    void thumbnail_downscales_and_keeps_aspect_and_falls_back_on_garbage() throws Exception {
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(270, 360, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        java.util.Random rnd = new java.util.Random(1);
+        for (int x = 0; x < 270; x++) for (int y = 0; y < 360; y++) img.setRGB(x, y, rnd.nextInt());
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(img, "jpg", out);
+        byte[] original = out.toByteArray();
+        byte[] thumb = FileProxyController.thumbnail(original, 96);
+        java.awt.image.BufferedImage t = javax.imageio.ImageIO.read(new java.io.ByteArrayInputStream(thumb));
+        assertThat(t.getWidth()).isEqualTo(96);
+        assertThat(t.getHeight()).isEqualTo(128);
+        byte[] junk = new byte[]{1, 2, 3};
+        assertThat(FileProxyController.thumbnail(junk, 96)).isSameAs(junk);
     }
 }

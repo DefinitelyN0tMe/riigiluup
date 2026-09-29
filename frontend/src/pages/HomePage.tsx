@@ -6,7 +6,7 @@ import { fetchPoliticians, fetchDataStatus, fetchFactions } from "../api/politic
 import { fetchVotes } from "../api/votes";
 import { fetchLegislation } from "../api/legislation";
 import { fetchHomeSummary } from "../api/home";
-import { resolveMediaUrl } from "../api/client";
+import { thumbMediaUrl } from "../api/client";
 import { formatDateTime } from "../lib/formatDate";
 import { voteTally } from "../lib/voteTally";
 import Sparkline from "../components/Sparkline";
@@ -281,7 +281,7 @@ function MpFeatureCard({ p }: { p: Politician | null }) {
 
 function MpMiniCard({ p, invert = false }: { p: Politician; invert?: boolean }) {
   const { t } = useTranslation();
-  const photoSrc = resolveMediaUrl(p.photoUrl);
+  const photoSrc = thumbMediaUrl(p.photoUrl);
   const color = partyColor(p.factionName);
   const partyShort = (p.factionName ? factionShortName(p.factionName) : "—").slice(0, 22);
   return (

@@ -4,10 +4,11 @@ import { useTranslation } from "react-i18next";
 import { fetchVoteDetail } from "../api/votes";
 import { formatDecimal } from "../lib/formatNumber";
 import VoteResultBar from "../components/VoteResultBar";
-import LoadFailed from "../components/LoadFailed";
 import VoteDefectorsPanel from "../components/analytics/VoteDefectorsPanel";
 import { formatDateTime } from "../lib/formatDate";
 import { voteTally } from "../lib/voteTally";
+import { useEntityTitle } from "../lib/useEntityTitle";
+import EntityLoadError from "../components/EntityLoadError";
 
 const CHOICE_CLASS: Record<string, string> = {
   FOR: "text-estonia",
@@ -27,9 +28,10 @@ export default function VoteDetailPage() {
     queryFn: () => fetchVoteDetail(id!),
     enabled: !!id,
   });
+  useEntityTitle(data ? [data.linkedBill?.title, data.description].filter(Boolean).join(": ") : undefined);
 
   if (isLoading) return <p className="text-slate-500" role="status">{t("common.loading")}</p>;
-  if (error) return <LoadFailed error={error} className="text-red-600" />;
+  if (error) return <EntityLoadError error={error} backTo="/votes" backLabel={t("nav.votes")} />;
   if (!data) return <p className="text-slate-500" role="status">{t("common.notFound")}</p>;
 
   const when = formatDateTime(data.startedAt);

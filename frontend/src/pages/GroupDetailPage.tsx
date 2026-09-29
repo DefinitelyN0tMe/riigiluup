@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { fetchGroup } from "../api/groups";
 import LoadFailed from "../components/LoadFailed";
+import { useEntityTitle } from "../lib/useEntityTitle";
 
 export default function GroupDetailPage() {
   const { t } = useTranslation();
@@ -12,6 +13,7 @@ export default function GroupDetailPage() {
     queryFn: () => fetchGroup(externalId as string),
     enabled: !!externalId,
   });
+  useEntityTitle(data?.name);
 
   return (
     <div className="max-w-[860px] mx-auto px-5 sm:px-8 py-8 sm:py-10">

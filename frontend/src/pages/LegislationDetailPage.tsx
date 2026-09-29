@@ -5,9 +5,10 @@ import { fetchLegislationDetail } from "../api/legislation";
 import { fetchSpeeches } from "../api/speeches";
 import { fetchInitiativesByBill } from "../api/initiatives";
 import StageTimeline from "../components/StageTimeline";
-import LoadFailed from "../components/LoadFailed";
 import TopicChip from "../components/TopicChip";
 import { formatDate } from "../lib/formatDate";
+import { useEntityTitle } from "../lib/useEntityTitle";
+import EntityLoadError from "../components/EntityLoadError";
 
 export default function LegislationDetailPage() {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ export default function LegislationDetailPage() {
     queryFn: () => fetchLegislationDetail(id!),
     enabled: !!id,
   });
+  useEntityTitle(data?.title);
   const initiativesQuery = useQuery({
     queryKey: ["legislation-initiatives", id],
     queryFn: () => fetchInitiativesByBill(id!),
@@ -31,7 +33,7 @@ export default function LegislationDetailPage() {
   const containerCls = "space-y-6 max-w-[1000px] mx-auto w-full px-5 sm:px-8 md:px-10 py-8 sm:py-12";
 
   if (isLoading) return <div className={containerCls}><p className="text-slate-500" role="status">{t("common.loading")}</p></div>;
-  if (error) return <div className={containerCls}><LoadFailed error={error} className="text-red-600" /></div>;
+  if (error) return <EntityLoadError error={error} backTo="/legislation" backLabel={t("nav.bills")} />;
   if (!data) return <div className={containerCls}><p className="text-slate-500" role="status">{t("common.notFound")}</p></div>;
 
   const phaseLabel = t(`phase.${data.phase}` as const, { defaultValue: data.phase });

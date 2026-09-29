@@ -158,7 +158,9 @@ export default function Layout() {
       </div>
 
       {/* Main */}
-      <main id="main" tabIndex={-1} className="flex-1 outline-none">
+      {/* min-h keeps the footer below the fold while a page is still loading, so it is not pushed
+          down once content arrives (was a 0.84 layout shift on MP profiles). */}
+      <main id="main" tabIndex={-1} className="flex-1 outline-none min-h-[80vh]">
         <ErrorBoundary key={location.pathname}>
           <Outlet />
         </ErrorBoundary>

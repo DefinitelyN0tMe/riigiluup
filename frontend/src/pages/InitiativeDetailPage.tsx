@@ -6,6 +6,7 @@ import { fetchInitiative } from "../api/initiatives";
 import { ApiError } from "../api/client";
 import { useLoadErrorMessage } from "../lib/useLoadErrorMessage";
 import { formatDate } from "../lib/formatDate";
+import { useEntityTitle } from "../lib/useEntityTitle";
 
 const NO_DATA_DEFAULT = "No data from the source";
 
@@ -64,6 +65,7 @@ export default function InitiativeDetailPage() {
     queryFn: () => fetchInitiative(id!),
     enabled: !!id,
   });
+  useEntityTitle(data?.title);
   const loadErrorMessage = useLoadErrorMessage(error);
 
   const containerCls = "max-w-[820px] mx-auto px-5 sm:px-8 py-10 sm:py-14";

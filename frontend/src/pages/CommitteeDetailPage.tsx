@@ -5,6 +5,7 @@ import { fetchCommittee } from "../api/committees";
 import { ApiError } from "../api/client";
 import { useLoadErrorMessage } from "../lib/useLoadErrorMessage";
 import { formatDate } from "../lib/formatDate";
+import { useEntityTitle } from "../lib/useEntityTitle";
 
 export default function CommitteeDetailPage() {
   const { t } = useTranslation();
@@ -14,6 +15,7 @@ export default function CommitteeDetailPage() {
     queryFn: () => fetchCommittee(externalId!),
     enabled: !!externalId,
   });
+  useEntityTitle(data?.name);
   const loadErrorMessage = useLoadErrorMessage(error);
 
   const containerCls = "max-w-[900px] mx-auto px-5 sm:px-8 py-10 sm:py-14";
