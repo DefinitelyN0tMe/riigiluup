@@ -733,6 +733,83 @@ final class CrawlerContent {
         }
     }
 
+    /**
+     * A static text page (about, methodology, sources...) for crawlers, rendered from the same
+     * Estonian UI dictionary (et.json) the page itself shows, so the two can never drift apart.
+     * Keys ending in title/heading become headings, every other string a paragraph, in dictionary
+     * order; nested groups are walked depth-first. Pure UI chrome keys are skipped.
+     */
+    static Page textPage(String title, String description, com.fasterxml.jackson.databind.JsonNode node) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>").append(esc(title)).append("</h1>");
+        appendText(b, node, true);
+        b.append("</article>");
+        return new Page(title + " — Riigiluup", description, wrap(b), null);
+    }
+
+    private static final java.util.Set<String> SKIP_KEYS = java.util.Set.of(
+            "title", "kicker", "noteLabel", "col", "empty", "tableCaption", "mailSubject", "button");
+
+    private static void appendText(StringBuilder b, com.fasterxml.jackson.databind.JsonNode node, boolean top) {
+        var fields = node.fields();
+        while (fields.hasNext()) {
+            var e = fields.next();
+            String key = e.getKey();
+            var v = e.getValue();
+            if (top && SKIP_KEYS.contains(key)) continue;
+            if (v.isObject()) {
+                appendText(b, v, false);
+            } else if (v.isTextual()) {
+                String text = v.asText().trim();
+                if (text.length() < 3 || text.contains("{{")) continue;
+                String k = key.toLowerCase(Locale.ROOT);
+                if (k.endsWith("title") || k.endsWith("heading")) {
+                    b.append("<h2>").append(esc(text)).append("</h2>");
+                } else {
+                    b.append("<p>").append(esc(text)).append("</p>");
+                }
+            }
+        }
+    }
+
+    static Page committeesList(List<com.riigiluup.committee.CommitteeDto.ListItem> items) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Riigikogu komisjonid</h1><p>Riigikogu alatised ja ")
+                .append("erikomisjonid: liikmed ja juhtivkomisjonina menetletud eelnõud.</p><ul>");
+        for (var c : items) {
+            b.append("<li><a href=\"").append(esc(SITE + "/committees/" + c.externalId())).append("\">")
+             .append(esc(c.name())).append("</a>: ").append(c.memberCount()).append(" liiget, ")
+             .append(c.ledBillCount()).append(" juhitud eelnõu</li>");
+        }
+        b.append("</ul></article><section lang=\"en\"><p>Standing and special committees of the Estonian parliament ")
+         .append("(Riigikogu), with members and the bills each leads.</p></section>");
+        return new Page("Komisjonid — Riigiluup", "Riigikogu komisjonid: liikmed ja juhitavad eelnõud.", wrap(b), null);
+    }
+
+    static Page groupsList(List<com.riigiluup.group.GroupDirectoryDto.ListItem> items) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Parlamendirühmad, toetusrühmad ja delegatsioonid</h1>")
+                .append("<p>Riigikogu liikmete sõprusrühmad, toetusrühmad ja rahvusvahelised delegatsioonid ning nende liikmed.</p><ul>");
+        for (var g : items) {
+            b.append("<li><a href=\"").append(esc(SITE + "/groups/" + g.externalId())).append("\">")
+             .append(esc(g.name())).append("</a> (").append(g.memberCount()).append(" liiget)</li>");
+        }
+        b.append("</ul></article><section lang=\"en\"><p>Friendship groups, support groups and international delegations ")
+         .append("of members of the Estonian parliament (Riigikogu).</p></section>");
+        return new Page("Rühmad — Riigiluup", "Riigikogu parlamendirühmad, toetusrühmad ja delegatsioonid.", wrap(b), null);
+    }
+
+    static Page initiativesList(List<Initiative> items) {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Kollektiivsed pöördumised</h1>")
+                .append("<p>Rahvaalgatus.ee kaudu Riigikogule suunatud kollektiivsed pöördumised: allkirjad, menetlus ja otsus. ")
+                .append("Allpool on viimati avaldatud pöördumised.</p><ul>");
+        for (Initiative i : items) {
+            b.append("<li><a href=\"").append(esc(SITE + "/initiatives/" + i.getId())).append("\">")
+             .append(esc(i.getTitle() != null ? i.getTitle() : "Pöördumine")).append("</a>")
+             .append(i.getSignatureCount() != null ? " (" + i.getSignatureCount() + " allkirja)" : "").append("</li>");
+        }
+        b.append("</ul></article><section lang=\"en\"><p>Collective addresses to the Estonian parliament (Riigikogu) ")
+         .append("submitted through Rahvaalgatus.ee: signatures, proceedings and decision.</p></section>");
+        return new Page("Pöördumised — Riigiluup", "Riigikogule suunatud kollektiivsed pöördumised ja nende menetlus.", wrap(b), null);
+    }
+
     private static String roleEt(String role) {
         if (role == null) return null;
         return switch (role) {

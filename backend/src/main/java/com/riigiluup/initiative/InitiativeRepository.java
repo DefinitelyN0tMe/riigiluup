@@ -10,6 +10,10 @@ import java.util.UUID;
 
 public interface InitiativeRepository extends JpaRepository<Initiative, Long> {
 
+    /** Newest initiatives, for the crawler-readable /initiatives list. */
+    java.util.List<Initiative> findTop100ByPublishedAtIsNotNullOrderByPublishedAtDesc();
+
+
     /** All initiative ids for the sitemap. */
     @org.springframework.data.jpa.repository.Query("select i.id from Initiative i")
     java.util.List<Long> findAllIdsForSitemap();

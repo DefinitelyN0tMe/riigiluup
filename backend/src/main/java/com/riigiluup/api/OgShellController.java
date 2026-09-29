@@ -204,6 +204,93 @@ public class OgShellController {
         }
     }
 
+    // ---------------------------------------------------------------- static text pages + lists
+
+    /** Static page path -> dictionary subtree (frontend src/i18n/locales/et.json). */
+    private static final java.util.Map<String, String> TEXT_PAGES = java.util.Map.ofEntries(
+            java.util.Map.entry("/about", "about"),
+            java.util.Map.entry("/sources", "sources"),
+            java.util.Map.entry("/data-status", "dataStatus"),
+            java.util.Map.entry("/corrections", "corrections"),
+            java.util.Map.entry("/privacy", "privacy"),
+            java.util.Map.entry("/terms", "terms"),
+            java.util.Map.entry("/methodology", "methodology.index"),
+            java.util.Map.entry("/methodology/participation", "methodology.participation"),
+            java.util.Map.entry("/methodology/alignment", "methodology.alignment"),
+            java.util.Map.entry("/methodology/agreement", "methodology.agreement"),
+            java.util.Map.entry("/methodology/analytics", "methodology.analytics"));
+
+    @GetMapping(value = {"/about", "/sources", "/data-status", "/corrections", "/privacy", "/terms", "/methodology"},
+            produces = "text/html;charset=UTF-8")
+    public ResponseEntity<String> textPage(jakarta.servlet.http.HttpServletRequest request) {
+        return textPageFor(request.getRequestURI());
+    }
+
+    @GetMapping(value = "/methodology/{sub}", produces = "text/html;charset=UTF-8")
+    public ResponseEntity<String> methodologySub(@PathVariable String sub) {
+        return textPageFor("/methodology/" + sub);
+    }
+
+    private ResponseEntity<String> textPageFor(String path) {
+        String keyPath = TEXT_PAGES.get(path);
+        if (keyPath == null) return notFound(path);
+        return ResponseEntity.ok(rendered(path, () -> {
+            com.fasterxml.jackson.databind.JsonNode node = dictionary();
+            if (node == null) return null;
+            for (String k : keyPath.split("\\.")) node = node.path(k);
+            if (!node.isObject()) return null;
+            String title = node.path("title").asText(null);
+            if (title == null || title.isBlank()) title = "Riigiluup";
+            String intro = node.path("intro").asText("");
+            String desc = intro.length() > 160 ? intro.substring(0, 157) + "…" : intro;
+            return CrawlerContent.textPage(title, desc.isBlank() ? title : desc, node);
+        }, () -> shell(null, null, path)));
+    }
+
+    @GetMapping(value = "/committees", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String committeesList() {
+        return rendered("/committees", () -> CrawlerContent.committeesList(committeeService.list()),
+                () -> shell(null, null, "/committees"));
+    }
+
+    @GetMapping(value = "/groups", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String groupsList() {
+        return rendered("/groups", () -> CrawlerContent.groupsList(groupService.list()),
+                () -> shell(null, null, "/groups"));
+    }
+
+    @GetMapping(value = "/initiatives", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String initiativesList() {
+        return rendered("/initiatives",
+                () -> CrawlerContent.initiativesList(initiativeRepo.findTop100ByPublishedAtIsNotNullOrderByPublishedAtDesc()),
+                () -> shell(null, null, "/initiatives"));
+    }
+
+    private final com.fasterxml.jackson.databind.ObjectMapper json = new com.fasterxml.jackson.databind.ObjectMapper();
+    private volatile com.fasterxml.jackson.databind.JsonNode cachedDictionary;
+    private volatile long dictionaryAt;
+
+    /** The Estonian UI dictionary the web container serves at /i18n/et.json, cached 10 min. */
+    private com.fasterxml.jackson.databind.JsonNode dictionary() {
+        long now = System.currentTimeMillis();
+        var c = cachedDictionary;
+        if (c != null && now - dictionaryAt < 600_000L) return c;
+        try {
+            byte[] bytes = web.get().uri("http://web:80/i18n/et.json").retrieve().body(byte[].class);
+            if (bytes != null) {
+                cachedDictionary = json.readTree(new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
+                dictionaryAt = now;
+                return cachedDictionary;
+            }
+        } catch (Exception e) {
+            log.warn("og-shell: dictionary fetch failed: {}", e.getMessage());
+        }
+        return c;
+    }
+
     @GetMapping(value = "/committees/{externalId}", produces = "text/html;charset=UTF-8")
     public ResponseEntity<String> committee(@PathVariable String externalId) {
         String path = "/committees/" + externalId;

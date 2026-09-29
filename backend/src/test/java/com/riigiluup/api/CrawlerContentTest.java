@@ -152,4 +152,21 @@ class CrawlerContentTest {
                 .doesNotContain("ei hääletanud").doesNotContain("Nimeline hääletus");
         assertThat(p.title()).isEqualTo("Kohaloleku kontroll 28.09.2026 — Riigiluup");
     }
+
+    @Test
+    void textPageRendersDictionaryInOrderAndSkipsPlaceholders() throws Exception {
+        var node = new com.fasterxml.jackson.databind.ObjectMapper().readTree("""
+                {"title":"Riigiluubist","intro":"Riigiluup on <avalik> tööriist.","editorial":"Toimetuse hoiak",
+                 "list":{"members":"Saadikute profiilid.","count":"{{count}} saadikut"},
+                 "wikidata":{"title":"Wikidata","what":"Erakondlik kuuluvus."}}
+                """);
+        CrawlerContent.Page p = CrawlerContent.textPage("Riigiluubist", "Kirjeldus", node);
+        assertThat(p.title()).isEqualTo("Riigiluubist — Riigiluup");
+        assertThat(p.bodyHtml())
+                .contains("<h1>Riigiluubist</h1><p>Riigiluup on &lt;avalik&gt; tööriist.</p><p>Toimetuse hoiak</p>")
+                .contains("<p>Saadikute profiilid.</p>")
+                .contains("<h2>Wikidata</h2><p>Erakondlik kuuluvus.</p>")
+                .doesNotContain("{{count}}")
+                .doesNotContain("<avalik>");
+    }
 }
