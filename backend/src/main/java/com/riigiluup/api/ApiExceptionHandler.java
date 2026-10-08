@@ -109,6 +109,16 @@ public class ApiExceptionHandler {
         throw ex;
     }
 
+    /**
+     * The visitor closed the tab or navigated away before the response was written ("Broken pipe").
+     * Not a server fault and nothing can be sent back, so log it quietly instead of as an ERROR
+     * that hides real failures.
+     */
+    @ExceptionHandler(org.springframework.web.context.request.async.AsyncRequestNotUsableException.class)
+    public void clientGone(Exception ex, HttpServletRequest req) {
+        log.debug("client disconnected during {}: {}", req.getRequestURI(), ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> internalError(Exception ex, HttpServletRequest req) {
         // Spring MVC exceptions (405, 406, 415, …) carry their own status — keep it instead
