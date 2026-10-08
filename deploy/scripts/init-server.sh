@@ -47,7 +47,7 @@ mkdir -p /opt/riigiluup/backups
 #    accumulating unbounded build cache that fills the root disk (it grew to 21 GB / 84% once).
 CRON_BACKUP="5 4 * * * cd /opt/riigiluup/deploy && ./scripts/backup.sh >> /var/log/riigiluup-backup.log 2>&1"
 CRON_RENEW="0 3 * * 1 cd /opt/riigiluup/deploy && ./scripts/renew-cert.sh >> /var/log/riigiluup-cert.log 2>&1"
-CRON_PRUNE="30 4 * * 0 docker builder prune -af --filter until=168h >> /var/log/riigiluup-prune.log 2>&1"
+CRON_PRUNE="50 3 * * * docker builder prune -af --filter until=72h >> /var/log/riigiluup-prune.log 2>&1"
 CRON_DISK="0 */6 * * * /opt/riigiluup/deploy/scripts/disk-alert.sh 85 >> /var/log/riigiluup-disk.log 2>&1"
 # `|| true`: grep -Fv exits 1 when it filters out ALL lines (empty crontab on a fresh box, or a
 # crontab holding only these managed lines). Under `set -euo pipefail` that would abort the subshell

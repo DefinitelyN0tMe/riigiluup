@@ -159,8 +159,9 @@ docker exec deploy-nginx-1 nginx -s reload     # edge re-resolves the api/web ad
 - **Monitoring / alerts:** the Telegram bot reports api startup, any import step that fails (an
   exception or a FAILED run), and, twice a day, any import job that has not landed data within
   about twice its schedule. `disk-alert.sh` warns at >85% disk; `backup.sh` alerts on a bad dump.
-  UptimeRobot watches `/healthz` (edge -> api -> DB). The weekly
-  `docker builder prune -af --filter until=168h` keeps build cache from filling the disk.
+  UptimeRobot watches `/healthz` (edge -> api -> DB). A daily
+  `docker builder prune -af --filter until=72h` keeps build cache from filling the disk (a busy
+  deploy week once left 12 GB of it).
 
 ## Rollback / incident response
 
