@@ -269,6 +269,19 @@ public class OgShellController {
                 () -> shell(null, null, "/initiatives"));
     }
 
+    /** Filtered views (?member=, ?billId=, ?q=, pairs) share one canonical: the bare list page. */
+    @GetMapping(value = "/speeches", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String speeches() {
+        return rendered("/speeches", CrawlerContent::speechesPage, () -> shell(null, null, "/speeches"));
+    }
+
+    @GetMapping(value = "/compare", produces = "text/html;charset=UTF-8")
+    @ResponseBody
+    public String compare() {
+        return rendered("/compare", CrawlerContent::comparePage, () -> shell(null, null, "/compare"));
+    }
+
     private final com.fasterxml.jackson.databind.ObjectMapper json = new com.fasterxml.jackson.databind.ObjectMapper();
     private volatile com.fasterxml.jackson.databind.JsonNode cachedDictionary;
     private volatile long dictionaryAt;

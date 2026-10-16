@@ -810,6 +810,38 @@ final class CrawlerContent {
         return new Page("Pöördumised — Riigiluup", "Riigikogule suunatud kollektiivsed pöördumised ja nende menetlus.", wrap(b), null);
     }
 
+    /** /speeches (any filter): what the stenogram search is, with the way into MPs and bills. */
+    static Page speechesPage() {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Täiskogu sõnavõtud</h1>")
+                .append("<p>Riigikogu täiskogu istungite stenogrammid alates XV koosseisu algusest (aprill 2023), ")
+                .append("otsitavad sõna, saadiku ja eelnõu järgi. Iga sõnavõtt on seotud istungi ja arutatud eelnõuga ning ")
+                .append("viitab ametlikule stenogrammile. Uued stenogrammid lisanduvad mõne tunni jooksul pärast avaldamist.</p>")
+                .append("<p>Saadiku sõnavõtud leiab tema profiililt: <a href=\"").append(SITE).append("/politicians\">kõik saadikud</a>. ")
+                .append("Eelnõu arutelu leiab eelnõu lehelt: <a href=\"").append(SITE).append("/legislation\">eelnõud</a>.</p></article>")
+                .append("<section lang=\"en\"><p>Searchable plenary stenograms of the Estonian parliament (Riigikogu) since April 2023, ")
+                .append("by word, MP and bill, each linked to the sitting, the bill under debate and the official stenogram.</p></section>")
+                .append("<section lang=\"ru\"><p>Стенограммы пленарных заседаний Рийгикогу с апреля 2023 года с поиском по слову, ")
+                .append("депутату и законопроекту; каждое выступление связано с заседанием, законопроектом и официальной стенограммой.</p></section>");
+        return new Page("Sõnavõtud — Riigiluup",
+                "Riigikogu täiskogu stenogrammid alates 2023: otsing sõna, saadiku ja eelnõu järgi.", wrap(b), null);
+    }
+
+    /** /compare (any pair): what the comparison does. */
+    static Page comparePage() {
+        StringBuilder b = new StringBuilder("<article lang=\"et\"><h1>Saadikute ja erakondade võrdlus</h1>")
+                .append("<p>Kahe saadiku või kahe erakonna kõrvutamine nimeliste hääletuste põhjal: kui sageli nad hääletasid ")
+                .append("samamoodi, kui sageli erinevalt ning millistel hiljutistel hääletustel nende valik lahknes. ")
+                .append("Iga hääletus viitab Riigikogu ametlikule andmetele.</p>")
+                .append("<p><a href=\"").append(SITE).append("/politicians\">Kõik saadikud</a> · <a href=\"").append(SITE)
+                .append("/methodology/agreement\">Kokkulangevuse metoodika</a></p></article>")
+                .append("<section lang=\"en\"><p>Side-by-side comparison of two MPs or two parties of the Estonian parliament ")
+                .append("by their roll-call votes: how often they voted the same way and where they differed.</p></section>")
+                .append("<section lang=\"ru\"><p>Сравнение двух депутатов или двух партий Рийгикогу по поимённым голосованиям: ")
+                .append("как часто они голосовали одинаково и где их выбор расходился.</p></section>");
+        return new Page("Võrdlus — Riigiluup",
+                "Kahe saadiku või erakonna võrdlus Riigikogu nimeliste hääletuste põhjal.", wrap(b), null);
+    }
+
     private static String roleEt(String role) {
         if (role == null) return null;
         return switch (role) {
