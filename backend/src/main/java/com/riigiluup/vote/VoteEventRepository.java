@@ -20,6 +20,10 @@ public interface VoteEventRepository extends JpaRepository<VoteEvent, UUID> {
     @org.springframework.data.jpa.repository.Query("select v.id from VoteEvent v")
     java.util.List<java.util.UUID> findAllIdsForSitemap();
 
+    /** Sitemap lastmod per vote: when it took place (a roll-call does not change afterwards). */
+    @org.springframework.data.jpa.repository.Query("select v.id, v.startedAt from VoteEvent v")
+    java.util.List<Object[]> findIdsWithDateForSitemap();
+
     /**
      * Votes first imported at or after {@code since}, with the linked bill id (may be null). Uses
      * imported_at, which is set once on insert, so re-upserting the refresh window does not count.

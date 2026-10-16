@@ -19,6 +19,10 @@ public interface LegislativeItemRepository extends JpaRepository<LegislativeItem
     @org.springframework.data.jpa.repository.Query("select i.id from LegislativeItem i")
     java.util.List<java.util.UUID> findAllIdsForSitemap();
 
+    /** Sitemap lastmod per bill: updated_at, which the importer only rewrites on a real change. */
+    @org.springframework.data.jpa.repository.Query("select i.id, i.updatedAt from LegislativeItem i")
+    java.util.List<Object[]> findIdsWithUpdatedForSitemap();
+
     /** Bills inserted or changed at or after {@code since} (change-detection only rewrites changed bills). */
     @Query("select i.id from LegislativeItem i where i.updatedAt >= :since")
     java.util.List<UUID> findIdsUpdatedSince(@Param("since") java.time.Instant since);

@@ -67,10 +67,12 @@ public class SitemapController {
         sb.append("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n");
 
         TOP_LEVEL.forEach(p -> loc(sb, p));
-        memberRepo.findAllSlugsForSitemap().forEach(s -> loc(sb, "/politicians/" + s));
-        voteRepo.findAllIdsForSitemap().forEach(id -> loc(sb, "/votes/" + id));
-        itemRepo.findAllIdsForSitemap().forEach(id -> loc(sb, "/legislation/" + id));
-        initiativeRepo.findAllIdsForSitemap().forEach(id -> loc(sb, "/initiatives/" + id));
+        // <lastmod> tells crawlers which of the ~12k pages actually changed, so new and updated
+        // votes, bills and profiles get re-crawled first instead of waiting their turn.
+        for (Object[] r : memberRepo.findSlugsWithLastVoteForSitemap()) loc(sb, "/politicians/" + r[0], r[1]);
+        for (Object[] r : voteRepo.findIdsWithDateForSitemap()) loc(sb, "/votes/" + r[0], r[1]);
+        for (Object[] r : itemRepo.findIdsWithUpdatedForSitemap()) loc(sb, "/legislation/" + r[0], r[1]);
+        for (Object[] r : initiativeRepo.findIdsWithLastEventForSitemap()) loc(sb, "/initiatives/" + r[0], r[1]);
 
         Set<GroupType> types = new HashSet<>();
         types.addAll(COMMITTEE_TYPES);
@@ -87,6 +89,24 @@ public class SitemapController {
 
     private static void loc(StringBuilder sb, String path) {
         sb.append("  <url><loc>").append(BASE).append(xmlEscape(path)).append("</loc></url>\n");
+    }
+
+    /** A URL with its last-modified date (W3C date, Tallinn day); no lastmod when unknown. */
+    static void loc(StringBuilder sb, String path, Object when) {
+        java.time.Instant t = toInstant(when);
+        sb.append("  <url><loc>").append(BASE).append(xmlEscape(path)).append("</loc>");
+        if (t != null) {
+            sb.append("<lastmod>").append(t.atZone(java.time.ZoneId.of("Europe/Tallinn")).toLocalDate()).append("</lastmod>");
+        }
+        sb.append("</url>\n");
+    }
+
+    private static java.time.Instant toInstant(Object o) {
+        if (o instanceof java.time.Instant i) return i;
+        if (o instanceof java.time.OffsetDateTime odt) return odt.toInstant();
+        if (o instanceof java.sql.Timestamp ts) return ts.toInstant();
+        if (o instanceof java.time.LocalDateTime ldt) return ldt.atZone(java.time.ZoneOffset.UTC).toInstant();
+        return null;
     }
 
     /** Slugs and UUIDs are URL-safe; still XML-escape defensively so no value can break the doc. */

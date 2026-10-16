@@ -21,6 +21,13 @@ public interface PlenaryMemberRepository extends JpaRepository<PlenaryMember, UU
     @org.springframework.data.jpa.repository.Query("select m.slug from PlenaryMember m where m.slug is not null")
     java.util.List<String> findAllSlugsForSitemap();
 
+    /** Sitemap lastmod per MP: the date of the latest roll-call vote they took part in (their profile changes with every vote). */
+    @org.springframework.data.jpa.repository.Query(value = "SELECT pm.slug, MAX(ve.started_at) FROM plenary_member pm "
+            + "LEFT JOIN individual_vote iv ON iv.plenary_member_id = pm.id "
+            + "LEFT JOIN vote_event ve ON ve.id = iv.vote_event_id "
+            + "WHERE pm.slug IS NOT NULL GROUP BY pm.slug", nativeQuery = true)
+    java.util.List<Object[]> findSlugsWithLastVoteForSitemap();
+
     Optional<PlenaryMember> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     Optional<PlenaryMember> findBySlug(String slug);

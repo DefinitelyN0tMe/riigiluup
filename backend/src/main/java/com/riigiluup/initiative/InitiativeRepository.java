@@ -18,6 +18,11 @@ public interface InitiativeRepository extends JpaRepository<Initiative, Long> {
     @org.springframework.data.jpa.repository.Query("select i.id from Initiative i")
     java.util.List<Long> findAllIdsForSitemap();
 
+    /** Sitemap lastmod per initiative: its latest recorded event (published, signed, sent, decided). */
+    @org.springframework.data.jpa.repository.Query(value = "SELECT id, GREATEST(published_at, last_signed_at, sent_to_parliament_at, "
+            + "finished_in_parliament_at, sent_to_government_at, finished_in_government_at) FROM initiative", nativeQuery = true)
+    java.util.List<Object[]> findIdsWithLastEventForSitemap();
+
     Optional<Initiative> findBySourceNameAndExternalId(String sourceName, String externalId);
 
     /** Reverse link for the bill page: "this act started as a citizen initiative". */
