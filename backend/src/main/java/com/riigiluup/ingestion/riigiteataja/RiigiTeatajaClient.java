@@ -53,7 +53,7 @@ public class RiigiTeatajaClient {
                 "general", Map.of(
                         "searchInTitle", true,
                         "searchInText", false,
-                        "searchText", title,
+                        "searchText", searchText(title),
                         "logicalOperator", "AND",
                         "morphSearch", false),
                 "precise", Map.of(
@@ -73,6 +73,26 @@ public class RiigiTeatajaClient {
             log.warn("RT search failed for '{}' @ {}: {}", title, publicationDate, e.toString());
             return Optional.empty();
         }
+    }
+
+    /** RT rejects longer search texts with 400 "Ei tohi ületada 200 tähemärki!". */
+    static final int MAX_SEARCH_CHARS = 200;
+
+    /**
+     * The title as RT accepts it: at most {@link #MAX_SEARCH_CHARS} characters, cut at a word
+     * boundary so no half word breaks the match. The search is AND over words in the title on one
+     * publication day, and {@link #findActId} still requires exactly one hit, so a shortened title
+     * never turns into a guess.
+     */
+    static String searchText(String title) {
+        String t = title.strip();
+        if (t.length() <= MAX_SEARCH_CHARS) return t;
+        String cut = t.substring(0, MAX_SEARCH_CHARS);
+        if (!Character.isWhitespace(t.charAt(MAX_SEARCH_CHARS))) {
+            int lastSpace = cut.lastIndexOf(' ');
+            if (lastSpace > 0) cut = cut.substring(0, lastSpace);
+        }
+        return cut.strip();
     }
 
     private long lastRequestNanos = -1L;
